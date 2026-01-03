@@ -23,6 +23,14 @@ const logger = new Logger('AppBootstrap');
 export async function createApp(): Promise<INestApplication> {
     dotenv.config();
     const bodyLimit = process.env.API_BODY_LIMIT || "25mb";
+    const isProduction = process.env.NODE_ENV === "production";
+    const frontendUrlRaw = process.env.FRONTEND_URL || "https://campreservweb-production.up.railway.app";
+    let frontendOrigin = frontendUrlRaw;
+    try {
+        frontendOrigin = new URL(frontendUrlRaw).origin;
+    } catch {
+        // Fall back to the raw value if it's not a valid URL.
+    }
 
     const app = await NestFactory.create(AppModule, {
         logger: new RedactingLogger(),
@@ -41,6 +49,10 @@ export async function createApp(): Promise<INestApplication> {
         "http://127.0.0.1:3000",
     ];
 
+    if (frontendOrigin && !allowedOrigins.includes(frontendOrigin)) {
+        allowedOrigins.push(frontendOrigin);
+    }
+
     // Add custom allowed origins from environment
     const envOrigins = process.env.CORS_ALLOWED_ORIGINS?.split(",").filter(Boolean) || [];
     allowedOrigins.push(...envOrigins);
@@ -57,25 +69,36 @@ export async function createApp(): Promise<INestApplication> {
                 return callback(null, true);
             }
 
+            let parsedOrigin: URL | null = null;
+            try {
+                parsedOrigin = new URL(origin);
+            } catch {
+                // Invalid URL, fall through to other checks.
+            }
+
+            if (parsedOrigin) {
+                const hostname = parsedOrigin.hostname;
+                // Allow Campreserv/Camp Everyday Railway hostnames (preview/prod).
+                if (
+                    hostname.endsWith(".up.railway.app") &&
+                    (hostname.includes("campreserv") || hostname.includes("camp-everyday"))
+                ) {
+                    return callback(null, true);
+                }
+            }
+
             // In development only, allow dev tunnels with strict patterns
             // SECURITY: Use exact patterns to prevent malicious subdomains
-            if (process.env.NODE_ENV !== "production") {
-                try {
-                    const url = new URL(origin);
+            if (!isProduction) {
+                if (parsedOrigin) {
                     // Only allow official ngrok domains (*.ngrok-free.app, *.ngrok.io)
-                    if (url.hostname.endsWith(".ngrok-free.app") || url.hostname.endsWith(".ngrok.io")) {
+                    if (parsedOrigin.hostname.endsWith(".ngrok-free.app") || parsedOrigin.hostname.endsWith(".ngrok.io")) {
                         return callback(null, true);
                     }
                     // Allow localhost with any port
-                    if (url.hostname === "localhost" || url.hostname === "127.0.0.1") {
+                    if (parsedOrigin.hostname === "localhost" || parsedOrigin.hostname === "127.0.0.1") {
                         return callback(null, true);
                     }
-                    // Allow Railway preview deployments (campreserv*.up.railway.app)
-                    if (url.hostname.endsWith(".up.railway.app") && url.hostname.includes("campreserv")) {
-                        return callback(null, true);
-                    }
-                } catch {
-                    // Invalid URL, fall through to rejection
                 }
                 // Allow any other origin in development for testing
                 return callback(null, true);
@@ -114,8 +137,7 @@ export async function createApp(): Promise<INestApplication> {
     app.use(cookieParserFn(process.env.COOKIE_SECRET || process.env.JWT_SECRET));
 
     // Security headers via helmet
-    const isProduction = process.env.NODE_ENV === "production";
-    const frontendUrl = process.env.FRONTEND_URL || "https://campreservweb-production.up.railway.app";
+    const frontendUrl = frontendOrigin;
 
     app.use(
         helmet({

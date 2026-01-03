@@ -64,6 +64,13 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(target);
   }
 
+  // Ensure finance overview resolves (legacy deep-link or prefetch)
+  if (pathname === "/finance/overview") {
+    const target = req.nextUrl.clone();
+    target.pathname = "/finance";
+    return NextResponse.rewrite(target);
+  }
+
   // Allow public paths and assets
   if (PUBLIC_PATHS.includes(pathname) || PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))) {
     return NextResponse.next();
