@@ -65,7 +65,13 @@ export function ProductModal({ open, onOpenChange, product, categories, onSave }
             await onSave({
                 ...formData,
                 priceCents: Number(formData.priceCents),
-                stockQty: Number(formData.stockQty)
+                stockQty: Number(formData.stockQty),
+                // Convert empty strings to null for optional fields
+                imageUrl: formData.imageUrl.trim() || null,
+                description: formData.description.trim() || null,
+                sku: formData.sku.trim() || null,
+                glCode: formData.glCode.trim() || null,
+                categoryId: formData.categoryId || null
             });
             onOpenChange(false);
         } catch (error) {

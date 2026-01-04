@@ -4503,6 +4503,7 @@ model OtaListingMapping {
   lastSyncAt  DateTime?
   lastError   String?
   icalToken   String?   @unique
+  icalTokenExpiresAt DateTime? // Tokens expire after 90 days for security
   icalUrl     String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt

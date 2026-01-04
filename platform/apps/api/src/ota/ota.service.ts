@@ -231,16 +231,42 @@ export class OtaService {
     return true;
   }
 
-  async ensureIcalToken(mappingId: string, campgroundId: string) {
-    const mapping = await this.requireMapping(campgroundId, mappingId, { id: true, icalToken: true });
-    if (mapping.icalToken) return mapping.icalToken;
+  private readonly ICAL_TOKEN_EXPIRY_DAYS = 90;
 
+  async ensureIcalToken(mappingId: string, campgroundId: string) {
+    const mapping = await this.requireMapping(campgroundId, mappingId, { id: true, icalToken: true, icalTokenExpiresAt: true });
+
+    // Return existing token if valid and not expired
+    if (mapping.icalToken && mapping.icalTokenExpiresAt && new Date(mapping.icalTokenExpiresAt) > new Date()) {
+      return mapping.icalToken;
+    }
+
+    // Generate new token with expiration
     const token = randomUUID();
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + this.ICAL_TOKEN_EXPIRY_DAYS);
+
     await (this.prisma as any).otaListingMapping.update({
       where: { id: mappingId },
-      data: { icalToken: token },
+      data: { icalToken: token, icalTokenExpiresAt: expiresAt },
     });
     return token;
+  }
+
+  async rotateIcalToken(mappingId: string, campgroundId: string) {
+    await this.requireMapping(campgroundId, mappingId, { id: true });
+
+    const token = randomUUID();
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + this.ICAL_TOKEN_EXPIRY_DAYS);
+
+    await (this.prisma as any).otaListingMapping.update({
+      where: { id: mappingId },
+      data: { icalToken: token, icalTokenExpiresAt: expiresAt },
+    });
+
+    this.logger.log(`Rotated iCal token for mapping ${mappingId}`);
+    return { token, expiresAt };
   }
 
   async setIcalUrl(mappingId: string, campgroundId: string, url: string) {
@@ -269,9 +295,15 @@ export class OtaService {
   async getIcsFeed(token: string) {
     const mapping = await (this.prisma as any).otaListingMapping.findFirst({
       where: { icalToken: token },
-      select: { id: true, siteId: true, channelId: true },
+      select: { id: true, siteId: true, channelId: true, icalTokenExpiresAt: true },
     });
     if (!mapping) throw new NotFoundException("Calendar not found");
+
+    // Check token expiration
+    if (mapping.icalTokenExpiresAt && new Date(mapping.icalTokenExpiresAt) < new Date()) {
+      throw new BadRequestException("Calendar token has expired. Please generate a new calendar link.");
+    }
+
     if (!mapping.siteId) throw new BadRequestException("Mapping is not linked to a site");
 
     const reservations = await (this.prisma as any).reservation.findMany({

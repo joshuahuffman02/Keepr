@@ -783,6 +783,12 @@ export const CreateProductCategorySchema = ProductCategorySchema.omit({
 });
 export type CreateProductCategoryDto = z.infer<typeof CreateProductCategorySchema>;
 
+// Helper to transform empty strings to null for optional URL fields
+const optionalUrl = z.preprocess(
+  (val) => (val === "" ? null : val),
+  z.string().url().nullish()
+);
+
 export const ProductSchema = z.object({
   id: z.string().cuid(),
   campgroundId: z.string().cuid(),
@@ -790,7 +796,7 @@ export const ProductSchema = z.object({
   name: z.string().min(1),
   description: z.string().nullish(),
   priceCents: z.number().int().nonnegative(),
-  imageUrl: z.string().url().nullish(),
+  imageUrl: optionalUrl,
   sku: z.string().nullish(),
   stockQty: z.number().int().nonnegative().nullish(),
   posStockQty: z.number().int().nonnegative().nullish(),

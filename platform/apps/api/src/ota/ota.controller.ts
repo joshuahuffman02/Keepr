@@ -107,6 +107,18 @@ export class OtaController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
+  @Post("mappings/:id/ical/rotate")
+  @Roles(UserRole.owner, UserRole.manager)
+  rotateIcalToken(
+    @Param("id") id: string,
+    @Query("campgroundId") campgroundId: string | undefined,
+    @Req() req: any
+  ) {
+    const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
+    return this.ota.rotateIcalToken(id, requiredCampgroundId);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
   @Post("mappings/:id/ical/url")
   @Roles(UserRole.owner, UserRole.manager)
   setIcalUrl(
