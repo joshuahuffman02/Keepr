@@ -23,7 +23,6 @@ importers:
     specifiers:
       '@aws-sdk/client-s3': ^3.948.0
       '@aws-sdk/s3-request-presigner': ^3.948.0
-      '@campreserv/shared': workspace:@keepr/shared@*
       '@codegenie/serverless-express': ^4.17.1
       '@google/adk': ^0.2.1
       '@jest/test-sequencer': ^29.7.0
@@ -104,7 +103,6 @@ importers:
     dependencies:
       '@aws-sdk/client-s3': 3.962.0
       '@aws-sdk/s3-request-presigner': 3.962.0
-      '@campreserv/shared': link:../../packages/shared
       '@codegenie/serverless-express': 4.17.1
       '@google/adk': 0.2.1_@opentelemetry+api@1.9.0
       '@keepr/shared': link:../../packages/shared
@@ -186,7 +184,6 @@ importers:
 
   platform/apps/web:
     specifiers:
-      '@campreserv/shared': workspace:@keepr/shared@*
       '@dnd-kit/core': ^6.3.1
       '@dnd-kit/sortable': ^10.0.0
       '@dnd-kit/utilities': ^3.2.2
@@ -261,7 +258,6 @@ importers:
       web-vitals: ^4.2.4
       zod: ^3.25.76
     dependencies:
-      '@campreserv/shared': link:../../packages/shared
       '@dnd-kit/core': 6.3.1_nnrd3gsncyragczmpvfhocinkq
       '@dnd-kit/sortable': 10.0.0_55ztycxty3xzw7t4rzpvix55vq
       '@dnd-kit/utilities': 3.2.2_react@18.3.1
