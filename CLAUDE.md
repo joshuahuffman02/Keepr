@@ -104,6 +104,10 @@ pnpm lint:web               # Lint web app
 3. **Multi-tenant isolation** - Always scope queries by `campgroundId`
 4. **Money in cents** - All amounts are integers (e.g., `9999` = $99.99)
 5. **No emojis** - Use Lucide SVG icons instead (professional and scalable)
+6. **Dockerfiles** - DO NOT modify or rename these files:
+   - `Dockerfile` = API service (NestJS)
+   - `Dockerfile.web` = Web service (Next.js)
+7. **railway.toml** - DO NOT add `dockerfilePath` - each Railway service configures this in dashboard
 
 ---
 
