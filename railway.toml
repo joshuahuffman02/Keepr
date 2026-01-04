@@ -2,6 +2,9 @@
 # Force Docker builds instead of Railpack to support pnpm workspaces
 builder = "DOCKERFILE"
 
+# Web uses the default Dockerfile
+dockerfilePath = "Dockerfile"
+
 # Cache pnpm store between builds for faster installs
 buildCacheMounts = ["/root/.local/share/pnpm/store"]
 

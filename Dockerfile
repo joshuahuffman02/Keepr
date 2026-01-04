@@ -1,5 +1,5 @@
-FROM node:lts-alpine AS base
-RUN echo "Build timestamp: $(date) - Docker Hub fix v10 scripts" && corepack enable && corepack prepare pnpm@7.33.6 --activate
+FROM node:22-alpine AS base
+RUN corepack enable && corepack prepare pnpm@7.33.6 --activate
 WORKDIR /app
 
 # Install dependencies
