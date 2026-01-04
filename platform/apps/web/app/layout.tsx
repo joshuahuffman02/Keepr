@@ -5,13 +5,14 @@ import ClientRoot from "./client-root";
 import { RootJsonLd } from "@/components/seo";
 import { SEO_CONFIG } from "@/lib/seo";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { fontVariables } from "@/lib/fonts";
 
 import { Metadata, Viewport } from "next";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SEO_CONFIG.siteUrl),
   title: {
-    template: "%s | Camp Everyday",
+    template: "%s | Keepr",
     default: SEO_CONFIG.defaultTitle,
   },
   description: SEO_CONFIG.defaultDescription,
@@ -26,9 +27,9 @@ export const metadata: Metadata = {
     apple: "/icons/icon-192.png",
   },
   applicationName: SEO_CONFIG.siteName,
-  authors: [{ name: "Camp Everyday Team" }],
-  creator: "Camp Everyday",
-  publisher: "Camp Everyday",
+  authors: [{ name: "Keepr Team" }],
+  creator: "Keepr",
+  publisher: "Keepr",
   formatDetection: {
     email: false,
     address: false,
@@ -81,7 +82,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className={fontVariables} suppressHydrationWarning>
       <head>
         <RootJsonLd />
         <link rel="dns-prefetch" href="//images.unsplash.com" />

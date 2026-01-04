@@ -792,19 +792,19 @@ export const ProductSchema = z.object({
   priceCents: z.number().int().nonnegative(),
   imageUrl: z.string().url().nullish(),
   sku: z.string().nullish(),
-  stockQty: z.number().int().nonnegative().optional(),
-  posStockQty: z.number().int().nonnegative().optional(),
-  onlineStockQty: z.number().int().nonnegative().optional(),
-  onlineBufferQty: z.number().int().nonnegative().optional(),
-  lowStockAlert: z.number().int().nonnegative().optional(),
-  trackInventory: z.boolean().optional(),
-  afterHoursAllowed: z.boolean().optional(),
-  channelInventoryMode: z.enum(["shared", "split"]).optional().default("shared"),
-  sortOrder: z.number().int().optional(),
+  stockQty: z.number().int().nonnegative().nullish(),
+  posStockQty: z.number().int().nonnegative().nullish(),
+  onlineStockQty: z.number().int().nonnegative().nullish(),
+  onlineBufferQty: z.number().int().nonnegative().nullish(),
+  lowStockAlert: z.number().int().nonnegative().nullish(),
+  trackInventory: z.boolean().nullish(),
+  afterHoursAllowed: z.boolean().nullish(),
+  channelInventoryMode: z.enum(["shared", "split"]).nullish().default("shared"),
+  sortOrder: z.number().int().nullish(),
   glCode: z.string().nullish(),
-  isActive: z.boolean().optional().default(true),
-  createdAt: z.string().optional(),
-  updatedAt: z.string().optional()
+  isActive: z.boolean().nullish().default(true),
+  createdAt: z.string().nullish(),
+  updatedAt: z.string().nullish()
 });
 export type Product = z.infer<typeof ProductSchema>;
 
