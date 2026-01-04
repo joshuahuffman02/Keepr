@@ -187,7 +187,7 @@ export default function ExplorePage() {
             <div className="flex items-center gap-4">
               <Link href="/" className="flex items-center gap-2">
                 <Tent className="h-6 w-6 text-emerald-600" />
-                <span className="font-bold text-xl">Camp Everyday</span>
+                <span className="font-bold text-xl">Keepr</span>
               </Link>
               <Badge variant="secondary">Explore</Badge>
             </div>

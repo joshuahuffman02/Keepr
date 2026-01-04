@@ -295,4 +295,4 @@ The most successful campground owners align their operational model with their l
 
 ---
 
-*Camp Everyday supports both seasonal and year-round operations with flexible pricing rules, seasonal date management, and long-term booking options. [Configure your seasons at campreserv.com](https://campreserv.com)*
+*Keepr supports both seasonal and year-round operations with flexible pricing rules, seasonal date management, and long-term booking options. [Configure your seasons at campreserv.com](https://campreserv.com)*

@@ -88,4 +88,4 @@ You set the rules—pricing, minimums, policies. The system enforces them automa
 
 ---
 
-*Camp Everyday's online booking is designed for campgrounds—intuitive for guests, powerful for owners. [Start booking online at campreserv.com](https://campreserv.com)*
+*Keepr's online booking is designed for campgrounds—intuitive for guests, powerful for owners. [Start booking online at campreserv.com](https://campreserv.com)*

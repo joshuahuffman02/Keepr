@@ -465,7 +465,7 @@ export class AiNoShowPredictionService {
 
         <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e2e8f0;">
           <p style="color: #94a3b8; font-size: 11px; margin: 0;">
-            ${campground?.name} • Powered by Camp Everyday
+            ${campground?.name} • Powered by Keepr
           </p>
         </div>
       </div>

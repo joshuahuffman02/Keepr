@@ -47,7 +47,7 @@ async function reverseGeocode(lat: number, lon: number): Promise<GeoResult | nul
       {
         headers: {
           'Accept-Language': 'en-US,en',
-          'User-Agent': 'CampEveryday/1.0 (contact@campeveryday.com)'
+          'User-Agent': 'Keepr/1.0 (contact@keeprstay.com)'
         }
       }
     );

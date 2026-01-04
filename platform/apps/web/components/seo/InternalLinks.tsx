@@ -238,7 +238,7 @@ export function SEOFooterLinks({ sections, className }: SEOFooterLinksProps) {
 }
 
 /**
- * Default footer link sections for Camp Everyday
+ * Default footer link sections for Keepr
  */
 export const DEFAULT_FOOTER_SECTIONS: FooterLinksSection[] = [
   {

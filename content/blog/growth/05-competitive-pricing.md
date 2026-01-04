@@ -321,4 +321,4 @@ Start with solid research, set thoughtful initial rates, and adjust based on res
 
 ---
 
-*Camp Everyday makes pricing management easy with seasonal rate automation, site-type pricing, and revenue reporting. [Optimize your pricing at campreserv.com](https://campreserv.com)*
+*Keepr makes pricing management easy with seasonal rate automation, site-type pricing, and revenue reporting. [Optimize your pricing at campreserv.com](https://campreserv.com)*

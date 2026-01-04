@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api";
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://app.campeveryday.com";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://app.keeprstay.com";
 
 interface ReferralStats {
   referralCode: string;
@@ -127,12 +127,12 @@ export default function ReferralsPage() {
 
   const handleShare = (platform: "email" | "twitter" | "facebook") => {
     const message = encodeURIComponent(
-      "I've been using Camp Everyday to manage my campground and it's been great! Sign up with my referral link and we both get a $50 credit:"
+      "I've been using Keepr to manage my campground and it's been great! Sign up with my referral link and we both get a $50 credit:"
     );
     const link = encodeURIComponent(displayData.referralLink);
 
     const urls: Record<string, string> = {
-      email: `mailto:?subject=${encodeURIComponent("Try Camp Everyday - Campground Management Software")}&body=${message}%0A%0A${link}`,
+      email: `mailto:?subject=${encodeURIComponent("Try Keepr - Campground Management Software")}&body=${message}%0A%0A${link}`,
       twitter: `https://twitter.com/intent/tweet?text=${message}&url=${link}`,
       facebook: `https://www.facebook.com/sharer/sharer.php?u=${link}&quote=${message}`
     };
@@ -295,7 +295,7 @@ export default function ReferralsPage() {
                 </div>
                 <h3 className="font-semibold text-foreground mb-1">2. They Sign Up</h3>
                 <p className="text-sm text-muted-foreground">
-                  Your friend joins Camp Everyday and sets up their campground
+                  Your friend joins Keepr and sets up their campground
                 </p>
               </div>
 

@@ -1,8 +1,8 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "About Us - Camp Everyday",
-    description: "Learn about Camp Everyday - the platform connecting outdoor enthusiasts with amazing campgrounds.",
+    title: "About Us - Keepr",
+    description: "Learn about Keepr - the platform connecting outdoor enthusiasts with amazing campgrounds.",
 };
 
 export default function AboutPage() {
@@ -12,7 +12,7 @@ export default function AboutPage() {
                 {/* Header */}
                 <div className="text-center mb-16">
                     <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-                        About Camp Everyday
+                        About Keepr
                     </h1>
                     <p className="text-lg text-slate-600 max-w-2xl mx-auto">
                         We're on a mission to make camping accessible and enjoyable for everyone.
@@ -24,13 +24,13 @@ export default function AboutPage() {
                     <h2 className="text-2xl font-bold text-slate-900 mb-6">Our Story</h2>
                     <div className="prose prose-slate max-w-none">
                         <p className="text-slate-600 mb-4">
-                            Camp Everyday was founded with a simple belief: that the great outdoors should be
+                            Keepr was founded with a simple belief: that the great outdoors should be
                             accessible to everyone. We&apos;ve built a platform that connects campers with amazing
                             campgrounds while giving campground owners the tools they need to succeed.
                         </p>
                         <p className="text-slate-600 mb-4">
                             Whether you&apos;re a first-time camper looking for the perfect spot or a seasoned RVer
-                            planning your next adventure, Camp Everyday makes it easy to find, book, and enjoy
+                            planning your next adventure, Keepr makes it easy to find, book, and enjoy
                             your outdoor experience.
                         </p>
                         <p className="text-slate-600">

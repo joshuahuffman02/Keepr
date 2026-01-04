@@ -91,6 +91,7 @@ export default function MessagesPage() {
     const [overdueNotified, setOverdueNotified] = useState(false);
     const [sendSuccess, setSendSuccess] = useState(false);
     const [showGuestInfo, setShowGuestInfo] = useState(true);
+    const [showStats, setShowStats] = useState(false); // Hidden by default to maximize message space
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     // Compose message state
@@ -789,7 +790,7 @@ export default function MessagesPage() {
 
     return (
         <DashboardShell density="full">
-            <div className="space-y-4 pb-24 md:pb-10" id="messages-shell">
+            <div className="space-y-4 pb-4" id="messages-shell">
                 <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -1056,7 +1057,7 @@ export default function MessagesPage() {
                     </motion.div>
                 )}
 
-                <div className="flex flex-col gap-4 lg:flex-row lg:h-[calc(100vh-12rem)]">
+                <div className="flex flex-col gap-4 lg:flex-row lg:h-[calc(100vh-18rem)] lg:min-h-[500px]">
                 {/* Sidebar */}
                 <Card className="w-full lg:w-80 flex flex-col">
                     <CardHeader className="pb-3">

@@ -1107,7 +1107,7 @@ model Organization {
   referralsGiven    OrgReferral[] @relation("ReferrerOrg")
   referralsReceived OrgReferral[] @relation("ReferredOrg")
 
-  // Organization billing (what Camp Everyday charges them)
+  // Organization billing (what Keepr charges them)
   billingPeriods OrganizationBillingPeriod[]
   usageEvents    UsageEvent[]
   setupServices  SetupService[]
@@ -7721,7 +7721,7 @@ model EarlyAccessSpot {
 }
 
 // =============================================================================
-// ORGANIZATION BILLING (What Camp Everyday charges campgrounds)
+// ORGANIZATION BILLING (What Keepr charges campgrounds)
 // =============================================================================
 
 enum OrgBillingPeriodStatus {

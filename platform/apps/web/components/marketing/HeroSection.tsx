@@ -124,7 +124,7 @@ export function HeroSection() {
               <div className="aspect-[4/3] relative bg-muted">
                 <Image
                   src="/images/owners/dashboard-preview.png"
-                  alt="Camp Everyday Host Dashboard"
+                  alt="Keepr Host Dashboard"
                   fill
                   className="object-cover"
                   priority

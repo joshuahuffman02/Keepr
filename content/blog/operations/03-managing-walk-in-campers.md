@@ -272,4 +272,4 @@ The key is being prepared: know your availability instantly, make check-in fast 
 
 ---
 
-*Camp Everyday's check-in features include real-time availability, quick registration, and self-service kiosk options—making walk-in management effortless. [See it in action at campreserv.com](https://campreserv.com)*
+*Keepr's check-in features include real-time availability, quick registration, and self-service kiosk options—making walk-in management effortless. [See it in action at campreserv.com](https://campreserv.com)*

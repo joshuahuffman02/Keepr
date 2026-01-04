@@ -145,7 +145,7 @@ export default function ClaimCampgroundPage({
       <header className="bg-white border-b border-slate-200">
         <div className="max-w-4xl mx-auto px-6 py-4">
           <Link href="/" className="text-xl font-bold text-emerald-600">
-            Camp Everyday
+            Keepr
           </Link>
         </div>
       </header>
@@ -208,7 +208,7 @@ export default function ClaimCampgroundPage({
                 Claim Your Campground
               </h1>
               <p className="text-slate-600">
-                Verify your ownership to manage your listing on Camp Everyday
+                Verify your ownership to manage your listing on Keepr
               </p>
             </div>
 

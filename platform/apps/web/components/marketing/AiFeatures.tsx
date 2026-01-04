@@ -15,7 +15,7 @@ export function AiFeatures() {
                         Smarter Camping, <span className="text-emerald-400">Private by Design</span>
                     </h2>
                     <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-                        Camp Everyday uses AI to help you find the perfect site and get answers faster.
+                        Keepr uses AI to help you find the perfect site and get answers faster.
                         But we never compromise on your privacy.
                     </p>
                 </div>
@@ -53,7 +53,7 @@ export function AiFeatures() {
                         </div>
                         <h3 className="text-xl font-bold text-white mb-3">You're in Control</h3>
                         <p className="text-muted-foreground">
-                            AI features are optional. You can use Camp Everyday without any AI assistance, or turn specific features on and off anytime.
+                            AI features are optional. You can use Keepr without any AI assistance, or turn specific features on and off anytime.
                         </p>
                     </div>
                 </div>

@@ -86,6 +86,12 @@ export function HomeClient() {
     const router = useRouter();
     const pathname = usePathname();
 
+    // Track hydration to prevent SSR/client mismatches
+    const [hasMounted, setHasMounted] = useState(false);
+    useEffect(() => {
+        setHasMounted(true);
+    }, []);
+
     // Initialize state from URL params
     const [searchQuery, setSearchQuery] = useState("");
     const [stateFilter, setStateFilter] = useState<string>(searchParams.get("state") || "");
@@ -157,8 +163,10 @@ export function HomeClient() {
         queryFn: () => apiClient.getPublicCampgrounds()
     });
 
-    // Fetch public events when events category is active
-    const { startDate, endDate } = getDateRange(dateRangeFilter);
+    // Calculate date range only after mount to prevent hydration mismatch
+    const { startDate, endDate } = hasMounted ? getDateRange(dateRangeFilter) : { startDate: undefined, endDate: undefined };
+
+    // Fetch public events when events category is active (only after mount)
     const { data: eventsData, isLoading: eventsLoading } = useQuery({
         queryKey: ["public-events", stateFilter, eventTypeFilter, startDate, endDate],
         queryFn: () => apiClient.searchPublicEvents({
@@ -168,7 +176,7 @@ export function HomeClient() {
             endDate: endDate,
             limit: 100
         }),
-        enabled: activeCategory === "events"
+        enabled: hasMounted && activeCategory === "events"
     });
 
     // Filter campgrounds from our database
@@ -339,7 +347,9 @@ export function HomeClient() {
     // Scroll animation refs
     const featuredRef = useRef(null);
     const featuredInView = useInView(featuredRef, { once: true, margin: "-100px" });
-    const prefersReducedMotion = useReducedMotion();
+    const prefersReducedMotionValue = useReducedMotion();
+    // Only use reduced motion after mount to prevent hydration mismatch
+    const prefersReducedMotion = hasMounted ? prefersReducedMotionValue : true;
 
     return (
         <div className="min-h-screen">
@@ -461,7 +471,7 @@ export function HomeClient() {
                                     onClick={() => setSearchQuery("")}
                                     className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                                 >
-                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg className="h-4 w-4" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                     </svg>
                                 </button>
@@ -690,7 +700,7 @@ export function HomeClient() {
                             transition={{ delay: 0.5 }}
                         >
                             <p className="text-slate-500 text-sm flex items-center justify-center gap-2">
-                                <svg className="w-5 h-5 text-emerald-500 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="w-5 h-5 text-emerald-500 animate-bounce" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6" />
                                 </svg>
                                 Finding your perfect outdoor escape...
@@ -881,10 +891,10 @@ export function HomeClient() {
                 </div>
             </section>
 
-            {/* Charity Impact Section - The heart of Camp Everyday */}
+            {/* Charity Impact Section - The heart of Keepr */}
             <CharityImpactSection />
 
-            {/* Value Stack - Why Book With Camp Everyday (condensed) */}
+            {/* Value Stack - Why Book With Keepr (condensed) */}
             <ValueStack />
         </div>
     );

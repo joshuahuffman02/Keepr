@@ -31,7 +31,7 @@ export interface FeatureTour {
 export const FEATURE_TOURS: FeatureTour[] = [
   {
     id: "dashboard-welcome",
-    name: "Welcome to Camp Everyday",
+    name: "Welcome to Keepr",
     description: "A quick overview of your dashboard",
     version: 1,
     trigger: "first_login",
@@ -165,7 +165,7 @@ export const FEATURE_TOURS: FeatureTour[] = [
       {
         id: "intro",
         title: "Refer & Earn $50",
-        content: "Know other campground owners? Refer them to Camp Everyday and you both get $50 in credits!",
+        content: "Know other campground owners? Refer them to Keepr and you both get $50 in credits!",
         placement: "center"
       },
       {

@@ -132,13 +132,13 @@ export default async function LocationPage({
         "@type": "ListItem",
         position: 1,
         name: "Camping",
-        item: "https://campeveryday.com/camping",
+        item: "https://keeprstay.com/camping",
       },
       ...(location.breadcrumbs || []).map((bc, index) => ({
         "@type": "ListItem",
         position: index + 2,
         name: bc.name,
-        item: `https://campeveryday.com/camping/${bc.slug}`,
+        item: `https://keeprstay.com/camping/${bc.slug}`,
       })),
     ],
   };

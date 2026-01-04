@@ -190,7 +190,7 @@ export default async function CampgroundPage({
             {campground.isComingSoon && (
               <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-500/20 border border-blue-500/30 rounded-full text-blue-300 text-sm mb-4">
                 <Clock className="h-4 w-4" />
-                Coming Soon to Camp Everyday
+                Coming Soon to Keepr
               </div>
             )}
 
@@ -529,7 +529,7 @@ export default async function CampgroundPage({
               >
                 Recreation.gov
               </a>
-              . Camp Everyday is not affiliated with or endorsed by the U.S. Government.
+              . Keepr is not affiliated with or endorsed by the U.S. Government.
             </p>
           </div>
         </section>

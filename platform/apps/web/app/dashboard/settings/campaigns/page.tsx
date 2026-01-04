@@ -217,7 +217,7 @@ export default function CampaignsPage() {
               </div>
               <div className="space-y-1">
                 <Label>Subject</Label>
-                <Input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Welcome to Camp Everyday" />
+                <Input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Welcome to Keepr" />
               </div>
               <div className="space-y-1">
                 <Label>Channel</Label>
@@ -241,7 +241,7 @@ export default function CampaignsPage() {
                 </div>
                 <div className="space-y-1">
                   <Label>From name (optional)</Label>
-                  <Input value={fromName} onChange={(e) => setFromName(e.target.value)} placeholder="Camp Everyday Team" />
+                  <Input value={fromName} onChange={(e) => setFromName(e.target.value)} placeholder="Keepr Team" />
                 </div>
               </div>
               <div className="space-y-1">

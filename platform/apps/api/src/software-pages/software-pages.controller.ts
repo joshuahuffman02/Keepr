@@ -48,8 +48,8 @@ export class PublicSoftwarePagesController {
     return {
       competitor: comparison.competitorName,
       slug: comparison.competitorSlug,
-      metaTitle: `${comparison.competitorName} Alternative | Camp Everyday vs ${comparison.competitorName}`,
-      metaDescription: `Looking for a ${comparison.competitorName} alternative? Compare features, pricing, and see why campgrounds are switching to Camp Everyday.`,
+      metaTitle: `${comparison.competitorName} Alternative | Keepr vs ${comparison.competitorName}`,
+      metaDescription: `Looking for a ${comparison.competitorName} alternative? Compare features, pricing, and see why campgrounds are switching to Keepr.`,
       ...comparison,
     };
   }
@@ -74,7 +74,7 @@ export class PublicSoftwarePagesController {
 
     return {
       ...page,
-      metaTitle: `${page.title} | Camp Everyday`,
+      metaTitle: `${page.title} | Keepr`,
       metaDescription: page.description,
     };
   }

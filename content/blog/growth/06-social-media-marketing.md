@@ -92,4 +92,4 @@ This guide covers how to build a social media presence that drives bookings.
 
 ---
 
-*Camp Everyday integrates with your marketing by providing booking links and guest data. [Build your presence at campreserv.com](https://campreserv.com)*
+*Keepr integrates with your marketing by providing booking links and guest data. [Build your presence at campreserv.com](https://campreserv.com)*

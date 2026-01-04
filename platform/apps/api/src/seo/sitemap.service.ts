@@ -30,7 +30,7 @@ export class SitemapService {
   private cache: Map<string, { data: string; timestamp: number }> = new Map();
 
   constructor(private readonly prisma: PrismaService) {
-    this.baseUrl = process.env.PUBLIC_URL || "https://campeveryday.com";
+    this.baseUrl = process.env.PUBLIC_URL || "https://keeprstay.com";
   }
 
   /**

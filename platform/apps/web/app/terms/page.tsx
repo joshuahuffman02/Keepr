@@ -1,8 +1,8 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "Terms of Service - Camp Everyday",
-    description: "Camp Everyday Terms of Service - Rules and guidelines for using our platform.",
+    title: "Terms of Service - Keepr",
+    description: "Keepr Terms of Service - Rules and guidelines for using our platform.",
 };
 
 export default function TermsPage() {
@@ -20,7 +20,7 @@ export default function TermsPage() {
                     <section className="mb-8">
                         <h2 className="text-2xl font-bold text-slate-900 mb-4">Acceptance of Terms</h2>
                         <p className="text-slate-600">
-                            By accessing or using Camp Everyday&apos;s website and services, you agree to be bound
+                            By accessing or using Keepr&apos;s website and services, you agree to be bound
                             by these Terms of Service. If you do not agree to these terms, please do not use
                             our services.
                         </p>
@@ -29,7 +29,7 @@ export default function TermsPage() {
                     <section className="mb-8">
                         <h2 className="text-2xl font-bold text-slate-900 mb-4">Services Description</h2>
                         <p className="text-slate-600">
-                            Camp Everyday provides an online platform that connects travelers with campground
+                            Keepr provides an online platform that connects travelers with campground
                             owners. We facilitate reservations but are not responsible for the campgrounds
                             themselves or the services they provide.
                         </p>
@@ -78,8 +78,8 @@ export default function TermsPage() {
                     <section className="mb-8">
                         <h2 className="text-2xl font-bold text-slate-900 mb-4">Intellectual Property</h2>
                         <p className="text-slate-600">
-                            All content on Camp Everyday, including text, graphics, logos, and software,
-                            is the property of Camp Everyday or its licensors and is protected by
+                            All content on Keepr, including text, graphics, logos, and software,
+                            is the property of Keepr or its licensors and is protected by
                             intellectual property laws.
                         </p>
                     </section>
@@ -87,7 +87,7 @@ export default function TermsPage() {
                     <section className="mb-8">
                         <h2 className="text-2xl font-bold text-slate-900 mb-4">Limitation of Liability</h2>
                         <p className="text-slate-600">
-                            Camp Everyday is not liable for any indirect, incidental, special, or
+                            Keepr is not liable for any indirect, incidental, special, or
                             consequential damages arising from your use of our services. Our total
                             liability shall not exceed the amount you paid for the specific service
                             giving rise to the claim.
@@ -119,7 +119,7 @@ export default function TermsPage() {
                         </p>
                         <div className="mt-4 p-4 bg-slate-50 rounded-lg">
                             <p className="text-slate-700">
-                                <strong>Email:</strong> legal@campeveryday.com<br />
+                                <strong>Email:</strong> legal@keeprstay.com<br />
                                 <strong>Phone:</strong> (800) 555-CAMP<br />
                                 <strong>Address:</strong> 123 Adventure Lane, Boulder, CO 80301
                             </p>

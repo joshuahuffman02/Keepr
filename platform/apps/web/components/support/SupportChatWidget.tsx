@@ -280,7 +280,7 @@ export function SupportChatWidget() {
           id: "welcome",
           role: "assistant",
           content:
-            "Hi! I'm here to help with any questions about Camp Everyday. What can I help you with today?\n\nI can assist with:\n- Setting up your campground\n- Payment and billing questions\n- Managing reservations\n- Using specific features\n\nJust ask away!",
+            "Hi! I'm here to help with any questions about Keepr. What can I help you with today?\n\nI can assist with:\n- Setting up your campground\n- Payment and billing questions\n- Managing reservations\n- Using specific features\n\nJust ask away!",
         },
       ]);
     }
@@ -360,7 +360,7 @@ export function SupportChatWidget() {
             "Sorry, I encountered an error. You can still get help by:\n\n" +
             "- Checking our Help Center\n" +
             "- Submitting a support ticket\n" +
-            "- Emailing support@campeveryday.com",
+            "- Emailing support@keeprstay.com",
           showTicketPrompt: true,
         },
       ]);

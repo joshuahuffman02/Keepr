@@ -5,8 +5,8 @@ import { PublicHeader } from "../../components/public/PublicHeader";
 import { getAllPosts, getCategories, getDebugInfo } from "../../lib/blog";
 
 export const metadata: Metadata = {
-  title: "Blog - Camp Everyday",
-  description: "Camping tips, destination guides, and industry insights from Camp Everyday.",
+  title: "Blog - Keepr",
+  description: "Camping tips, destination guides, and industry insights from Keepr.",
 };
 
 // Map categories to icons/labels
@@ -53,7 +53,7 @@ export default function BlogPage() {
         <div className="relative max-w-7xl mx-auto px-6 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 rounded-full border border-emerald-500/20 mb-8 backdrop-blur-sm">
             <BookOpen className="w-4 h-4 text-emerald-400" />
-            <span className="text-sm font-medium text-emerald-300">The Camp Everyday Blog</span>
+            <span className="text-sm font-medium text-emerald-300">The Keepr Blog</span>
           </div>
 
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
@@ -138,7 +138,7 @@ export default function BlogPage() {
                   >
                     <div className="p-8 flex-1 flex flex-col">
                       <div className="flex items-center gap-3 text-xs font-semibold text-slate-400 mb-4 uppercase tracking-wider">
-                        <span>Camp Everyday</span>
+                        <span>Keepr</span>
                         <span>•</span>
                         <span>{Math.ceil(post.content.split(/\s+/).length / 200)} min</span>
                       </div>
@@ -173,7 +173,7 @@ export default function BlogPage() {
               Ready to transform your campground?
             </h2>
             <p className="text-lg text-slate-300 mb-10">
-              Join hundreds of campground owners who use Camp Everyday to save time and increase bookings.
+              Join hundreds of campground owners who use Keepr to save time and increase bookings.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
@@ -205,7 +205,7 @@ export default function BlogPage() {
                     <path d="M2 20h20" />
                   </svg>
                 </div>
-                <span className="text-xl font-bold">Camp Everyday</span>
+                <span className="text-xl font-bold">Keepr</span>
               </div>
               <p className="text-slate-400 text-sm">
                 Discover and book the perfect campground for your next adventure.
@@ -245,7 +245,7 @@ export default function BlogPage() {
 
           <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-sm text-slate-500">
-              © {new Date().getFullYear()} Camp Everyday. All rights reserved.
+              © {new Date().getFullYear()} Keepr. All rights reserved.
             </p>
           </div>
         </div>

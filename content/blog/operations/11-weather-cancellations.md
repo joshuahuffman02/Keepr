@@ -292,4 +292,4 @@ A clear, written policy applied consistently creates trust. Guests who know you'
 
 ---
 
-*Camp Everyday allows you to configure weather-related booking rules and quickly process credits or refunds when conditions warrant. [Manage the unexpected at campreserv.com](https://campreserv.com)*
+*Keepr allows you to configure weather-related booking rules and quickly process credits or refunds when conditions warrant. [Manage the unexpected at campreserv.com](https://campreserv.com)*

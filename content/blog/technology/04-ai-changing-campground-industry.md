@@ -87,4 +87,4 @@ You don't need to become a tech expert:
 
 ---
 
-*Camp Everyday incorporates AI-powered features for pricing, guest communication, and business insights. [Explore the future at campreserv.com](https://campreserv.com)*
+*Keepr incorporates AI-powered features for pricing, guest communication, and business insights. [Explore the future at campreserv.com](https://campreserv.com)*

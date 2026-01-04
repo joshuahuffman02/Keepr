@@ -52,7 +52,7 @@ export function DemoCTA() {
         });
       }, 5000);
     } catch (err) {
-      setError('Something went wrong. Please try again or email us directly at sales@campeveryday.com');
+      setError('Something went wrong. Please try again or email us directly at sales@keeprstay.com');
       console.error('Demo request error:', err);
     } finally {
       setLoading(false);
@@ -90,7 +90,7 @@ export function DemoCTA() {
               Ready to modernize your campground?
             </h2>
             <p className="text-xl text-emerald-50 mb-8">
-              See how Camp Everyday can streamline your operations with AI-powered tools,
+              See how Keepr can streamline your operations with AI-powered tools,
               guest loyalty programs, and integrated staff scheduling.
             </p>
 
@@ -132,7 +132,7 @@ export function DemoCTA() {
                 </p>
                 <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-sm text-emerald-800">
                   <strong>What happens next:</strong><br />
-                  Your request has been sent to our sales team at <strong>sales@campeveryday.com</strong>.
+                  Your request has been sent to our sales team at <strong>sales@keeprstay.com</strong>.
                   You'll receive a confirmation email shortly, followed by a call from our onboarding specialist.
                 </div>
               </div>
@@ -140,7 +140,7 @@ export function DemoCTA() {
               <>
                 <h3 className="text-2xl font-bold text-foreground mb-2">Get a Free Demo</h3>
                 <p className="text-muted-foreground mb-6">
-                  See how Camp Everyday Host can work for your campground.
+                  See how Keepr Host can work for your campground.
                 </p>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -270,7 +270,7 @@ export function DemoCTA() {
                   </Button>
 
                   <p className="text-xs text-muted-foreground text-center">
-                    By submitting this form, you agree to receive communications from Camp Everyday Host.
+                    By submitting this form, you agree to receive communications from Keepr Host.
                   </p>
                 </form>
               </>

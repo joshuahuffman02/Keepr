@@ -1,5 +1,5 @@
 # Acquisition Exit Strategy
-## Camp Everyday - Path to $1M+ Exit
+## Keepr - Path to $1M+ Exit
 
 **Goal**: Be acquired by a larger campground management system company for enough to net **$1,000,000+ after taxes**.
 
@@ -54,7 +54,7 @@ Assuming sale structured as asset sale or stock sale with long-term capital gain
 
 ---
 
-## What Makes Camp Everyday Acquirable
+## What Makes Keepr Acquirable
 
 ### Assets of Value
 
@@ -111,7 +111,7 @@ Assuming sale structured as asset sale or stock sale with long-term capital gain
 
 1. **Win Their Customers**
    - Every customer you take from Campspot = they notice you
-   - Case studies: "Switched from [Competitor] to Camp Everyday"
+   - Case studies: "Switched from [Competitor] to Keepr"
    - SEO for "[Competitor] alternative"
 
 2. **Industry Presence**
@@ -250,7 +250,7 @@ Assuming sale structured as asset sale or stock sale with long-term capital gain
 
 ### Immediate (This Month)
 1. [ ] Set up proper analytics tracking
-2. [ ] Register trademark for "Camp Everyday"
+2. [ ] Register trademark for "Keepr"
 3. [ ] Ensure Delaware C-Corp structure (or convert)
 4. [ ] Start building relationships at industry events
 5. [ ] Create SEO content targeting "[competitor] alternative"

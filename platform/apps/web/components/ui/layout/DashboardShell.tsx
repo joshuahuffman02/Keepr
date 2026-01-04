@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
@@ -844,9 +843,6 @@ export function DashboardShell({ children, className, title, subtitle, density =
         >
           <div className="px-4 py-4 border-b border-border flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="relative w-8 h-8">
-                <Image src="/logo.png" alt="Camp Everyday" fill sizes="32px" className="object-contain" />
-              </div>
               <span className="font-semibold text-sm text-foreground">Navigate</span>
             </div>
             <button
@@ -926,19 +922,7 @@ export function DashboardShell({ children, className, title, subtitle, density =
             collapsed ? "w-16 items-center" : "w-64"
           )}
         >
-          <div className={cn("w-full border-b border-border flex items-center", collapsed ? "justify-center p-3" : "justify-between p-4 gap-2")}>
-            {collapsed ? (
-              <div className="relative w-8 h-8">
-                <Image src="/logo.png" alt="Camp Everyday" fill sizes="32px" className="object-contain" />
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <div className="relative w-8 h-8">
-                  <Image src="/logo.png" alt="Camp Everyday" fill sizes="32px" className="object-contain" />
-                </div>
-                <div className="text-lg font-semibold text-foreground">Camp Everyday</div>
-              </div>
-            )}
+          <div className={cn("w-full border-b border-border flex items-center", collapsed ? "justify-center p-3" : "justify-end p-3")}>
             <button
               className="rounded-md border border-border bg-muted p-2 text-muted-foreground hover:bg-muted/80 hover:text-foreground"
               onClick={() => {

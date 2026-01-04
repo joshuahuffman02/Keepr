@@ -311,4 +311,4 @@ Invest the time upfront to train properly, create solid reference materials, and
 
 ---
 
-*Camp Everyday is designed to be intuitive for staff, with minimal training required for daily operations. When you do need help, our support team is ready to assist with training and onboarding. [Learn more at campreserv.com](https://campreserv.com)*
+*Keepr is designed to be intuitive for staff, with minimal training required for daily operations. When you do need help, our support team is ready to assist with training and onboarding. [Learn more at campreserv.com](https://campreserv.com)*

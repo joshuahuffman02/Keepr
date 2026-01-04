@@ -190,7 +190,7 @@ export default async function CampgroundsIndexPage() {
         </h2>
         <div className="prose prose-slate max-w-none">
           <p>
-            Camp Everyday makes it easy to discover and book campgrounds across the
+            Keepr makes it easy to discover and book campgrounds across the
             United States. Whether you're planning a family RV trip, a romantic cabin
             getaway, or a rustic tent camping adventure, we have options for every
             type of camper.
@@ -214,7 +214,7 @@ export default async function CampgroundsIndexPage() {
               and safari tents
             </li>
           </ul>
-          <h3>Why Book with Camp Everyday?</h3>
+          <h3>Why Book with Keepr?</h3>
           <ul>
             <li>Instant confirmation on all bookings</li>
             <li>Verified guest reviews and ratings</li>

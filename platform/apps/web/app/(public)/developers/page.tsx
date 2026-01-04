@@ -16,7 +16,7 @@ const developerFaqs = [
   },
   {
     question: "Is the API free to use?",
-    answer: "API access is included with all Camp Everyday plans. Usage limits vary by plan tier.",
+    answer: "API access is included with all Keepr plans. Usage limits vary by plan tier.",
   },
   {
     question: "What authentication method does the API use?",

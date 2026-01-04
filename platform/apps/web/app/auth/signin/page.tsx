@@ -50,17 +50,16 @@ export default function SignInPage() {
     <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="w-full max-w-md space-y-8 p-8">
         <div className="text-center">
-          <div className="relative w-24 h-24 mx-auto mb-4">
+          <div className="flex justify-center mb-4">
             <Image
-              src="/logo.png"
-              alt="Camp Everyday"
-              fill
-              sizes="96px"
+              src="/images/logo/keepr-logo.png"
+              alt="Keepr"
+              width={180}
+              height={48}
               className="object-contain"
               priority
             />
           </div>
-          <h1 className="text-3xl font-bold">Camp Everyday</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Sign in to your account
           </p>
@@ -123,7 +122,7 @@ export default function SignInPage() {
         </form>
 
         <div className="mt-4 text-center text-xs text-muted-foreground">
-          <p>Use your Camp Everyday credentials to sign in.</p>
+          <p>Use your Keepr credentials to sign in.</p>
         </div>
       </div>
     </div>

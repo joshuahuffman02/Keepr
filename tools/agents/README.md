@@ -1,4 +1,4 @@
-# Camp Everyday Agents (Codex MCP + Agents SDK)
+# Keepr Agents (Codex MCP + Agents SDK)
 
 This folder contains a ready-to-run multi-agent workflow using Codex CLI as an MCP server and the OpenAI Agents SDK.
 

@@ -2,7 +2,7 @@
  * Setup Stripe Billing Products & Prices
  *
  * Run this script ONCE to create the products, prices, and coupons in Stripe
- * for Camp Everyday's billing tiers.
+ * for Keepr's billing tiers.
  *
  * Usage:
  *   npx ts-node src/scripts/setup-stripe-billing.ts
@@ -31,7 +31,7 @@ interface CreatedResources {
 }
 
 async function main() {
-  console.log("Setting up Stripe billing for Camp Everyday...\n");
+  console.log("Setting up Stripe billing for Keepr...\n");
 
   const isTestMode = (STRIPE_SECRET_KEY as string).startsWith("sk_test_");
   console.log(`Mode: ${isTestMode ? "TEST" : "LIVE"}\n`);
@@ -56,7 +56,7 @@ async function main() {
 
     // Monthly subscription product
     const subscriptionProduct = await stripe.products.create({
-      name: "Camp Everyday Subscription",
+      name: "Keepr Subscription",
       description: "Monthly platform access for campground management",
       metadata: { type: "subscription" },
     });
@@ -65,7 +65,7 @@ async function main() {
 
     // Per-booking fee product
     const bookingFeeProduct = await stripe.products.create({
-      name: "Camp Everyday Per-Booking Fee",
+      name: "Keepr Per-Booking Fee",
       description: "Fee charged per reservation created",
       metadata: { type: "booking_fee" },
     });
@@ -74,7 +74,7 @@ async function main() {
 
     // SMS product
     const smsProduct = await stripe.products.create({
-      name: "Camp Everyday SMS",
+      name: "Keepr SMS",
       description: "SMS messaging charges",
       metadata: { type: "sms" },
     });

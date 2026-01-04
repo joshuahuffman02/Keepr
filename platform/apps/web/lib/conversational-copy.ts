@@ -138,7 +138,7 @@ export const conversationalCopy = {
     night: "Night owls plan the best adventures",
     welcome: "Welcome back, explorer!",
     goodbye: "Happy trails until next time!",
-    firstVisit: "Welcome to Camp Everyday!",
+    firstVisit: "Welcome to Keepr!",
     returning: "Great to see you again!",
   },
 

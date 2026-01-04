@@ -317,4 +317,4 @@ Start today: send a review request to your last 10 checkout guests. Set up a sys
 
 ---
 
-*Camp Everyday includes automated review request emails, helping you systematically build your online reputation after every stay. [Grow your reviews at campreserv.com](https://campreserv.com)*
+*Keepr includes automated review request emails, helping you systematically build your online reputation after every stay. [Grow your reviews at campreserv.com](https://campreserv.com)*

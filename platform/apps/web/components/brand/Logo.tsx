@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 
 interface LogoProps {
   /** Size variant */
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: "sm" | "md" | "lg" | "xl" | "2xl";
   /** Color variant - defaults to evergreen */
   variant?: "evergreen" | "white" | "charcoal";
   /** Additional className */
@@ -14,6 +14,7 @@ const sizeClasses = {
   md: "h-8",
   lg: "h-10",
   xl: "h-12",
+  "2xl": "h-16",
 };
 
 const colorClasses = {
@@ -71,6 +72,7 @@ export function LogoImage({
     md: 32,
     lg: 40,
     xl: 48,
+    "2xl": 64,
   };
 
   return (

@@ -24,7 +24,7 @@ I came across [Park Name] while [researching campgrounds in [Region] / planning 
 
 Quick question: Are you happy with your current reservation software, or is it one of those things that works "well enough" but doesn't thrill you?
 
-I ask because we built Camp Everyday specifically for parks like yours, and I'm curious if the problems we solve resonate:
+I ask because we built Keepr specifically for parks like yours, and I'm curious if the problems we solve resonate:
 
 - Setup fees that cost more than a month's revenue
 - Per-booking fees that grow as you grow
@@ -35,7 +35,7 @@ If any of that sounds familiar, I'd love to show you what we're doing differentl
 If you're all set, no worries at all. Happy to share some tips for [relevant topic based on their park] regardless.
 
 [Your name]
-Camp Everyday
+Keepr
 
 P.S. - We include AI pricing features that most competitors charge extra for. Might be interesting if you're doing rate adjustments manually now.
 ```
@@ -64,7 +64,7 @@ A few parks that switched to us from [Competitor] said the same things:
 "Setup took 6 weeks and cost $X,XXX."
 "We needed features they wanted to upsell us on."
 
-So we built Camp Everyday to fix those:
+So we built Keepr to fix those:
 
 - $100/month + $2.30/booking (transparent, predictable)
 - No setup fees, live in days not weeks
@@ -102,7 +102,7 @@ I was checking out [Park Name]'s website to potentially plan a trip, and noticed
 - The site looks great but booking requires a phone call. Have you considered a reservation system?
 - I saw you're using [dated system] - are you exploring newer options?
 
-I run Camp Everyday, campground software built for mid-size parks that want modern features without enterprise prices.
+I run Keepr, campground software built for mid-size parks that want modern features without enterprise prices.
 
 Parks like [Park Name] typically save 15-20 hours/week on phone bookings once guests can self-serve online. And they pick up bookings at 10pm that would've been lost to "I'll call tomorrow" (they never do).
 
@@ -139,7 +139,7 @@ We've been talking with a lot of parks about [related topic], and it made me won
 
 Are you evaluating your tech stack this year? Many parks are finding that [competitor] costs have crept up 20-30% over the past few years, and they're exploring alternatives.
 
-Camp Everyday is what we built for parks that want:
+Keepr is what we built for parks that want:
 - Transparent pricing that doesn't grow faster than your bookings
 - Modern features without enterprise complexity
 - A team that actually answers the phone
@@ -159,7 +159,7 @@ If not, no problem. I just share relevant industry stuff sometimes if you're int
 
 **Subject Lines:**
 - Following up - [original subject]
-- Quick follow up on Camp Everyday
+- Quick follow up on Keepr
 - [First Name] - worth another look?
 
 **Body:**
@@ -167,7 +167,7 @@ If not, no problem. I just share relevant industry stuff sometimes if you're int
 ```
 Hi [First Name],
 
-I reached out last week about Camp Everyday and wanted to follow up.
+I reached out last week about Keepr and wanted to follow up.
 
 I know campground season is [busy/winding down/ramping up] so I'll keep this short:
 
@@ -200,7 +200,7 @@ P.S. - Happy to send a comparison with whatever you're using now if you share th
 ```
 Hi [First Name],
 
-I've reached out a couple times about Camp Everyday and haven't heard back.
+I've reached out a couple times about Keepr and haven't heard back.
 
 I get it, you're busy running a campground and software sales emails aren't exactly exciting.
 

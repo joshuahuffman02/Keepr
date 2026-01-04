@@ -3,7 +3,7 @@ Living view of what's shipping for RV hospitality operators and guests. Themes o
 
 ## Update — Dec 17, 2025: Self-Service & Support Automation (SHIPPED)
 
-We've completed our Product-Led Growth initiative to make Camp Everyday fully self-service:
+We've completed our Product-Led Growth initiative to make Keepr fully self-service:
 
 ### Self-Service Signup & Onboarding
 - **Early Access Program**: Choose your tier (Pioneer, Trailblazer, or Base Camp) with transparent pricing
@@ -11,7 +11,7 @@ We've completed our Product-Led Growth initiative to make Camp Everyday fully se
 - **Welcome Dashboard**: Track your setup progress and get started quickly
 
 ### AI-Powered Support
-- **Support Chat Assistant**: Get instant answers about using Camp Everyday
+- **Support Chat Assistant**: Get instant answers about using Keepr
 - **Smart Help Articles**: Context-aware suggestions based on your questions
 - **Seamless Escalation**: Create support tickets when you need human help
 

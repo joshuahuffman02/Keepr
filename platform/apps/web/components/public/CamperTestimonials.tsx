@@ -21,7 +21,7 @@ const defaultTestimonials: Testimonial[] = [
     name: "Sarah M.",
     location: "Portland, OR",
     rating: 5,
-    quote: "Booking was so easy! No surprise fees and the campground was exactly as pictured. We'll definitely use Camp Everyday again.",
+    quote: "Booking was so easy! No surprise fees and the campground was exactly as pictured. We'll definitely use Keepr again.",
     stayDate: "November 2024",
   },
   {
@@ -45,7 +45,7 @@ const defaultTestimonials: Testimonial[] = [
     name: "Lisa & Tom K.",
     location: "Seattle, WA",
     rating: 5,
-    quote: "We've tried other booking sites but always got hit with hidden fees at checkout. Camp Everyday shows the real price upfront.",
+    quote: "We've tried other booking sites but always got hit with hidden fees at checkout. Keepr shows the real price upfront.",
     stayDate: "August 2024",
   },
   {
@@ -100,7 +100,7 @@ export function CamperTestimonials({
             What Campers Are Saying
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Don't just take our word for it. Here's what real campers have to say about booking with Camp Everyday.
+            Don't just take our word for it. Here's what real campers have to say about booking with Keepr.
           </p>
         </div>
 

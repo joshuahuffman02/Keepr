@@ -86,7 +86,7 @@ export class OrgReferralsService {
       }
     });
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://app.campeveryday.com";
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://app.keeprstay.com";
 
     return {
       referralCode,

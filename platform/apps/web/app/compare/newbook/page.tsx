@@ -24,9 +24,9 @@ import {
 } from "@/lib/positioning";
 
 export const metadata: Metadata = {
-  title: "Camp Everyday vs Newbook - Full Feature Comparison 2025",
+  title: "Keepr vs Newbook - Full Feature Comparison 2025",
   description:
-    "Compare Camp Everyday to Newbook. No $1,000-$3,000 setup fee, faster onboarding, AI features, and simpler pricing. Switch in 48 hours.",
+    "Compare Keepr to Newbook. No $1,000-$3,000 setup fee, faster onboarding, AI features, and simpler pricing. Switch in 48 hours.",
   keywords: [
     "newbook alternative",
     "newbook vs",
@@ -35,9 +35,9 @@ export const metadata: Metadata = {
     "best newbook alternative",
   ],
   openGraph: {
-    title: "Camp Everyday vs Newbook - Which is Better for Your Park?",
+    title: "Keepr vs Newbook - Which is Better for Your Park?",
     description:
-      "Comprehensive comparison of Camp Everyday and Newbook. See features, pricing, and why parks are choosing Camp Everyday.",
+      "Comprehensive comparison of Keepr and Newbook. See features, pricing, and why parks are choosing Keepr.",
     type: "website",
   },
 };
@@ -45,11 +45,11 @@ export const metadata: Metadata = {
 const structuredData = {
   "@context": "https://schema.org",
   "@type": "Article",
-  headline: "Camp Everyday vs Newbook Comparison",
-  description: "A comprehensive comparison of Camp Everyday and Newbook campground management software",
+  headline: "Keepr vs Newbook Comparison",
+  description: "A comprehensive comparison of Keepr and Newbook campground management software",
   author: {
     "@type": "Organization",
-    name: "Camp Everyday",
+    name: "Keepr",
   },
 };
 
@@ -76,7 +76,7 @@ export default function CompareNewbookPage() {
             </div>
 
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
-              Camp Everyday vs Newbook
+              Keepr vs Newbook
             </h1>
 
             <p className="text-xl md:text-2xl text-slate-300 mb-8 leading-relaxed">
@@ -159,7 +159,7 @@ export default function CompareNewbookPage() {
 
           <div className="mt-12 text-center">
             <p className="text-slate-600 mb-6">
-              Looking for something simpler? We built Camp Everyday for you.
+              Looking for something simpler? We built Keepr for you.
             </p>
             <Button asChild className="bg-violet-600 hover:bg-violet-500">
               <Link href="/signup">
@@ -179,7 +179,7 @@ export default function CompareNewbookPage() {
               Feature-by-Feature Comparison
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Camp Everyday matches Newbook's features at a fraction of the cost and complexity.
+              Keepr matches Newbook's features at a fraction of the cost and complexity.
             </p>
           </div>
 
@@ -189,7 +189,7 @@ export default function CompareNewbookPage() {
                 <tr className="bg-slate-50 border-b border-slate-200">
                   <th className="text-left p-4 text-slate-600 font-semibold">Feature</th>
                   <th className="p-4 text-center bg-violet-50 border-x border-violet-100">
-                    <div className="text-violet-700 font-bold">Camp Everyday</div>
+                    <div className="text-violet-700 font-bold">Keepr</div>
                     <div className="text-xs text-violet-600 mt-1">That's us!</div>
                   </th>
                   <th className="p-4 text-center">
@@ -289,7 +289,7 @@ export default function CompareNewbookPage() {
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-violet-500/20 border border-violet-500/30 rounded-full text-violet-400 text-sm font-semibold mb-6">
               <Award className="h-4 w-4" />
-              Exclusive to Camp Everyday
+              Exclusive to Keepr
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
               Features Newbook Doesn't Offer
@@ -326,7 +326,7 @@ export default function CompareNewbookPage() {
                 Save $1,000 - $3,000 on Day One
               </h2>
               <p className="text-slate-600">
-                Newbook's setup fee could pay for 10-30 months of Camp Everyday service.
+                Newbook's setup fee could pay for 10-30 months of Keepr service.
               </p>
             </div>
 
@@ -366,7 +366,7 @@ export default function CompareNewbookPage() {
                 Simple Onboarding. No Training Required.
               </h2>
               <p className="text-lg text-slate-600 mb-8">
-                Unlike Newbook's complex platform that requires extensive training, Camp Everyday is intuitive from day one.
+                Unlike Newbook's complex platform that requires extensive training, Keepr is intuitive from day one.
                 Most staff are comfortable within hours, not weeks.
               </p>
 
@@ -388,7 +388,7 @@ export default function CompareNewbookPage() {
             </div>
 
             <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-lg">
-              <h3 className="text-xl font-bold text-slate-900 mb-6">Newbook vs Camp Everyday Setup</h3>
+              <h3 className="text-xl font-bold text-slate-900 mb-6">Newbook vs Keepr Setup</h3>
               <div className="space-y-6">
                 <div className="flex items-center gap-4">
                   <div className="w-24 text-sm font-semibold text-slate-500">Newbook</div>
@@ -398,7 +398,7 @@ export default function CompareNewbookPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="w-24 text-sm font-semibold text-violet-600">Camp Everyday</div>
+                  <div className="w-24 text-sm font-semibold text-violet-600">Keepr</div>
                   <div className="flex-1 bg-violet-100 rounded-full h-4 relative">
                     <div className="absolute left-0 top-0 h-full w-[15%] bg-violet-500 rounded-full" />
                     <span className="absolute left-[18%] top-1/2 -translate-y-1/2 text-xs text-violet-700">48 hours</span>
@@ -453,7 +453,7 @@ export default function CompareNewbookPage() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-center md:text-left">
               <p className="text-slate-400 text-sm">
-                Camp Everyday - The modern alternative to legacy campground software.
+                Keepr - The modern alternative to legacy campground software.
               </p>
             </div>
             <div className="flex items-center gap-6 text-sm text-slate-400">

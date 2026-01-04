@@ -89,4 +89,4 @@ Electric vehicles are coming to campgrounds—both as tow vehicles and eventuall
 
 ---
 
-*Camp Everyday can track and charge for EV amenity usage. [Prepare for the future at campreserv.com](https://campreserv.com)*
+*Keepr can track and charge for EV amenity usage. [Prepare for the future at campreserv.com](https://campreserv.com)*

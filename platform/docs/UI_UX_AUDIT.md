@@ -1,4 +1,4 @@
-# UI/UX Audit: Camp Everyday Platform
+# UI/UX Audit: Keepr Platform
 
 ## Executive Summary
 **Overall Score: A-**  

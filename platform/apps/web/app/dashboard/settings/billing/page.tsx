@@ -1139,7 +1139,7 @@ export default function BillingPage() {
                     Payment Method
                   </h3>
                   <p className="text-muted-foreground text-sm mt-1">
-                    Manage how you pay for Camp Everyday
+                    Manage how you pay for Keepr
                   </p>
                 </div>
                 <Button variant="outline" asChild>

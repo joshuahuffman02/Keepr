@@ -344,4 +344,4 @@ Start planning your signature event—something that reflects your campground's 
 
 ---
 
-*Camp Everyday helps you manage event bookings, communicate with attending guests, and capture the marketing value of your events. [Plan your next event at campreserv.com](https://campreserv.com)*
+*Keepr helps you manage event bookings, communicate with attending guests, and capture the marketing value of your events. [Plan your next event at campreserv.com](https://campreserv.com)*

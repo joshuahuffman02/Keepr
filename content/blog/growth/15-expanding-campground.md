@@ -90,4 +90,4 @@ Your campground is thriving—selling out weekends, turning away guests, waitlis
 
 ---
 
-*Camp Everyday scales with your campground, handling any number of sites with the same ease. [Grow with confidence at campreserv.com](https://campreserv.com)*
+*Keepr scales with your campground, handling any number of sites with the same ease. [Grow with confidence at campreserv.com](https://campreserv.com)*

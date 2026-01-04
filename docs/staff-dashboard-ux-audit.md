@@ -10,7 +10,7 @@ Scope: staff-facing dashboard pages (routes using `DashboardShell`) and shared c
 - Navigation registry exposes a missing “Contact Support” page, creating a dead-end experience. Evidence: `platform/apps/web/lib/page-registry.ts:1366` points to `/help/contact`, but `platform/apps/web/app/help/contact/page.tsx` does not exist.
 
 ### Medium
-- Branding/naming is inconsistent inside the staff shell (e.g., “Host” vs “Camp Everyday Host”), which makes the product feel stitched together. Evidence: `platform/apps/web/components/ui/layout/DashboardShell.tsx:911` and `platform/apps/web/components/ui/layout/DashboardShell.tsx:918` (sidebar brand), `platform/apps/web/app/dashboard/page.tsx:575` (Welcome to Camp Everyday Host).
+- Branding/naming is inconsistent inside the staff shell (e.g., “Host” vs “Keepr Host”), which makes the product feel stitched together. Evidence: `platform/apps/web/components/ui/layout/DashboardShell.tsx:911` and `platform/apps/web/components/ui/layout/DashboardShell.tsx:918` (sidebar brand), `platform/apps/web/app/dashboard/page.tsx:575` (Welcome to Keepr Host).
 - Page chrome and hierarchy patterns are inconsistent (breadcrumbs vs none, multiple breadcrumb components, titles sometimes in shell and sometimes inside content), causing uneven typography and spacing across pages. Evidence: `platform/apps/web/components/ui/layout/DashboardShell.tsx:1065` (optional shell title/subtitle), `platform/apps/web/app/reservations/page.tsx:26` (custom header inside card), `platform/apps/web/app/finance/page.tsx:8` (Breadcrumbs from `ui/breadcrumbs`), `platform/apps/web/app/guests/page.tsx:5` (Breadcrumbs from `components/breadcrumbs`), `platform/apps/web/app/dashboard/settings/layout.tsx:79` (custom breadcrumb layout).
 - Global max width (`max-w-7xl`) is applied to all staff pages, including data-dense workflows like calendar/reservations, which can feel cramped compared to enterprise dashboards. Evidence: `platform/apps/web/components/ui/layout/DashboardShell.tsx:1064`.
 - Loading/empty state quality varies widely (full skeletons on dashboard vs plain text loaders elsewhere), making the experience feel uneven. Evidence: `platform/apps/web/app/dashboard/page.tsx:53` (skeleton pattern), `platform/apps/web/app/booking-lab/page.tsx:84` (text-only loader), `platform/apps/web/app/pos/page.tsx:853` (text-only loader).
@@ -30,5 +30,5 @@ Scope: staff-facing dashboard pages (routes using `DashboardShell`) and shared c
 
 ## Open Questions / Assumptions
 - Are “lab” and “v2” routes intended to be customer-visible or strictly internal testing?
-- Should “Host” be the final staff-facing brand name, or should it match Campreserv/Camp Everyday?
+- Should “Host” be the final staff-facing brand name, or should it match Campreserv/Keepr?
 - Which pages are considered GA vs beta? That impacts how aggressively to remove “coming soon” UI.

@@ -16,7 +16,7 @@ import {
 
 const codeExamples = {
   auth: `// Get an access token using client credentials
-const response = await fetch('https://api.campeveryday.com/oauth/token', {
+const response = await fetch('https://api.keeprstay.com/oauth/token', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
@@ -31,7 +31,7 @@ const { access_token, expires_in } = await response.json();`,
 
   availability: `// Check site availability
 const response = await fetch(
-  'https://api.campeveryday.com/v1/campgrounds/{id}/availability?' +
+  'https://api.keeprstay.com/v1/campgrounds/{id}/availability?' +
   new URLSearchParams({
     startDate: '2024-06-01',
     endDate: '2024-06-07'
@@ -131,7 +131,7 @@ export default function DevelopersClient() {
             Developer Preview
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Build with Camp Everyday API
+            Build with Keepr API
           </h1>
           <p className="text-xl text-slate-300 max-w-2xl mb-8">
             Integrate campground availability, reservations, and payments into your applications with our RESTful API.
@@ -223,7 +223,7 @@ export default function DevelopersClient() {
               <div className="prose prose-slate max-w-none">
                 <h2 className="text-2xl font-bold text-slate-900">API Overview</h2>
                 <p className="text-slate-600">
-                  The Camp Everyday API provides programmatic access to campground management
+                  The Keepr API provides programmatic access to campground management
                   functionality. Use it to build integrations, sync data with external systems,
                   or create custom booking experiences.
                 </p>
@@ -267,7 +267,7 @@ export default function DevelopersClient() {
               <div className="prose prose-slate max-w-none">
                 <h2 className="text-2xl font-bold text-slate-900">Quickstart</h2>
                 <p className="text-slate-600">
-                  Get up and running with the Camp Everyday API in minutes.
+                  Get up and running with the Keepr API in minutes.
                 </p>
               </div>
 
@@ -467,7 +467,7 @@ export default function DevelopersClient() {
         <div className="max-w-6xl mx-auto px-6 py-16 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to build?</h2>
           <p className="text-slate-400 mb-8 max-w-xl mx-auto">
-            Get your API keys and start integrating with Camp Everyday today.
+            Get your API keys and start integrating with Keepr today.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link

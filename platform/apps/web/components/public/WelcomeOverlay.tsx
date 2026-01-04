@@ -107,7 +107,7 @@ export function WelcomeOverlay() {
             >
               Welcome to{" "}
               <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
-                Camp Everyday
+                Keepr
               </span>
             </motion.h1>
 

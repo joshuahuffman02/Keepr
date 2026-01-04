@@ -421,7 +421,7 @@ export class OnboardingService {
                 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 540px; margin: 0 auto; padding: 20px;">
                   <h2 style="color: #0f172a; margin-bottom: 12px;">Welcome, ${name}!</h2>
                   <p style="color: #475569; line-height: 1.5;">
-                    You've been invited as <strong>${roleLabel}</strong> to manage a campground in Camp Everyday Host.
+                    You've been invited as <strong>${roleLabel}</strong> to manage a campground in Keepr Host.
                   </p>
                   <p style="color: #475569; line-height: 1.5;">
                     Click the button below to set your password and get started.
@@ -693,7 +693,7 @@ I have read and understand this waiver and agree to its terms.`;
           <p style="color: #0f172a; font-weight: 600; font-size: 18px; margin: 0 0 12px 0;">Complete onboarding for ${campgroundName}</p>
           <p style="color: #475569; margin: 0 0 16px 0;">We saved your progress so you can finish anytime in the next few days.</p>
           <a href="${url}" style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; text-decoration: none; padding: 12px 18px; border-radius: 10px; font-weight: 700;">Start onboarding</a>
-          <p style="color: #64748b; margin: 16px 0 0 0; font-size: 12px;">This link expires on ${inviteExpiryString(expiresAt)}. If it stops working, request a new invite from your Camp Everyday Host contact.</p>
+          <p style="color: #64748b; margin: 16px 0 0 0; font-size: 12px;">This link expires on ${inviteExpiryString(expiresAt)}. If it stops working, request a new invite from your Keepr Host contact.</p>
         </div>
       </div>
     `;
@@ -808,7 +808,7 @@ I have read and understand this waiver and agree to its terms.`;
 
       await this.email.sendEmail({
         to: user.email,
-        subject: `${campground.name} is live on Camp Everyday!`,
+        subject: `${campground.name} is live on Keepr!`,
         html: this.generateGoLiveEmail({
           firstName: user.firstName || "there",
           campgroundName: campground.name,
@@ -883,10 +883,10 @@ I have read and understand this waiver and agree to its terms.`;
 
         <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e2e8f0;">
           <p style="color: #64748b; font-size: 14px; margin: 0 0 8px 0;">
-            Need help? Reply to this email or check out our <a href="https://help.campeveryday.com" style="color: #10b981;">Help Center</a>
+            Need help? Reply to this email or check out our <a href="https://help.keeprstay.com" style="color: #10b981;">Help Center</a>
           </p>
           <p style="color: #94a3b8; font-size: 12px; margin: 0;">
-            Camp Everyday - Making campground management effortless
+            Keepr - Making campground management effortless
           </p>
         </div>
       </div>

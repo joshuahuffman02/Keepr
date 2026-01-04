@@ -78,7 +78,7 @@ export async function createApp(): Promise<INestApplication> {
 
             if (parsedOrigin) {
                 const hostname = parsedOrigin.hostname;
-                // Allow Campreserv/Camp Everyday Railway hostnames (preview/prod).
+                // Allow Campreserv/Keepr Railway hostnames (preview/prod).
                 if (
                     hostname.endsWith(".up.railway.app") &&
                     (hostname.includes("campreserv") || hostname.includes("camp-everyday"))

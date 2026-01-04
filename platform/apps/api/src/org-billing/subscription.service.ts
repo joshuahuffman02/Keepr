@@ -82,7 +82,7 @@ export class SubscriptionService {
     const ownerEmail =
       org.billingEmail ||
       org.campgrounds[0]?.memberships[0]?.user?.email ||
-      `org-${org.id}@campeveryday.com`;
+      `org-${org.id}@keeprstay.com`;
 
     // Create new Stripe customer
     const customer = await this.stripe.createOrGetCustomer(
@@ -566,7 +566,7 @@ export class SubscriptionService {
           <p><strong>Invoice ID:</strong> ${invoice.id}</p>
           <p><strong>Due Date:</strong> ${dueDate}</p>
           <p>If you believe this is an error or need assistance, please contact our support team.</p>
-          <p>Thank you,<br/>The Camp Everyday Team</p>
+          <p>Thank you,<br/>The Keepr Team</p>
         `,
       });
 

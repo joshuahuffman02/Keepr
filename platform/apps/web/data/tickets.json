@@ -7,7 +7,7 @@
     "notes": "on the homepage the campgrounds ratings look to be static and not reflective of their actualy ratings... if a campground has no ratings yet, we can indicate that somehow in a friendly way... also, make sure all the data on his page is rich and dynmic.",
     "url": "http://localhost:3000/",
     "path": "/",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure | Camp Everyday",
+    "pageTitle": "Keepr - Find your perfect camping adventure | Keepr",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -44,7 +44,7 @@
     "notes": "I noticed on mobile phone the spacing in the search bar of the text is crammed.",
     "url": "https://camp.everyday.host.ngrok-free.app/",
     "path": "/",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure | Camp Everyday",
+    "pageTitle": "Keepr - Find your perfect camping adventure | Keepr",
     "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
     "extra": {
       "viewport": {
@@ -79,7 +79,7 @@
     "notes": "Help screen info should only be visable by campground staff users.",
     "url": "https://camp.everyday.host.ngrok-free.app/help",
     "path": "/help",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
     "extra": {
       "viewport": {
@@ -114,7 +114,7 @@
     "notes": "Submit a ticket randomly disappears. Need a confirm to close.",
     "url": "https://camp.everyday.host.ngrok-free.app/help",
     "path": "/help",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
     "extra": {
       "viewport": {
@@ -141,15 +141,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmizgft380000c5h03gmly7br",
-      "name": "josh@campeveryday.com",
-      "email": "josh@campeveryday.com"
+      "name": "josh@keeprstay.com",
+      "email": "josh@keeprstay.com"
     },
     "upvoters": [],
     "title": "ticket submit went away",
     "notes": "as I'm trying a support ticket, the whole submit a ticket thing went away... it was doing this on mobile a bunch but you said you fixed it",
     "url": "https://camp.everyday.host.ngrok-free.app/booking",
     "path": "/booking",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -176,15 +176,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmizgft380000c5h03gmly7br",
-      "name": "josh@campeveryday.com",
-      "email": "josh@campeveryday.com"
+      "name": "josh@keeprstay.com",
+      "email": "josh@keeprstay.com"
     },
     "upvoters": [],
     "title": "Richer Text",
     "notes": "a guests info should be auto populate ie equipment/rv type and length when you select/create a guest. if a guest doesn't have an rv whatever you type in should save to their account",
     "url": "https://camp.everyday.host.ngrok-free.app/booking",
     "path": "/booking",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -219,7 +219,7 @@
     "notes": "Can the sort by, that’s for all the campgrounds, move above the filter so it doesn’t feel so squished on mobile",
     "url": "https://camp.everyday.host.ngrok-free.app/",
     "path": "/",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure | Camp Everyday",
+    "pageTitle": "Keepr - Find your perfect camping adventure | Keepr",
     "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
     "extra": {
       "viewport": {
@@ -254,7 +254,7 @@
     "notes": "On mobile the weight seems to change a lot. Let’s keep it fixed like a true mobile app",
     "url": "https://camp.everyday.host.ngrok-free.app/",
     "path": "/",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure | Camp Everyday",
+    "pageTitle": "Keepr - Find your perfect camping adventure | Keepr",
     "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
     "extra": {
       "viewport": {
@@ -281,15 +281,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmizgft380000c5h03gmly7br",
-      "name": "josh@campeveryday.com",
-      "email": "josh@campeveryday.com"
+      "name": "josh@keeprstay.com",
+      "email": "josh@keeprstay.com"
     },
     "upvoters": [],
     "title": "Text outside buttom",
     "notes": "The resolve text lives outside of the button in the attention area",
     "url": "https://camp.everyday.host.ngrok-free.app/dashboard",
     "path": "/dashboard",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
     "extra": {
       "viewport": {
@@ -316,15 +316,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmizgft380000c5h03gmly7br",
-      "name": "josh@campeveryday.com",
-      "email": "josh@campeveryday.com"
+      "name": "josh@keeprstay.com",
+      "email": "josh@keeprstay.com"
     },
     "upvoters": [],
     "title": "Recent activity",
     "notes": "In recent activity the reservation button is like 0 pixels away from the other text and looks awkward on mobile",
     "url": "https://camp.everyday.host.ngrok-free.app/dashboard",
     "path": "/dashboard",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
     "extra": {
       "viewport": {
@@ -351,15 +351,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmizgft380000c5h03gmly7br",
-      "name": "josh@campeveryday.com",
-      "email": "josh@campeveryday.com"
+      "name": "josh@keeprstay.com",
+      "email": "josh@keeprstay.com"
     },
     "upvoters": [],
     "title": "group bookings",
     "notes": "this might be more of a question, but I see how to create groups for bookings, but how do i attach reservations to a group?",
     "url": "https://camp.everyday.host.ngrok-free.app/groups",
     "path": "/groups",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -394,7 +394,7 @@
     "notes": "on a new browser I went directly to /roadmap and it opened it up. gave me the whole menu ssytem for the campground dashboard. there's even a sign out button, but I'm not even signed it. it should not be possible to see anything campground dashboard related if you are not signed in as a campground staff, also the signout button shouldn't be there if you're not even signed in...",
     "url": "https://camp.everyday.host.ngrok-free.app/roadmap",
     "path": "/roadmap",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -421,15 +421,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmizgft380000c5h03gmly7br",
-      "name": "josh@campeveryday.com",
-      "email": "josh@campeveryday.com"
+      "name": "josh@keeprstay.com",
+      "email": "josh@keeprstay.com"
     },
     "upvoters": [],
     "title": "bell notifcations",
     "notes": "if it hit the bell for the notications on the top menu bar, and then hit 'mark resolved' it doesn't actually resolve the notications. then if I hit the more button or whatever it is on the button of the list, it takes me to the roadmaps update page, which doesn't feel like the right page I should be going to. I should be going to whereever these notications are coming from? please think through that.",
     "url": "https://camp.everyday.host.ngrok-free.app/dashboard",
     "path": "/dashboard",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -464,7 +464,7 @@
     "notes": "When I save’hesrt’ A campground on the homepage where does that go?",
     "url": "https://camp.everyday.host.ngrok-free.app/",
     "path": "/",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure | Camp Everyday",
+    "pageTitle": "Keepr - Find your perfect camping adventure | Keepr",
     "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
     "extra": {
       "viewport": {
@@ -499,7 +499,7 @@
     "notes": "The whole lead capture on the bottom is weird. Why call it publicly a lead capture? Isn’t that an internal name?",
     "url": "https://camp.everyday.host.ngrok-free.app/",
     "path": "/",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure | Camp Everyday",
+    "pageTitle": "Keepr - Find your perfect camping adventure | Keepr",
     "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
     "extra": {
       "viewport": {
@@ -534,7 +534,7 @@
     "notes": "Marketing page should use actual screen shots. Also, we don’t have any listings yet so make sure the data reflects that in creative ways.",
     "url": "https://camp.everyday.host.ngrok-free.app/owners",
     "path": "/owners",
-    "pageTitle": "Camp Everyday Host - Campground Management Software | Camp Everyday",
+    "pageTitle": "Keepr Host - Campground Management Software | Keepr",
     "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
     "extra": {
       "viewport": {
@@ -569,7 +569,7 @@
     "notes": "When I’m clicking tools in this section the preview for them is way below where the screen is. So you have to scroll up and down to view the info",
     "url": "https://camp.everyday.host.ngrok-free.app/owners",
     "path": "/owners",
-    "pageTitle": "Camp Everyday Host - Campground Management Software | Camp Everyday",
+    "pageTitle": "Keepr Host - Campground Management Software | Keepr",
     "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
     "extra": {
       "viewport": {
@@ -604,7 +604,7 @@
     "notes": "When some one requests a demo where does that info go? It should go to a page where the campground software employees have.",
     "url": "https://camp.everyday.host.ngrok-free.app/owners",
     "path": "/owners",
-    "pageTitle": "Camp Everyday Host - Campground Management Software | Camp Everyday",
+    "pageTitle": "Keepr Host - Campground Management Software | Keepr",
     "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
     "extra": {
       "viewport": {
@@ -639,7 +639,7 @@
     "notes": "The blog page is missing the standard header and footer.",
     "url": "https://camp.everyday.host.ngrok-free.app/blog",
     "path": "/blog",
-    "pageTitle": "Blog - Camp Everyday | Camp Everyday",
+    "pageTitle": "Blog - Keepr | Keepr",
     "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
     "extra": {
       "viewport": {
@@ -674,7 +674,7 @@
     "notes": "We don’t have an api page or case study page.",
     "url": "https://camp.everyday.host.ngrok-free.app/owners",
     "path": "/owners",
-    "pageTitle": "Camp Everyday Host - Campground Management Software | Camp Everyday",
+    "pageTitle": "Keepr Host - Campground Management Software | Keepr",
     "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
     "extra": {
       "viewport": {
@@ -709,7 +709,7 @@
     "notes": "Is this info actually accurate?",
     "url": "https://camp.everyday.host.ngrok-free.app/security",
     "path": "/security",
-    "pageTitle": "Security - Camp Everyday | Camp Everyday",
+    "pageTitle": "Security - Keepr | Keepr",
     "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
     "extra": {
       "viewport": {
@@ -744,7 +744,7 @@
     "notes": "We should develop this page https://camp.everyday.host.ngrok-free.app/careers\nEven though we’re in dev mode we have no employees and we’re gonna need them if we go live. And before we go live. Think through who we would need",
     "url": "https://camp.everyday.host.ngrok-free.app/owners",
     "path": "/owners",
-    "pageTitle": "Camp Everyday Host - Campground Management Software | Camp Everyday",
+    "pageTitle": "Keepr Host - Campground Management Software | Keepr",
     "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
     "extra": {
       "viewport": {
@@ -779,7 +779,7 @@
     "notes": "When I hit the menu button in the upper right corner none of the link works ie reseoices etc",
     "url": "https://camp.everyday.host.ngrok-free.app/owners#about",
     "path": "/owners",
-    "pageTitle": "Camp Everyday Host - Campground Management Software | Camp Everyday",
+    "pageTitle": "Keepr Host - Campground Management Software | Keepr",
     "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
     "extra": {
       "viewport": {
@@ -814,7 +814,7 @@
     "notes": "If I’m here accidentally and want to go back to the campgrounds bookings page. How do I do that?",
     "url": "https://camp.everyday.host.ngrok-free.app/owners#integrations",
     "path": "/owners",
-    "pageTitle": "Camp Everyday Host - Campground Management Software | Camp Everyday",
+    "pageTitle": "Keepr Host - Campground Management Software | Keepr",
     "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
     "extra": {
       "viewport": {
@@ -849,7 +849,7 @@
     "notes": "How do we leave reviews for external campgrounds?",
     "url": "https://camp.everyday.host.ngrok-free.app/",
     "path": "/",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure | Camp Everyday",
+    "pageTitle": "Keepr - Find your perfect camping adventure | Keepr",
     "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
     "extra": {
       "viewport": {
@@ -884,7 +884,7 @@
     "notes": "When I’m an external campground, it would be a feat for a button so that it sends an email or message to the campground saying someone is asking them to consider platform. Give them a personal message and a template marketing promo in that email.",
     "url": "https://camp.everyday.host.ngrok-free.app/",
     "path": "/",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure | Camp Everyday",
+    "pageTitle": "Keepr - Find your perfect camping adventure | Keepr",
     "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
     "extra": {
       "viewport": {
@@ -919,7 +919,7 @@
     "notes": "When I clicked filters the majority of that menu got hidden behind the campgrounds area",
     "url": "https://camp.everyday.host.ngrok-free.app/",
     "path": "/",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure | Camp Everyday",
+    "pageTitle": "Keepr - Find your perfect camping adventure | Keepr",
     "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
     "extra": {
       "viewport": {
@@ -954,7 +954,7 @@
     "notes": "There should be some kind of rating system for campgrounds idk how to do to promote both smalll and large parks, and middle, but crate some kind of rating system that calculates based of reviews, and internal data like # of reservations, or days booked (might be weird data if a campground has seasonals) and/or\nNps score etc.",
     "url": "https://camp.everyday.host.ngrok-free.app/",
     "path": "/",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure | Camp Everyday",
+    "pageTitle": "Keepr - Find your perfect camping adventure | Keepr",
     "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
     "extra": {
       "viewport": {
@@ -989,7 +989,7 @@
     "notes": "It’s not optimized for horizontal mode on your phone. Can some how lock it from doing that like a regular phone app",
     "url": "https://camp.everyday.host.ngrok-free.app/",
     "path": "/",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure | Camp Everyday",
+    "pageTitle": "Keepr - Find your perfect camping adventure | Keepr",
     "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
     "extra": {
       "viewport": {
@@ -1024,7 +1024,7 @@
     "notes": "The buttons for start and stop are to close to each other",
     "url": "https://camp.everyday.host.ngrok-free.app/settings/pricing-rules",
     "path": "/settings/pricing-rules",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
     "extra": {
       "viewport": {
@@ -1059,7 +1059,7 @@
     "notes": "When creating a pricing group what’s the priority mean?",
     "url": "https://camp.everyday.host.ngrok-free.app/settings/pricing-rules",
     "path": "/settings/pricing-rules",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
     "extra": {
       "viewport": {
@@ -1094,7 +1094,7 @@
     "notes": "I can’t get to the bottom of the menu bar.",
     "url": "https://camp.everyday.host.ngrok-free.app/settings/pricing-rules",
     "path": "/settings/pricing-rules",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
     "extra": {
       "viewport": {
@@ -1129,7 +1129,7 @@
     "notes": "Sometime when scrolling the menu bar it actually scrolls the page in the back ground",
     "url": "https://camp.everyday.host.ngrok-free.app/settings/pricing-rules",
     "path": "/settings/pricing-rules",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
     "extra": {
       "viewport": {
@@ -1164,7 +1164,7 @@
     "notes": "You can make special rates here and on dynamic pricing it looks like? I like the set up better on dynamic pricing but I like the list below here. Either way if they both do the same things we should have two spots",
     "url": "https://camp.everyday.host.ngrok-free.app/settings/pricing-rules",
     "path": "/settings/pricing-rules",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
     "extra": {
       "viewport": {
@@ -1199,7 +1199,7 @@
     "notes": "So correct me if I’m wrong but rate types, dynamic pricing, and seasonal rates are all the same thing?????? If they do differ, we should still merge them all to the same page so everything rated lives on the same pages.",
     "url": "https://camp.everyday.host.ngrok-free.app/settings/seasonal-rates",
     "path": "/settings/seasonal-rates",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
     "extra": {
       "viewport": {
@@ -1234,7 +1234,7 @@
     "notes": "Are the upsells merged and in sync with the pos system? Ie firewood would be in both.",
     "url": "https://camp.everyday.host.ngrok-free.app/settings/upsells",
     "path": "/settings/upsells",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_7 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.2 Mobile/15E148 Safari/604.1",
     "extra": {
       "viewport": {
@@ -1261,15 +1261,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmizgft380000c5h03gmly7br",
-      "name": "josh@campeveryday.com",
-      "email": "josh@campeveryday.com"
+      "name": "josh@keeprstay.com",
+      "email": "josh@keeprstay.com"
     },
     "upvoters": [],
     "title": "messages page weird layout",
     "notes": "i think the heading of some filter and stuff got put in the wrong spot and now the messaging system is super squeshed",
     "url": "https://camp.everyday.host.ngrok-free.app/tickets",
     "path": "/tickets",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -1296,15 +1296,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmizgft3d0001c5h0rjai0mih",
-      "name": "admin@campeveryday.com",
-      "email": "admin@campeveryday.com"
+      "name": "admin@keeprstay.com",
+      "email": "admin@keeprstay.com"
     },
     "upvoters": [],
     "title": "staff time clock",
     "notes": "staff time clock is missing the whole campground UI for the campground staff",
     "url": "http://localhost:3000/campgrounds/cmizgft4a000cc5h08e0sc60c/staff/timeclock",
     "path": "/campgrounds/cmizgft4a000cc5h08e0sc60c/staff/timeclock",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -1331,15 +1331,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmizgft3d0001c5h0rjai0mih",
-      "name": "admin@campeveryday.com",
-      "email": "admin@campeveryday.com"
+      "name": "admin@keeprstay.com",
+      "email": "admin@keeprstay.com"
     },
     "upvoters": [],
     "title": "Staff Approvals",
     "notes": "Staff Approvals missing the whole campground UI for the campground staff",
     "url": "http://localhost:3000/campgrounds/cmizgft4a000cc5h08e0sc60c/staff/approvals",
     "path": "/campgrounds/cmizgft4a000cc5h08e0sc60c/staff/approvals",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -1366,15 +1366,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmizgft3d0001c5h0rjai0mih",
-      "name": "admin@campeveryday.com",
-      "email": "admin@campeveryday.com"
+      "name": "admin@keeprstay.com",
+      "email": "admin@keeprstay.com"
     },
     "upvoters": [],
     "title": "Staff Overrides",
     "notes": "Staff Overides is missing the whole campground UI for the campground staff",
     "url": "http://localhost:3000/campgrounds/cmizgft4a000cc5h08e0sc60c/staff/overrides",
     "path": "/campgrounds/cmizgft4a000cc5h08e0sc60c/staff/overrides",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -1401,15 +1401,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmizgft3d0001c5h0rjai0mih",
-      "name": "admin@campeveryday.com",
-      "email": "admin@campeveryday.com"
+      "name": "admin@keeprstay.com",
+      "email": "admin@keeprstay.com"
     },
     "upvoters": [],
     "title": "memberships",
     "notes": "how do you become a part of amembership? can it be set up to either be bought in, or you become in after so many stays or amount spent. etc",
     "url": "http://localhost:3000/settings/memberships",
     "path": "/settings/memberships",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -1436,15 +1436,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmizgft3d0001c5h0rjai0mih",
-      "name": "admin@campeveryday.com",
-      "email": "admin@campeveryday.com"
+      "name": "admin@keeprstay.com",
+      "email": "admin@keeprstay.com"
     },
     "upvoters": [],
     "title": "reports",
     "notes": "booking source report I'd like to even know info down to which staff makes reservations, etc",
     "url": "http://localhost:3000/reports",
     "path": "/reports",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -1471,15 +1471,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmizgft3d0001c5h0rjai0mih",
-      "name": "admin@campeveryday.com",
-      "email": "admin@campeveryday.com"
+      "name": "admin@keeprstay.com",
+      "email": "admin@keeprstay.com"
     },
     "upvoters": [],
     "title": "new triggers",
     "notes": "so you create a trigger, and then what? how do we add actually communitcation messages to that?",
     "url": "http://localhost:3000/settings/notification-triggers",
     "path": "/settings/notification-triggers",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -1508,15 +1508,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmizgft3d0001c5h0rjai0mih",
-      "name": "admin@campeveryday.com",
-      "email": "admin@campeveryday.com"
+      "name": "admin@keeprstay.com",
+      "email": "admin@keeprstay.com"
     },
     "upvoters": [],
     "title": "prebuilt templates",
     "notes": "can we build a handful of prebuilt tempaltes. think of all the reasons yo uwould need one and then build it",
     "url": "http://localhost:3000/settings/templates",
     "path": "/settings/templates",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -1543,15 +1543,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmizgft3d0001c5h0rjai0mih",
-      "name": "admin@campeveryday.com",
-      "email": "admin@campeveryday.com"
+      "name": "admin@keeprstay.com",
+      "email": "admin@keeprstay.com"
     },
     "upvoters": [],
     "title": "secutity",
     "notes": "how does this security work?",
     "url": "http://localhost:3000/settings/security",
     "path": "/settings/security",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -1578,15 +1578,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmizgft3d0001c5h0rjai0mih",
-      "name": "admin@campeveryday.com",
-      "email": "admin@campeveryday.com"
+      "name": "admin@keeprstay.com",
+      "email": "admin@keeprstay.com"
     },
     "upvoters": [],
     "title": "privacy",
     "notes": "how does this privacy page work?",
     "url": "http://localhost:3000/settings/privacy",
     "path": "/settings/privacy",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -1613,15 +1613,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmizgft3d0001c5h0rjai0mih",
-      "name": "admin@campeveryday.com",
-      "email": "admin@campeveryday.com"
+      "name": "admin@keeprstay.com",
+      "email": "admin@keeprstay.com"
     },
     "upvoters": [],
     "title": "confused",
     "notes": "there are fields on page that I don't know what it is asking for...",
     "url": "http://localhost:3000/campgrounds/cmizgft4a000cc5h08e0sc60c/settings",
     "path": "/campgrounds/cmizgft4a000cc5h08e0sc60c/settings",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -1648,15 +1648,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmizgft3d0001c5h0rjai0mih",
-      "name": "admin@campeveryday.com",
-      "email": "admin@campeveryday.com"
+      "name": "admin@keeprstay.com",
+      "email": "admin@keeprstay.com"
     },
     "upvoters": [],
     "title": "photos",
     "notes": "so you add photos here and then what? can you llike them to sites and site classes etc. does this act as the media pool or how does this work?",
     "url": "http://localhost:3000/settings/photos",
     "path": "/settings/photos",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -1681,15 +1681,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmizgft3d0001c5h0rjai0mih",
-      "name": "admin@campeveryday.com",
-      "email": "admin@campeveryday.com"
+      "name": "admin@keeprstay.com",
+      "email": "admin@keeprstay.com"
     },
     "upvoters": [],
     "title": "rich data",
     "notes": "lets have richer data here. be able to select a reservation and guest ID fro a list/search built in instead of having to figure it out",
     "url": "http://localhost:3000/incidents",
     "path": "/incidents",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -1716,15 +1716,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmizgft3d0001c5h0rjai0mih",
-      "name": "admin@campeveryday.com",
-      "email": "admin@campeveryday.com"
+      "name": "admin@keeprstay.com",
+      "email": "admin@keeprstay.com"
     },
     "upvoters": [],
     "title": "acceess control",
     "notes": "so if I had a gate provider or whatever, how does this work? does it work? is it built out enought to work?",
     "url": "http://localhost:3000/settings/access-control",
     "path": "/settings/access-control",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -1749,15 +1749,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmizgft380000c5h03gmly7br",
-      "name": "josh@campeveryday.com",
-      "email": "josh@campeveryday.com"
+      "name": "josh@keeprstay.com",
+      "email": "josh@keeprstay.com"
     },
     "upvoters": [],
     "title": "short cuts",
     "notes": "can we remove the menu short cuts. I like them but they look ugly. unless you can get them to full width like the rest of the menu buttons. also, lets make sure the menus casscades. aka if you open one section, the oters automaticaly close.",
     "url": "https://camp.everyday.host.ngrok-free.app/dashboard",
     "path": "/dashboard",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -1784,15 +1784,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmizgft3d0001c5h0rjai0mih",
-      "name": "admin@campeveryday.com",
-      "email": "admin@campeveryday.com"
+      "name": "admin@keeprstay.com",
+      "email": "admin@keeprstay.com"
     },
     "upvoters": [],
     "title": "guest and reservation billing accounts",
     "notes": "not sure if this is the case, but the guest and the reservatoin each need their own billing accounts, with the ability to transfer billing between the accounts that would make sense in the hospalitliy buisness",
     "url": "http://localhost:3000/finance/gift-cards",
     "path": "/finance/gift-cards",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -1819,15 +1819,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmizgft3d0001c5h0rjai0mih",
-      "name": "admin@campeveryday.com",
-      "email": "admin@campeveryday.com"
+      "name": "admin@keeprstay.com",
+      "email": "admin@keeprstay.com"
     },
     "upvoters": [],
     "title": "shift id is werid",
     "notes": "use rich data and let staff just select themselves. even better, know who is logged in and apply that person..",
     "url": "http://localhost:3000/campgrounds/undefined/staff/timeclock",
     "path": "/campgrounds/undefined/staff/timeclock",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -1852,15 +1852,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmizgft3d0001c5h0rjai0mih",
-      "name": "admin@campeveryday.com",
-      "email": "admin@campeveryday.com"
+      "name": "admin@keeprstay.com",
+      "email": "admin@keeprstay.com"
     },
     "upvoters": [],
     "title": "rich dat",
     "notes": "no one knows the idea. just use a rich text so you can select the guest",
     "url": "http://localhost:3000/campgrounds/undefined/staff-scheduling",
     "path": "/campgrounds/undefined/staff-scheduling",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -1885,15 +1885,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmizgft3d0001c5h0rjai0mih",
-      "name": "admin@campeveryday.com",
-      "email": "admin@campeveryday.com"
+      "name": "admin@keeprstay.com",
+      "email": "admin@keeprstay.com"
     },
     "upvoters": [],
     "title": "staff scheduling",
     "notes": "also we need the menu uis. no side or top menu here",
     "url": "http://localhost:3000/campgrounds/undefined/staff-scheduling",
     "path": "/campgrounds/undefined/staff-scheduling",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -1925,10 +1925,10 @@
     },
     "upvoters": [],
     "title": "Campreserv",
-    "notes": "need to remove all refernces to Campreserv on the public side it is called Camp Everyday. on the staff side it is called Camp Everyday Host",
+    "notes": "need to remove all refernces to Campreserv on the public side it is called Keepr. on the staff side it is called Keepr Host",
     "url": "http://localhost:3000/dashboard",
     "path": "/dashboard",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "selection": "Campreserv",
     "extra": {
@@ -1954,15 +1954,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmj2hvk2i000119y3xtzc4c7k",
-      "name": "josh@campeveryday.com",
-      "email": "josh@campeveryday.com"
+      "name": "josh@keeprstay.com",
+      "email": "josh@keeprstay.com"
     },
     "upvoters": [],
     "title": "click and drag",
     "notes": "click and drag doesn' work o selec a sie on he booking char",
     "url": "http://localhost:3000/calendar?campgroundId=cmj2hvp7t01xh19y3uweosswl",
     "path": "/calendar",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "selection": "\n",
     "extra": {
@@ -1988,15 +1988,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmj2hvk2i000119y3xtzc4c7k",
-      "name": "josh@campeveryday.com",
-      "email": "josh@campeveryday.com"
+      "name": "josh@keeprstay.com",
+      "email": "josh@keeprstay.com"
     },
     "upvoters": [],
     "title": "add on desn't refeclt in price",
     "notes": "i got an add on firewood bundle and I see it in the notes but it doesn't reflelct on the price",
     "url": "http://localhost:3000/booking",
     "path": "/booking",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -2023,15 +2023,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmj2hvk2i000119y3xtzc4c7k",
-      "name": "josh@campeveryday.com",
-      "email": "josh@campeveryday.com"
+      "name": "josh@keeprstay.com",
+      "email": "josh@keeprstay.com"
     },
     "upvoters": [],
     "title": "cash payment",
     "notes": "i hit chash payment, pay in full. and got this error when i hit pay: balanceAmount must not be less than 0\nCall Stack\n2\n\nparseResponse\nfile:///Users/josh/Documents/GitHub/Campreserv%20(broken)%20copy/platform/apps/web/.next/dev/static/chunks/platform_ffa0cf44._.js (2578:17)\nasync Object.createReservation\nfile:///Users/josh/Documents/GitHub/Campreserv%20(broken)%20copy/platform/apps/web/.next/dev/static/chunks/platform_ffa0cf44._.js (4577:22",
     "url": "http://localhost:3000/booking",
     "path": "/booking",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -2058,15 +2058,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmj2hvk2i000119y3xtzc4c7k",
-      "name": "josh@campeveryday.com",
-      "email": "josh@campeveryday.com"
+      "name": "josh@keeprstay.com",
+      "email": "josh@keeprstay.com"
     },
     "upvoters": [],
     "title": "guest page sort",
     "notes": "this page needs to reflect the same sort layout ui we have on ther eservatin page now",
     "url": "http://localhost:3000/guests",
     "path": "/guests",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -2093,15 +2093,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmj2hvk2i000119y3xtzc4c7k",
-      "name": "josh@campeveryday.com",
-      "email": "josh@campeveryday.com"
+      "name": "josh@keeprstay.com",
+      "email": "josh@keeprstay.com"
     },
     "upvoters": [],
     "title": "firewood upsel",
     "notes": "there was fire wood up sells on the booking page, but on this upsell it's not an item?",
     "url": "http://localhost:3000/settings/upsells",
     "path": "/settings/upsells",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -2128,15 +2128,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmj2hvk2i000119y3xtzc4c7k",
-      "name": "josh@campeveryday.com",
-      "email": "josh@campeveryday.com"
+      "name": "josh@keeprstay.com",
+      "email": "josh@keeprstay.com"
     },
     "upvoters": [],
     "title": "taged to sites",
     "notes": "this needs to get automaticaly taged to site.custimoation. option: as soon as someone check outs site or cabin is marked as dirty and then you add the clean up instructions",
     "url": "http://localhost:3000/campgrounds/cmj2hvp7t01xh19y3uweosswl/housekeeping",
     "path": "/campgrounds/cmj2hvp7t01xh19y3uweosswl/housekeeping",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -2163,15 +2163,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmj2hvk2i000119y3xtzc4c7k",
-      "name": "josh@campeveryday.com",
-      "email": "josh@campeveryday.com"
+      "name": "josh@keeprstay.com",
+      "email": "josh@keeprstay.com"
     },
     "upvoters": [],
     "title": "adding task",
     "notes": "adding a task caused an error. also, confusing that we have this page, housekeeping page, and maintance page. should all be in one.",
     "url": "http://localhost:3000/operations",
     "path": "/operations",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -2196,15 +2196,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmj2hvk2i000119y3xtzc4c7k",
-      "name": "josh@campeveryday.com",
-      "email": "josh@campeveryday.com"
+      "name": "josh@keeprstay.com",
+      "email": "josh@keeprstay.com"
     },
     "upvoters": [],
     "title": "tax",
     "notes": "why do we have a currency and tax page as well as a tax page, and at mininum why doesn't it reflect the same data?lets make sure theres only on page, and whichever is active is applied to pos, upsells, bookings, etc",
     "url": "http://localhost:3000/settings/currency-tax",
     "path": "/settings/currency-tax",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -2231,15 +2231,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmj2hvk2i000119y3xtzc4c7k",
-      "name": "josh@campeveryday.com",
-      "email": "josh@campeveryday.com"
+      "name": "josh@keeprstay.com",
+      "email": "josh@keeprstay.com"
     },
     "upvoters": [],
     "title": "saved reports",
     "notes": "how do you actually save a report?",
     "url": "http://localhost:3000/reports",
     "path": "/reports",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -2264,15 +2264,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmj2hvk2i000119y3xtzc4c7k",
-      "name": "josh@campeveryday.com",
-      "email": "josh@campeveryday.com"
+      "name": "josh@keeprstay.com",
+      "email": "josh@keeprstay.com"
     },
     "upvoters": [],
     "title": "reports",
     "notes": "reports need more break downs. need to see everything at large, and as granular as site level, etc",
     "url": "http://localhost:3000/reports",
     "path": "/reports",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -2297,15 +2297,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmj2hvk2i000119y3xtzc4c7k",
-      "name": "josh@campeveryday.com",
-      "email": "josh@campeveryday.com"
+      "name": "josh@keeprstay.com",
+      "email": "josh@keeprstay.com"
     },
     "upvoters": [],
     "title": "bell notications",
     "notes": "when i hit the bell for notications and to mark as read, that only works as long until I hit a new page, then the notications are back",
     "url": "http://localhost:3000/messages",
     "path": "/messages",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -2330,15 +2330,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmj2hvk2i000119y3xtzc4c7k",
-      "name": "josh@campeveryday.com",
-      "email": "josh@campeveryday.com"
+      "name": "josh@keeprstay.com",
+      "email": "josh@keeprstay.com"
     },
     "upvoters": [],
     "title": "/reviews",
     "notes": "theres not a review page",
     "url": "http://localhost:3000/reviews",
     "path": "/reviews",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -2363,15 +2363,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmj2hvk2i000119y3xtzc4c7k",
-      "name": "josh@campeveryday.com",
-      "email": "josh@campeveryday.com"
+      "name": "josh@keeprstay.com",
+      "email": "josh@keeprstay.com"
     },
     "upvoters": [],
     "title": "FAQS",
     "notes": "theres no way for an owner currently to add FAQS",
     "url": "http://localhost:3000/park/camp-everyday-riverbend",
     "path": "/park/camp-everyday-riverbend",
-    "pageTitle": "Camp Everyday – Riverbend | Book stays, events, deals | Camp Everyday",
+    "pageTitle": "Keepr – Riverbend | Book stays, events, deals | Keepr",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -2398,15 +2398,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmj2hvk2i000119y3xtzc4c7k",
-      "name": "josh@campeveryday.com",
-      "email": "josh@campeveryday.com"
+      "name": "josh@keeprstay.com",
+      "email": "josh@keeprstay.com"
     },
     "upvoters": [],
     "title": "guest reviews",
     "notes": "there is two guest reviews on the top of the page...",
     "url": "http://localhost:3000/park/camp-everyday-riverbend",
     "path": "/park/camp-everyday-riverbend",
-    "pageTitle": "Camp Everyday – Riverbend | Book stays, events, deals | Camp Everyday",
+    "pageTitle": "Keepr – Riverbend | Book stays, events, deals | Keepr",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -2433,15 +2433,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmj2hvk2i000119y3xtzc4c7k",
-      "name": "josh@campeveryday.com",
-      "email": "josh@campeveryday.com"
+      "name": "josh@keeprstay.com",
+      "email": "josh@keeprstay.com"
     },
     "upvoters": [],
     "title": "inaccurant error",
     "notes": "on the marketing pages. /owners. there isn't 500+ campgorunds.. there's not even 1.. make sure all info is actually accurate on these pages...",
     "url": "http://localhost:3000/owners",
     "path": "/owners",
-    "pageTitle": "Camp Everyday Host - Campground Management Software | Camp Everyday",
+    "pageTitle": "Keepr Host - Campground Management Software | Keepr",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -2466,15 +2466,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmj2hvk2i000119y3xtzc4c7k",
-      "name": "josh@campeveryday.com",
-      "email": "josh@campeveryday.com"
+      "name": "josh@keeprstay.com",
+      "email": "josh@keeprstay.com"
     },
     "upvoters": [],
     "title": "better hybird pricig",
     "notes": "lets do a more hybrid pricing. a monthy fee plus per booking that can be passed to guests, or eaten, campground dependant. and something more affordable then the big names.",
     "url": "http://localhost:3000/owners#pricing",
     "path": "/owners",
-    "pageTitle": "Camp Everyday Host - Campground Management Software | Camp Everyday",
+    "pageTitle": "Keepr Host - Campground Management Software | Keepr",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -2497,19 +2497,19 @@
     "createdAt": "2025-12-12T07:33:58.348Z",
     "status": "completed",
     "completedAt": "2025-12-12T17:15:00.000Z",
-    "agentNotes": "Added clear confirmation message after demo form submission explaining requests go to sales@campeveryday.com. Added 'What happens next' section detailing email confirmation and onboarding specialist follow-up.",
+    "agentNotes": "Added clear confirmation message after demo form submission explaining requests go to sales@keeprstay.com. Added 'What happens next' section detailing email confirmation and onboarding specialist follow-up.",
     "votes": 0,
     "submitter": {
       "id": "cmj2hvk2i000119y3xtzc4c7k",
-      "name": "josh@campeveryday.com",
-      "email": "josh@campeveryday.com"
+      "name": "josh@keeprstay.com",
+      "email": "josh@keeprstay.com"
     },
     "upvoters": [],
     "title": "request demo",
     "notes": "where does the request demo go to>",
     "url": "http://localhost:3000/owners#pricing",
     "path": "/owners",
-    "pageTitle": "Camp Everyday Host - Campground Management Software | Camp Everyday",
+    "pageTitle": "Keepr Host - Campground Management Software | Keepr",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -2534,15 +2534,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmj2hvk2i000119y3xtzc4c7k",
-      "name": "josh@campeveryday.com",
-      "email": "josh@campeveryday.com"
+      "name": "josh@keeprstay.com",
+      "email": "josh@keeprstay.com"
     },
     "upvoters": [],
     "title": "kiosk, select a site",
     "notes": "when selecting a site it would be nice to filter by cabin, tent, tv, then by amendities, 50 amps, 30 amps, sewer, etc",
     "url": "http://localhost:3000/kiosk",
     "path": "/kiosk",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {
@@ -2567,15 +2567,15 @@
     "votes": 0,
     "submitter": {
       "id": "cmj2hvk2i000119y3xtzc4c7k",
-      "name": "josh@campeveryday.com",
-      "email": "josh@campeveryday.com"
+      "name": "josh@keeprstay.com",
+      "email": "josh@keeprstay.com"
     },
     "upvoters": [],
     "title": "guest info",
     "notes": "after i put in the guest infi, i hit enter and got an error: Console Error\n\n\nInternal server error\nCall Stack\n3\n\nparseResponse\nfile:///Users/josh/Documents/GitHub/Campreserv%20(broken)%20copy/platform/apps/web/.next/dev/static/chunks/platform_ffa0cf44._.js (2578:17)\nasync Object.createPublicReservation\nfile:///Users/josh/Documents/GitHub/Campreserv%20(broken)%20copy/platform/apps/web/.next/dev/static/chunks/platform_ffa0cf44._.js (5924:22)\nasync handleWalkInSubmit\nfile:///Users/josh/Documents/GitHub/Campreserv%20(broken)%20copy/platform/apps/web/.next/dev/static/chunks/platform_apps_web_4bf9e58e._.js (965:28)",
     "url": "http://localhost:3000/kiosk",
     "path": "/kiosk",
-    "pageTitle": "Camp Everyday - Find your perfect camping adventure",
+    "pageTitle": "Keepr - Find your perfect camping adventure",
     "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
     "extra": {
       "viewport": {

@@ -104,4 +104,4 @@ CHECK-OUT DAY → "Thanks for staying!"
 
 ---
 
-*Camp Everyday includes built-in automation for confirmations, reminders, and follow-ups. [Automate your communication at campreserv.com](https://campreserv.com)*
+*Keepr includes built-in automation for confirmations, reminders, and follow-ups. [Automate your communication at campreserv.com](https://campreserv.com)*

@@ -25,9 +25,9 @@ import {
 } from "@/lib/positioning";
 
 export const metadata: Metadata = {
-  title: "Camp Everyday vs CampLife - Full Feature Comparison 2025",
+  title: "Keepr vs CampLife - Full Feature Comparison 2025",
   description:
-    "Compare Camp Everyday to CampLife. Multi-property support, AI features, loyalty programs, and transparent pricing. See why growing parks choose Camp Everyday.",
+    "Compare Keepr to CampLife. Multi-property support, AI features, loyalty programs, and transparent pricing. See why growing parks choose Keepr.",
   keywords: [
     "camplife alternative",
     "camplife vs",
@@ -36,9 +36,9 @@ export const metadata: Metadata = {
     "best camplife alternative",
   ],
   openGraph: {
-    title: "Camp Everyday vs CampLife - Which is Better for Your Park?",
+    title: "Keepr vs CampLife - Which is Better for Your Park?",
     description:
-      "Comprehensive comparison of Camp Everyday and CampLife. See features, pricing, and why parks are choosing Camp Everyday.",
+      "Comprehensive comparison of Keepr and CampLife. See features, pricing, and why parks are choosing Keepr.",
     type: "website",
   },
 };
@@ -46,11 +46,11 @@ export const metadata: Metadata = {
 const structuredData = {
   "@context": "https://schema.org",
   "@type": "Article",
-  headline: "Camp Everyday vs CampLife Comparison",
-  description: "A comprehensive comparison of Camp Everyday and CampLife campground management software",
+  headline: "Keepr vs CampLife Comparison",
+  description: "A comprehensive comparison of Keepr and CampLife campground management software",
   author: {
     "@type": "Organization",
-    name: "Camp Everyday",
+    name: "Keepr",
   },
 };
 
@@ -77,7 +77,7 @@ export default function CompareCamplifePage() {
             </div>
 
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
-              Camp Everyday vs CampLife
+              Keepr vs CampLife
             </h1>
 
             <p className="text-xl md:text-2xl text-slate-300 mb-8 leading-relaxed">
@@ -180,7 +180,7 @@ export default function CompareCamplifePage() {
               Feature-by-Feature Comparison
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Camp Everyday has everything CampLife offers, plus advanced features for growing operations.
+              Keepr has everything CampLife offers, plus advanced features for growing operations.
             </p>
           </div>
 
@@ -190,7 +190,7 @@ export default function CompareCamplifePage() {
                 <tr className="bg-slate-50 border-b border-slate-200">
                   <th className="text-left p-4 text-slate-600 font-semibold">Feature</th>
                   <th className="p-4 text-center bg-cyan-50 border-x border-cyan-100">
-                    <div className="text-cyan-700 font-bold">Camp Everyday</div>
+                    <div className="text-cyan-700 font-bold">Keepr</div>
                     <div className="text-xs text-cyan-600 mt-1">That's us!</div>
                   </th>
                   <th className="p-4 text-center">
@@ -291,7 +291,7 @@ export default function CompareCamplifePage() {
               Features You'll Need as You Scale
             </h2>
             <p className="text-lg text-slate-300 max-w-2xl mx-auto">
-              Don't outgrow your software. Camp Everyday scales with you.
+              Don't outgrow your software. Keepr scales with you.
             </p>
           </div>
 
@@ -479,7 +479,7 @@ export default function CompareCamplifePage() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-center md:text-left">
               <p className="text-slate-400 text-sm">
-                Camp Everyday - The modern alternative to legacy campground software.
+                Keepr - The modern alternative to legacy campground software.
               </p>
             </div>
             <div className="flex items-center gap-6 text-sm text-slate-400">

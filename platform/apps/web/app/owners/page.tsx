@@ -50,7 +50,7 @@ const ownerFaqs = [
 
 
 export const metadata: Metadata = {
-  title: 'Campground Management Software | Camp Everyday',
+  title: 'Campground Management Software | Keepr',
   description: 'The modern campground reservation software with AI-powered insights, guest loyalty programs, and integrated staff scheduling. $100/mo flat + $2.30/booking. No contracts. Go live in 48 hours.',
   keywords: [
     'campground management software',
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     'campground software with ai',
   ],
   openGraph: {
-    title: 'Camp Everyday - Modern Campground Management Software',
+    title: 'Keepr - Modern Campground Management Software',
     description: 'The all-in-one platform for campgrounds and RV parks. AI-powered insights, guest loyalty programs, and integrated staff scheduling. $100/mo + $2.30/booking.',
     type: 'website',
     images: [
@@ -71,17 +71,17 @@ export const metadata: Metadata = {
         url: '/images/og/owners-preview.png',
         width: 1200,
         height: 630,
-        alt: 'Camp Everyday - Modern Campground Management Software',
+        alt: 'Keepr - Modern Campground Management Software',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Camp Everyday - Modern Campground Software',
+    title: 'Keepr - Modern Campground Software',
     description: 'AI-powered insights, loyalty programs, and staff scheduling in one platform.',
   },
   alternates: {
-    canonical: 'https://campeveryday.com/owners',
+    canonical: 'https://keeprstay.com/owners',
   },
 };
 
@@ -127,7 +127,7 @@ export default function OwnersPage() {
       <FAQSection
         faqs={ownerFaqs}
         title="Frequently Asked Questions"
-        subtitle="Everything you need to know about getting started with Camp Everyday."
+        subtitle="Everything you need to know about getting started with Keepr."
         className="bg-muted"
       />
 

@@ -208,7 +208,7 @@ export class PublicReservationsController {
             const safeMessage = dto.message ? escapeHtml(dto.message) : null;
 
             await this.emailService.sendEmail({
-                to: "sales@campeveryday.com",
+                to: "sales@keeprstay.com",
                 subject: `New Demo Request: ${safeCampgroundName}`,
                 html: `
                     <h2>New Demo Request</h2>

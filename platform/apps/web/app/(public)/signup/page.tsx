@@ -396,7 +396,7 @@ export default function SignupPage() {
                   </span>
                 </h1>
                 <p className="text-xl text-slate-300 max-w-2xl mx-auto">
-                  Join the campgrounds shaping Camp Everyday. Lock in your rate forever — once these spots are gone, they're gone.
+                  Join the campgrounds shaping Keepr. Lock in your rate forever — once these spots are gone, they're gone.
                 </p>
               </motion.div>
             ) : (

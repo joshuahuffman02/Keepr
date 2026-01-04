@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
 
     return {
-        title: `${post.title} - Camp Everyday Blog`,
+        title: `${post.title} - Keepr Blog`,
         description: post.description,
     };
 }
@@ -98,7 +98,7 @@ export default function BlogPostPage({ params }: Props) {
                     <div className="flex items-center gap-4 mt-8 pt-8 border-t border-white/10">
                         <div className="w-10 h-10 bg-emerald-600 rounded-full flex items-center justify-center font-bold text-white">CE</div>
                         <div>
-                            <div className="font-semibold text-white">Camp Everyday Team</div>
+                            <div className="font-semibold text-white">Keepr Team</div>
                             <div className="text-sm text-slate-400">Curated Guides & Tips</div>
                         </div>
                     </div>
@@ -133,7 +133,7 @@ export default function BlogPostPage({ params }: Props) {
                         <div className="mt-16 bg-slate-50 rounded-2xl p-8 md:p-12 border border-slate-100">
                             <div className="text-center">
                                 <h3 className="text-2xl font-bold text-slate-900 mb-4">
-                                    Subscribe to Camp Everyday
+                                    Subscribe to Keepr
                                 </h3>
                                 <p className="text-slate-600 mb-8">
                                     Get the latest camping tips and industry insights delivered straight to your inbox.
@@ -204,7 +204,7 @@ export default function BlogPostPage({ params }: Props) {
                                         <path d="M2 20h20" />
                                     </svg>
                                 </div>
-                                <span className="text-xl font-bold">Camp Everyday</span>
+                                <span className="text-xl font-bold">Keepr</span>
                             </div>
                             <p className="text-slate-400 text-sm">
                                 Discover and book the perfect campground for your next adventure.
@@ -244,7 +244,7 @@ export default function BlogPostPage({ params }: Props) {
 
                     <div className="pt-8 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
                         <p className="text-sm text-slate-500">
-                            © {new Date().getFullYear()} Camp Everyday. All rights reserved.
+                            © {new Date().getFullYear()} Keepr. All rights reserved.
                         </p>
                     </div>
                 </div>

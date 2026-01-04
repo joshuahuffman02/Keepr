@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document defines the key metrics for tracking Camp Everyday's go-to-market performance. Use this as a guide for building internal dashboards and reporting.
+This document defines the key metrics for tracking Keepr's go-to-market performance. Use this as a guide for building internal dashboards and reporting.
 
 ---
 
@@ -10,7 +10,7 @@ This document defines the key metrics for tracking Camp Everyday's go-to-market 
 
 ### 1. Awareness Metrics
 
-Track how many potential customers are discovering Camp Everyday.
+Track how many potential customers are discovering Keepr.
 
 | Metric | Definition | Target | Tracking Source |
 |--------|------------|--------|-----------------|

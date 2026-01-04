@@ -29,9 +29,9 @@ import {
 } from "@/lib/positioning";
 
 export const metadata: Metadata = {
-  title: "Camp Everyday vs Campspot - Full Feature Comparison 2025",
+  title: "Keepr vs Campspot - Full Feature Comparison 2025",
   description:
-    "Compare Camp Everyday to Campspot. No 10% marketplace commission, AI-powered features, loyalty programs, and staff scheduling included. Switch in 48 hours.",
+    "Compare Keepr to Campspot. No 10% marketplace commission, AI-powered features, loyalty programs, and staff scheduling included. Switch in 48 hours.",
   keywords: [
     "campspot alternative",
     "campspot vs",
@@ -40,9 +40,9 @@ export const metadata: Metadata = {
     "best campspot alternative",
   ],
   openGraph: {
-    title: "Camp Everyday vs Campspot - Which is Better for Your Park?",
+    title: "Keepr vs Campspot - Which is Better for Your Park?",
     description:
-      "Comprehensive comparison of Camp Everyday and Campspot. See features, pricing, and what 100+ parks say about switching.",
+      "Comprehensive comparison of Keepr and Campspot. See features, pricing, and what 100+ parks say about switching.",
     type: "website",
   },
 };
@@ -51,11 +51,11 @@ export const metadata: Metadata = {
 const structuredData = {
   "@context": "https://schema.org",
   "@type": "Article",
-  headline: "Camp Everyday vs Campspot Comparison",
-  description: "A comprehensive comparison of Camp Everyday and Campspot campground management software",
+  headline: "Keepr vs Campspot Comparison",
+  description: "A comprehensive comparison of Keepr and Campspot campground management software",
   author: {
     "@type": "Organization",
-    name: "Camp Everyday",
+    name: "Keepr",
   },
 };
 
@@ -83,7 +83,7 @@ export default function CompareCampspotPage() {
             </div>
 
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
-              Camp Everyday vs Campspot
+              Keepr vs Campspot
             </h1>
 
             <p className="text-xl md:text-2xl text-slate-300 mb-8 leading-relaxed">
@@ -188,7 +188,7 @@ export default function CompareCampspotPage() {
               Feature-by-Feature Comparison
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              See exactly what you get with Camp Everyday vs Campspot. No hidden features, no surprises.
+              See exactly what you get with Keepr vs Campspot. No hidden features, no surprises.
             </p>
           </div>
 
@@ -198,7 +198,7 @@ export default function CompareCampspotPage() {
                 <tr className="bg-slate-50 border-b border-slate-200">
                   <th className="text-left p-4 text-slate-600 font-semibold">Feature</th>
                   <th className="p-4 text-center bg-emerald-50 border-x border-emerald-100">
-                    <div className="text-emerald-700 font-bold">Camp Everyday</div>
+                    <div className="text-emerald-700 font-bold">Keepr</div>
                     <div className="text-xs text-emerald-600 mt-1">That's us!</div>
                   </th>
                   <th className="p-4 text-center">
@@ -298,7 +298,7 @@ export default function CompareCampspotPage() {
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/20 border border-emerald-500/30 rounded-full text-emerald-400 text-sm font-semibold mb-6">
               <Award className="h-4 w-4" />
-              Exclusive to Camp Everyday
+              Exclusive to Keepr
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
               Features Campspot Doesn't Offer
@@ -335,7 +335,7 @@ export default function CompareCampspotPage() {
                 Calculate Your Savings
               </h2>
               <p className="text-slate-600">
-                See how much you could save by switching from Campspot to Camp Everyday.
+                See how much you could save by switching from Campspot to Keepr.
               </p>
             </div>
 
@@ -474,7 +474,7 @@ export default function CompareCampspotPage() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="text-center md:text-left">
               <p className="text-slate-400 text-sm">
-                Camp Everyday - The modern alternative to legacy campground software.
+                Keepr - The modern alternative to legacy campground software.
               </p>
             </div>
             <div className="flex items-center gap-6 text-sm text-slate-400">

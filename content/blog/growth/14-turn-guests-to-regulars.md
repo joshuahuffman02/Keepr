@@ -69,4 +69,4 @@ Acquiring new guests is expensive. Keeping existing ones coming back is where re
 
 ---
 
-*Camp Everyday tracks guest history so you can recognize returning guests and personalize their experience. [Build loyalty at campreserv.com](https://campreserv.com)*
+*Keepr tracks guest history so you can recognize returning guests and personalize their experience. [Build loyalty at campreserv.com](https://campreserv.com)*

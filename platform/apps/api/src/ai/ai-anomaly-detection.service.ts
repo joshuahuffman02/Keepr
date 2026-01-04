@@ -344,7 +344,7 @@ Response in JSON:
 
             <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
               <p style="color: #94a3b8; font-size: 11px; margin: 0;">
-                AI-Powered Anomaly Detection • Camp Everyday
+                AI-Powered Anomaly Detection • Keepr
               </p>
             </div>
           </div>
@@ -461,7 +461,7 @@ Response in JSON:
             Log in to your dashboard to view details and take action.
           </p>
           <p style="color: #94a3b8; font-size: 11px; margin-top: 8px;">
-            AI-Powered Anomaly Detection • Camp Everyday
+            AI-Powered Anomaly Detection • Keepr
           </p>
         </div>
       </div>

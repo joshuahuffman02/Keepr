@@ -80,4 +80,4 @@ The nightly rate is just the beginning. Smart campgrounds generate significant a
 
 ---
 
-*Camp Everyday includes add-on management so guests can purchase extras at booking or during their stay. [Boost revenue at campreserv.com](https://campreserv.com)*
+*Keepr includes add-on management so guests can purchase extras at booking or during their stay. [Boost revenue at campreserv.com](https://campreserv.com)*

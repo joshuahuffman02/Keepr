@@ -88,4 +88,4 @@ If uncertain, test before committing:
 
 ---
 
-*Camp Everyday supports any accommodation type, from tent sites to luxury glamping. [Manage your property at campreserv.com](https://campreserv.com)*
+*Keepr supports any accommodation type, from tent sites to luxury glamping. [Manage your property at campreserv.com](https://campreserv.com)*

@@ -296,4 +296,4 @@ The key is preparation: know who's coming, have their information ready, and get
 
 ---
 
-*Camp Everyday streamlines check-in with pre-populated guest information, quick site assignment, and integrated payments—getting guests to their sites faster. [See it in action at campreserv.com](https://campreserv.com)*
+*Keepr streamlines check-in with pre-populated guest information, quick site assignment, and integrated payments—getting guests to their sites faster. [See it in action at campreserv.com](https://campreserv.com)*

@@ -105,7 +105,7 @@ export function DemoClient() {
               </div>
 
               <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
-                See Camp Everyday
+                See Keepr
                 <span className="block text-violet-400">In Action</span>
               </h1>
 
@@ -260,7 +260,7 @@ export function DemoClient() {
                     </Link>
                   </Button>
                   <p className="mt-4 text-sm text-slate-500">
-                    Demo credentials: <code className="bg-slate-100 px-2 py-1 rounded">demo@campeveryday.com</code>
+                    Demo credentials: <code className="bg-slate-100 px-2 py-1 rounded">demo@keeprstay.com</code>
                   </p>
                 </div>
               )}
@@ -277,7 +277,7 @@ export function DemoClient() {
               What's in the Demo
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              A realistic campground setup so you can see how Camp Everyday handles real-world scenarios.
+              A realistic campground setup so you can see how Keepr handles real-world scenarios.
             </p>
           </div>
 
@@ -369,7 +369,7 @@ export function DemoClient() {
         <div className="max-w-6xl mx-auto px-6 py-12">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <p className="text-slate-400 text-sm">
-              Camp Everyday - Try before you buy.
+              Keepr - Try before you buy.
             </p>
             <div className="flex items-center gap-6 text-sm text-slate-400">
               <Link href="/pricing" className="hover:text-white">Pricing</Link>

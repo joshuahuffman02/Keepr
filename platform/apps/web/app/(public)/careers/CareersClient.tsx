@@ -16,7 +16,7 @@ export default function CareersClient() {
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-100">
           We're hiring soon
         </div>
-        <h1 className="text-3xl md:text-4xl font-bold text-slate-900">Careers at Camp Everyday</h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-slate-900">Careers at Keepr</h1>
         <p className="text-slate-600 max-w-2xl mx-auto">
           Help campgrounds run smoother and delight guests. Join us as we build the operating system for outdoor hospitality.
         </p>
@@ -52,7 +52,7 @@ export default function CareersClient() {
         </div>
         <div className="flex flex-wrap gap-3">
           <Link
-            href="mailto:careers@campeveryday.com"
+            href="mailto:careers@keeprstay.com"
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-emerald-600 rounded-lg hover:bg-emerald-700"
           >
             Send your resume

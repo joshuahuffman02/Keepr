@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useSession, signOut } from "next-auth/react";
+import { Logo, LogoImage } from "@/components/brand";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -321,20 +321,8 @@ export function PublicHeader() {
         <header className="fixed top-0 left-0 right-0 z-50 bg-card/85 backdrop-blur-xl border-b border-border/60">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-3">
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-3 group min-w-0" onClick={handleLogoClick}>
-                    <div className="relative w-10 h-10 sm:w-12 sm:h-12 transition-transform group-hover:scale-105">
-                        <Image
-                            src="/logo.png"
-                            alt="Camp Everyday"
-                            fill
-                            sizes="48px"
-                            className="object-contain"
-                            priority
-                        />
-                    </div>
-                    <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent truncate">
-                        Camp Everyday
-                    </span>
+                <Link href="/" className="flex items-center group" onClick={handleLogoClick}>
+                    <LogoImage size="2xl" className="transition-transform group-hover:scale-105" />
                 </Link>
 
                 {/* Desktop Navigation */}

@@ -15,9 +15,9 @@ import { Button } from "@/components/ui/button";
 import { PublicHeader } from "@/components/public/PublicHeader";
 
 export const metadata: Metadata = {
-  title: "Demo Preview | Camp Everyday - Explore Without Signing Up",
+  title: "Demo Preview | Keepr - Explore Without Signing Up",
   description:
-    "Browse Camp Everyday features without creating an account. See the dashboard, calendar, and key features in action.",
+    "Browse Keepr features without creating an account. See the dashboard, calendar, and key features in action.",
 };
 
 const previewScreens = [
@@ -75,7 +75,7 @@ export default function DemoPreviewPage() {
           </div>
 
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Explore Camp Everyday
+            Explore Keepr
           </h1>
 
           <p className="text-xl text-slate-300 mb-8 max-w-2xl mx-auto">
@@ -173,7 +173,7 @@ export default function DemoPreviewPage() {
         <div className="max-w-6xl mx-auto px-6 py-12">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <p className="text-slate-400 text-sm">
-              Camp Everyday - Preview without commitment.
+              Keepr - Preview without commitment.
             </p>
             <div className="flex items-center gap-6 text-sm text-slate-400">
               <Link href="/pricing" className="hover:text-white">

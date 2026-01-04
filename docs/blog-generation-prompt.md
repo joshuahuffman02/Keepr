@@ -1,12 +1,12 @@
-# Blog Post Generation Prompt for Camp Everyday
+# Blog Post Generation Prompt for Keepr
 
-Use this prompt with an AI agent to generate 50+ SEO-optimized blog posts for the Camp Everyday platform.
+Use this prompt with an AI agent to generate 50+ SEO-optimized blog posts for the Keepr platform.
 
 ---
 
 ## Context
 
-You are writing blog posts for **Camp Everyday** (campreserv.com), a modern campground management software platform. 
+You are writing blog posts for **Keepr** (campreserv.com), a modern campground management software platform. 
 
 **Target Audiences:**
 1. **Campground owners/operators** - looking to improve operations, increase bookings, and modernize their business
@@ -15,7 +15,7 @@ You are writing blog posts for **Camp Everyday** (campreserv.com), a modern camp
 
 **Brand Voice:** Professional but approachable, knowledgeable, helpful. Think "friendly industry expert."
 
-**Goal:** Create 50+ SEO-optimized blog posts that will rank for relevant keywords and establish Camp Everyday as a thought leader.
+**Goal:** Create 50+ SEO-optimized blog posts that will rank for relevant keywords and establish Keepr as a thought leader.
 
 ---
 
@@ -116,7 +116,7 @@ You are writing blog posts for **Camp Everyday** (campreserv.com), a modern camp
 [3-5 bullet point summary]
 
 ## Conclusion
-[Call to action - often soft mention of how Camp Everyday helps]
+[Call to action - often soft mention of how Keepr helps]
 ```
 
 ---
@@ -124,7 +124,7 @@ You are writing blog posts for **Camp Everyday** (campreserv.com), a modern camp
 ## Important Guidelines
 
 ### 1. Avoid Hard Selling
-Focus on providing value. Mention Camp Everyday naturally only 1-2 times per post as a helpful solution, not a sales pitch.
+Focus on providing value. Mention Keepr naturally only 1-2 times per post as a helpful solution, not a sales pitch.
 
 ### 2. Use Real Examples
 Include specific scenarios campground owners face. Make it relatable.
@@ -144,7 +144,7 @@ Mark where posts should link to each other: `[LINK: related-post-title]`
 ### 6. Suggested CTAs
 
 **For owner-focused posts:**
-> "Want to simplify your campground operations? See how Camp Everyday can help."
+> "Want to simplify your campground operations? See how Keepr can help."
 
 **For camper-focused posts:**
 > "Find your next campsite at campreserv.com"

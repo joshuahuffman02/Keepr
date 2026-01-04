@@ -35,7 +35,7 @@ export default function PublicRoadmapPage() {
         <div className="max-w-5xl mx-auto px-6 py-5 flex items-center justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-emerald-600">Product roadmap</p>
-            <h1 className="text-2xl font-bold text-slate-900">Camp Everyday</h1>
+            <h1 className="text-2xl font-bold text-slate-900">Keepr</h1>
             <p className="text-sm text-slate-600">What we're building next</p>
           </div>
           <div className="flex items-center gap-2">

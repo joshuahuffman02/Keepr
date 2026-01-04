@@ -1,5 +1,5 @@
 /**
- * SEO Utilities for Camp Everyday
+ * SEO Utilities for Keepr
  * Centralized SEO configuration, metadata generation, and structured data helpers
  */
 

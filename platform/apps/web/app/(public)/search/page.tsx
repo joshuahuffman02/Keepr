@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { SemanticSearchResults } from "./SemanticSearchResults";
 
 export const metadata: Metadata = {
-  title: "Search Campgrounds | Camp Everyday",
+  title: "Search Campgrounds | Keepr",
   description: "Find the perfect campground using natural language search",
 };
 

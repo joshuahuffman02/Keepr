@@ -18,7 +18,14 @@ interface InlineActivityFeedProps {
 export function InlineActivityFeed({ className }: InlineActivityFeedProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
-  const prefersReducedMotion = useReducedMotion();
+  const [hasMounted, setHasMounted] = useState(false);
+  const prefersReducedMotionValue = useReducedMotion();
+  // Use consistent value before mount to prevent hydration mismatch
+  const prefersReducedMotion = hasMounted ? prefersReducedMotionValue : true;
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   // Fetch real platform stats
   const { data: stats } = useQuery({

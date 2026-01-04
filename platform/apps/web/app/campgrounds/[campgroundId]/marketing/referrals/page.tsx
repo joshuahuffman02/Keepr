@@ -103,7 +103,7 @@ export default function ReferralsPage() {
         notes: ""
     });
 
-    const referralBaseUrl = useMemo(() => (typeof window !== "undefined" ? window.location.origin : "https://campeveryday.com"), []);
+    const referralBaseUrl = useMemo(() => (typeof window !== "undefined" ? window.location.origin : "https://keeprstay.com"), []);
     const formatMoney = (cents: number | null | undefined) => `$${(((cents ?? 0) as number) / 100).toFixed(2)}`;
 
     // Queries

@@ -23,9 +23,9 @@ import { PublicHeader } from "@/components/public/PublicHeader";
 import { PRICING, COMPETITOR_PAIN_POINTS, CTA_COPY } from "@/lib/positioning";
 
 export const metadata: Metadata = {
-  title: "Switch from Campspot to Camp Everyday | Free Migration in 48 Hours",
+  title: "Switch from Campspot to Keepr | Free Migration in 48 Hours",
   description:
-    "Tired of Campspot's 10% commission and rising fees? Switch to Camp Everyday with free data migration. Keep all your features, lose the hidden costs. Go live in 48 hours.",
+    "Tired of Campspot's 10% commission and rising fees? Switch to Keepr with free data migration. Keep all your features, lose the hidden costs. Go live in 48 hours.",
   keywords: [
     "switch from campspot",
     "campspot alternative",
@@ -57,7 +57,7 @@ const migrationSteps = [
   {
     day: "Day 2",
     title: "Quick Training Call",
-    description: "30-minute call to walk through Camp Everyday. Your team will be comfortable immediately - it's intuitive.",
+    description: "30-minute call to walk through Keepr. Your team will be comfortable immediately - it's intuitive.",
     icon: Phone,
   },
   {
@@ -173,7 +173,7 @@ export default function SwitchFromCampspotPage() {
               Why Parks Are Leaving Campspot
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Sound familiar? Here's what we hear from park owners switching to Camp Everyday.
+              Sound familiar? Here's what we hear from park owners switching to Keepr.
             </p>
           </div>
 
@@ -411,8 +411,8 @@ export default function SwitchFromCampspotPage() {
 
           <p className="text-emerald-200 text-sm">
             Questions? Email us at{" "}
-            <a href="mailto:switch@campeveryday.com" className="underline">
-              switch@campeveryday.com
+            <a href="mailto:switch@keeprstay.com" className="underline">
+              switch@keeprstay.com
             </a>
           </p>
         </div>
@@ -423,7 +423,7 @@ export default function SwitchFromCampspotPage() {
         <div className="max-w-6xl mx-auto px-6 py-12">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <p className="text-slate-400 text-sm">
-              Camp Everyday - The Campspot alternative parks are switching to.
+              Keepr - The Campspot alternative parks are switching to.
             </p>
             <div className="flex items-center gap-6 text-sm text-slate-400">
               <Link href="/compare/campspot" className="hover:text-white">Full Comparison</Link>

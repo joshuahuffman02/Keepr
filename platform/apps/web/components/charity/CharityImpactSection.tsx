@@ -2,15 +2,16 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { motion, useInView, useReducedMotion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { TrendingUp } from "lucide-react";
 import Image from "next/image";
 import { apiClient } from "@/lib/api-client";
+import { useReducedMotionSafe } from "@/hooks/use-reduced-motion-safe";
 
 // Animated counter hook
 function useAnimatedCounter(end: number, duration: number = 2000, start: boolean = true) {
   const [count, setCount] = useState(0);
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReducedMotion = useReducedMotionSafe();
 
   useEffect(() => {
     if (!start || end === 0) {
@@ -88,7 +89,7 @@ interface CharityImpactSectionProps {
 export function CharityImpactSection({ variant = "full", showCTA = true }: CharityImpactSectionProps) {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReducedMotion = useReducedMotionSafe();
 
   const { data: stats, isLoading } = useQuery({
     queryKey: ["platform-charity-stats"],
@@ -205,7 +206,7 @@ export function CharityImpactSection({ variant = "full", showCTA = true }: Chari
               Camping with Heart
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              When you book through Camp Everyday, you're part of a community that gives back.
+              When you book through Keepr, you're part of a community that gives back.
               Campgrounds across the country are making a difference, one reservation at a time.
             </p>
           </motion.div>

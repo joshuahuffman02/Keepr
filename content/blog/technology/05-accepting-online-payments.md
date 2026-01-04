@@ -107,4 +107,4 @@ If you're not accepting online payments, you're creating friction for guests and
 
 ---
 
-*Camp Everyday includes integrated payment processing with competitive rates and automatic reconciliation. [Accept payments easily at campreserv.com](https://campreserv.com)*
+*Keepr includes integrated payment processing with competitive rates and automatic reconciliation. [Accept payments easily at campreserv.com](https://campreserv.com)*

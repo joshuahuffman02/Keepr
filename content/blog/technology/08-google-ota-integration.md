@@ -106,4 +106,4 @@ Online travel agencies (OTAs) and Google can expand your reach dramatically. But
 
 ---
 
-*Camp Everyday integrates with major booking channels to keep availability synchronized. [Expand your reach at campreserv.com](https://campreserv.com)*
+*Keepr integrates with major booking channels to keep availability synchronized. [Expand your reach at campreserv.com](https://campreserv.com)*

@@ -1,4 +1,4 @@
-# Camp Everyday - Feature Priorities
+# Keepr - Feature Priorities
 
 **Last Updated:** December 17, 2025
 
@@ -25,7 +25,7 @@ These are the 7 key features identified as critical for competitive positioning 
 ### Marketing Messaging (Dec 2025)
 - Updated HeroSection with "Modern Alternative to Legacy Systems" headline
 - Added pain point badges (no contracts, no setup fees, no hidden costs)
-- Created WhySwitch component comparing Camp Everyday vs legacy systems
+- Created WhySwitch component comparing Keepr vs legacy systems
 - Updated OwnerCTA with switch-focused messaging
 - Updated pricing copy to emphasize savings vs competitors
 - Updated meta titles/descriptions for SEO

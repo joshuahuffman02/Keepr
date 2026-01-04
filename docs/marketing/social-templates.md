@@ -17,7 +17,7 @@ Setup fees of $2,000+
 Per-booking fees that grow faster than your business
 "Enterprise features" you'll never use
 
-We built Camp Everyday because mid-size parks deserve modern software at fair prices.
+We built Keepr because mid-size parks deserve modern software at fair prices.
 
 $100/month + $2.30/booking
 No setup fees
@@ -66,7 +66,7 @@ They faxed me a confirmation. (Faxed.)
 
 I thought: "The camping industry deserves better tech."
 
-So we built Camp Everyday.
+So we built Keepr.
 
 Modern booking. AI pricing. Staff scheduling. POS.
 All in one system, priced fairly.
@@ -106,7 +106,7 @@ How many does your current system have?
 ### Template 5: Customer Win Story (Anonymous if needed)
 
 ```
-A 75-site RV park in [Region] switched to Camp Everyday.
+A 75-site RV park in [Region] switched to Keepr.
 
 Before:
 - Paying $1,400/month in software costs

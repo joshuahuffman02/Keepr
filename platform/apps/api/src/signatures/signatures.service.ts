@@ -174,7 +174,7 @@ export class SignaturesService {
 
     if (request.deliveryChannel === SignatureDeliveryChannel.sms || request.deliveryChannel === SignatureDeliveryChannel.email_and_sms) {
       if (recipientPhone) {
-        const body = `Camp Everyday Host: Signature needed for your stay. ${link}`;
+        const body = `Keepr Host: Signature needed for your stay. ${link}`;
         await this.sms.sendSms({ to: recipientPhone, body, reservationId: request.reservationId, campgroundId: request.campgroundId });
       } else {
         this.logger.warn(`SMS delivery requested but no phone found for request ${request.id}`);

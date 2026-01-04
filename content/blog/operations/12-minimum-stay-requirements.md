@@ -328,4 +328,4 @@ The sweet spot: rules that ensure high-demand periods fill with multi-night stay
 
 ---
 
-*Camp Everyday lets you configure flexible minimum stay rules by date, site type, and season—automatically enforcing them during booking. [Optimize your revenue at campreserv.com](https://campreserv.com)*
+*Keepr lets you configure flexible minimum stay rules by date, site type, and season—automatically enforcing them during booking. [Optimize your revenue at campreserv.com](https://campreserv.com)*

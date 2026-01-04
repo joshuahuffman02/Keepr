@@ -46,7 +46,7 @@ export function Testimonials() {
             Be part of something new
           </p>
           <p className="text-xl text-muted-foreground">
-            We're building Camp Everyday with campground owners, not just for them.
+            We're building Keepr with campground owners, not just for them.
             Early adopters get unique benefits you won't find anywhere else.
           </p>
         </div>

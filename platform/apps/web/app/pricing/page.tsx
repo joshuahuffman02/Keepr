@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Pricing | Camp Everyday",
+  title: "Pricing | Keepr",
   description: "Transparent plans with fee pass-through controls for campgrounds.",
 };
 

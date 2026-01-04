@@ -83,4 +83,4 @@ More than 60% of campground website visits come from mobile devices. If your boo
 
 ---
 
-*Camp Everyday's booking interface is optimized for mobile from the ground up. [See mobile booking at campreserv.com](https://campreserv.com)*
+*Keepr's booking interface is optimized for mobile from the ground up. [See mobile booking at campreserv.com](https://campreserv.com)*

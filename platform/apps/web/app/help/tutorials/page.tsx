@@ -21,7 +21,7 @@ interface VideoTutorial {
 const tutorials: VideoTutorial[] = [
   {
     id: "getting-started",
-    title: "Getting Started with Camp Everyday",
+    title: "Getting Started with Keepr",
     description: "Complete overview of the system, navigation, and key features",
     duration: "8:30",
     category: "Getting Started",
@@ -175,7 +175,7 @@ export default function TutorialsPage() {
             <div>
               <h1 className="text-2xl font-bold text-slate-900 mb-2">Video Tutorials</h1>
               <p className="text-slate-600">
-                Step-by-step video guides to master Camp Everyday features
+                Step-by-step video guides to master Keepr features
               </p>
             </div>
             <div className="px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-lg text-sm font-medium text-emerald-700">

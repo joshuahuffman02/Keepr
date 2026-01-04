@@ -20,9 +20,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { PublicHeader } from "@/components/public/PublicHeader";
 
-const CAMP_EVERYDAY_BASE = 100;
-const CAMP_EVERYDAY_PER_BOOKING = 2.3;
-const CAMP_EVERYDAY_AI_INCLUDED = 5;
+const KEEPR_BASE = 100;
+const KEEPR_PER_BOOKING = 2.3;
+const KEEPR_AI_INCLUDED = 5;
 
 const competitors = [
   {
@@ -95,14 +95,14 @@ export function ROICalculatorClient() {
   const competitorAnnual = competitorMonthly * 12;
   const competitorFirstYear = competitorAnnual + competitor.setupFee;
 
-  const campEverydayPerBooking = monthlyBookings * CAMP_EVERYDAY_PER_BOOKING;
-  const campEverydayMonthly = CAMP_EVERYDAY_BASE + campEverydayPerBooking;
-  const campEverydayAnnual = campEverydayMonthly * 12;
-  const campEverydayFirstYear = campEverydayAnnual; // No setup fee
+  const keeprPerBooking = monthlyBookings * KEEPR_PER_BOOKING;
+  const keeprMonthly = KEEPR_BASE + keeprPerBooking;
+  const keeprAnnual = keeprMonthly * 12;
+  const keeprFirstYear = keeprAnnual; // No setup fee
 
-  const monthlySavings = competitorMonthly - campEverydayMonthly;
-  const annualSavings = competitorAnnual - campEverydayAnnual;
-  const firstYearSavings = competitorFirstYear - campEverydayFirstYear;
+  const monthlySavings = competitorMonthly - keeprMonthly;
+  const annualSavings = competitorAnnual - keeprAnnual;
+  const firstYearSavings = competitorFirstYear - keeprFirstYear;
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -141,7 +141,7 @@ export function ROICalculatorClient() {
           </h1>
 
           <p className="text-xl text-slate-300 max-w-2xl mx-auto">
-            Compare your current software costs to Camp Everyday&apos;s transparent pricing.
+            Compare your current software costs to Keepr&apos;s transparent pricing.
             Most parks save $5,000-15,000 per year.
           </p>
         </div>
@@ -229,7 +229,7 @@ export function ROICalculatorClient() {
                     </span>
                   </label>
                   <p className="text-xs text-slate-500 mt-1 ml-8">
-                    Competitors charge $100-200/mo extra. Camp Everyday includes it.
+                    Competitors charge $100-200/mo extra. Keepr includes it.
                   </p>
                 </div>
 
@@ -306,22 +306,22 @@ export function ROICalculatorClient() {
                     </div>
                   </div>
 
-                  {/* Camp Everyday */}
+                  {/* Keepr */}
                   <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-emerald-800">Camp Everyday</span>
+                      <span className="text-sm font-medium text-emerald-800">Keepr</span>
                       <span className="text-xl font-bold text-emerald-600">
-                        {formatCurrency(campEverydayMonthly)}/mo
+                        {formatCurrency(keeprMonthly)}/mo
                       </span>
                     </div>
                     <div className="text-xs text-emerald-600 space-y-1">
                       <div className="flex justify-between">
                         <span>Base fee</span>
-                        <span>{formatCurrency(CAMP_EVERYDAY_BASE)}</span>
+                        <span>{formatCurrency(KEEPR_BASE)}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Per-booking ({monthlyBookings} x ${CAMP_EVERYDAY_PER_BOOKING})</span>
-                        <span>{formatCurrency(campEverydayPerBooking)}</span>
+                        <span>Per-booking ({monthlyBookings} x ${KEEPR_PER_BOOKING})</span>
+                        <span>{formatCurrency(keeprPerBooking)}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>AI features</span>
@@ -501,7 +501,7 @@ export function ROICalculatorClient() {
         <div className="max-w-6xl mx-auto px-6 py-12">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <p className="text-slate-400 text-sm">
-              Camp Everyday - Transparent pricing for modern campgrounds.
+              Keepr - Transparent pricing for modern campgrounds.
             </p>
             <div className="flex items-center gap-6 text-sm text-slate-400">
               <Link href="/pricing" className="hover:text-white">

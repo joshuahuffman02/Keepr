@@ -21,14 +21,14 @@ Case studies are one of the most effective sales tools for B2B software. They pr
 | **Size** | [X] sites |
 | **Type** | [RV Park / Campground / Mixed] |
 | **Challenge** | [Primary challenge in one sentence] |
-| **Solution** | Camp Everyday [specific feature focus] |
+| **Solution** | Keepr [specific feature focus] |
 | **Results** | [Key metric: X% improvement, $X savings] |
 
 ---
 
 ## The Challenge
 
-[2-3 paragraphs describing the situation before Camp Everyday]
+[2-3 paragraphs describing the situation before Keepr]
 
 [Park Name] is a [size]-site [type] in [location], serving [describe typical guests] since [year established].
 
@@ -47,15 +47,15 @@ Case studies are one of the most effective sales tools for B2B software. They pr
 
 ## The Solution
 
-### Why Camp Everyday?
+### Why Keepr?
 
-[Park Name] evaluated [number] different platforms before choosing Camp Everyday. Here's what stood out:
+[Park Name] evaluated [number] different platforms before choosing Keepr. Here's what stood out:
 
 1. **[Feature 1]** - [Why it mattered to them]
 2. **[Feature 2]** - [Why it mattered to them]
 3. **[Feature 3]** - [Why it mattered to them]
 
-"[Quote about why they chose Camp Everyday]" explains [Owner Name].
+"[Quote about why they chose Keepr]" explains [Owner Name].
 
 ### Implementation
 
@@ -101,7 +101,7 @@ Case studies are one of the most effective sales tools for B2B software. They pr
 - [Future plan 1]
 - [Future plan 2]
 
-"[Quote about future with Camp Everyday]"
+"[Quote about future with Keepr]"
 
 ---
 
@@ -123,7 +123,7 @@ Case studies are one of the most effective sales tools for B2B software. They pr
 ### Structure
 
 ```markdown
-# [Park Name] Saves [Key Result] with Camp Everyday
+# [Park Name] Saves [Key Result] with Keepr
 
 **Industry:** [RV Park / Campground / Resort]
 **Size:** [X sites]
@@ -139,7 +139,7 @@ Case studies are one of the most effective sales tools for B2B software. They pr
 
 ## The Solution
 
-After evaluating alternatives, [Park Name] switched to Camp Everyday in [Month Year].
+After evaluating alternatives, [Park Name] switched to Keepr in [Month Year].
 
 **What made the difference:**
 - [Feature 1] helped them [benefit]
@@ -158,7 +158,7 @@ Within [timeframe], [Park Name] saw:
 
 ---
 
-*[Park Name] is one of [X] parks that have switched to Camp Everyday. [See if it's right for you](link).*
+*[Park Name] is one of [X] parks that have switched to Keepr. [See if it's right for you](link).*
 ```
 
 ---
@@ -179,7 +179,7 @@ Within [timeframe], [Park Name] saw:
 [2-3 sentences max]
 
 ### THE SOLUTION
-[2-3 sentences about Camp Everyday features used]
+[2-3 sentences about Keepr features used]
 
 ### THE RESULTS
 
@@ -208,8 +208,8 @@ Within [timeframe], [Park Name] saw:
 Send these to the customer before filming:
 
 1. Tell us about your park (size, location, type of guests)
-2. What challenges were you facing before Camp Everyday?
-3. Why did you choose Camp Everyday over alternatives?
+2. What challenges were you facing before Keepr?
+3. Why did you choose Keepr over alternatives?
 4. How was the setup/transition process?
 5. What results have you seen since switching?
 6. What's your favorite feature and why?
@@ -229,7 +229,7 @@ Send these to the customer before filming:
 - What was the breaking point?
 
 [1:30-2:30] THE SOLUTION
-- Why did you choose Camp Everyday?
+- Why did you choose Keepr?
 - How was the onboarding process?
 - What features do you use most?
 
@@ -243,7 +243,7 @@ Send these to the customer before filming:
 - Final thoughts
 
 [4:30-5:00] CALL TO ACTION
-- Camp Everyday branding
+- Keepr branding
 - Website URL
 - "Schedule a demo"
 ```
@@ -259,13 +259,13 @@ Send these to the customer before filming:
 - What's your peak season like?
 
 ### About Their Challenges
-- What was your biggest operational frustration before Camp Everyday?
+- What was your biggest operational frustration before Keepr?
 - What software were you using before? What did you like/dislike?
 - How much time were you spending on [specific task]?
 - What made you decide to look for alternatives?
 
 ### About the Decision
-- How did you first hear about Camp Everyday?
+- How did you first hear about Keepr?
 - What other options did you consider?
 - What was the deciding factor?
 - Was there anything that almost stopped you from switching?
@@ -290,7 +290,7 @@ Send these to the customer before filming:
 - What would you miss most if you had to switch away?
 
 ### Recommendation
-- Would you recommend Camp Everyday to other park owners?
+- Would you recommend Keepr to other park owners?
 - What type of park would benefit most?
 - What would you tell someone who's on the fence?
 - Any advice for the transition process?
@@ -302,7 +302,7 @@ Send these to the customer before filming:
 ### Step 1: Identify Candidates
 
 **Ideal case study customers:**
-- Using Camp Everyday for 3+ months
+- Using Keepr for 3+ months
 - Measurable results (cost savings, time savings, revenue growth)
 - Articulate and willing to participate
 - Represent a desirable customer segment
@@ -317,7 +317,7 @@ Subject: Would [Park Name] be open to a case study?
 
 Hi [Name],
 
-I've noticed [Park Name] has been doing great things with Camp Everyday, and I'd love to share your story with other campground owners who might be in a similar situation.
+I've noticed [Park Name] has been doing great things with Keepr, and I'd love to share your story with other campground owners who might be in a similar situation.
 
 Would you be interested in a brief case study? It would involve:
 - A 20-30 minute phone/video interview
@@ -327,7 +327,7 @@ Would you be interested in a brief case study? It would involve:
 In return, we'd love to:
 - Feature [Park Name] on our website and materials
 - Link to your booking page (good for SEO!)
-- Send you some Camp Everyday swag
+- Send you some Keepr swag
 - Give you [X months] free as a thank-you
 
 No pressure at all, but if you're interested, let me know and we can find a time to chat.
@@ -390,7 +390,7 @@ Include this in your case study agreement:
 ```
 CASE STUDY AUTHORIZATION
 
-I, [Customer Name], authorize [Camp Everyday / Campreserv Inc.] to:
+I, [Customer Name], authorize [Keepr / Campreserv Inc.] to:
 
 1. Use the name, logo, and images of [Park Name] in marketing materials
 2. Quote me by name and title in written and video content

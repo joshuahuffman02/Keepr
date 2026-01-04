@@ -9,7 +9,7 @@ const prisma = new PrismaClient({ adapter });
 async function testPassword() {
   try {
     const user = await prisma.user.findUnique({
-      where: { email: 'admin@campeveryday.com' },
+      where: { email: 'admin@keeprstay.com' },
       select: { email: true, passwordHash: true }
     });
 

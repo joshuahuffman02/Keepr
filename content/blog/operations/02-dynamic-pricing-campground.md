@@ -246,4 +246,4 @@ The key is starting simple and building sophistication over time. Begin with sea
 
 ---
 
-*Camp Everyday includes built-in dynamic pricing tools that automatically adjust your rates based on customizable rules. Set it once and let the system optimize your revenue. [Explore pricing features at campreserv.com](https://campreserv.com)*
+*Keepr includes built-in dynamic pricing tools that automatically adjust your rates based on customizable rules. Set it once and let the system optimize your revenue. [Explore pricing features at campreserv.com](https://campreserv.com)*

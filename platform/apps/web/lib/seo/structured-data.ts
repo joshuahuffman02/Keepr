@@ -22,7 +22,7 @@ export function generateOrganizationSchema() {
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "customer service",
-      email: "support@campeveryday.com",
+      email: "support@keeprstay.com",
     },
   };
 }
@@ -284,7 +284,7 @@ export function generateArticleSchema(article: {
     dateModified: article.modifiedAt || article.publishedAt,
     author: {
       "@type": "Person",
-      name: article.author || "Camp Everyday Team",
+      name: article.author || "Keepr Team",
     },
     publisher: {
       "@type": "Organization",

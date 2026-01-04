@@ -23,7 +23,7 @@ import { PublicHeader } from "@/components/public/PublicHeader";
 import { PRICING, PROOF_POINTS, CTA_COPY, DIFFERENTIATORS } from "@/lib/positioning";
 
 export const metadata: Metadata = {
-  title: "RV Park Reservation System | Camp Everyday - Online Booking for RV Parks",
+  title: "RV Park Reservation System | Keepr - Online Booking for RV Parks",
   description:
     "Complete RV park reservation system with hookup management, utility metering, long-term booking support, and online reservations. Go live in 48 hours. $100/mo.",
   keywords: [
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
 const structuredData = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  name: "Camp Everyday - RV Park Reservation System",
+  name: "Keepr - RV Park Reservation System",
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
   description: "Complete RV park reservation system with hookup management, utility metering, and online booking.",
@@ -199,7 +199,7 @@ export default function RvParkReservationSystemPage() {
               Features Built for RV Parks
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Not just generic campground software. Camp Everyday understands what RV parks actually need.
+              Not just generic campground software. Keepr understands what RV parks actually need.
             </p>
           </div>
 
@@ -282,7 +282,7 @@ export default function RvParkReservationSystemPage() {
               More Than Just Reservations
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Camp Everyday handles everything else too - POS, staff scheduling, and AI-powered insights.
+              Keepr handles everything else too - POS, staff scheduling, and AI-powered insights.
             </p>
           </div>
 
@@ -383,7 +383,7 @@ export default function RvParkReservationSystemPage() {
             Ready to Upgrade Your RV Park?
           </h2>
           <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Join RV parks across the country using Camp Everyday for reservations, utility billing, and more.
+            Join RV parks across the country using Keepr for reservations, utility billing, and more.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
@@ -418,7 +418,7 @@ export default function RvParkReservationSystemPage() {
         <div className="max-w-6xl mx-auto px-6 py-12">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <p className="text-slate-400 text-sm">
-              Camp Everyday - RV park reservation system built for modern parks.
+              Keepr - RV park reservation system built for modern parks.
             </p>
             <div className="flex items-center gap-6 text-sm text-slate-400">
               <Link href="/campground-management-software" className="hover:text-white">Campground Software</Link>

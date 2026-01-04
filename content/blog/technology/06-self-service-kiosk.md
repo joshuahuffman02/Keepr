@@ -104,4 +104,4 @@ Provide clear "For assistance, call..." signage.
 
 ---
 
-*Camp Everyday includes kiosk-ready check-in interfaces that work on any tablet. [Enable self-service at campreserv.com](https://campreserv.com)*
+*Keepr includes kiosk-ready check-in interfaces that work on any tablet. [Enable self-service at campreserv.com](https://campreserv.com)*

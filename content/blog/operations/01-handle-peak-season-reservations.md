@@ -190,4 +190,4 @@ Ready to handle peak season with confidence? [LINK: technology/01-paper-to-digit
 
 ---
 
-*Camp Everyday helps campground owners streamline their reservations with real-time availability, automated conflict prevention, and centralized booking management. [Learn more at campreserv.com](https://campreserv.com)*
+*Keepr helps campground owners streamline their reservations with real-time availability, automated conflict prevention, and centralized booking management. [Learn more at campreserv.com](https://campreserv.com)*

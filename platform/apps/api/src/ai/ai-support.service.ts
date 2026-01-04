@@ -106,7 +106,7 @@ const HELP_KNOWLEDGE = [
     id: "support-contact",
     title: "Contact Support",
     keywords: ["support", "help", "contact", "issue", "problem"],
-    summary: "Check help panel first. Use in-app chat or email support@campeveryday.com. Include reservation IDs or screenshots."
+    summary: "Check help panel first. Use in-app chat or email support@keeprstay.com. Include reservation IDs or screenshots."
   }
 ];
 
@@ -133,7 +133,7 @@ export class AiSupportService {
       .map((a) => `- ${a.title}: ${a.summary}`)
       .join("\n");
 
-    const systemPrompt = `You are a helpful support assistant for Camp Everyday, a campground management software. Your role is to help campground owners and staff use the platform effectively.
+    const systemPrompt = `You are a helpful support assistant for Keepr, a campground management software. Your role is to help campground owners and staff use the platform effectively.
 
 IMPORTANT GUIDELINES:
 - Be friendly, concise, and helpful

@@ -186,7 +186,7 @@ Let's compare the medium park example (120 sites, 300 bookings/month) across dif
 |----------|-------------|-------------|
 | Campspot | ~$1,149 | ~$13,788 |
 | Newbook | ~$800-1,000 | ~$9,600-12,000 |
-| Camp Everyday | ~$790 | ~$9,480 |
+| Keepr | ~$790 | ~$9,480 |
 | CampLife | ~$600-800 | ~$7,200-9,600 |
 
 *Note: These are estimates. Actual costs vary by features, negotiations, and specific park needs.*
@@ -198,7 +198,7 @@ The differences become more dramatic at higher volumes:
 | Software | Per-Booking Cost | Monthly Total |
 |----------|-----------------|---------------|
 | Campspot ($2.50/booking) | $1,250 | ~$1,649+ |
-| Camp Everyday ($2.30/booking) | $1,150 | ~$1,250 |
+| Keepr ($2.30/booking) | $1,150 | ~$1,250 |
 | **Annual difference** | | **~$4,788** |
 
 ---
@@ -258,4 +258,4 @@ The best software is the one that fits your operation's needs at a price that ma
 
 ---
 
-*Calculating software costs shouldn't require a spreadsheet. Camp Everyday offers transparent pricing: $100/month base + $2.30 per booking, AI included, no setup fees. [Compare at campeveryday.com](https://campeveryday.com/pricing)*
+*Calculating software costs shouldn't require a spreadsheet. Keepr offers transparent pricing: $100/month base + $2.30 per booking, AI included, no setup fees. [Compare at campeveryday.com](https://campeveryday.com/pricing)*

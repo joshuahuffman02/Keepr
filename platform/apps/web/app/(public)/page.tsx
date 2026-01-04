@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { HomeClient } from "./client";
 
 export const metadata: Metadata = {
-    title: "Camp Everyday - Find your perfect camping adventure",
+    title: "Keepr - Find your perfect camping adventure",
     description: "Search and book campgrounds, RV parks, and cabins. Start your outdoor adventure today.",
 };
 

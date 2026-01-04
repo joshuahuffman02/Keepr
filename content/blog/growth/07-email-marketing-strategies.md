@@ -135,4 +135,4 @@ Ready to book? [Link]
 
 ---
 
-*Camp Everyday includes automated email sequences for confirmations, reminders, and follow-ups. [Build your email marketing at campreserv.com](https://campreserv.com)*
+*Keepr includes automated email sequences for confirmations, reminders, and follow-ups. [Build your email marketing at campreserv.com](https://campreserv.com)*

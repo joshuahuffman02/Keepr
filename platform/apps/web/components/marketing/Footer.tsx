@@ -34,22 +34,22 @@ const navigation = {
 const social = [
   {
     name: 'Facebook',
-    href: 'https://facebook.com/campeveryday',
+    href: 'https://facebook.com/keeprstay',
     icon: Facebook,
   },
   {
     name: 'Twitter',
-    href: 'https://twitter.com/campeveryday',
+    href: 'https://twitter.com/keeprstay',
     icon: Twitter,
   },
   {
     name: 'Instagram',
-    href: 'https://instagram.com/campeveryday',
+    href: 'https://instagram.com/keeprstay',
     icon: Instagram,
   },
   {
     name: 'LinkedIn',
-    href: 'https://linkedin.com/company/campeveryday',
+    href: 'https://linkedin.com/company/keeprstay',
     icon: Linkedin,
   },
 ];
@@ -92,7 +92,7 @@ export function Footer() {
                   </svg>
                 </div>
                 <span className="font-bold text-xl text-white">
-                  Camp Everyday Host
+                  Keepr Host
                 </span>
               </Link>
               <p className="text-muted-foreground mb-6 max-w-sm">
@@ -106,9 +106,9 @@ export function Footer() {
                   <Phone className="h-4 w-4" />
                   <span className="text-sm">(800) 555-CAMP</span>
                 </a>
-                <a href="mailto:hello@campeveryday.com" className="flex items-center gap-2 text-muted-foreground hover:text-emerald-400 transition-colors">
+                <a href="mailto:hello@keeprstay.com" className="flex items-center gap-2 text-muted-foreground hover:text-emerald-400 transition-colors">
                   <Mail className="h-4 w-4" />
-                  <span className="text-sm">hello@campeveryday.com</span>
+                  <span className="text-sm">hello@keeprstay.com</span>
                 </a>
               </div>
             </div>
@@ -198,7 +198,7 @@ export function Footer() {
               onClick={handleCopyrightClick}
               className="text-sm text-muted-foreground hover:text-muted-foreground transition-colors cursor-default select-none"
             >
-              Keep the campfire burning - {new Date().getFullYear()} Camp Everyday
+              Keep the campfire burning - {new Date().getFullYear()} Keepr
             </button>
 
             {/* Social Links */}

@@ -83,4 +83,4 @@ First-time campers are a growing market—but they're also nervous. A great firs
 
 ---
 
-*Camp Everyday helps you identify first-time guests and automate welcome communications. [Welcome new campers at campreserv.com](https://campreserv.com)*
+*Keepr helps you identify first-time guests and automate welcome communications. [Welcome new campers at campreserv.com](https://campreserv.com)*

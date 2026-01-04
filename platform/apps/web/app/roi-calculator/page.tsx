@@ -2,9 +2,9 @@ import { Metadata } from "next";
 import { ROICalculatorClient } from "./client";
 
 export const metadata: Metadata = {
-  title: "ROI Calculator | Camp Everyday - Calculate Your Savings",
+  title: "ROI Calculator | Keepr - Calculate Your Savings",
   description:
-    "Calculate how much you could save by switching to Camp Everyday. Compare your current software costs to our transparent pricing.",
+    "Calculate how much you could save by switching to Keepr. Compare your current software costs to our transparent pricing.",
   keywords: [
     "campground software roi",
     "rv park software cost calculator",
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Calculate Your Campground Software Savings",
     description:
-      "See exactly how much you could save with Camp Everyday's transparent pricing model.",
+      "See exactly how much you could save with Keepr's transparent pricing model.",
     type: "website",
   },
 };

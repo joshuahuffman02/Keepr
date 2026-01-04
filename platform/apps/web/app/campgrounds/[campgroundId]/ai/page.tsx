@@ -193,7 +193,7 @@ export default function AiSettingsPage() {
                                 </div>
 
                                 <div className="p-3 rounded-lg bg-muted text-sm text-muted-foreground">
-                                    <strong>AI powered by Camp Everyday.</strong> We use OpenAI's GPT-4 to provide AI features.
+                                    <strong>AI powered by Keepr.</strong> We use OpenAI's GPT-4 to provide AI features.
                                     Your data is anonymized before processing and never used to train models.
                                 </div>
                             </CardContent>

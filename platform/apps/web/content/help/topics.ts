@@ -511,7 +511,7 @@ export const helpTopics: HelpTopic[] = [
     tags: ["support", "contact"],
     steps: [
       "Check this help panel for answers first.",
-      "Use in-app chat or email support@campeveryday.com.",
+      "Use in-app chat or email support@keeprstay.com.",
       "Include reservation IDs or screenshots for faster help.",
       "For outages, provide error messages and time of issue."
     ],

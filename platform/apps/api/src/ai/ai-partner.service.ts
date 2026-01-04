@@ -409,7 +409,7 @@ export class AiPartnerService {
     role: string;
     mode: PartnerMode;
   }): Promise<{ persona: PersonaKey; confidence?: number; reason?: string }> {
-    const systemPrompt = `You are a routing agent for Camp Everyday Host.
+    const systemPrompt = `You are a routing agent for Keepr Host.
 Select the single best persona for the request.
 Return ONLY valid JSON with keys: persona, confidence, reason.
 

@@ -318,4 +318,4 @@ The guest driving past three RV parks to get to yours? They'll book where the ex
 
 ---
 
-*Camp Everyday includes all five of these features at a transparent price: $100/month + $2.30 per booking, AI included. No setup fees, no hidden costs. [Explore what's possible at campeveryday.com](https://campeveryday.com)*
+*Keepr includes all five of these features at a transparent price: $100/month + $2.30 per booking, AI included. No setup fees, no hidden costs. [Explore what's possible at campeveryday.com](https://campeveryday.com)*

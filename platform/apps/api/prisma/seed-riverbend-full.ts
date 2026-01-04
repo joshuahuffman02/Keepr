@@ -1,5 +1,5 @@
 /**
- * Comprehensive seed for Camp Everyday - Riverbend
+ * Comprehensive seed for Keepr - Riverbend
  * Creates full demo data for testing all features
  *
  * Run: DATABASE_URL="..." npx tsx prisma/seed-riverbend-full.ts
@@ -47,7 +47,7 @@ const firstNames = ["James", "Mary", "Robert", "Patricia", "John", "Jennifer", "
 const lastNames = ["Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Jackson", "Martin", "Lee", "Perez", "Thompson", "White", "Harris", "Sanchez", "Clark", "Ramirez", "Lewis", "Robinson"];
 
 async function main() {
-  console.log("=== Seeding Camp Everyday - Riverbend ===\n");
+  console.log("=== Seeding Keepr - Riverbend ===\n");
 
   // Find the campground
   const campground = await prisma.campground.findFirst({
@@ -55,7 +55,7 @@ async function main() {
   });
 
   if (!campground) {
-    console.error("Camp Everyday - Riverbend not found!");
+    console.error("Keepr - Riverbend not found!");
     process.exit(1);
   }
 
@@ -463,8 +463,8 @@ async function main() {
     { name: "Firewood Bundle", sku: "FIRE-001", price: 800, category: "Supplies" },
     { name: "Ice Bag (10lb)", sku: "ICE-001", price: 400, category: "Supplies" },
     { name: "S'mores Kit", sku: "FOOD-001", price: 1200, category: "Food" },
-    { name: "Camp Everyday T-Shirt", sku: "MERCH-001", price: 2500, category: "Merchandise" },
-    { name: "Camp Everyday Hat", sku: "MERCH-002", price: 1800, category: "Merchandise" },
+    { name: "Keepr T-Shirt", sku: "MERCH-001", price: 2500, category: "Merchandise" },
+    { name: "Keepr Hat", sku: "MERCH-002", price: 1800, category: "Merchandise" },
     { name: "Propane Refill", sku: "PROP-001", price: 2200, category: "Supplies" },
     { name: "RV Sewer Kit", sku: "RV-001", price: 3500, category: "RV Supplies" },
     { name: "30A Extension Cord", sku: "RV-002", price: 4500, category: "RV Supplies" },
@@ -637,7 +637,7 @@ async function main() {
   // ============ SUMMARY ============
   console.log("\n=== Seed Complete ===");
   console.log(`
-Summary for Camp Everyday - Riverbend:
+Summary for Keepr - Riverbend:
 - 200 guests
 - 30 seasonal guests
 - ${reservationCount} reservations

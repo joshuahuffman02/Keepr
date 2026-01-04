@@ -9,6 +9,7 @@ import { formatDistanceToNow } from "date-fns";
 import { HelpPanel } from "../../help/HelpPanel";
 import { useKeyboardShortcuts } from "@/contexts/KeyboardShortcutsContext";
 import { apiClient } from "@/lib/api-client";
+import { LogoImage } from "@/components/brand";
 
 type AdminTopBarProps = {
     onToggleNav?: () => void;
@@ -307,8 +308,18 @@ export function AdminTopBar({
         <>
             {/* Top Bar */}
             <div className="sticky top-0 z-50 h-14 border-b border-border bg-background/95 backdrop-blur flex items-center px-3 sm:px-4 gap-3 sm:gap-4 shadow-sm transition-colors">
-                {/* Left - mobile nav + spacer */}
-                <div className="flex items-center">
+                {/* Left - Logo + mobile nav */}
+                <div className="flex items-center gap-3">
+                    <Link href="/dashboard" className="flex items-center">
+                        {/* Use overflow-hidden and object-cover to crop the PNG whitespace */}
+                        <div className="h-8 overflow-hidden flex items-center">
+                            <img
+                                src="/images/logo/keepr-logo.png"
+                                alt="Keepr"
+                                className="h-12 w-auto object-contain object-center -my-2"
+                            />
+                        </div>
+                    </Link>
                     {onToggleNav && (
                         <button
                             onClick={onToggleNav}
@@ -321,7 +332,6 @@ export function AdminTopBar({
                             </svg>
                         </button>
                     )}
-                    <div className="hidden md:block w-8" />
                 </div>
 
                 {/* Center - Global Search */}

@@ -93,4 +93,4 @@ The cost is typically offset by increased bookings, reduced errors, and time sav
 
 ---
 
-*Camp Everyday helps campgrounds transition smoothly from paper to digital, with training and support every step of the way. [Make the switch at campreserv.com](https://campreserv.com)*
+*Keepr helps campgrounds transition smoothly from paper to digital, with training and support every step of the way. [Make the switch at campreserv.com](https://campreserv.com)*

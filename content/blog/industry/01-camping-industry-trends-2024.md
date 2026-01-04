@@ -77,4 +77,4 @@ The camping industry has seen remarkable growth and change. Understanding curren
 
 ---
 
-*Camp Everyday helps campgrounds stay current with modern booking and management tools. [Stay ahead at campreserv.com](https://campreserv.com)*
+*Keepr helps campgrounds stay current with modern booking and management tools. [Stay ahead at campreserv.com](https://campreserv.com)*

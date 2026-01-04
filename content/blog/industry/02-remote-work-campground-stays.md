@@ -85,4 +85,4 @@ The rise of remote work has created a new category of campground guest: the digi
 
 ---
 
-*Camp Everyday helps you manage extended stays and market to remote workers effectively. [Attract remote workers at campreserv.com](https://campreserv.com)*
+*Keepr helps you manage extended stays and market to remote workers effectively. [Attract remote workers at campreserv.com](https://campreserv.com)*

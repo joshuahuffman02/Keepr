@@ -118,4 +118,4 @@ Within 5 seconds, visitors should understand:
 
 ---
 
-*Camp Everyday provides embeddable booking widgets that integrate seamlessly with any website. [Convert more visitors at campreserv.com](https://campreserv.com)*
+*Keepr provides embeddable booking widgets that integrate seamlessly with any website. [Convert more visitors at campreserv.com](https://campreserv.com)*

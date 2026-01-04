@@ -315,4 +315,4 @@ Stop scheduling like it's 2005. Your campground runs on modern systems for reser
 
 ---
 
-*Camp Everyday includes built-in staff scheduling that syncs with your occupancy and reservation data. One system for reservations, guests, and staff. [See how it works at campeveryday.com](https://campeveryday.com)*
+*Keepr includes built-in staff scheduling that syncs with your occupancy and reservation data. One system for reservations, guests, and staff. [See how it works at campeveryday.com](https://campeveryday.com)*

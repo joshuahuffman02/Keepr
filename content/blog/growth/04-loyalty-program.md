@@ -339,4 +339,4 @@ Start simple, launch it properly, and improve over time. Your most loyal guests 
 
 ---
 
-*Camp Everyday includes built-in loyalty program features that automatically track guest stays and communicate rewards—no manual tracking required. [Build loyalty at campreserv.com](https://campreserv.com)*
+*Keepr includes built-in loyalty program features that automatically track guest stays and communicate rewards—no manual tracking required. [Build loyalty at campreserv.com](https://campreserv.com)*

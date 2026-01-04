@@ -643,7 +643,7 @@ export class StripeService {
     // =========================================================================
 
     /**
-     * Create a product (e.g., "Camp Everyday Subscription")
+     * Create a product (e.g., "Keepr Subscription")
      */
     async createProduct(
         name: string,

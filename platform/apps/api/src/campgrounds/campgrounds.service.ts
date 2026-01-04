@@ -1251,7 +1251,7 @@ export class CampgroundsService {
           <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 540px; margin: 0 auto; padding: 20px;">
             <h2 style="color: #0f172a; margin-bottom: 12px;">Welcome, ${name}!</h2>
             <p style="color: #475569; line-height: 1.5;">
-              You've been granted <strong>${roleLabel}</strong> access to a campground in Camp Everyday Host.
+              You've been granted <strong>${roleLabel}</strong> access to a campground in Keepr Host.
             </p>
             <p style="color: #475569; line-height: 1.5;">
               Sign in with your email. ${inviteToken ? "Use the button below to set your password." : "If you don't have a password yet, use the reset link on the login page to set one."}
@@ -1329,7 +1329,7 @@ export class CampgroundsService {
     const inviteUrl = `${baseUrl}/invite?token=${token}`;
     this.emailService.sendEmail({
       to: membership.user.email,
-      subject: "Your Camp Everyday Host invite",
+      subject: "Your Keepr Host invite",
       html: `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 540px; margin: 0 auto; padding: 20px;">
           <h2 style="color: #0f172a; margin-bottom: 12px;">You're invited</h2>

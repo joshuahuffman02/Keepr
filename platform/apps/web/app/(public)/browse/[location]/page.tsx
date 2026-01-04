@@ -280,7 +280,7 @@ export default async function LocationPage({ params }: Props) {
               : `${stateName} offers diverse camping experiences across its beautiful landscapes. Whether you're looking for beachfront RV parks, mountain cabins, or family-friendly campgrounds, you'll find it here.`}
           </p>
           <p>
-            All campgrounds listed on Camp Everyday offer online booking with instant confirmation. Compare amenities, read guest reviews, and find available dates for your preferred travel dates.
+            All campgrounds listed on Keepr offer online booking with instant confirmation. Compare amenities, read guest reviews, and find available dates for your preferred travel dates.
           </p>
         </div>
       </section>

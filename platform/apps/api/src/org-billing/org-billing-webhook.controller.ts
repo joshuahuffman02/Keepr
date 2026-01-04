@@ -14,7 +14,7 @@ import { SubscriptionService } from "./subscription.service";
 /**
  * Webhook controller for organization billing events from Stripe.
  *
- * This handles subscription billing events for Camp Everyday's platform fees,
+ * This handles subscription billing events for Keepr's platform fees,
  * separate from the campground-level payment webhooks in payments.controller.ts.
  *
  * Configure this endpoint in Stripe dashboard as a separate webhook endpoint
@@ -38,7 +38,7 @@ export class OrgBillingWebhookController {
    * Handle Stripe webhooks for organization subscriptions
    *
    * Configure in Stripe Dashboard:
-   * - Endpoint URL: https://api.campeveryday.com/webhooks/billing
+   * - Endpoint URL: https://api.keeprstay.com/webhooks/billing
    * - Events to listen:
    *   - customer.subscription.created
    *   - customer.subscription.updated

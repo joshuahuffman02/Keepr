@@ -67,7 +67,7 @@ export default function ContactPage() {
             setTicketId(data?.id ?? null);
             setSubmitted(true);
         } catch (error) {
-            setErrorMessage("We could not send your message. Please try again or email hello@campeveryday.com.");
+            setErrorMessage("We could not send your message. Please try again or email hello@keeprstay.com.");
         } finally {
             setSubmitting(false);
         }
@@ -96,8 +96,8 @@ export default function ContactPage() {
                                 </div>
                                 <div>
                                     <h3 className="font-semibold text-slate-900">General inquiries</h3>
-                                    <a href="mailto:hello@campeveryday.com" className="text-emerald-600 hover:underline">
-                                        hello@campeveryday.com
+                                    <a href="mailto:hello@keeprstay.com" className="text-emerald-600 hover:underline">
+                                        hello@keeprstay.com
                                     </a>
                                 </div>
                             </div>
@@ -113,8 +113,8 @@ export default function ContactPage() {
                                 </div>
                                 <div>
                                     <h3 className="font-semibold text-slate-900">Product support</h3>
-                                    <a href="mailto:support@campeveryday.com" className="text-emerald-600 hover:underline">
-                                        support@campeveryday.com
+                                    <a href="mailto:support@keeprstay.com" className="text-emerald-600 hover:underline">
+                                        support@keeprstay.com
                                     </a>
                                 </div>
                             </div>

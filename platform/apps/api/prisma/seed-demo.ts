@@ -47,7 +47,7 @@ const addDays = (date: Date, days: number) => {
 const DEMO_ORG_NAME = "Demo Organization";
 const DEMO_CAMPGROUND_NAME = "Evergreen Pines Demo Resort";
 const DEMO_CAMPGROUND_SLUG = "evergreen-pines-demo";
-const DEMO_USER_EMAIL = "demo@campeveryday.com";
+const DEMO_USER_EMAIL = "demo@keeprstay.com";
 const DEMO_USER_PASSWORD = "demo123";
 
 // Site class definitions
@@ -149,7 +149,7 @@ const posProducts = [
   { name: "Firewood Bundle", price: 800, category: "Supplies" },
   { name: "Ice Bag (10lb)", price: 400, category: "Supplies" },
   { name: "S'mores Kit", price: 1200, category: "Food" },
-  { name: "Camp Everyday T-Shirt", price: 2500, category: "Merchandise" },
+  { name: "Keepr T-Shirt", price: 2500, category: "Merchandise" },
   { name: "Fishing License (Day)", price: 1500, category: "Services" },
   { name: "Kayak Rental (Hour)", price: 2000, category: "Rentals" },
   { name: "Bike Rental (Day)", price: 3500, category: "Rentals" },

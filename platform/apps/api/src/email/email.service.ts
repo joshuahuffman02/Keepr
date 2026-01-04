@@ -73,7 +73,7 @@ export class EmailService {
         // For Resend, use onboarding@resend.dev if no verified domain is configured
         const configuredFrom = process.env.SMTP_FROM || "";
         const isValidEmail = configuredFrom.includes("@");
-        const resendFrom = isValidEmail ? configuredFrom : "Camp Everyday <onboarding@resend.dev>";
+        const resendFrom = isValidEmail ? configuredFrom : "Keepr <onboarding@resend.dev>";
         const fromEmail = isValidEmail ? configuredFrom : "no-reply@campreserv.com";
 
         const tryResend = async () => {
@@ -389,7 +389,7 @@ ${options.html}
                         If you have any follow-up questions, please submit a new ticket.
                     </p>
                     <p style="color: #94a3b8; font-size: 11px; margin-top: 8px;">
-                        Camp Everyday Support
+                        Keepr Support
                     </p>
                 </div>
             </div>

@@ -154,7 +154,7 @@ function ConfirmContent() {
           </h3>
           <ol className="space-y-4">
             {[
-              { step: 1, text: "Open the email from Camp Everyday", subtext: "Check spam if you don't see it" },
+              { step: 1, text: "Open the email from Keepr", subtext: "Check spam if you don't see it" },
               { step: 2, text: "Click the verification link", subtext: "It expires in 24 hours" },
               { step: 3, text: "Complete your campground setup", subtext: "Takes about 10 minutes" }
             ].map(({ step, text, subtext }, i) => (
@@ -265,7 +265,7 @@ function ConfirmContent() {
         >
           Having trouble?{" "}
           <a
-            href="mailto:support@campeveryday.com"
+            href="mailto:support@keeprstay.com"
             className="text-emerald-400 hover:underline"
           >
             We're here to help

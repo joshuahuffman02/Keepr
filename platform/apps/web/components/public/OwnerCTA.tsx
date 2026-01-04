@@ -43,7 +43,7 @@ export function OwnerCTA({ className }: OwnerCTAProps) {
 
         {/* Subheadline */}
         <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-          Stop overpaying for outdated software. Camp Everyday is the modern reservation
+          Stop overpaying for outdated software. Keepr is the modern reservation
           system built for how you actually run your campground — fast, simple, affordable.
         </p>
 

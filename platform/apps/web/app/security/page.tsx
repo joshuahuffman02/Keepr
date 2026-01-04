@@ -2,8 +2,8 @@ import { Metadata } from "next";
 import { Shield, Lock, Eye, Server, CheckCircle } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Security - Camp Everyday",
-  description: "Learn about Camp Everyday's security practices and how we protect your data.",
+  title: "Security - Keepr",
+  description: "Learn about Keepr's security practices and how we protect your data.",
 };
 
 export default function SecurityPage() {
@@ -18,7 +18,7 @@ export default function SecurityPage() {
             </div>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-            Security at Camp Everyday
+            Security at Keepr
           </h1>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto">
             Your trust is our priority. We are building toward industry-standard security and will update this page as controls roll out.
@@ -114,11 +114,11 @@ export default function SecurityPage() {
             Please report any security issues to our dedicated security team.
           </p>
           <a
-            href="mailto:security@campeveryday.com"
+            href="mailto:security@keeprstay.com"
             className="inline-flex items-center gap-2 px-6 py-3 bg-emerald-500 text-white font-semibold rounded-lg hover:bg-emerald-400 transition-colors"
           >
             <Shield className="w-5 h-5" />
-            security@campeveryday.com
+            security@keeprstay.com
           </a>
         </div>
       </div>

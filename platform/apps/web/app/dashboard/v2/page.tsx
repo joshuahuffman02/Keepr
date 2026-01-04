@@ -132,7 +132,7 @@ export default function DashboardV2() {
         {!selectedCampground ? (
           <div className="flex items-center justify-center min-h-[40vh]">
             <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-foreground">Welcome to Camp Everyday</h2>
+              <h2 className="text-2xl font-bold text-foreground">Welcome to Keepr</h2>
               <p className="text-muted-foreground">Select a campground from the dropdown to get started.</p>
             </div>
           </div>

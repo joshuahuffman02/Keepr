@@ -78,7 +78,7 @@ const earlyAccessTiers = [
 // Competitor comparison data
 const competitors = [
   {
-    name: "Camp Everyday",
+    name: "Keepr",
     isUs: true,
     monthlyBase: "$100",
     perBooking: "$2.30",

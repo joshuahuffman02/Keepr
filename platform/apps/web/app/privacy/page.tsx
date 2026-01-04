@@ -1,8 +1,8 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "Privacy Policy - Camp Everyday",
-    description: "Camp Everyday Privacy Policy - How we collect, use, and protect your personal information.",
+    title: "Privacy Policy - Keepr",
+    description: "Keepr Privacy Policy - How we collect, use, and protect your personal information.",
 };
 
 export default function PrivacyPage() {
@@ -20,7 +20,7 @@ export default function PrivacyPage() {
                     <section className="mb-8">
                         <h2 className="text-2xl font-bold text-slate-900 mb-4">Introduction</h2>
                         <p className="text-slate-600">
-                            Camp Everyday (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;) is committed to protecting your privacy.
+                            Keepr (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;) is committed to protecting your privacy.
                             This Privacy Policy explains how we collect, use, disclose, and safeguard your
                             information when you use our website and services.
                         </p>
@@ -107,7 +107,7 @@ export default function PrivacyPage() {
                         </p>
                         <div className="mt-4 p-4 bg-slate-50 rounded-lg">
                             <p className="text-slate-700">
-                                <strong>Email:</strong> privacy@campeveryday.com<br />
+                                <strong>Email:</strong> privacy@keeprstay.com<br />
                                 <strong>Phone:</strong> (800) 555-CAMP<br />
                                 <strong>Address:</strong> 123 Adventure Lane, Boulder, CO 80301
                             </p>

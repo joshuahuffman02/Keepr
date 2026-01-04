@@ -155,7 +155,7 @@ export default function WelcomePage() {
           </div>
 
           <h1 className="text-3xl font-bold text-foreground">
-            Welcome to Camp Everyday!
+            Welcome to Keepr!
           </h1>
 
           <p className="text-lg text-muted-foreground max-w-xl mx-auto">
@@ -302,7 +302,7 @@ export default function WelcomePage() {
               </Link>
             </Button>
             <Button asChild variant="outline">
-              <a href="mailto:support@campeveryday.com">
+              <a href="mailto:support@keeprstay.com">
                 Contact Support
               </a>
             </Button>

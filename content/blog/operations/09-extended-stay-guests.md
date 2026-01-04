@@ -320,4 +320,4 @@ Done right, long-term guests become your campground's biggest advocates and most
 
 ---
 
-*Camp Everyday supports long-term bookings with monthly billing, utility tracking, and customizable agreement templates—making extended stay management straightforward. [Explore features at campreserv.com](https://campreserv.com)*
+*Keepr supports long-term bookings with monthly billing, utility tracking, and customizable agreement templates—making extended stay management straightforward. [Explore features at campreserv.com](https://campreserv.com)*

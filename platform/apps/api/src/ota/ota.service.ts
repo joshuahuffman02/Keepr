@@ -325,14 +325,14 @@ export class OtaService {
     const lines: string[] = [
       "BEGIN:VCALENDAR",
       "VERSION:2.0",
-      "PRODID:-//Camp Everyday Host//OTA iCal//EN",
+      "PRODID:-//Keepr Host//OTA iCal//EN",
       "CALSCALE:GREGORIAN",
     ];
 
     for (const res of reservations) {
       lines.push(
         "BEGIN:VEVENT",
-        `UID:${res.id}@campeveryday`,
+        `UID:${res.id}@keeprstay`,
         `DTSTAMP:${this.formatIcsDate(new Date(res.bookedAt || res.arrivalDate))}`,
         `DTSTART:${this.formatIcsDate(new Date(res.arrivalDate))}`,
         `DTEND:${this.formatIcsDate(new Date(res.departureDate))}`,
@@ -344,7 +344,7 @@ export class OtaService {
     for (const b of blackouts) {
       lines.push(
         "BEGIN:VEVENT",
-        `UID:${b.id}@campeveryday`,
+        `UID:${b.id}@keeprstay`,
         `DTSTAMP:${this.formatIcsDate(new Date(b.startDate))}`,
         `DTSTART:${this.formatIcsDate(new Date(b.startDate))}`,
         `DTEND:${this.formatIcsDate(new Date(b.endDate))}`,

@@ -15,7 +15,7 @@ export class EmailController {
 
         const result = await this.emailService.sendEmail({
             to,
-            subject: 'Camp Everyday - Test Email',
+            subject: 'Keepr - Test Email',
             html: `
                 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
                     <div style="text-align: center; margin-bottom: 30px;">
@@ -24,7 +24,7 @@ export class EmailController {
                     </div>
 
                     <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 24px;">
-                        <p style="color: white; margin: 0; font-size: 18px;">Camp Everyday is ready to send emails!</p>
+                        <p style="color: white; margin: 0; font-size: 18px;">Keepr is ready to send emails!</p>
                     </div>
 
                     <div style="background: #f8fafc; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
@@ -37,7 +37,7 @@ export class EmailController {
 
                     <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
                         <p style="color: #94a3b8; font-size: 11px; margin: 0;">
-                            This is a test email from Camp Everyday
+                            This is a test email from Keepr
                         </p>
                     </div>
                 </div>

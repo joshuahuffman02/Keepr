@@ -360,4 +360,4 @@ The keys to success are clear contracts, thoughtful logistics, and excellent com
 
 ---
 
-*Camp Everyday includes group booking features with block reservations, group pricing, and organizer management tools—simplifying even the largest rally events. [Plan your next group at campreserv.com](https://campreserv.com)*
+*Keepr includes group booking features with block reservations, group pricing, and organizer management tools—simplifying even the largest rally events. [Plan your next group at campreserv.com](https://campreserv.com)*

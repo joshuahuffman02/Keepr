@@ -82,4 +82,4 @@ Every booking, every guest, every dollar creates data. The campgrounds that thri
 
 ---
 
-*Camp Everyday includes built-in analytics dashboards that surface the metrics you need. [Make data-driven decisions at campreserv.com](https://campreserv.com)*
+*Keepr includes built-in analytics dashboards that surface the metrics you need. [Make data-driven decisions at campreserv.com](https://campreserv.com)*

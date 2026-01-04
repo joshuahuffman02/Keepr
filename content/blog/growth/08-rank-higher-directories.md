@@ -79,4 +79,4 @@ Campground directories are where travelers discover new places to stay. Ranking 
 
 ---
 
-*Camp Everyday can sync availability with directory listings, ensuring accurate information everywhere. [Expand your reach at campreserv.com](https://campreserv.com)*
+*Keepr can sync availability with directory listings, ensuring accurate information everywhere. [Expand your reach at campreserv.com](https://campreserv.com)*

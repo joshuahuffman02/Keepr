@@ -308,13 +308,13 @@ export default function Dashboard() {
   const [search, setSearch] = useState("");
   const prefersReducedMotion = useReducedMotion();
 
-  // Onboarding tour for new users
-  const tour = useTour({
-    tour: DASHBOARD_TOUR,
-    onComplete: () => {
-      console.log("Dashboard tour completed!");
-    },
-  });
+  // Onboarding tour disabled - was annoying users
+  // const tour = useTour({
+  //   tour: DASHBOARD_TOUR,
+  //   onComplete: () => {
+  //     console.log("Dashboard tour completed!");
+  //   },
+  // });
 
   const { data: campgrounds = [] } = useQuery({
     queryKey: ["campgrounds"],
@@ -336,15 +336,15 @@ export default function Dashboard() {
     setHasMounted(true);
   }, []);
 
-  // Auto-start tour for new users after a short delay
-  useEffect(() => {
-    if (hasMounted && !tour.hasCompleted && selectedId) {
-      const timer = setTimeout(() => {
-        tour.start();
-      }, 1500);
-      return () => clearTimeout(timer);
-    }
-  }, [hasMounted, tour.hasCompleted, selectedId]);
+  // Onboarding tour disabled - was annoying users
+  // useEffect(() => {
+  //   if (hasMounted && !tour.hasCompleted && selectedId) {
+  //     const timer = setTimeout(() => {
+  //       tour.start();
+  //     }, 1500);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [hasMounted, tour.hasCompleted, selectedId]);
 
   // Get time-of-day greeting only after mount to prevent hydration mismatch
   // (server time may differ from client time)
@@ -602,7 +602,7 @@ export default function Dashboard() {
 
   return (
     <DashboardShell>
-      {/* Onboarding Tour Overlay */}
+      {/* Onboarding Tour Overlay - disabled, was annoying users
       <TourOverlay
         isActive={tour.isActive}
         currentStep={tour.currentStep}
@@ -614,6 +614,7 @@ export default function Dashboard() {
         onPrev={tour.prev}
         onSkip={tour.skip}
       />
+      */}
 
       <motion.div
         className="space-y-6"
@@ -629,7 +630,7 @@ export default function Dashboard() {
             transition={SPRING_CONFIG}
           >
             <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-foreground">Welcome to Camp Everyday</h2>
+              <h2 className="text-2xl font-bold text-foreground">Welcome to Keepr</h2>
               <p className="text-muted-foreground">Select a campground from the dropdown to get started.</p>
             </div>
           </motion.div>

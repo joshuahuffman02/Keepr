@@ -37,7 +37,7 @@ export class QRCodeService {
   private readonly baseUrl: string;
 
   constructor(private readonly prisma: PrismaService) {
-    this.baseUrl = process.env.PUBLIC_APP_URL || "https://app.campeveryday.com";
+    this.baseUrl = process.env.PUBLIC_APP_URL || "https://app.keeprstay.com";
   }
 
   /**

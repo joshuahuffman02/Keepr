@@ -4,7 +4,7 @@ Audience: product, engineering, GTM. Structure: Foundations → Differentiators 
 
 ## Update — Dec 17, 2025 (Session 2): Product-Led Growth Complete (SHIPPED)
 
-All PLG features are now complete. Camp Everyday can sell itself with minimal founder involvement.
+All PLG features are now complete. Keepr can sell itself with minimal founder involvement.
 
 ### AI Support Backend
 - **New service**: `ai-support.service.ts` with embedded help knowledge base

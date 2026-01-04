@@ -191,8 +191,8 @@ export function generateArticleMetadata(article: {
   const canonical = `${baseUrl}/blog/${article.category ? `${article.category}/` : ""}${article.slug}`;
 
   return generatePageMetadata({
-    title: `${article.title} | Camp Everyday Blog`,
-    description: article.excerpt || `Read ${article.title} on the Camp Everyday blog.`,
+    title: `${article.title} | Keepr Blog`,
+    description: article.excerpt || `Read ${article.title} on the Keepr blog.`,
     path: `/blog/${article.category ? `${article.category}/` : ""}${article.slug}`,
     image: article.image,
     type: "article",

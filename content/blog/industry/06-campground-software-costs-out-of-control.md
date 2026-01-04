@@ -260,4 +260,4 @@ Modern software should cost less, not more. The technology has gotten cheaper. C
 
 ---
 
-*Camp Everyday offers transparent pricing: $100/month base + $2.30 per booking, with AI features included and no setup fees. Calculate your actual cost in seconds. [See the difference at campeveryday.com](https://campeveryday.com)*
+*Keepr offers transparent pricing: $100/month base + $2.30 per booking, with AI features included and no setup fees. Calculate your actual cost in seconds. [See the difference at campeveryday.com](https://campeveryday.com)*

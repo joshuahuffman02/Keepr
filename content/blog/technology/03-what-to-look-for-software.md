@@ -108,4 +108,4 @@ Campground software is a major decision—it touches every aspect of your operat
 
 ---
 
-*Camp Everyday is built specifically for campgrounds, with intuitive design and responsive support. [See if we're the right fit at campreserv.com](https://campreserv.com)*
+*Keepr is built specifically for campgrounds, with intuitive design and responsive support. [See if we're the right fit at campreserv.com](https://campreserv.com)*

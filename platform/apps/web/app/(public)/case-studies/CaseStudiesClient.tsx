@@ -34,7 +34,7 @@ export default function CaseStudiesClient() {
         </div>
         <h1 className="text-3xl md:text-4xl font-bold text-slate-900">Case Studies</h1>
         <p className="text-slate-600 max-w-2xl mx-auto">
-          How campgrounds use Camp Everyday to boost revenue, smooth operations, and delight guests.
+          How campgrounds use Keepr to boost revenue, smooth operations, and delight guests.
         </p>
       </div>
 

@@ -76,4 +76,4 @@ Millennials (born 1981-1996) and Gen Z (born 1997-2012) are the future of campin
 
 ---
 
-*Camp Everyday provides the modern booking experience younger guests expect. [Attract new guests at campreserv.com](https://campreserv.com)*
+*Keepr provides the modern booking experience younger guests expect. [Attract new guests at campreserv.com](https://campreserv.com)*

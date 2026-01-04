@@ -554,7 +554,7 @@ Status key: VERIFIED, PARTIAL, NOT VERIFIED.
 
 #### UI-MED-001: Brand naming inconsistent across surfaces
 - Files: `platform/apps/web/lib/seo/constants.ts:6`, `platform/apps/web/components/marketing/MarketingHeader.tsx:50`, `platform/apps/web/public/sw.js:145`, `platform/apps/web/components/reservations/FinancialSummary.tsx:300`
-- Problem: UI uses "Camp Everyday", "Camp Everyday Host", and "Campreserv" within public, staff, and notification surfaces.
+- Problem: UI uses "Keepr", "Keepr Host", and "Campreserv" within public, staff, and notification surfaces.
 - Impact: Confusing brand identity and unclear product ownership.
 - Fix: Define canonical names per persona (guest/staff/admin) and update UI strings and notifications to align.
 

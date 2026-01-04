@@ -28,7 +28,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
                                         <path d="M2 20h20" />
                                     </svg>
                                 </div>
-                                <span className="text-xl font-bold">Camp Everyday</span>
+                                <span className="text-xl font-bold">Keepr</span>
                             </div>
                             <p className="text-slate-400 text-sm">
                                 Discover and book the perfect campground for your next adventure.
@@ -69,7 +69,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
 
                     <div className="pt-8 border-t border-slate-800 flex items-center justify-center">
                         <p className="text-sm text-slate-500">
-                            © {new Date().getFullYear()} Camp Everyday. All rights reserved.
+                            © {new Date().getFullYear()} Keepr. All rights reserved.
                         </p>
                     </div>
                 </div>

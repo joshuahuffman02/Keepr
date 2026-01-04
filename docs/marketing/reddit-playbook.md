@@ -48,7 +48,7 @@ Great question. I've worked with a lot of campground software (I'm in the indust
 Campspot or Newbook are the established players. Expect $400-600+/month plus per-booking fees. They work, but you're paying premium prices.
 
 **For mid-size parks (50-150 sites):**
-This is where it gets tricky. The enterprise tools are overkill, but the small-business tools lack features. Camp Everyday (disclosure: I work on this) built specifically for this segment at $100/month + $2.30/booking.
+This is where it gets tricky. The enterprise tools are overkill, but the small-business tools lack features. Keepr (disclosure: I work on this) built specifically for this segment at $100/month + $2.30/booking.
 
 **For small parks (under 50 sites):**
 Some parks still do fine with simple booking plugins or even Google Calendar + spreadsheets. It depends on your booking volume.
@@ -151,7 +151,7 @@ Cons: Expensive ($2.50+/booking adds up), long setup, enterprise-focused
 Pros: Solid features, good for multi-property
 Cons: High setup fees ($1-3K), complex, enterprise pricing
 
-**Camp Everyday:**
+**Keepr:**
 Pros: $100/mo + $2.30/booking, AI included, fast setup
 Cons: Newer (less market presence), smaller company
 
@@ -260,7 +260,7 @@ A few reasons from what I've seen:
 
 4. **VC funding** - Some vendors have raised money and need to show returns. That money comes from customers.
 
-That said, I think the market is overpriced. We're building Camp Everyday specifically to offer more reasonable pricing ($100/mo + $2.30/booking). Not because features should be cheaper, but because we're more efficient at building them.
+That said, I think the market is overpriced. We're building Keepr specifically to offer more reasonable pricing ($100/mo + $2.30/booking). Not because features should be cheaper, but because we're more efficient at building them.
 ```
 
 ### "Is online booking worth it for a small campground?"
@@ -336,7 +336,7 @@ What's your biggest constraint right now - awareness or conversion?
 
 ### DON'T
 - Post promotional content as its own post
-- Mention Camp Everyday in every comment
+- Mention Keepr in every comment
 - Be defensive if someone criticizes the industry
 - Argue with competitors or their advocates
 - Comment on posts where you have nothing to add

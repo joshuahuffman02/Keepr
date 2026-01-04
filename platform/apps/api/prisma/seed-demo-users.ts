@@ -56,7 +56,7 @@ async function main() {
   });
   console.log(`Created/updated user: John Thesing (${john.email})`);
 
-  // Get only the main demo campgrounds (Camp Everyday branded ones)
+  // Get only the main demo campgrounds (Keepr branded ones)
   const campgrounds = await prisma.campground.findMany({
     where: {
       OR: [

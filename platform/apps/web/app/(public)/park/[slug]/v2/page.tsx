@@ -9,7 +9,7 @@ type Props = {
   searchParams: Promise<{ token?: string }>;
 };
 
-const baseUrl = (process.env.NEXT_PUBLIC_APP_BASE || "https://campeveryday.com").replace(/\/+$/, "");
+const baseUrl = (process.env.NEXT_PUBLIC_APP_BASE || "https://keeprstay.com").replace(/\/+$/, "");
 
 export async function generateMetadata(
   { params, searchParams }: Props,

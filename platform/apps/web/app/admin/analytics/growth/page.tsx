@@ -247,7 +247,7 @@ export default function PlatformGrowthPage() {
               <div>
                 <h2 className="text-lg font-bold text-foreground">Founding Members</h2>
                 <p className="text-amber-700/70 text-sm">
-                  Your original 45 campgrounds who believed in Camp Everyday from the start
+                  Your original 45 campgrounds who believed in Keepr from the start
                 </p>
               </div>
             </div>

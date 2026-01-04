@@ -314,4 +314,4 @@ The key is treating every complaint as an opportunity: to fix a real problem, to
 
 ---
 
-*Camp Everyday includes guest communication history so every staff member can see past interactions—enabling consistent, informed complaint resolution. [Improve guest relations at campreserv.com](https://campreserv.com)*
+*Keepr includes guest communication history so every staff member can see past interactions—enabling consistent, informed complaint resolution. [Improve guest relations at campreserv.com](https://campreserv.com)*

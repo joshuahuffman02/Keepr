@@ -101,7 +101,7 @@ export function useGeolocation(options: UseGeolocationOptions = {}) {
         {
           headers: {
             "Accept-Language": "en-US,en",
-            "User-Agent": "CampEveryday/1.0"
+            "User-Agent": "Keepr/1.0"
           }
         }
       );

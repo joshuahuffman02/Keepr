@@ -767,7 +767,7 @@ export class AiMorningBriefingService {
         <!-- Footer -->
         <div style="text-align: center; padding-top: 24px; border-top: 1px solid #e2e8f0;">
           <p style="color: #64748b; font-size: 12px; margin: 0;">Log in to your dashboard for full details</p>
-          <p style="color: #94a3b8; font-size: 11px; margin-top: 8px;">AI-Powered Morning Briefing | Camp Everyday</p>
+          <p style="color: #94a3b8; font-size: 11px; margin-top: 8px;">AI-Powered Morning Briefing | Keepr</p>
         </div>
       </div>
     `;

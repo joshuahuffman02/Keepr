@@ -29,11 +29,11 @@ import { FAQJsonLd } from "@/components/seo";
 
 const softwareFaqs = [
   {
-    question: "What types of campgrounds can use Camp Everyday?",
-    answer: "Camp Everyday works for all types of outdoor hospitality: RV parks, tent campgrounds, cabin rentals, glamping sites, yurts, treehouses, and mixed-use properties. Our flexible site class system lets you manage any combination of accommodations.",
+    question: "What types of campgrounds can use Keepr?",
+    answer: "Keepr works for all types of outdoor hospitality: RV parks, tent campgrounds, cabin rentals, glamping sites, yurts, treehouses, and mixed-use properties. Our flexible site class system lets you manage any combination of accommodations.",
   },
   {
-    question: "How is Camp Everyday different from Campspot or Newbook?",
+    question: "How is Keepr different from Campspot or Newbook?",
     answer: "Unlike Campspot, we charge zero commission on bookings (just a flat $2.30 per reservation). Unlike Newbook, there are no setup fees or long implementation times. We offer features most competitors lack: AI demand forecasting, built-in loyalty programs, and integrated staff scheduling.",
   },
   {
@@ -46,7 +46,7 @@ const softwareFaqs = [
   },
   {
     question: "What integrations are available?",
-    answer: "Camp Everyday integrates with Stripe for payments, QuickBooks and Xero for accounting, major OTA channels (Hipcamp, Airbnb, Booking.com), and offers a full REST API for custom integrations.",
+    answer: "Keepr integrates with Stripe for payments, QuickBooks and Xero for accounting, major OTA channels (Hipcamp, Airbnb, Booking.com), and offers a full REST API for custom integrations.",
   },
   {
     question: "How does the AI demand forecasting work?",
@@ -63,7 +63,7 @@ const softwareFaqs = [
 ];
 
 export const metadata: Metadata = {
-  title: "Campground Management Software | Camp Everyday - Modern Reservation System",
+  title: "Campground Management Software | Keepr - Modern Reservation System",
   description:
     "All-in-one campground management software with online reservations, POS, staff scheduling, AI demand forecasting, and loyalty programs. Go live in 48 hours. $100/mo.",
   keywords: [
@@ -85,7 +85,7 @@ export const metadata: Metadata = {
 const structuredData = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  name: "Camp Everyday",
+  name: "Keepr",
   applicationCategory: "BusinessApplication",
   operatingSystem: "Web",
   description: "All-in-one campground management software for reservations, POS, staff scheduling, and AI insights.",
@@ -265,7 +265,7 @@ export default function CampgroundManagementSoftwarePage() {
               Everything You Need to Run Your Campground
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Stop juggling multiple systems. Camp Everyday handles reservations, payments, staff, POS, and analytics in one platform.
+              Stop juggling multiple systems. Keepr handles reservations, payments, staff, POS, and analytics in one platform.
             </p>
           </div>
 
@@ -313,7 +313,7 @@ export default function CampgroundManagementSoftwarePage() {
               Features Others Don't Have
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-              What Makes Camp Everyday Different
+              What Makes Keepr Different
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
               These aren't coming soon. They're live now.
@@ -353,7 +353,7 @@ export default function CampgroundManagementSoftwarePage() {
               Built for Every Type of Campground
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Whether you're running RV sites, tent camping, cabins, or glamping, Camp Everyday handles it all.
+              Whether you're running RV sites, tent camping, cabins, or glamping, Keepr handles it all.
             </p>
           </div>
 
@@ -376,7 +376,7 @@ export default function CampgroundManagementSoftwarePage() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-              Why Parks Switch to Camp Everyday
+              Why Parks Switch to Keepr
             </h2>
             <p className="text-lg text-slate-300 max-w-2xl mx-auto">
               See how we compare to legacy campground software.
@@ -437,7 +437,7 @@ export default function CampgroundManagementSoftwarePage() {
               Go Live in 48 Hours
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Getting started with Camp Everyday is simple. No lengthy implementations or training sessions.
+              Getting started with Keepr is simple. No lengthy implementations or training sessions.
             </p>
           </div>
 
@@ -470,7 +470,7 @@ export default function CampgroundManagementSoftwarePage() {
               ))}
             </div>
             <blockquote className="text-2xl text-slate-700 mb-6 italic">
-              "Camp Everyday replaced 4 different tools we were using. The AI predictions alone have saved us thousands in no-shows."
+              "Keepr replaced 4 different tools we were using. The AI predictions alone have saved us thousands in no-shows."
             </blockquote>
             <div className="text-slate-600">
               <span className="font-semibold text-slate-900">Sarah M.</span>
@@ -489,7 +489,7 @@ export default function CampgroundManagementSoftwarePage() {
               Frequently Asked Questions
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Everything you need to know about Camp Everyday campground management software.
+              Everything you need to know about Keepr campground management software.
             </p>
           </div>
 
@@ -521,7 +521,7 @@ export default function CampgroundManagementSoftwarePage() {
             Ready to Modernize Your Campground?
           </h2>
           <p className="text-xl text-emerald-100 mb-8 max-w-2xl mx-auto">
-            Join hundreds of campgrounds using Camp Everyday to save time, reduce no-shows, and grow revenue.
+            Join hundreds of campgrounds using Keepr to save time, reduce no-shows, and grow revenue.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
@@ -585,7 +585,7 @@ export default function CampgroundManagementSoftwarePage() {
             </div>
           </div>
           <div className="mt-12 pt-8 border-t border-slate-800 text-center text-sm text-slate-500">
-            Camp Everyday - Modern campground management software.
+            Keepr - Modern campground management software.
           </div>
         </div>
       </footer>

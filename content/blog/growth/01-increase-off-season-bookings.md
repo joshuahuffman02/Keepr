@@ -242,4 +242,4 @@ Ready to build your off-season strategy?
 
 ---
 
-*Camp Everyday makes seasonal pricing, event management, and guest marketing simple—so you can focus on filling sites year-round. [Grow your revenue at campreserv.com](https://campreserv.com)*
+*Keepr makes seasonal pricing, event management, and guest marketing simple—so you can focus on filling sites year-round. [Grow your revenue at campreserv.com](https://campreserv.com)*

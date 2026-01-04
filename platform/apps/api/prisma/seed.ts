@@ -57,7 +57,7 @@ const GL_CODES = {
 
 const seededCampgrounds = [
   {
-    name: "Camp Everyday – Riverbend",
+    name: "Keepr – Riverbend",
     slug: "camp-everyday-riverbend",
     city: "Winona",
     state: "MN",
@@ -67,7 +67,7 @@ const seededCampgrounds = [
     guestOffset: 0
   },
   {
-    name: "Camp Everyday – Mountain Base",
+    name: "Keepr – Mountain Base",
     slug: "camp-everyday-mtn-base",
     city: "Salida",
     state: "CO",
@@ -148,16 +148,16 @@ async function seedUsers() {
   const password = await bcrypt.hash("password123", 12);
 
   const userDefs: Array<{ email: string; firstName: string; lastName: string; platformRole?: PlatformRole }> = [
-    { email: "admin@campeveryday.com", firstName: "Admin", lastName: "User", platformRole: PlatformRole.platform_admin },
-    { email: "josh@campeveryday.com", firstName: "Josh", lastName: "Owner", platformRole: PlatformRole.platform_admin },
-    { email: "manager@campeveryday.com", firstName: "Sarah", lastName: "Manager" },
-    { email: "frontdesk@campeveryday.com", firstName: "Mike", lastName: "Reception" },
-    { email: "maintenance@campeveryday.com", firstName: "Bob", lastName: "Fixit" },
-    { email: "finance@campeveryday.com", firstName: "Priya", lastName: "Ledger" },
-    { email: "marketing@campeveryday.com", firstName: "Lena", lastName: "Hype" },
-    { email: "bucky@campeveryday.com", firstName: "Bucky", lastName: "Admin", platformRole: PlatformRole.platform_admin },
-    { email: "allie@campeveryday.com", firstName: "Allie", lastName: "Admin", platformRole: PlatformRole.platform_admin },
-    { email: "murf@campeveryday.com", firstName: "Murf", lastName: "Admin", platformRole: PlatformRole.platform_admin }
+    { email: "admin@keeprstay.com", firstName: "Admin", lastName: "User", platformRole: PlatformRole.platform_admin },
+    { email: "josh@keeprstay.com", firstName: "Josh", lastName: "Owner", platformRole: PlatformRole.platform_admin },
+    { email: "manager@keeprstay.com", firstName: "Sarah", lastName: "Manager" },
+    { email: "frontdesk@keeprstay.com", firstName: "Mike", lastName: "Reception" },
+    { email: "maintenance@keeprstay.com", firstName: "Bob", lastName: "Fixit" },
+    { email: "finance@keeprstay.com", firstName: "Priya", lastName: "Ledger" },
+    { email: "marketing@keeprstay.com", firstName: "Lena", lastName: "Hype" },
+    { email: "bucky@keeprstay.com", firstName: "Bucky", lastName: "Admin", platformRole: PlatformRole.platform_admin },
+    { email: "allie@keeprstay.com", firstName: "Allie", lastName: "Admin", platformRole: PlatformRole.platform_admin },
+    { email: "murf@keeprstay.com", firstName: "Murf", lastName: "Admin", platformRole: PlatformRole.platform_admin }
   ];
 
   const users = await Promise.all(
@@ -1830,10 +1830,10 @@ async function main() {
   const users = await seedUsers();
 
   // Create organization
-  let org = await prisma.organization.findFirst({ where: { name: "Camp Everyday" } });
+  let org = await prisma.organization.findFirst({ where: { name: "Keepr" } });
   if (!org) {
     org = await prisma.organization.create({
-      data: { name: "Camp Everyday" }
+      data: { name: "Keepr" }
     });
   }
   console.log(`\nOrganization ready: ${org.name}\n`);
@@ -1848,7 +1848,7 @@ async function main() {
 
   console.log("\nSeed complete!");
   console.log("\nTest Login Credentials:");
-  console.log("   Email: admin@campeveryday.com");
+  console.log("   Email: admin@keeprstay.com");
   console.log("   Password: password123");
   console.log("\n   (All users share the same password)");
 }

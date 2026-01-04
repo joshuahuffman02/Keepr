@@ -267,7 +267,7 @@ export default function DashboardPage() {
     <div className="space-y-6">
       <PageOnboardingHint
         id="dashboard-welcome"
-        title="Welcome to Camp Everyday Host!"
+        title="Welcome to Keepr Host!"
         content={
           <div>
             <p className="mb-2">

@@ -370,4 +370,4 @@ Build your maintenance schedule around your season, track what's done, and addre
 
 ---
 
-*Camp Everyday includes maintenance tracking features that let you log issues, schedule work, and block sites for repairs—all integrated with your reservation calendar. [Keep your campground maintained at campreserv.com](https://campreserv.com)*
+*Keepr includes maintenance tracking features that let you log issues, schedule work, and block sites for repairs—all integrated with your reservation calendar. [Keep your campground maintained at campreserv.com](https://campreserv.com)*

@@ -1,5 +1,5 @@
 # Competitive Roadmap
-## Camp Everyday - Path to Market Leadership
+## Keepr - Path to Market Leadership
 
 **Positioning**: The Modern Alternative to Legacy Campground Software
 
@@ -26,7 +26,7 @@
 
 **SEO Targets**:
 - "Campspot alternative"
-- "Newbook vs Camp Everyday"
+- "Newbook vs Keepr"
 - "Best campground management software 2025"
 - "Modern RV park software"
 

@@ -12,11 +12,11 @@ import { CampingSearchForm } from "./CampingSearchForm";
 import { getServerApiUrl } from "@/lib/api-base";
 
 export const metadata: Metadata = {
-  title: "Find Campgrounds & RV Parks | Camp Everyday",
+  title: "Find Campgrounds & RV Parks | Keepr",
   description:
     "Discover campgrounds, RV parks, and outdoor accommodations across the United States. Browse by state, city, or nearby attractions.",
   openGraph: {
-    title: "Find Campgrounds & RV Parks | Camp Everyday",
+    title: "Find Campgrounds & RV Parks | Keepr",
     description:
       "Discover campgrounds, RV parks, and outdoor accommodations across the United States.",
     type: "website",
@@ -84,13 +84,13 @@ export default async function CampingIndexPage() {
           "@type": "ListItem",
           position: 1,
           name: "Home",
-          item: "https://campeveryday.com",
+          item: "https://keeprstay.com",
         },
         {
           "@type": "ListItem",
           position: 2,
           name: "Camping",
-          item: "https://campeveryday.com/camping",
+          item: "https://keeprstay.com/camping",
         },
       ],
     },
@@ -334,7 +334,7 @@ export default async function CampingIndexPage() {
             Own a Campground?
           </h2>
           <p className="text-emerald-100 text-lg mb-8">
-            Claim your listing on Camp Everyday and start accepting online reservations
+            Claim your listing on Keepr and start accepting online reservations
             today. No marketplace commission, transparent pricing.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

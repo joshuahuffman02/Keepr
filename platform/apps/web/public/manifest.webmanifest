@@ -1,10 +1,10 @@
 {
-  "name": "Camp Everyday",
-  "short_name": "CampEveryday",
+  "name": "Keepr",
+  "short_name": "Keepr",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#0f172a",
+  "background_color": "#FAF7F2",
+  "theme_color": "#1F3D34",
   "lang": "en",
   "icons": [
     {

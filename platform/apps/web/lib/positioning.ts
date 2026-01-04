@@ -1,5 +1,5 @@
 /**
- * Campreserv / Camp Everyday - Positioning & Messaging Constants
+ * Campreserv / Keepr - Positioning & Messaging Constants
  *
  * Central source of truth for all marketing messaging, pricing, and positioning.
  * Use these constants across landing pages, comparison pages, and marketing materials.

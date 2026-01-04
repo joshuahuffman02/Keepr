@@ -13,21 +13,34 @@ export interface TemporalContext {
   isReducedMotion: boolean;
 }
 
+// SSR-safe defaults to prevent hydration mismatch
+const SSR_DEFAULTS = {
+  hour: 12,
+  month: 6, // July - summer
+};
+
 /**
  * Hook for detecting time of day, season, and motion preferences.
  * Used for time-aware greetings, seasonal effects, and accessibility.
+ *
+ * IMPORTANT: Uses SSR-safe defaults to prevent hydration mismatch.
+ * Real values are set after mount.
  */
 export function useTemporalContext(): TemporalContext {
-  const [hour, setHour] = useState<number>(() => {
-    if (typeof window === "undefined") return 12; // SSR default
-    return new Date().getHours();
-  });
+  // Track if component has mounted to prevent hydration mismatch
+  const [hasMounted, setHasMounted] = useState(false);
+  const [hour, setHour] = useState<number>(SSR_DEFAULTS.hour);
+  const [month, setMonth] = useState<number>(SSR_DEFAULTS.month);
 
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReducedMotionValue = useReducedMotion();
+  // Use consistent value before mount to prevent hydration mismatch
+  const prefersReducedMotion = hasMounted ? prefersReducedMotionValue : false;
 
   useEffect(() => {
-    // Set initial hour on client
+    // Set real values only after mount
+    setHasMounted(true);
     setHour(new Date().getHours());
+    setMonth(new Date().getMonth());
 
     // Update hour every minute
     const interval = setInterval(() => {
@@ -45,7 +58,6 @@ export function useTemporalContext(): TemporalContext {
   }, [hour]);
 
   const season = useMemo((): Season => {
-    const month = new Date().getMonth();
     // Spring: March (2) - May (4)
     if (month >= 2 && month <= 4) return "spring";
     // Summer: June (5) - August (7)
@@ -54,7 +66,7 @@ export function useTemporalContext(): TemporalContext {
     if (month >= 8 && month <= 10) return "fall";
     // Winter: December (11) - February (1)
     return "winter";
-  }, []);
+  }, [month]);
 
   return {
     timeOfDay,

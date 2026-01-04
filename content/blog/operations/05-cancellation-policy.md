@@ -332,4 +332,4 @@ Remember: your policy should encourage guests to commit meaningfully while provi
 
 ---
 
-*Camp Everyday lets you configure custom cancellation policies by season, site type, and reservation length—then automatically applies them to bookings and communicates terms to guests. [See how at campreserv.com](https://campreserv.com)*
+*Keepr lets you configure custom cancellation policies by season, site type, and reservation length—then automatically applies them to bookings and communicates terms to guests. [See how at campreserv.com](https://campreserv.com)*

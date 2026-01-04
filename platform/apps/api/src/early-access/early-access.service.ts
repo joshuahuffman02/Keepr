@@ -364,7 +364,7 @@ export class EarlyAccessService {
 
     await this.emailService.sendEmail({
       to: user.email,
-      subject: `Welcome to Camp Everyday - Let's Set Up ${dto.campgroundName}!`,
+      subject: `Welcome to Keepr - Let's Set Up ${dto.campgroundName}!`,
       html: this.generateWelcomeEmail({
         firstName: user.firstName || "there",
         campgroundName: dto.campgroundName,
@@ -409,7 +409,7 @@ export class EarlyAccessService {
               <path d="M2 20h20" />
             </svg>
           </div>
-          <h1 style="color: #0f172a; margin: 0;">Welcome to Camp Everyday!</h1>
+          <h1 style="color: #0f172a; margin: 0;">Welcome to Keepr!</h1>
         </div>
 
         <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 24px; color: white;">
@@ -425,7 +425,7 @@ export class EarlyAccessService {
             Hey ${params.firstName}!
           </p>
           <p style="margin: 0 0 16px 0; color: #334155;">
-            Congratulations on joining Camp Everyday's Early Access Program! You've made a great choice for <strong>${params.campgroundName}</strong>.
+            Congratulations on joining Keepr's Early Access Program! You've made a great choice for <strong>${params.campgroundName}</strong>.
           </p>
           <p style="margin: 0; color: #334155;">
             Let's get your campground set up. Click the button below to continue with your setup - it only takes about 10 minutes.
@@ -449,7 +449,7 @@ export class EarlyAccessService {
             Questions? Reply to this email or text us at (555) 123-4567
           </p>
           <p style="color: #94a3b8; font-size: 12px; margin: 0;">
-            Camp Everyday - Making campground management effortless
+            Keepr - Making campground management effortless
           </p>
         </div>
       </div>
@@ -514,7 +514,7 @@ export class EarlyAccessService {
 
     await this.emailService.sendEmail({
       to: invite.email,
-      subject: `[Reminder] Complete Your Camp Everyday Setup`,
+      subject: `[Reminder] Complete Your Keepr Setup`,
       html: this.generateWelcomeEmail({
         firstName: sessionData?.firstName || "there",
         campgroundName: sessionData?.campgroundName || "Your Campground",
@@ -595,7 +595,7 @@ export class EarlyAccessService {
 
     await this.emailService.sendEmail({
       to: user.email,
-      subject: `[Reminder] Complete Your Camp Everyday Setup`,
+      subject: `[Reminder] Complete Your Keepr Setup`,
       html: this.generateWelcomeEmail({
         firstName: user.firstName || "there",
         campgroundName: sessionData?.campgroundName || "Your Campground",
@@ -740,7 +740,7 @@ export class EarlyAccessService {
 
     await this.emailService.sendEmail({
       to: session.invite.email,
-      subject: `[Reminder] Complete Your Camp Everyday Setup`,
+      subject: `[Reminder] Complete Your Keepr Setup`,
       html: this.generateWelcomeEmail({
         firstName: data?.firstName || "there",
         campgroundName: data?.campgroundName || "Your Campground",

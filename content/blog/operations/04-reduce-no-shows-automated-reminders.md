@@ -327,4 +327,4 @@ The best reminder systems feel helpful, not nagging. They give guests the inform
 
 ---
 
-*Camp Everyday includes automated confirmation, reminder, and pre-arrival messages built right in—reducing no-shows while keeping guests informed throughout their journey. [Explore at campreserv.com](https://campreserv.com)*
+*Keepr includes automated confirmation, reminder, and pre-arrival messages built right in—reducing no-shows while keeping guests informed throughout their journey. [Explore at campreserv.com](https://campreserv.com)*

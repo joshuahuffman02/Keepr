@@ -413,4 +413,4 @@ Build your emergency plan now, train your team, and practice regularly. The goal
 
 ---
 
-*Camp Everyday stores guest contact information and emergency notes for quick access during any situation, helping you communicate with all guests instantly. [Prepare your campground at campreserv.com](https://campreserv.com)*
+*Keepr stores guest contact information and emergency notes for quick access during any situation, helping you communicate with all guests instantly. [Prepare your campground at campreserv.com](https://campreserv.com)*

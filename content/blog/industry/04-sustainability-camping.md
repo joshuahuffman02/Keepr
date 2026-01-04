@@ -79,4 +79,4 @@ Today's campers increasingly care about environmental impact. They notice—and 
 
 ---
 
-*Camp Everyday helps reduce paper waste with digital booking and communication. [Go green at campreserv.com](https://campreserv.com)*
+*Keepr helps reduce paper waste with digital booking and communication. [Go green at campreserv.com](https://campreserv.com)*

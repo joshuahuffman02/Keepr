@@ -58,11 +58,11 @@ const nextConfig = {
     // Content Security Policy directives
     const cspDirectives = [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://maps.googleapis.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://maps.googleapis.com https://static.cloudflareinsights.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com",
       "font-src 'self' https://fonts.gstatic.com data:",
       "img-src 'self' data: blob: https: http:",
-      "connect-src 'self' https://api.stripe.com wss://*.stripe.com https://maps.googleapis.com https://*.railway.app https://*.keeprstay.com https://keeprstay.com https://*.ingest.us.sentry.io https://*.sentry.io http://localhost:* ws://localhost:*",
+      "connect-src 'self' https://api.stripe.com wss://*.stripe.com https://maps.googleapis.com https://*.railway.app https://*.keeprstay.com https://keeprstay.com https://*.ingest.us.sentry.io https://*.sentry.io https://nominatim.openstreetmap.org https://*.cloudflareinsights.com http://localhost:* ws://localhost:*",
       "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://www.google.com",
       "object-src 'none'",
       "base-uri 'self'",

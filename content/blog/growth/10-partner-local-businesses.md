@@ -74,4 +74,4 @@ Create joint packages:
 
 ---
 
-*Camp Everyday includes partner discount codes that help you track which partnerships drive bookings. [Grow through partnerships at campreserv.com](https://campreserv.com)*
+*Keepr includes partner discount codes that help you track which partnerships drive bookings. [Grow through partnerships at campreserv.com](https://campreserv.com)*

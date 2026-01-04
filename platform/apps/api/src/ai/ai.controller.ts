@@ -129,7 +129,7 @@ export class AiController {
 
   /**
    * Support chat endpoint for dashboard users
-   * Provides AI-powered help with using Camp Everyday
+   * Provides AI-powered help with using Keepr
    */
   @UseGuards(JwtAuthGuard)
   @Post('support/chat')

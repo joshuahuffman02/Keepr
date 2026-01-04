@@ -1,11 +1,11 @@
-# Camp Everyday Host - Business Plan
+# Keepr Host - Business Plan
 ## Bootstrapped Growth Strategy for a Time-Constrained Founder
 
 ---
 
 ## Executive Summary
 
-Camp Everyday Host is a campground management platform competing with Campspot, Newbook, and Firefly. Unlike VC-backed competitors burning cash for market share, we're building a profitable, sustainable business that can grow without requiring full-time founder involvement.
+Keepr Host is a campground management platform competing with Campspot, Newbook, and Firefly. Unlike VC-backed competitors burning cash for market share, we're building a profitable, sustainable business that can grow without requiring full-time founder involvement.
 
 **Key Constraint:** Founder has a full-time job, family (3 kids), and two campgrounds to manage. The business must be designed to run with minimal active management.
 
@@ -27,7 +27,7 @@ Camp Everyday Host is a campground management platform competing with Campspot, 
 | Family (3 kids) | 20-30 |
 | Two campgrounds | 10-20 |
 | Sleep, life, sanity | 50+ |
-| **Available for Camp Everyday** | **5-10 hours** |
+| **Available for Keepr** | **5-10 hours** |
 
 ### What 5-10 Hours/Week Can Realistically Do
 
