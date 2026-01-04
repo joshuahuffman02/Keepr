@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
+import { Logo } from "@/components/brand";
 
 export const metadata: Metadata = {
   title: "Brand Guidelines",
@@ -16,13 +17,80 @@ export default function BrandPage() {
       <div className="container py-12 space-y-16">
         {/* Header */}
         <header className="space-y-4">
+          <Logo size="xl" />
           <h1 className="font-display text-5xl font-bold tracking-tighter text-foreground">
-            Keepr Brand System
+            Brand System
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl">
             Reservation software for places worth returning to. Calm, trustworthy, human, premium.
           </p>
         </header>
+
+        {/* Logo */}
+        <section className="space-y-6">
+          <h2 className="font-display text-3xl font-medium tracking-tighter">Logo</h2>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Light background */}
+            <Card>
+              <CardHeader>
+                <CardTitle>On light backgrounds</CardTitle>
+                <CardDescription>Evergreen variant (default)</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="flex items-center gap-6">
+                  <Logo size="sm" />
+                  <Logo size="md" />
+                  <Logo size="lg" />
+                  <Logo size="xl" />
+                </div>
+                <p className="text-xs text-muted-foreground font-mono">
+                  {`<Logo size="sm|md|lg|xl" />`}
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Dark background */}
+            <Card className="bg-keepr-evergreen text-white border-keepr-evergreen">
+              <CardHeader>
+                <CardTitle className="text-white">On dark backgrounds</CardTitle>
+                <CardDescription className="text-white/70">White variant</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="flex items-center gap-6">
+                  <Logo size="sm" variant="white" />
+                  <Logo size="md" variant="white" />
+                  <Logo size="lg" variant="white" />
+                  <Logo size="xl" variant="white" />
+                </div>
+                <p className="text-xs text-white/70 font-mono">
+                  {`<Logo variant="white" />`}
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="p-4 bg-muted rounded-lg">
+            <p className="text-sm font-medium mb-2">Usage</p>
+            <pre className="text-xs bg-background p-3 rounded border overflow-x-auto">
+{`import { Logo } from "@/components/brand";
+
+// Default - Evergreen on light backgrounds
+<Logo />
+
+// Size variants
+<Logo size="sm" />  // 24px height
+<Logo size="md" />  // 32px height (default)
+<Logo size="lg" />  // 40px height
+<Logo size="xl" />  // 48px height
+
+// Color variants
+<Logo variant="evergreen" />  // Default
+<Logo variant="white" />      // For dark backgrounds
+<Logo variant="charcoal" />   // Alternative dark`}
+            </pre>
+          </div>
+        </section>
 
         {/* Color Palette */}
         <section className="space-y-6">
