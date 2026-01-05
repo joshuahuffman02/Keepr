@@ -1,7 +1,7 @@
 [build]
 builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile.web"
-rootDirectory = "."
+rootDirectory = "./"
 buildArgs = [
   "NEXT_PUBLIC_API_BASE",
   "AUTH_URL",
