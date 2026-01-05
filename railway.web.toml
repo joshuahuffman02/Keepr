@@ -1,0 +1,15 @@
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile.web"
+buildCacheMounts = ["/root/.local/share/pnpm/store"]
+buildArgs = [
+  "NEXT_PUBLIC_API_BASE",
+  "AUTH_URL",
+  "AUTH_SECRET",
+  "AUTH_TRUST_HOST",
+  "CACHE_BUST"
+]
+
+[deploy]
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
