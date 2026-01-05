@@ -1,4 +1,5 @@
 [build]
+# Clean deploy v4
 builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile.web"
 buildCacheMounts = ["/root/.local/share/pnpm/store"]
