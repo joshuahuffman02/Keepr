@@ -1,11 +1,13 @@
 'use client';
 
-import { Check, X, ArrowRight, Star, Clock, Users, Zap, Crown, Rocket, Gift, Shield, Wrench, Database, Headphones } from 'lucide-react';
+import { Check, X, ArrowRight, Star, Clock, Users, Zap, Crown, Rocket, Gift, Shield, Wrench, Database, Headphones, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { motion } from 'framer-motion';
+import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
 
-// Early Access Tiers - Real scarcity with limited spots
+// Early Access Tiers - Waterfall: first fills, then next opens
 const earlyAccessTiers = [
   {
     name: "Founder's Circle",
@@ -198,26 +200,87 @@ const featureLabels: Record<string, string> = {
 
 export function PricingPreview() {
   const [showComparison, setShowComparison] = useState(false);
+  const prefersReducedMotion = useReducedMotionSafe();
+
+  // Determine which tier is currently active (first one with spots remaining)
+  const { activeTier, upcomingTiers, filledTiers } = useMemo(() => {
+    let active = null;
+    const upcoming: typeof earlyAccessTiers = [];
+    const filled: typeof earlyAccessTiers = [];
+
+    for (const tier of earlyAccessTiers) {
+      if (tier.spotsRemaining > 0 && !active) {
+        active = tier;
+      } else if (active) {
+        upcoming.push(tier);
+      } else {
+        filled.push(tier);
+      }
+    }
+
+    return { activeTier: active, upcomingTiers: upcoming, filledTiers: filled };
+  }, []);
+
+  // Calculate total spots and remaining
+  const totalSpots = earlyAccessTiers.reduce((sum, t) => sum + t.spots, 0);
+  const totalRemaining = earlyAccessTiers.reduce((sum, t) => sum + t.spotsRemaining, 0);
+  const spotsFilled = totalSpots - totalRemaining;
+
+  const containerVariants = {
+    hidden: { opacity: prefersReducedMotion ? 1 : 0 },
+    visible: { opacity: 1, transition: prefersReducedMotion ? undefined : { staggerChildren: 0.1 } }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: prefersReducedMotion ? 1 : 0, y: prefersReducedMotion ? 0 : 20 },
+    visible: { opacity: 1, y: 0, transition: prefersReducedMotion ? undefined : { duration: 0.5 } }
+  };
 
   return (
     <section id="pricing" className="py-24 bg-gradient-to-br from-keepr-charcoal via-slate-900 to-keepr-charcoal">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
         {/* Early Access Hero */}
-        <div className="text-center max-w-4xl mx-auto mb-16">
+        <motion.div
+          initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center max-w-4xl mx-auto mb-16"
+        >
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-keepr-clay/15 border border-keepr-clay/30 rounded-full text-keepr-clay text-sm font-semibold mb-6">
-            <Clock className="h-4 w-4" />
-            Only 45 Founding Spots Available
+            <Sparkles className="h-4 w-4" />
+            {activeTier ? `NOW OPEN: ${activeTier.name}` : 'Early Access Closed'}
           </div>
 
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Be One of Our First 45 Founding Campgrounds
+            {spotsFilled > 0
+              ? `${spotsFilled} of 45 Spots Claimed`
+              : 'Be One of Our First 45 Founding Campgrounds'
+            }
           </h2>
 
           <p className="text-xl text-muted-foreground mb-8">
-            Lock in per-booking fees that will never increase — $0.75 to $1.25 vs $2.30 standard.
-            Once these 45 spots are gone, you'll have helped shape the future of campground software.
+            Early access tiers fill in order — once {activeTier?.name || 'a tier'} is full, the next tier opens.
+            Lock in per-booking fees that will never increase.
           </p>
+
+          {/* Overall Progress Bar */}
+          <div className="max-w-md mx-auto mb-8">
+            <div className="flex justify-between text-sm mb-2">
+              <span className="text-muted-foreground">{spotsFilled} claimed</span>
+              <span className="text-keepr-clay font-semibold">{totalRemaining} spots left</span>
+            </div>
+            <div className="h-3 bg-white/10 rounded-full overflow-hidden">
+              <motion.div
+                className="h-full bg-gradient-to-r from-keepr-clay to-keepr-evergreen rounded-full"
+                initial={{ width: 0 }}
+                whileInView={{ width: `${(spotsFilled / totalSpots) * 100}%` }}
+                viewport={{ once: true }}
+                transition={{ duration: 1, delay: 0.3 }}
+              />
+            </div>
+          </div>
 
           <div className="flex flex-wrap items-center justify-center gap-6 text-muted-foreground">
             <div className="flex items-center gap-2">
@@ -233,109 +296,150 @@ export function PricingPreview() {
               <span>Go live in 48 hours</span>
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* Early Access Tiers */}
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-20">
-          {earlyAccessTiers.map((tier) => {
-            const colorStylesMap = {
-              amber: {
-                border: "border-keepr-clay/60",
-                bg: "bg-keepr-clay/10",
-                badge: "bg-keepr-clay text-white",
-                icon: "text-keepr-clay",
-                button: "bg-keepr-clay hover:bg-keepr-clay-light",
-                urgency: "text-keepr-clay",
-              },
-              emerald: {
-                border: "border-keepr-evergreen/60",
-                bg: "bg-keepr-evergreen/10",
-                badge: "bg-keepr-evergreen text-white",
-                icon: "text-keepr-evergreen",
-                button: "bg-keepr-evergreen hover:bg-keepr-evergreen-light",
-                urgency: "text-keepr-evergreen",
-              },
-              violet: {
-                border: "border-white/20",
-                bg: "bg-white/5",
-                badge: "bg-white/10 text-white",
-                icon: "text-white/80",
-                button: "bg-white/10 hover:bg-white/20",
-                urgency: "text-white/70",
-              },
-            };
-            const colorStyles = colorStylesMap[tier.color as keyof typeof colorStylesMap];
+        {/* Active Tier - Hero Card */}
+        {activeTier && (
+          <motion.div
+            initial={prefersReducedMotion ? {} : { opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="max-w-2xl mx-auto mb-12"
+          >
+            <div className="relative rounded-3xl border-2 border-keepr-clay/60 bg-gradient-to-br from-keepr-clay/20 via-keepr-clay/10 to-transparent p-10 shadow-2xl shadow-keepr-clay/20">
+              {/* Glow effect */}
+              <div className="absolute inset-0 rounded-3xl bg-keepr-clay/5 blur-xl -z-10" />
 
-            return (
-              <div
-                key={tier.name}
-                className={`relative rounded-2xl border-2 ${colorStyles.border} ${colorStyles.bg} p-8 transition-all duration-300 hover:scale-[1.02]`}
-              >
-                {/* Badge */}
-                <div className={`absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 ${colorStyles.badge} text-sm font-bold rounded-full`}>
-                  {tier.highlight}
+              {/* Badge */}
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-6 py-2 bg-keepr-clay text-white text-sm font-bold rounded-full shadow-lg flex items-center gap-2">
+                <Sparkles className="h-4 w-4" />
+                NOW OPEN
+              </div>
+
+              {/* Header */}
+              <div className="text-center mb-8 pt-4">
+                <activeTier.icon className="h-16 w-16 mx-auto mb-4 text-keepr-clay" />
+                <h3 className="text-3xl font-bold text-white mb-2">{activeTier.name}</h3>
+                <p className="text-muted-foreground">First-come, first-served</p>
+
+                {/* Spots Progress */}
+                <div className="mt-6 max-w-xs mx-auto">
+                  <div className="flex justify-between text-sm mb-2">
+                    <span className="text-white font-medium">{activeTier.spotsRemaining} of {activeTier.spots} spots left</span>
+                  </div>
+                  <div className="h-4 bg-white/10 rounded-full overflow-hidden">
+                    <motion.div
+                      className="h-full bg-keepr-clay rounded-full"
+                      initial={{ width: '100%' }}
+                      whileInView={{ width: `${(activeTier.spotsRemaining / activeTier.spots) * 100}%` }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.8, delay: 0.5 }}
+                    />
+                  </div>
                 </div>
 
-                {/* Header */}
-                <div className="text-center mb-8 pt-4">
-                  <tier.icon className={`h-12 w-12 mx-auto mb-4 ${colorStyles.icon}`} />
-                  <h3 className="text-2xl font-bold text-white mb-2">{tier.name}</h3>
-
-                  {/* Spots Counter */}
-                  <div className="flex items-center justify-center gap-2 mb-4">
-                    <div className="flex -space-x-1">
-                      {[...Array(Math.min(tier.spotsRemaining, 5))].map((_, i) => (
-                        <div key={i} className="w-6 h-6 rounded-full bg-muted border-2 border-border" />
-                      ))}
-                    </div>
-                    <span className={`text-sm font-semibold ${colorStyles.urgency}`}>
-                      {tier.urgency}
+                {/* Pricing */}
+                <div className="mt-8 space-y-2">
+                  <div className="flex items-baseline justify-center gap-1">
+                    <span className="text-3xl text-muted-foreground">$</span>
+                    <span className="text-7xl font-bold text-white">{activeTier.monthlyPrice}</span>
+                    <span className="text-xl text-muted-foreground">/mo</span>
+                  </div>
+                  <p className="text-lg text-muted-foreground">{activeTier.monthlyDuration}</p>
+                  <div className="pt-3 mt-3 border-t border-white/10">
+                    <span className="text-2xl text-keepr-clay font-bold">
+                      ${activeTier.bookingFee.toFixed(2)} per booking
+                    </span>
+                    <span className="text-muted-foreground text-sm block mt-1">
+                      (pass to guest or absorb — locked forever)
                     </span>
                   </div>
+                </div>
+              </div>
 
-                  {/* Pricing */}
-                  <div className="space-y-2">
-                    <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-3xl text-muted-foreground">$</span>
-                      <span className="text-6xl font-bold text-white">{tier.monthlyPrice}</span>
-                      <span className="text-muted-foreground">/mo</span>
+              {/* Benefits */}
+              <ul className="grid md:grid-cols-2 gap-3 mb-8">
+                {activeTier.benefits.map((benefit) => (
+                  <li key={benefit} className="flex items-start gap-3">
+                    <Check className="h-5 w-5 text-keepr-clay flex-shrink-0 mt-0.5" />
+                    <span className="text-white/90">{benefit}</span>
+                  </li>
+                ))}
+              </ul>
+
+              {/* CTA */}
+              <Button
+                asChild
+                className="w-full py-7 text-xl font-bold bg-keepr-clay hover:bg-keepr-clay-light text-white shadow-lg shadow-keepr-clay/30"
+              >
+                <Link href={`/signup?tier=${activeTier.name.toLowerCase().replace(/['\s]/g, '_').replace(/__/g, '_')}`}>
+                  {activeTier.cta}
+                  <ArrowRight className="ml-2 h-6 w-6" />
+                </Link>
+              </Button>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Upcoming Tiers - Smaller, Grayed Out */}
+        {upcomingTiers.length > 0 && (
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="max-w-4xl mx-auto mb-16"
+          >
+            <div className="text-center mb-6">
+              <p className="text-muted-foreground text-sm uppercase tracking-wider font-medium">
+                Coming Next — Opens when {activeTier?.name} fills
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              {upcomingTiers.map((tier, index) => (
+                <motion.div
+                  key={tier.name}
+                  variants={itemVariants}
+                  className="relative rounded-xl border border-white/10 bg-white/5 p-6 opacity-60"
+                >
+                  {/* Queue Position */}
+                  <div className="absolute -top-3 left-4 px-3 py-1 bg-slate-700 text-white/70 text-xs font-medium rounded-full">
+                    Opens {index === 0 ? 'next' : `after ${upcomingTiers[index - 1]?.name}`}
+                  </div>
+
+                  <div className="flex items-start gap-4 pt-2">
+                    <div className="p-3 rounded-xl bg-white/5">
+                      <tier.icon className="h-8 w-8 text-white/40" />
                     </div>
-                    <p className="text-muted-foreground">{tier.monthlyDuration}</p>
-                    <div className="pt-2 border-t border-border/50">
-                      <span className="text-keepr-clay font-semibold">
+                    <div className="flex-1">
+                      <h4 className="text-lg font-bold text-white/70">{tier.name}</h4>
+                      <p className="text-sm text-muted-foreground">{tier.spots} spots</p>
+
+                      <div className="mt-3 flex items-baseline gap-2">
+                        <span className="text-2xl font-bold text-white/60">${tier.monthlyPrice}</span>
+                        <span className="text-sm text-muted-foreground">/mo {tier.monthlyDuration}</span>
+                      </div>
+                      <p className="text-sm text-white/50 mt-1">
                         ${tier.bookingFee.toFixed(2)} per booking
-                      </span>
-                      <span className="text-muted-foreground text-sm block">
-                        (pass to guest or absorb)
-                      </span>
+                      </p>
                     </div>
                   </div>
-                </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        )}
 
-                {/* Benefits */}
-                <ul className="space-y-3 mb-8">
-                  {tier.benefits.map((benefit) => (
-                    <li key={benefit} className="flex items-start gap-3">
-                      <Check className="h-5 w-5 text-keepr-clay flex-shrink-0 mt-0.5" />
-                      <span className="text-muted-foreground">{benefit}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                {/* CTA */}
-                <Button
-                  asChild
-                  className={`w-full py-6 text-lg font-semibold ${colorStyles.button} text-white shadow-lg`}
-                >
-                  <Link href={`/signup?tier=${tier.name.toLowerCase().replace(/['\s]/g, '_').replace(/__/g, '_')}`}>
-                    {tier.cta}
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Link>
-                </Button>
-              </div>
-            );
-          })}
-        </div>
+        {/* Filled Tiers (if any) */}
+        {filledTiers.length > 0 && (
+          <div className="max-w-2xl mx-auto mb-16 text-center">
+            <p className="text-muted-foreground text-sm">
+              Already filled: {filledTiers.map(t => t.name).join(', ')}
+            </p>
+          </div>
+        )}
 
         {/* After Early Access Note */}
         <div className="text-center mb-16">

@@ -1,17 +1,17 @@
 import { Metadata } from 'next';
 import { MarketingHeader } from '@/components/marketing/MarketingHeader';
 import { HeroSection } from '@/components/marketing/HeroSection';
-import { WhySwitch } from '@/components/marketing/WhySwitch';
 import { FeaturePillars } from '@/components/marketing/FeaturePillars';
 import { PopularFeatures } from '@/components/marketing/PopularFeatures';
 import { SocialProof } from '@/components/marketing/SocialProof';
 import { DemoCTA } from '@/components/marketing/DemoCTA';
 import { Testimonials } from '@/components/marketing/Testimonials';
 import { PricingPreview } from '@/components/marketing/PricingPreview';
-import { AiFeatures } from '@/components/marketing/AiFeatures';
 import { Footer } from '@/components/marketing/Footer';
 import { FAQSection } from '@/components/marketing/FAQSection';
 import { FAQJsonLd } from '@/components/seo';
+
+// Removed: WhySwitch (merged into FeaturePillars), AiFeatures (content was vague)
 
 const ownerFaqs = [
   {
@@ -93,48 +93,42 @@ export default function OwnersPage() {
       {/* Header */}
       <MarketingHeader />
 
-      {/* Hero Section */}
+      {/* 1. Hero Section */}
       <HeroSection />
 
-      {/* Social Proof Bar */}
+      {/* 2. Social Proof - Outcome-focused stats with animations */}
       <SocialProof />
 
-      {/* Why Switch Section - Competitor Pain Points */}
-      <WhySwitch />
-
-      {/* Feature Pillars - 6 Core Categories */}
+      {/* 3. Feature Pillars - 6 Core Categories */}
       <FeaturePillars />
 
-      {/* Popular Features Showcase */}
+      {/* 4. Popular Features Showcase */}
       <section id="resources">
         <PopularFeatures />
       </section>
 
-      {/* Testimonials */}
+      {/* 5. Early Access Benefits */}
       <section id="about">
         <Testimonials />
       </section>
 
-      {/* Pricing Preview */}
+      {/* 6. Pricing - Waterfall tier system */}
       <section id="pricing">
         <PricingPreview />
       </section>
 
-      {/* AI Features */}
-      <AiFeatures />
-
-      {/* FAQ Section */}
+      {/* 7. FAQ Section */}
       <FAQSection
         faqs={ownerFaqs}
         title="Frequently Asked Questions"
         subtitle="Everything you need to know about getting started with Keepr."
-        className="bg-muted"
+        className="bg-slate-50"
       />
 
-      {/* Demo CTA */}
+      {/* 8. Demo CTA */}
       <DemoCTA />
 
-      {/* Footer */}
+      {/* 9. Footer */}
       <Footer />
     </div>
   );

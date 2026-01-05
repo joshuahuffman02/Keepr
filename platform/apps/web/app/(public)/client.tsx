@@ -19,6 +19,8 @@ import { HeroBanner } from "../../components/public/HeroBanner";
 import { ValueStack } from "../../components/public/ValueStack";
 import { CharityImpactSection } from "../../components/charity/CharityImpactSection";
 import { InlineActivityFeed } from "../../components/public/InlineActivityFeed";
+import { FeaturedCampground } from "../../components/design/FeaturedCampground";
+import { GuestStories } from "../../components/public/GuestStories";
 
 // Animation variants for scroll reveal
 const fadeInUp = {
@@ -339,6 +341,14 @@ export function HomeClient() {
     const handleSearch = (query: string, filters: typeof searchFilters) => {
         setSearchQuery(query);
         setSearchFilters(filters);
+
+        // Scroll to results section after a brief delay for state to update
+        setTimeout(() => {
+            const resultsSection = document.getElementById("featured");
+            if (resultsSection) {
+                resultsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+        }, 100);
     };
 
     useEffect(() => {
@@ -357,6 +367,9 @@ export function HomeClient() {
 
             {/* Live Activity Feed - Social proof inline after hero */}
             <InlineActivityFeed className="border-b border-slate-100" />
+
+            {/* This Week's Top Pick - Featured Campground (warm variant) */}
+            <FeaturedCampground variant="warm" />
 
             {/* Category Navigation - Airbnb-style tabs */}
             <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-slate-100 shadow-sm">
@@ -825,8 +838,8 @@ export function HomeClient() {
                 )}
             </section>
 
-            {/* Browse All Campgrounds CTA */}
-            <section className="py-16 bg-gradient-to-br from-emerald-50 via-white to-teal-50 border-y border-slate-100">
+            {/* Browse All Campgrounds CTA - Warm version */}
+            <section className="py-16 bg-gradient-to-br from-amber-50/50 via-white to-rose-50/40 border-y border-amber-100/50">
                 <div className="max-w-4xl mx-auto px-6 text-center">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -849,10 +862,10 @@ export function HomeClient() {
                         {/* Text */}
                         <div className="space-y-3">
                             <h2 className="text-3xl md:text-4xl font-bold text-slate-900">
-                                Discover Your Next Adventure
+                                Ready to Start Your Adventure?
                             </h2>
                             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-                                Browse campgrounds by state, explore national parks, or find the perfect spot near your favorite attractions.
+                                Thousands of families have found their perfect getaway. Your next memory is just a few clicks away.
                             </p>
                         </div>
 
@@ -860,16 +873,16 @@ export function HomeClient() {
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                             <Link
                                 href="/camping"
-                                className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold rounded-xl transition-all shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 hover:scale-105"
+                                className="inline-flex items-center gap-2 px-8 py-4 bg-keepr-evergreen hover:bg-keepr-evergreen/90 text-white font-semibold rounded-xl transition-all shadow-lg shadow-keepr-evergreen/20 hover:shadow-keepr-evergreen/30 hover:scale-105"
                             >
                                 <MapPin className="w-5 h-5" />
                                 Browse All Campgrounds
                             </Link>
                             <Link
                                 href="/near/yosemite-national-park"
-                                className="inline-flex items-center gap-2 px-6 py-4 bg-white border border-slate-200 text-slate-700 font-medium rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all"
+                                className="inline-flex items-center gap-2 px-6 py-4 bg-white border border-slate-200 text-slate-700 font-medium rounded-xl hover:bg-amber-50 hover:border-amber-200 transition-all"
                             >
-                                <Mountain className="w-5 h-5 text-slate-400" />
+                                <Mountain className="w-5 h-5 text-amber-500" />
                                 Explore National Parks
                             </Link>
                         </div>
@@ -880,7 +893,7 @@ export function HomeClient() {
                                 <Link
                                     key={state}
                                     href={`/camping/${state.toLowerCase().replace(/ /g, "-")}`}
-                                    className="px-4 py-2 text-sm text-slate-600 bg-white border border-slate-200 rounded-full hover:border-emerald-300 hover:text-emerald-700 transition-colors"
+                                    className="px-4 py-2 text-sm text-slate-600 bg-white border border-slate-200 rounded-full hover:border-amber-300 hover:text-amber-700 hover:bg-amber-50 transition-colors"
                                 >
                                     {state}
                                 </Link>
@@ -889,6 +902,9 @@ export function HomeClient() {
                     </motion.div>
                 </div>
             </section>
+
+            {/* Guest Stories - Real testimonials */}
+            <GuestStories variant="warm" />
 
             {/* Charity Impact Section - The heart of Keepr */}
             <CharityImpactSection />

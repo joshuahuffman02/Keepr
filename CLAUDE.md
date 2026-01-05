@@ -104,11 +104,39 @@ pnpm lint:web               # Lint web app
 3. **Multi-tenant isolation** - Always scope queries by `campgroundId`
 4. **Money in cents** - All amounts are integers (e.g., `9999` = $99.99)
 5. **No emojis** - Use Lucide SVG icons instead (professional and scalable)
-6. **Dockerfiles** - DO NOT modify or rename these files:
-   - `Dockerfile` = API service (NestJS)
-   - `Dockerfile.api` = API service (copy of Dockerfile, for Railway)
-   - `Dockerfile.web` = Web service (Next.js)
-7. **railway.toml** - DO NOT add `dockerfilePath` - each Railway service configures this in dashboard
+
+### DOCKER & RAILWAY CONFIG - NEVER MODIFY
+
+These files control Railway deployment. Modifying them breaks production.
+
+| File | Purpose | NEVER CHANGE |
+|------|---------|--------------|
+| `Dockerfile.api` | API Docker build | Ports, CMD, paths |
+| `Dockerfile.web` | Web Docker build | Ports, CMD, paths |
+| `railway.api.toml` | API Railway config | dockerfilePath |
+| `railway.web.toml` | Web Railway config | dockerfilePath, buildArgs |
+| `railway.toml` | Root config (fallback) | Keep minimal |
+
+**Current working configuration:**
+
+```
+Dockerfile.api:
+  - EXPOSE 4000 (but Railway injects PORT=8080, so Target Port = 8080 in dashboard)
+  - CMD ["./start.sh"]
+
+Dockerfile.web:
+  - EXPOSE 3000, Target Port = 3000
+  - CMD ["node", "node_modules/next/dist/bin/next", "start", "-p", "3000"]
+
+Railway Dashboard Settings:
+  - API: Config File = /railway.api.toml, Target Port = 8080
+  - Web: Config File = /railway.web.toml, Target Port = 3000
+```
+
+**If builds break, check:**
+1. Railway dashboard "Config File" matches the service (api vs web)
+2. Target Port matches what the app listens on
+3. Environment variables exist (especially `NEXT_PUBLIC_API_BASE` for web builds)
 
 ---
 

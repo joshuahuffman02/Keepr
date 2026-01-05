@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react';
 import Image from 'next/image';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   ShoppingCart,
   Grid3x3,
@@ -9,9 +10,9 @@ import {
   CreditCard,
   Calendar,
   MessageSquare,
-  Wifi,
-  Package
+  Check,
 } from 'lucide-react';
+import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
 
 const popularFeatures = [
   {
@@ -97,6 +98,7 @@ const popularFeatures = [
 export function PopularFeatures() {
   const [activeFeature, setActiveFeature] = useState(popularFeatures[0]);
   const detailRef = useRef<HTMLDivElement | null>(null);
+  const prefersReducedMotion = useReducedMotionSafe();
 
   const handleSelect = (feature: typeof popularFeatures[number]) => {
     setActiveFeature(feature);
@@ -106,10 +108,16 @@ export function PopularFeatures() {
   };
 
   return (
-    <section className="py-24 bg-gradient-to-br from-keepr-off-white to-white">
+    <section className="py-24 bg-slate-50">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        <motion.div
+          initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center max-w-3xl mx-auto mb-16"
+        >
           <h2 className="text-base font-semibold text-keepr-evergreen tracking-wide uppercase mb-3">
             Popular Features
           </h2>
@@ -119,12 +127,18 @@ export function PopularFeatures() {
           <p className="text-xl text-muted-foreground">
             Discover the features that make daily operations smoother and guests happier.
           </p>
-        </div>
+        </motion.div>
 
         {/* Feature Showcase */}
         <div className="grid lg:grid-cols-2 gap-12 items-start">
           {/* Left: Feature Tabs */}
-          <div className="space-y-3">
+          <motion.div
+            initial={prefersReducedMotion ? {} : { opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="space-y-3"
+          >
             {popularFeatures.map((feature) => {
               const Icon = feature.icon;
               const isActive = activeFeature.id === feature.id;
@@ -133,26 +147,37 @@ export function PopularFeatures() {
                 <button
                   key={feature.id}
                   onClick={() => handleSelect(feature)}
-                  className={`w-full text-left p-6 rounded-xl border-2 transition-all duration-300 ${isActive
-                    ? 'border-keepr-evergreen/40 bg-keepr-evergreen/10 shadow-lg'
-                    : 'border-border bg-card hover:border-keepr-evergreen/30 hover:shadow-md'
+                  className={`w-full text-left p-5 rounded-xl border-2 transition-all duration-300 relative overflow-hidden ${isActive
+                    ? 'border-keepr-evergreen bg-white shadow-lg'
+                    : 'border-border bg-white hover:border-keepr-evergreen/30 hover:shadow-md'
                     }`}
                 >
-                  <div className="flex items-start gap-4">
+                  {/* Active indicator bar */}
+                  <div
+                    className={`absolute left-0 top-0 bottom-0 w-1 bg-keepr-evergreen transition-opacity duration-300 ${
+                      isActive ? 'opacity-100' : 'opacity-0'
+                    }`}
+                  />
+
+                  <div className="flex items-center gap-4">
                     <div
-                      className={`flex-shrink-0 h-12 w-12 rounded-lg flex items-center justify-center ${isActive ? 'bg-keepr-evergreen' : 'bg-muted'
+                      className={`flex-shrink-0 h-11 w-11 rounded-xl flex items-center justify-center transition-all duration-300 ${
+                        isActive
+                          ? 'bg-keepr-evergreen shadow-md'
+                          : 'bg-slate-100'
                         }`}
                     >
-                      <Icon className={`h-6 w-6 ${isActive ? 'text-white' : 'text-muted-foreground'}`} />
+                      <Icon className={`h-5 w-5 transition-colors duration-300 ${isActive ? 'text-white' : 'text-muted-foreground'}`} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3
-                        className={`text-lg font-semibold mb-1 ${isActive ? 'text-keepr-evergreen' : 'text-foreground'
+                        className={`text-base font-semibold transition-colors duration-300 ${
+                          isActive ? 'text-keepr-evergreen' : 'text-foreground'
                           }`}
                       >
                         {feature.name}
                       </h3>
-                      <p className={`text-sm ${isActive ? 'text-keepr-evergreen/80' : 'text-muted-foreground'}`}>
+                      <p className={`text-sm transition-colors duration-300 ${isActive ? 'text-keepr-evergreen/70' : 'text-muted-foreground'}`}>
                         {feature.description}
                       </p>
                     </div>
@@ -160,55 +185,95 @@ export function PopularFeatures() {
                 </button>
               );
             })}
-          </div>
+          </motion.div>
 
-          {/* Right: Feature Details */}
-          <div ref={detailRef} className="lg:sticky lg:top-24">
-            <div className="bg-card rounded-2xl shadow-xl border border-border overflow-hidden">
-              {/* Feature Image Placeholder */}
-              <div className="aspect-[16/10] relative bg-muted">
-                <Image
-                  src={activeFeature.image}
-                  alt={`${activeFeature.name} Preview`}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-
-              {/* Feature Content */}
-              <div className="p-8">
-                <h3 className="text-2xl font-bold text-foreground mb-4">
-                  {activeFeature.name}
-                </h3>
-                <p className="text-muted-foreground mb-6">{activeFeature.description}</p>
-
-                {/* Benefits List */}
-                <div className="space-y-3">
-                  <h4 className="text-sm font-semibold text-foreground uppercase tracking-wide">
-                    Key Benefits
-                  </h4>
-                  <ul className="space-y-2">
-                    {activeFeature.benefits.map((benefit) => (
-                      <li key={benefit} className="flex items-start gap-3">
-                        <svg
-                          className="h-6 w-6 text-keepr-clay flex-shrink-0 mt-0.5"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        <span className="text-foreground">{benefit}</span>
-                      </li>
-                    ))}
-                  </ul>
+          {/* Right: Feature Details with Animation */}
+          <motion.div
+            ref={detailRef}
+            initial={prefersReducedMotion ? {} : { opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="lg:sticky lg:top-24"
+          >
+            {/* Browser Chrome Frame */}
+            <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+              {/* Browser Header */}
+              <div className="flex items-center gap-2 px-4 py-3 bg-slate-100 border-b border-slate-200">
+                <div className="flex gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-red-400" />
+                  <div className="w-3 h-3 rounded-full bg-amber-400" />
+                  <div className="w-3 h-3 rounded-full bg-green-400" />
+                </div>
+                <div className="flex-1 mx-4">
+                  <div className="bg-white rounded-md px-3 py-1.5 text-xs text-slate-400 text-center border border-slate-200">
+                    app.keeprstay.com/dashboard
+                  </div>
                 </div>
               </div>
+
+              {/* Feature Image with Crossfade */}
+              <div className="aspect-[16/10] relative bg-slate-100">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={activeFeature.id}
+                    initial={prefersReducedMotion ? {} : { opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={prefersReducedMotion ? {} : { opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="absolute inset-0"
+                  >
+                    <Image
+                      src={activeFeature.image}
+                      alt={`${activeFeature.name} Preview`}
+                      fill
+                      className="object-cover"
+                    />
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+
+              {/* Feature Content with Animation */}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeFeature.id}
+                  initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={prefersReducedMotion ? {} : { opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                  className="p-8"
+                >
+                  <h3 className="text-2xl font-bold text-foreground mb-3">
+                    {activeFeature.name}
+                  </h3>
+                  <p className="text-muted-foreground mb-6">{activeFeature.description}</p>
+
+                  {/* Benefits List */}
+                  <div className="space-y-3">
+                    <h4 className="text-sm font-semibold text-foreground uppercase tracking-wide">
+                      Key Benefits
+                    </h4>
+                    <ul className="grid grid-cols-2 gap-3">
+                      {activeFeature.benefits.map((benefit, index) => (
+                        <motion.li
+                          key={benefit}
+                          initial={prefersReducedMotion ? {} : { opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          className="flex items-center gap-2"
+                        >
+                          <div className="h-5 w-5 rounded-full bg-keepr-evergreen/10 flex items-center justify-center flex-shrink-0">
+                            <Check className="h-3 w-3 text-keepr-evergreen" />
+                          </div>
+                          <span className="text-sm text-foreground">{benefit}</span>
+                        </motion.li>
+                      ))}
+                    </ul>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>

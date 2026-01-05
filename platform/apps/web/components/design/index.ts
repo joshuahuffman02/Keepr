@@ -1,6 +1,2 @@
-// Design variant components
-export { HeroRefined } from "./HeroRefined";
-export { HeroWarm } from "./HeroWarm";
-export { HeroBold } from "./HeroBold";
-export { TestimonialsSection } from "./TestimonialsSection";
+// Design components
 export { FeaturedCampground } from "./FeaturedCampground";

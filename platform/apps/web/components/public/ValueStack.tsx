@@ -1,27 +1,39 @@
 "use client";
 
+import { useRef } from "react";
 import Image from "next/image";
-import { CheckCircle2 } from "lucide-react";
+import { Shield, Heart, Sparkles } from "lucide-react";
+import { motion, useInView } from "framer-motion";
 import { cn } from "../../lib/utils";
+import { useReducedMotionSafe } from "../../hooks/use-reduced-motion-safe";
 
 const pillars = [
   {
     image: "/images/icons/trust-security.png",
-    title: "Your Adventure, Protected",
-    description: "Bank-level security keeps your payment and personal info safe. Book with complete peace of mind.",
-    guarantee: "100% Secure",
+    fallbackIcon: Shield,
+    title: "Book with Peace of Mind",
+    description: "Your payment and personal details are protected with the same security used by banks. Focus on the fun, we'll handle the rest.",
+    guarantee: "Safe & Secure",
+    color: "text-keepr-evergreen",
+    bgColor: "bg-keepr-evergreen/10",
   },
   {
     image: "/images/icons/best-price.png",
-    title: "No Middleman Magic",
-    description: "Book directly with campgrounds. No hidden fees, no markup - just honest pricing for honest adventures.",
-    guarantee: "Best Price Promise",
+    fallbackIcon: Sparkles,
+    title: "Prices You Can Count On",
+    description: "What you see is what you pay. No surprise fees at checkout, no hidden costs. Just honest, transparent pricing.",
+    guarantee: "No Hidden Fees",
+    color: "text-amber-600",
+    bgColor: "bg-amber-50",
   },
   {
     image: "/images/icons/support.png",
-    title: "Real Humans, Real Help",
-    description: "Our team of camping enthusiasts is here whenever you need us. Day or night, rain or shine.",
-    guarantee: "24/7 Support",
+    fallbackIcon: Heart,
+    title: "Real People, Real Care",
+    description: "Questions? Concerns? Our friendly team of camping enthusiasts is here to help you every step of the way.",
+    guarantee: "We're Here for You",
+    color: "text-rose-500",
+    bgColor: "bg-rose-50",
   },
 ];
 
@@ -30,64 +42,118 @@ interface ValueStackProps {
 }
 
 export function ValueStack({ className }: ValueStackProps) {
+  const ref = useRef<HTMLElement>(null);
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
+  const prefersReducedMotion = useReducedMotionSafe();
+
+  const containerVariants = {
+    hidden: { opacity: prefersReducedMotion ? 1 : 0 },
+    visible: {
+      opacity: 1,
+      transition: prefersReducedMotion ? undefined : { staggerChildren: 0.15 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: prefersReducedMotion ? 1 : 0, y: prefersReducedMotion ? 0 : 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: prefersReducedMotion ? undefined : { duration: 0.5, ease: "easeOut" as const },
+    },
+  };
+
   return (
-    <section className={cn("py-16 md:py-20 bg-keepr-off-white", className)}>
+    <section
+      ref={ref}
+      className={cn(
+        "py-16 md:py-20 bg-gradient-to-br from-rose-50/40 via-amber-50/30 to-white",
+        className
+      )}
+    >
       <div className="max-w-7xl mx-auto px-6">
         {/* Section header */}
-        <div className="text-center mb-12 md:mb-16">
-          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-4">
-            Your Trust is Our Treasure
+        <motion.div
+          initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-12 md:mb-16"
+        >
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-100 text-amber-700 rounded-full text-sm font-medium mb-4">
+            <Heart className="w-4 h-4 fill-amber-500" />
+            <span>Family-Trusted Since Day One</span>
+          </div>
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 mb-4">
+            Why Families Choose Keepr
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Every great adventure begins with peace of mind. Here's how we make
-            your journey magical from the very first click.
+          <p className="text-slate-600 max-w-2xl mx-auto text-lg">
+            Creating memories shouldn't come with stress. Here's how we make
+            your camping experience easy, safe, and joyful.
           </p>
-        </div>
+        </motion.div>
 
         {/* Pillars grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-          {pillars.map((pillar, i) => (
-            <div
-              key={i}
-              className="bg-card rounded-2xl p-6 md:p-8 shadow-lg shadow-slate-900/5 hover:shadow-xl hover:shadow-slate-900/10 transition-all hover:-translate-y-1"
-            >
-              {/* Icon */}
-              <div className="relative w-16 h-16 mb-6">
-                <Image
-                  src={pillar.image}
-                  alt={pillar.title}
-                  fill
-                  className="object-contain"
-                  sizes="64px"
-                />
-              </div>
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+          className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
+        >
+          {pillars.map((pillar, i) => {
+            const FallbackIcon = pillar.fallbackIcon;
+            return (
+              <motion.div
+                key={i}
+                variants={itemVariants}
+                className="bg-white rounded-2xl p-6 md:p-8 shadow-lg shadow-slate-900/5 hover:shadow-xl hover:shadow-slate-900/10 transition-all duration-300 hover:-translate-y-1 border border-slate-100"
+              >
+                {/* Icon */}
+                <div className={cn("w-14 h-14 rounded-xl flex items-center justify-center mb-6", pillar.bgColor)}>
+                  <div className="relative w-8 h-8">
+                    <Image
+                      src={pillar.image}
+                      alt={pillar.title}
+                      fill
+                      className="object-contain"
+                      sizes="32px"
+                      onError={(e) => {
+                        // Hide image on error, fallback icon will show
+                        e.currentTarget.style.display = "none";
+                      }}
+                    />
+                  </div>
+                  <FallbackIcon className={cn("w-7 h-7 absolute", pillar.color)} style={{ display: "none" }} />
+                </div>
 
-              {/* Content */}
-              <h3 className="text-xl font-bold text-foreground mb-3">{pillar.title}</h3>
-              <p className="text-muted-foreground mb-4">{pillar.description}</p>
+                {/* Content */}
+                <h3 className="text-xl font-bold text-slate-900 mb-3">{pillar.title}</h3>
+                <p className="text-slate-600 mb-5 leading-relaxed">{pillar.description}</p>
 
-              {/* Guarantee badge */}
-              <div className="flex items-center gap-2 text-keepr-evergreen">
-                <CheckCircle2 className="h-4 w-4" />
-                <span className="text-sm font-medium">{pillar.guarantee}</span>
-              </div>
-            </div>
-          ))}
-        </div>
+                {/* Guarantee badge */}
+                <div className={cn(
+                  "inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium",
+                  pillar.bgColor,
+                  pillar.color
+                )}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                  <span>{pillar.guarantee}</span>
+                </div>
+              </motion.div>
+            );
+          })}
+        </motion.div>
 
-        {/* Additional trust statement */}
-        <div className="mt-12 text-center">
-          <div className="inline-flex items-center gap-3 bg-keepr-evergreen/10 text-keepr-evergreen rounded-full px-5 py-2.5 text-sm font-medium">
-            <Image
-              src="/images/icons/trust-security.png"
-              alt="Security"
-              width={24}
-              height={24}
-              className="object-contain"
-            />
-            Your satisfaction is our priority
-          </div>
-        </div>
+        {/* Trust reinforcement */}
+        <motion.div
+          initial={prefersReducedMotion ? {} : { opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : {}}
+          transition={{ delay: 0.6, duration: 0.5 }}
+          className="mt-12 text-center"
+        >
+          <p className="text-slate-500 text-sm">
+            Trusted by thousands of families for their outdoor adventures
+          </p>
+        </motion.div>
       </div>
     </section>
   );

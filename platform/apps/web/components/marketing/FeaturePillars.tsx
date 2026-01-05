@@ -1,17 +1,16 @@
 'use client';
 
+import { useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
 import {
   TrendingUp,
   Settings,
-  Megaphone,
   Users,
-  Zap,
-  BarChart3,
-  ArrowRight,
   Brain,
   Sparkles,
   Calendar
 } from 'lucide-react';
+import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
 
 const features = [
   {
@@ -122,11 +121,37 @@ const colorClasses = {
 };
 
 export function FeaturePillars() {
+  const ref = useRef<HTMLElement>(null);
+  const isInView = useInView(ref, { once: true, margin: '-50px' });
+  const prefersReducedMotion = useReducedMotionSafe();
+
+  const containerVariants = {
+    hidden: { opacity: prefersReducedMotion ? 1 : 0 },
+    visible: {
+      opacity: 1,
+      transition: prefersReducedMotion ? {} : { staggerChildren: 0.1 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: prefersReducedMotion ? 1 : 0, y: prefersReducedMotion ? 0 : 30 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: prefersReducedMotion ? undefined : { duration: 0.5, ease: 'easeOut' as const },
+    },
+  };
+
   return (
-    <section id="features" className="py-24 bg-card">
+    <section ref={ref} id="features" className="py-24 bg-card">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        <motion.div
+          initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 1 }}
+          transition={{ duration: 0.6 }}
+          className="text-center max-w-3xl mx-auto mb-16"
+        >
           <h2 className="text-base font-semibold text-keepr-evergreen tracking-wide uppercase mb-3">
             Complete Platform
           </h2>
@@ -137,21 +162,27 @@ export function FeaturePillars() {
             From AI-powered insights to guest loyalty programs, we've built the
             all-in-one platform for modern campground operations.
           </p>
-        </div>
+        </motion.div>
 
         {/* Feature Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate={isInView ? 'visible' : 'hidden'}
+          className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+        >
           {features.map((feature) => {
             const Icon = feature.icon;
             const colors = colorClasses[feature.color as keyof typeof colorClasses];
 
             return (
-              <div
+              <motion.div
                 key={feature.name}
-                className={`group relative bg-card rounded-2xl border-2 border-border p-8 transition-all duration-300 hover:shadow-xl ${colors.hover}`}
+                variants={itemVariants}
+                className={`group relative bg-card rounded-2xl border-2 border-border p-8 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${colors.hover}`}
               >
                 {/* Icon */}
-                <div className={`inline-flex h-14 w-14 items-center justify-center rounded-xl ${colors.bg} mb-6`}>
+                <div className={`inline-flex h-14 w-14 items-center justify-center rounded-xl ${colors.bg} mb-6 transition-transform duration-300 group-hover:scale-110`}>
                   <Icon className={`h-7 w-7 ${colors.icon}`} />
                 </div>
 
@@ -185,10 +216,10 @@ export function FeaturePillars() {
 
                 {/* Hover Effect */}
                 <div className="absolute inset-0 -z-10 rounded-2xl bg-gradient-to-br from-keepr-evergreen/10 to-keepr-clay/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              </div>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
