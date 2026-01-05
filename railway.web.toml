@@ -6,7 +6,8 @@ buildArgs = [
   "NEXT_PUBLIC_API_BASE",
   "AUTH_URL",
   "AUTH_SECRET",
-  "AUTH_TRUST_HOST"
+  "AUTH_TRUST_HOST",
+  "CACHEBUST"
 ]
 
 [deploy]
