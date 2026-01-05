@@ -1,6 +1,7 @@
 [build]
 # Force Docker builds instead of Railpack to support pnpm workspaces
 builder = "DOCKERFILE"
+rootDirectory = "."
 # NOTE: dockerfilePath is set per-service via railway.api.toml and railway.web.toml
 # - Web service: Dockerfile.web (uses /railway.web.toml)
 # - API service: Dockerfile.api (uses /railway.api.toml)
