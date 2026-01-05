@@ -1,165 +1,88 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { TrendingDown, Clock, Star, Headphones } from 'lucide-react';
+import { Heart, Shield, Users, Zap } from 'lucide-react';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
 
-// Outcome-focused stats that speak to campground owner pain points
-const stats = [
+// Authentic value props - no fake metrics, just genuine statements
+const valueProps = [
   {
-    icon: TrendingDown,
-    value: 30,
-    suffix: '%',
-    label: 'Fewer No-Shows',
-    description: 'With automated reminders',
-    color: 'text-keepr-evergreen',
-    iconBg: 'bg-keepr-evergreen/15',
+    icon: Heart,
+    title: 'Built by Campground Owners',
+    description: 'We run parks ourselves. We know your pain.',
   },
   {
-    icon: Clock,
-    value: 2,
-    suffix: ' hrs',
-    label: 'Saved Daily',
-    description: 'On admin tasks',
-    color: 'text-keepr-clay',
-    iconBg: 'bg-keepr-clay/15',
+    icon: Shield,
+    title: 'No Contracts',
+    description: 'Month-to-month. Cancel anytime. 30-day guarantee.',
   },
   {
-    icon: Star,
-    value: 4.9,
-    suffix: '/5',
-    label: 'Owner Rating',
-    description: 'From beta testers',
-    color: 'text-amber-500',
-    iconBg: 'bg-amber-500/15',
+    icon: Users,
+    title: 'Human Support',
+    description: 'Real people who understand campgrounds.',
   },
   {
-    icon: Headphones,
-    value: 24,
-    suffix: '/7',
-    label: 'Expert Support',
-    description: 'Real humans, always',
-    color: 'text-violet-500',
-    iconBg: 'bg-violet-500/15',
+    icon: Zap,
+    title: 'Go Live Today',
+    description: 'Same-day setup. Free data migration.',
   },
 ];
 
-// Animated counter hook
-function useAnimatedCounter(end: number, duration: number = 2000, startOnView: boolean = true) {
-  const [count, setCount] = useState(0);
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true });
+function ValuePropCard({ prop, index }: { prop: typeof valueProps[0]; index: number }) {
   const prefersReducedMotion = useReducedMotionSafe();
-
-  useEffect(() => {
-    if (!startOnView || !isInView) return;
-    if (prefersReducedMotion) {
-      setCount(end);
-      return;
-    }
-
-    let startTime: number;
-    let animationFrame: number;
-
-    const animate = (currentTime: number) => {
-      if (!startTime) startTime = currentTime;
-      const elapsed = currentTime - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-
-      // Ease out cubic
-      const easeOut = 1 - Math.pow(1 - progress, 3);
-      setCount(end * easeOut);
-
-      if (progress < 1) {
-        animationFrame = requestAnimationFrame(animate);
-      }
-    };
-
-    animationFrame = requestAnimationFrame(animate);
-
-    return () => {
-      if (animationFrame) {
-        cancelAnimationFrame(animationFrame);
-      }
-    };
-  }, [end, duration, isInView, startOnView, prefersReducedMotion]);
-
-  return { count, ref };
-}
-
-function StatCard({ stat, index }: { stat: typeof stats[0]; index: number }) {
-  const prefersReducedMotion = useReducedMotionSafe();
-  const { count, ref } = useAnimatedCounter(stat.value, 2000);
-  const Icon = stat.icon;
-
-  // Format the count based on suffix
-  const formattedCount = stat.suffix === '/5' || stat.suffix === ' hrs'
-    ? count.toFixed(1)
-    : Math.round(count);
+  const Icon = prop.icon;
 
   return (
     <motion.div
-      ref={ref}
-      initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 30 }}
+      initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-50px' }}
-      transition={prefersReducedMotion ? undefined : { duration: 0.5, delay: index * 0.1, ease: 'easeOut' as const }}
-      className="text-center group"
+      viewport={{ once: true, margin: '-30px' }}
+      transition={prefersReducedMotion ? undefined : { duration: 0.4, delay: index * 0.1, ease: 'easeOut' as const }}
+      className="flex items-start gap-4 group"
     >
       {/* Icon */}
-      <div className="flex justify-center mb-4">
-        <div className={`h-14 w-14 rounded-2xl ${stat.iconBg} flex items-center justify-center transition-transform duration-300 group-hover:scale-110`}>
-          <Icon className={`h-7 w-7 ${stat.color}`} />
-        </div>
+      <div className="flex-shrink-0 h-12 w-12 rounded-xl bg-keepr-evergreen/10 flex items-center justify-center transition-all duration-300 group-hover:bg-keepr-evergreen/20 group-hover:scale-105">
+        <Icon className="h-6 w-6 text-keepr-evergreen" />
       </div>
 
-      {/* Value with animated counter */}
-      <div className="flex items-baseline justify-center gap-0.5 mb-2">
-        <span className={`text-4xl md:text-5xl font-bold ${stat.color}`}>
-          {formattedCount}
-        </span>
-        <span className={`text-2xl md:text-3xl font-bold ${stat.color}`}>
-          {stat.suffix}
-        </span>
-      </div>
-
-      {/* Label */}
-      <div className="text-lg font-semibold text-foreground mb-1">
-        {stat.label}
-      </div>
-
-      {/* Description */}
-      <div className="text-sm text-muted-foreground">
-        {stat.description}
+      {/* Content */}
+      <div>
+        <h3 className="text-base font-semibold text-foreground mb-0.5">
+          {prop.title}
+        </h3>
+        <p className="text-sm text-muted-foreground">
+          {prop.description}
+        </p>
       </div>
     </motion.div>
   );
 }
 
 export function SocialProof() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const isInView = useInView(sectionRef, { once: true, margin: '-50px' });
   const prefersReducedMotion = useReducedMotionSafe();
 
   return (
-    <section className="py-16 bg-gradient-to-br from-amber-50/40 via-white to-emerald-50/30 border-y border-border/50">
+    <section ref={sectionRef} className="py-16 bg-slate-50 border-y border-border/50">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Optional header */}
+        {/* Section header */}
         <motion.div
-          initial={prefersReducedMotion ? {} : { opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
+          initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.4 }}
           className="text-center mb-10"
         >
-          <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-            What Campground Owners Can Expect
+          <p className="text-sm font-medium text-keepr-evergreen uppercase tracking-wider">
+            Why Campground Owners Choose Us
           </p>
         </motion.div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
-          {stats.map((stat, index) => (
-            <StatCard key={stat.label} stat={stat} index={index} />
+        {/* Value Props Grid - 2x2 on mobile, 4 across on desktop */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {valueProps.map((prop, index) => (
+            <ValuePropCard key={prop.title} prop={prop} index={index} />
           ))}
         </div>
       </div>

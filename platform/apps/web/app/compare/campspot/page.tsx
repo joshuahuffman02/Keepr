@@ -19,7 +19,8 @@ import {
   Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PublicHeader } from "@/components/public/PublicHeader";
+import { MarketingHeader } from "@/components/marketing/MarketingHeader";
+import { Footer } from "@/components/marketing/Footer";
 import {
   PRICING,
   COMPETITOR_PAIN_POINTS,
@@ -62,7 +63,7 @@ const structuredData = {
 export default function CompareCampspotPage() {
   return (
     <div className="min-h-screen bg-white">
-      <PublicHeader />
+      <MarketingHeader />
 
       {/* Structured Data */}
       <script
@@ -71,13 +72,13 @@ export default function CompareCampspotPage() {
       />
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
+      <section className="relative pt-32 pb-20 bg-gradient-to-br from-keepr-charcoal via-slate-900 to-keepr-charcoal overflow-hidden">
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-emerald-500/10 to-transparent" />
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-keepr-evergreen/10 to-transparent" />
 
         <div className="relative max-w-6xl mx-auto px-6">
           <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500/20 border border-amber-500/30 rounded-full text-amber-400 text-sm font-semibold mb-8">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-keepr-clay/20 border border-keepr-clay/30 rounded-full text-keepr-clay text-sm font-semibold mb-8">
               <Sparkles className="h-4 w-4" />
               2025 Comparison Guide
             </div>
@@ -88,7 +89,7 @@ export default function CompareCampspotPage() {
 
             <p className="text-xl md:text-2xl text-slate-300 mb-8 leading-relaxed">
               Everything Campspot offers.{" "}
-              <span className="text-emerald-400 font-semibold">
+              <span className="text-keepr-evergreen font-semibold">
                 Plus loyalty programs, AI, and staff scheduling.
               </span>{" "}
               Without the 10% marketplace commission.
@@ -98,7 +99,7 @@ export default function CompareCampspotPage() {
               <Button
                 asChild
                 size="lg"
-                className="px-8 py-6 text-lg bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400"
+                className="px-8 py-6 text-lg bg-gradient-to-r from-keepr-evergreen to-keepr-evergreen-dark hover:from-keepr-evergreen-light hover:to-keepr-evergreen"
               >
                 <Link href="/signup">
                   {CTA_COPY.switch.button}
@@ -124,7 +125,7 @@ export default function CompareCampspotPage() {
                 { value: "$0", label: "Setup Fee", note: "No contracts" },
               ].map((stat) => (
                 <div key={stat.label} className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-emerald-400">
+                  <div className="text-3xl md:text-4xl font-bold text-keepr-evergreen">
                     {stat.value}
                   </div>
                   <div className="text-sm text-slate-300 font-medium">{stat.label}</div>
@@ -170,7 +171,7 @@ export default function CompareCampspotPage() {
             <p className="text-slate-600 mb-6">
               Sound familiar? You're not alone. That's why we built something better.
             </p>
-            <Button asChild className="bg-emerald-600 hover:bg-emerald-500">
+            <Button asChild className="bg-keepr-evergreen hover:bg-keepr-evergreen-light">
               <Link href="/signup">
                 Start Your Free Trial
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -197,9 +198,9 @@ export default function CompareCampspotPage() {
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-200">
                   <th className="text-left p-4 text-slate-600 font-semibold">Feature</th>
-                  <th className="p-4 text-center bg-emerald-50 border-x border-emerald-100">
-                    <div className="text-emerald-700 font-bold">Keepr</div>
-                    <div className="text-xs text-emerald-600 mt-1">That's us!</div>
+                  <th className="p-4 text-center bg-keepr-evergreen/10 border-x border-keepr-evergreen/20">
+                    <div className="text-keepr-evergreen font-bold">Keepr</div>
+                    <div className="text-xs text-keepr-evergreen/80 mt-1">That's us!</div>
                   </th>
                   <th className="p-4 text-center">
                     <div className="text-slate-700 font-bold">Campspot</div>
@@ -215,22 +216,22 @@ export default function CompareCampspotPage() {
                 </tr>
                 <tr className="border-b border-slate-100">
                   <td className="p-4 text-slate-700">Monthly Base</td>
-                  <td className="p-4 text-center bg-emerald-50/30 border-x border-emerald-50">
-                    <span className="text-emerald-700 font-semibold">$100/month</span>
+                  <td className="p-4 text-center bg-keepr-evergreen/5 border-x border-keepr-evergreen/10">
+                    <span className="text-keepr-evergreen font-semibold">$100/month</span>
                   </td>
                   <td className="p-4 text-center text-slate-600">Varies (opaque)</td>
                 </tr>
                 <tr className="border-b border-slate-100">
                   <td className="p-4 text-slate-700">Per Booking Fee</td>
-                  <td className="p-4 text-center bg-emerald-50/30 border-x border-emerald-50">
-                    <span className="text-emerald-700 font-semibold">$2.30</span>
+                  <td className="p-4 text-center bg-keepr-evergreen/5 border-x border-keepr-evergreen/10">
+                    <span className="text-keepr-evergreen font-semibold">$2.30</span>
                   </td>
                   <td className="p-4 text-center text-slate-600">$3.00+</td>
                 </tr>
                 <tr className="border-b border-slate-100">
                   <td className="p-4 text-slate-700">Marketplace Commission</td>
-                  <td className="p-4 text-center bg-emerald-50/30 border-x border-emerald-50">
-                    <span className="text-emerald-700 font-bold">0%</span>
+                  <td className="p-4 text-center bg-keepr-evergreen/5 border-x border-keepr-evergreen/10">
+                    <span className="text-keepr-evergreen font-bold">0%</span>
                   </td>
                   <td className="p-4 text-center">
                     <span className="text-red-600 font-semibold">10%</span>
@@ -238,15 +239,15 @@ export default function CompareCampspotPage() {
                 </tr>
                 <tr className="border-b border-slate-100">
                   <td className="p-4 text-slate-700">Setup Fee</td>
-                  <td className="p-4 text-center bg-emerald-50/30 border-x border-emerald-50">
-                    <span className="text-emerald-700 font-semibold">$0</span>
+                  <td className="p-4 text-center bg-keepr-evergreen/5 border-x border-keepr-evergreen/10">
+                    <span className="text-keepr-evergreen font-semibold">$0</span>
                   </td>
                   <td className="p-4 text-center text-slate-600">$$$</td>
                 </tr>
                 <tr className="border-b border-slate-100">
                   <td className="p-4 text-slate-700">AI Credits Included</td>
-                  <td className="p-4 text-center bg-emerald-50/30 border-x border-emerald-50">
-                    <span className="text-emerald-700 font-semibold">$5/month</span>
+                  <td className="p-4 text-center bg-keepr-evergreen/5 border-x border-keepr-evergreen/10">
+                    <span className="text-keepr-evergreen font-semibold">$5/month</span>
                   </td>
                   <td className="p-4 text-center">
                     <X className="h-5 w-5 mx-auto text-slate-400" />
@@ -264,18 +265,18 @@ export default function CompareCampspotPage() {
                     {category.features.map((feature) => (
                       <tr key={feature.name} className="border-b border-slate-100">
                         <td className="p-4 text-slate-700">{feature.name}</td>
-                        <td className="p-4 text-center bg-emerald-50/30 border-x border-emerald-50">
+                        <td className="p-4 text-center bg-keepr-evergreen/5 border-x border-keepr-evergreen/10">
                           {feature.us === true ? (
-                            <Check className="h-5 w-5 mx-auto text-emerald-600" />
+                            <Check className="h-5 w-5 mx-auto text-keepr-evergreen" />
                           ) : feature.us === false ? (
                             <X className="h-5 w-5 mx-auto text-slate-400" />
                           ) : (
-                            <span className="text-emerald-600">{feature.us}</span>
+                            <span className="text-keepr-evergreen">{feature.us}</span>
                           )}
                         </td>
                         <td className="p-4 text-center">
                           {feature.campspot === true ? (
-                            <Check className="h-5 w-5 mx-auto text-emerald-600" />
+                          <Check className="h-5 w-5 mx-auto text-keepr-evergreen" />
                           ) : feature.campspot === false ? (
                             <X className="h-5 w-5 mx-auto text-slate-400" />
                           ) : (
@@ -293,10 +294,10 @@ export default function CompareCampspotPage() {
       </section>
 
       {/* Exclusive Features Section */}
-      <section className="py-20 bg-gradient-to-br from-emerald-900 to-slate-900">
+      <section className="py-20 bg-gradient-to-br from-keepr-charcoal to-slate-900">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/20 border border-emerald-500/30 rounded-full text-emerald-400 text-sm font-semibold mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-keepr-evergreen/20 border border-keepr-evergreen/30 rounded-full text-keepr-evergreen text-sm font-semibold mb-6">
               <Award className="h-4 w-4" />
               Exclusive to Keepr
             </div>
@@ -316,9 +317,9 @@ export default function CompareCampspotPage() {
               >
                 <h3 className="text-xl font-bold text-white mb-2">{diff.feature}</h3>
                 <p className="text-slate-300 mb-4">{diff.description}</p>
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/20 rounded-full">
-                  <Star className="h-4 w-4 text-emerald-400" />
-                  <span className="text-sm text-emerald-400">{diff.competitorStatus}</span>
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-keepr-clay/20 rounded-full">
+                  <Star className="h-4 w-4 text-keepr-clay" />
+                  <span className="text-sm text-keepr-clay">{diff.competitorStatus}</span>
                 </div>
               </div>
             ))}
@@ -341,19 +342,19 @@ export default function CompareCampspotPage() {
 
             <div className="grid md:grid-cols-3 gap-8 mb-8">
               <div className="text-center p-6 bg-white rounded-xl border border-slate-200">
-                <DollarSign className="h-8 w-8 mx-auto text-emerald-600 mb-2" />
+                <DollarSign className="h-8 w-8 mx-auto text-keepr-evergreen mb-2" />
                 <div className="text-2xl font-bold text-slate-900">$0.70</div>
                 <div className="text-sm text-slate-600">Saved per booking</div>
                 <div className="text-xs text-slate-500 mt-1">($3.00 vs $2.30)</div>
               </div>
               <div className="text-center p-6 bg-white rounded-xl border border-slate-200">
-                <TrendingUp className="h-8 w-8 mx-auto text-emerald-600 mb-2" />
+                <TrendingUp className="h-8 w-8 mx-auto text-keepr-evergreen mb-2" />
                 <div className="text-2xl font-bold text-slate-900">10%</div>
                 <div className="text-sm text-slate-600">Commission eliminated</div>
                 <div className="text-xs text-slate-500 mt-1">Keep more revenue</div>
               </div>
               <div className="text-center p-6 bg-white rounded-xl border border-slate-200">
-                <Zap className="h-8 w-8 mx-auto text-emerald-600 mb-2" />
+                <Zap className="h-8 w-8 mx-auto text-keepr-evergreen mb-2" />
                 <div className="text-2xl font-bold text-slate-900">$5</div>
                 <div className="text-sm text-slate-600">AI credits included</div>
                 <div className="text-xs text-slate-500 mt-1">Predict demand, reduce no-shows</div>
@@ -363,10 +364,10 @@ export default function CompareCampspotPage() {
             <div className="text-center">
               <p className="text-slate-600 mb-4">
                 <strong>Example:</strong> A park with 300 bookings/month saves{" "}
-                <span className="text-emerald-600 font-bold">$210/month</span> just on per-booking fees,
-                plus keeps an extra <span className="text-emerald-600 font-bold">10%</span> of every marketplace booking.
+                <span className="text-keepr-evergreen font-bold">$210/month</span> just on per-booking fees,
+                plus keeps an extra <span className="text-keepr-evergreen font-bold">10%</span> of every marketplace booking.
               </p>
-              <Button asChild size="lg" className="bg-emerald-600 hover:bg-emerald-500">
+              <Button asChild size="lg" className="bg-keepr-evergreen hover:bg-keepr-evergreen-light">
                 <Link href="/roi-calculator">
                   Calculate Your Exact Savings
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -398,8 +399,8 @@ export default function CompareCampspotPage() {
                   { icon: CreditCard, text: "No contracts, cancel anytime" },
                 ].map((item) => (
                   <div key={item.text} className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-emerald-100">
-                      <item.icon className="h-5 w-5 text-emerald-600" />
+                    <div className="p-2 rounded-lg bg-keepr-evergreen/10">
+                      <item.icon className="h-5 w-5 text-keepr-evergreen" />
                     </div>
                     <span className="text-slate-700 font-medium">{item.text}</span>
                   </div>
@@ -417,7 +418,7 @@ export default function CompareCampspotPage() {
                   { day: "Day 2", task: "Go live and start taking bookings" },
                 ].map((step, index) => (
                   <div key={index} className="flex items-start gap-4">
-                    <div className="flex-shrink-0 w-16 text-sm font-semibold text-emerald-600">
+                    <div className="flex-shrink-0 w-16 text-sm font-semibold text-keepr-evergreen">
                       {step.day}
                     </div>
                     <div className="flex-1 pb-6 border-b border-slate-100 last:border-0">
@@ -445,7 +446,7 @@ export default function CompareCampspotPage() {
             <Button
               asChild
               size="lg"
-              className="px-8 py-6 text-lg bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400"
+              className="px-8 py-6 text-lg bg-gradient-to-r from-keepr-evergreen to-keepr-evergreen-dark hover:from-keepr-evergreen-light hover:to-keepr-evergreen"
             >
               <Link href="/signup">
                 Start Free Trial
@@ -468,29 +469,7 @@ export default function CompareCampspotPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-slate-900 text-white border-t border-slate-800">
-        <div className="max-w-6xl mx-auto px-6 py-12">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="text-center md:text-left">
-              <p className="text-slate-400 text-sm">
-                Keepr - The modern alternative to legacy campground software.
-              </p>
-            </div>
-            <div className="flex items-center gap-6 text-sm text-slate-400">
-              <Link href="/compare/newbook" className="hover:text-white transition-colors">
-                vs Newbook
-              </Link>
-              <Link href="/compare/camplife" className="hover:text-white transition-colors">
-                vs CampLife
-              </Link>
-              <Link href="/pricing" className="hover:text-white transition-colors">
-                Pricing
-              </Link>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

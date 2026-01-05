@@ -217,7 +217,10 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
   };
 
   const copyLink = async (id: string) => {
-    const url = typeof window !== "undefined" ? `${window.location.origin}/help#${id}` : `/help#${id}`;
+    const url =
+      typeof window !== "undefined"
+        ? `${window.location.origin}/dashboard/help#${id}`
+        : `/dashboard/help#${id}`;
     try {
       await navigator.clipboard.writeText(url);
     } catch {
@@ -348,7 +351,7 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
         </div>
         <div className="mt-3 flex items-center gap-2 text-xs">
           <Link
-            href={`/help#${topic.id}`}
+            href={`/dashboard/help#${topic.id}`}
             onClick={() => recordRecent(topic.id)}
             className="inline-flex items-center gap-1 font-semibold text-emerald-600 hover:text-emerald-700"
           >
@@ -440,7 +443,7 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
             <span className="font-semibold text-muted-foreground">Context</span>
             <span className="rounded-full bg-muted px-2 py-0.5">{pathname || "/"}</span>
             <span className="text-muted-foreground">|</span>
-            <Link href="/help" className="text-emerald-600 font-semibold hover:text-emerald-700">
+            <Link href="/dashboard/help" className="text-emerald-600 font-semibold hover:text-emerald-700">
               Open full help
             </Link>
             <span className="text-muted-foreground">|</span>
@@ -555,7 +558,7 @@ export function HelpPanel({ open, onClose }: HelpPanelProps) {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {allTopics.map((topic) => (
                   <Link
-                    href={`/help#${topic.id}`}
+                    href={`/dashboard/help#${topic.id}`}
                     key={topic.id}
                     onClick={() => recordRecent(topic.id)}
                     className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border hover:border-emerald-500 text-sm text-foreground"

@@ -2,16 +2,14 @@
 
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
-import { Logo, LogoImage } from "@/components/brand";
+import { LogoImage } from "@/components/brand";
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     Menu,
     X,
-    User,
     Settings,
     LogOut,
-    Heart,
     Calendar,
     Building2,
     ChevronDown,
@@ -35,12 +33,6 @@ interface ExtendedSession {
     };
     campgrounds?: Array<{ id: string; name: string }>;
 }
-
-const navLinks = [
-    { label: "Campgrounds", href: "/campgrounds" },
-    { label: "Book a stay", href: "/booking" },
-    { label: "Help", href: "/help" }
-];
 
 // Popular destinations for the Explore dropdown
 const exploreDestinations = [
@@ -88,6 +80,18 @@ export function PublicHeader() {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
+    useEffect(() => {
+        function handleKeyDown(event: KeyboardEvent) {
+            if (event.key === "Escape") {
+                setProfileOpen(false);
+                setExploreOpen(false);
+                setMobileOpen(false);
+            }
+        }
+        document.addEventListener("keydown", handleKeyDown);
+        return () => document.removeEventListener("keydown", handleKeyDown);
+    }, []);
+
     const closeMobile = () => setMobileOpen(false);
 
     // Get user initials for avatar
@@ -105,6 +109,9 @@ export function PublicHeader() {
             <button
                 onClick={() => setExploreOpen(!exploreOpen)}
                 className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-foreground hover:bg-muted rounded-full transition-colors"
+                aria-expanded={exploreOpen}
+                aria-controls="explore-menu"
+                aria-haspopup="menu"
             >
                 <Compass className="w-4 h-4" />
                 Explore
@@ -119,6 +126,8 @@ export function PublicHeader() {
                         exit={{ opacity: 0, y: 8, scale: 0.96 }}
                         transition={{ duration: 0.15 }}
                         className="absolute left-0 mt-2 w-80 bg-card rounded-xl shadow-lg border border-border overflow-hidden z-50"
+                        id="explore-menu"
+                        role="menu"
                     >
                         {/* Browse All */}
                         <div className="p-3 border-b border-border">
@@ -126,6 +135,7 @@ export function PublicHeader() {
                                 href="/camping"
                                 onClick={() => setExploreOpen(false)}
                                 className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-gradient-to-r from-keepr-evergreen/10 to-keepr-evergreen/20 hover:from-keepr-evergreen/20 hover:to-keepr-evergreen/30 transition-colors"
+                                role="menuitem"
                             >
                                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-keepr-evergreen to-keepr-evergreen-light flex items-center justify-center">
                                     <MapPin className="w-5 h-5 text-white" />
@@ -149,6 +159,7 @@ export function PublicHeader() {
                                             href={`/near/${dest.slug}`}
                                             onClick={() => setExploreOpen(false)}
                                             className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-foreground hover:bg-muted transition-colors"
+                                            role="menuitem"
                                         >
                                             <Icon className="w-4 h-4 text-muted-foreground" />
                                             {dest.name}
@@ -168,6 +179,7 @@ export function PublicHeader() {
                                         href={`/camping/${state.slug}`}
                                         onClick={() => setExploreOpen(false)}
                                         className="px-3 py-2 rounded-lg text-sm text-foreground hover:bg-muted transition-colors text-center"
+                                        role="menuitem"
                                     >
                                         {state.name}
                                     </Link>
@@ -185,6 +197,9 @@ export function PublicHeader() {
             <button
                 onClick={() => setProfileOpen(!profileOpen)}
                 className="flex items-center gap-2 px-2 py-1.5 rounded-full border border-border hover:shadow-md transition-all bg-card"
+                aria-expanded={profileOpen}
+                aria-controls="profile-menu"
+                aria-haspopup="menu"
             >
                 <Menu className="w-4 h-4 text-muted-foreground ml-1" />
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-keepr-evergreen to-keepr-evergreen-light flex items-center justify-center text-white text-sm font-semibold">
@@ -200,6 +215,8 @@ export function PublicHeader() {
                         exit={{ opacity: 0, y: 8, scale: 0.96 }}
                         transition={{ duration: 0.15 }}
                         className="absolute right-0 mt-2 w-64 bg-card rounded-xl shadow-lg border border-border overflow-hidden z-50"
+                        id="profile-menu"
+                        role="menu"
                     >
                         {/* User info section */}
                         <div className="px-4 py-3 border-b border-border bg-muted">
@@ -214,25 +231,19 @@ export function PublicHeader() {
                         {/* Menu items */}
                         <div className="py-2">
                             <Link
-                                href="/trips"
+                                href="/dashboard"
                                 onClick={() => setProfileOpen(false)}
                                 className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted transition-colors"
+                                role="menuitem"
                             >
                                 <Calendar className="w-4 h-4 text-muted-foreground" />
-                                My Trips
+                                Dashboard
                             </Link>
                             <Link
-                                href="/wishlists"
+                                href="/dashboard/settings/account"
                                 onClick={() => setProfileOpen(false)}
                                 className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted transition-colors"
-                            >
-                                <Heart className="w-4 h-4 text-muted-foreground" />
-                                Wishlists
-                            </Link>
-                            <Link
-                                href="/account"
-                                onClick={() => setProfileOpen(false)}
-                                className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted transition-colors"
+                                role="menuitem"
                             >
                                 <Settings className="w-4 h-4 text-muted-foreground" />
                                 Account Settings
@@ -246,15 +257,17 @@ export function PublicHeader() {
                                     href="/dashboard"
                                     onClick={() => setProfileOpen(false)}
                                     className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-keepr-evergreen hover:bg-keepr-evergreen/10 transition-colors"
+                                    role="menuitem"
                                 >
                                     <Building2 className="w-4 h-4" />
                                     Manage your campground
                                 </Link>
                             ) : (
                                 <Link
-                                    href="/host"
+                                    href="/owners"
                                     onClick={() => setProfileOpen(false)}
                                     className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted transition-colors"
+                                    role="menuitem"
                                 >
                                     <Building2 className="w-4 h-4 text-muted-foreground" />
                                     Become a Host
@@ -270,6 +283,7 @@ export function PublicHeader() {
                                     signOut({ callbackUrl: "/" });
                                 }}
                                 className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted transition-colors"
+                                role="menuitem"
                             >
                                 <LogOut className="w-4 h-4 text-muted-foreground" />
                                 Sign Out
@@ -336,6 +350,7 @@ export function PublicHeader() {
                         className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-card text-foreground hover:bg-muted transition-colors"
                         onClick={() => setMobileOpen((v) => !v)}
                         aria-label="Toggle menu"
+                        aria-expanded={mobileOpen}
                     >
                         {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
                     </button>
@@ -386,17 +401,6 @@ export function PublicHeader() {
                                 </div>
                             </div>
 
-                            {navLinks.map((link) => (
-                                <Link
-                                    key={link.href}
-                                    href={link.href}
-                                    className="block rounded-lg px-3 py-3 text-base font-medium text-foreground hover:bg-muted"
-                                    onClick={closeMobile}
-                                >
-                                    {link.label}
-                                </Link>
-                            ))}
-
                             {/* Mobile: Show hosting link if applicable */}
                             {session && hasCampgroundAccess && (
                                 <Link
@@ -428,21 +432,14 @@ export function PublicHeader() {
                                             </div>
                                         </div>
                                         <Link
-                                            href="/trips"
+                                            href="/dashboard"
                                             className="block rounded-lg px-3 py-3 text-base font-medium text-foreground hover:bg-muted"
                                             onClick={closeMobile}
                                         >
-                                            My Trips
+                                            Dashboard
                                         </Link>
                                         <Link
-                                            href="/wishlists"
-                                            className="block rounded-lg px-3 py-3 text-base font-medium text-foreground hover:bg-muted"
-                                            onClick={closeMobile}
-                                        >
-                                            Wishlists
-                                        </Link>
-                                        <Link
-                                            href="/account"
+                                            href="/dashboard/settings/account"
                                             className="block rounded-lg px-3 py-3 text-base font-medium text-foreground hover:bg-muted"
                                             onClick={closeMobile}
                                         >

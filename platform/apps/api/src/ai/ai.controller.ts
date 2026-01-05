@@ -259,6 +259,7 @@ export class AiController {
       ...campground,
       aiApiKey: campground.aiApiKey ? '••••••••' : null,
       hasCustomApiKey: !!campground.aiApiKey,
+      aiProvider: 'openai',
     };
   }
 
@@ -293,7 +294,7 @@ export class AiController {
     if (typeof body.aiAnalyticsEnabled === 'boolean') updateData.aiAnalyticsEnabled = body.aiAnalyticsEnabled;
     if (typeof body.aiForecastingEnabled === 'boolean') updateData.aiForecastingEnabled = body.aiForecastingEnabled;
     if (body.aiAnonymizationLevel) updateData.aiAnonymizationLevel = body.aiAnonymizationLevel;
-    if (body.aiProvider) updateData.aiProvider = body.aiProvider;
+    updateData.aiProvider = 'openai';
     if (body.aiApiKey !== undefined) updateData.aiApiKey = body.aiApiKey;
     if (body.aiMonthlyBudgetCents !== undefined) updateData.aiMonthlyBudgetCents = body.aiMonthlyBudgetCents;
 

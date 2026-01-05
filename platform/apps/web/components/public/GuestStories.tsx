@@ -1,42 +1,13 @@
 "use client";
 
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { Star, Quote, ChevronRight, Heart } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useReducedMotionSafe } from "@/hooks/use-reduced-motion-safe";
-
-// Curated guest stories - these will be replaced with real reviews when API is available
-const guestStories = [
-  {
-    id: "1",
-    quote: "We came for a weekend and left with memories that'll last forever. The kids are already asking when we can go back!",
-    guestName: "Sarah M.",
-    guestLocation: "Denver, CO",
-    campgroundName: "Mountain View Camp",
-    rating: 5,
-    stayType: "Family Weekend",
-  },
-  {
-    id: "2",
-    quote: "Finally found our go-to camping spot. The staff made us feel so welcome, and the sunset views were absolutely stunning.",
-    guestName: "Michael & Lisa",
-    guestLocation: "Phoenix, AZ",
-    campgroundName: "Desert Springs RV",
-    rating: 5,
-    stayType: "Anniversary Trip",
-  },
-  {
-    id: "3",
-    quote: "As first-time campers, we were nervous. But everything was so well-organized and the community was incredibly friendly.",
-    guestName: "Emma T.",
-    guestLocation: "Austin, TX",
-    campgroundName: "Lakeside Retreat",
-    rating: 5,
-    stayType: "First Camping Trip",
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import { apiClient } from "@/lib/api-client";
 
 interface GuestStoriesProps {
   className?: string;
@@ -47,6 +18,88 @@ export function GuestStories({ className, variant = "warm" }: GuestStoriesProps)
   const ref = useRef<HTMLElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });
   const prefersReducedMotion = useReducedMotionSafe();
+  const campgroundsQuery = useQuery({
+    queryKey: ["public-campgrounds"],
+    queryFn: () => apiClient.getPublicCampgrounds(),
+    staleTime: 10 * 60 * 1000,
+  });
+
+  const storiesQuery = useQuery({
+    queryKey: ["public-guest-stories", campgroundsQuery.data?.length ?? 0],
+    enabled: (campgroundsQuery.data?.length ?? 0) > 0,
+    staleTime: 5 * 60 * 1000,
+    retry: false,
+    queryFn: async () => {
+      const campgrounds = campgroundsQuery.data ?? [];
+      const candidates = campgrounds
+        .filter((cg) => !cg.isExternal && (cg.reviewCount ?? 0) > 0 && cg.slug)
+        .sort((a, b) => (b.reviewCount ?? 0) - (a.reviewCount ?? 0))
+        .slice(0, 12);
+
+      const reviewsByCampground = await Promise.all(
+        candidates.map(async (cg) => {
+          try {
+            const reviews = await apiClient.getPublicReviews(cg.id);
+            return { campground: cg, reviews };
+          } catch {
+            return { campground: cg, reviews: [] };
+          }
+        })
+      );
+
+      const stories: Array<{
+        id: string;
+        quote: string;
+        campgroundName: string;
+        campgroundLocation: string;
+        campgroundSlug: string;
+        stayType: string;
+      }> = [];
+      const seen = new Set<string>();
+
+      for (const { campground, reviews } of reviewsByCampground) {
+        const fiveStarReviews = reviews
+          .filter((review) => Math.round(review.rating) === 5)
+          .sort((a, b) => {
+            const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            return bTime - aTime;
+          });
+
+        for (const review of fiveStarReviews) {
+          if (stories.length >= 6) break;
+          if (seen.has(review.id)) continue;
+          const quote = (review.body || review.title || "").trim();
+          if (!quote) continue;
+          const stayType = (review.tags || []).find(Boolean) || "5-star stay";
+          const campgroundLocation = [campground.city, campground.state].filter(Boolean).join(", ");
+
+          stories.push({
+            id: review.id,
+            quote,
+            campgroundName: campground.name,
+            campgroundLocation,
+            campgroundSlug: campground.slug,
+            stayType,
+          });
+          seen.add(review.id);
+        }
+
+        if (stories.length >= 6) break;
+      }
+
+      return stories;
+    },
+  });
+
+  const guestStories = useMemo(() => {
+    const items = storiesQuery.data ?? [];
+    return items.length >= 3 ? items.slice(0, 3) : [];
+  }, [storiesQuery.data]);
+
+  if (guestStories.length < 3) {
+    return null;
+  }
 
   const variantStyles = {
     light: {
@@ -126,57 +179,56 @@ export function GuestStories({ className, variant = "warm" }: GuestStoriesProps)
             <motion.div
               key={story.id}
               variants={itemVariants}
-              className={cn(
-                "relative rounded-2xl p-6 border shadow-lg shadow-slate-900/5 hover:shadow-xl transition-all duration-300 hover:-translate-y-1",
-                styles.cardBg,
-                styles.border
-              )}
             >
-              {/* Quote Icon */}
-              <div className="absolute -top-3 -left-2">
-                <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
-                  <Quote className="w-5 h-5 text-amber-600" />
+              <Link
+                href={`/park/${story.campgroundSlug}`}
+                className={cn(
+                  "relative block rounded-2xl p-6 border shadow-lg shadow-slate-900/5 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-keepr-evergreen focus-visible:ring-offset-2",
+                  styles.cardBg,
+                  styles.border
+                )}
+              >
+                {/* Quote Icon */}
+                <div className="absolute -top-3 -left-2">
+                  <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
+                    <Quote className="w-5 h-5 text-amber-600" />
+                  </div>
                 </div>
-              </div>
 
-              {/* Rating */}
-              <div className="flex items-center gap-1 mb-4 pt-2">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star
-                    key={i}
-                    className={cn(
-                      "w-4 h-4",
-                      i < story.rating
-                        ? "text-amber-400 fill-amber-400"
-                        : "text-slate-200"
-                    )}
-                  />
-                ))}
-                <span className="ml-2 text-xs text-slate-500 font-medium">
-                  {story.stayType}
-                </span>
-              </div>
-
-              {/* Quote */}
-              <blockquote className="text-slate-700 leading-relaxed mb-6">
-                "{story.quote}"
-              </blockquote>
-
-              {/* Guest Info */}
-              <div className="flex items-center gap-3 pt-4 border-t border-slate-100">
-                {/* Avatar with initials */}
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-keepr-evergreen to-teal-500 flex items-center justify-center text-white font-semibold text-sm">
-                  {story.guestName.split(" ").map(n => n[0]).join("")}
+                {/* Rating */}
+                <div className="flex items-center gap-1 mb-4 pt-2">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star
+                      key={i}
+                      className="w-4 h-4 text-amber-400 fill-amber-400"
+                    />
+                  ))}
+                  <span className="ml-2 text-xs text-slate-500 font-medium">
+                    {story.stayType}
+                  </span>
                 </div>
-                <div>
-                  <p className="font-semibold text-slate-900 text-sm">
-                    {story.guestName}
-                  </p>
-                  <p className="text-xs text-slate-500">
-                    {story.guestLocation} · {story.campgroundName}
-                  </p>
+
+                {/* Quote */}
+                <blockquote className="text-slate-700 leading-relaxed mb-6">
+                  "{story.quote}"
+                </blockquote>
+
+                {/* Guest Info */}
+                <div className="flex items-center gap-3 pt-4 border-t border-slate-100">
+                  {/* Avatar with initials */}
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-keepr-evergreen to-teal-500 flex items-center justify-center text-white font-semibold text-sm">
+                    KG
+                  </div>
+                  <div>
+                    <p className="font-semibold text-slate-900 text-sm">
+                      Keepr Guest
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      {story.campgroundLocation ? `${story.campgroundLocation} · ` : ""}{story.campgroundName}
+                    </p>
+                  </div>
                 </div>
-              </div>
+              </Link>
             </motion.div>
           ))}
         </motion.div>

@@ -7,12 +7,27 @@ import { Shield, CheckCircle2, Star } from "lucide-react";
 import { SearchBar } from "./SearchBar";
 import { useReducedMotionSafe } from "@/hooks/use-reduced-motion-safe";
 
+type FeaturedBadgeTone = "world-class" | "top-rated" | "featured";
+
 interface HeroBannerProps {
   onSearch: (query: string, filters: {
     location: string;
     dates: { checkIn: string; checkOut: string };
     guests: number;
   } | null) => void;
+  featuredCampground?: {
+    id: string;
+    name: string;
+    slug?: string | null;
+    city?: string | null;
+    state?: string | null;
+    imageUrl: string;
+    rating?: number | null;
+    reviewCount?: number | null;
+    badgeLabel: string;
+    badgeTone: FeaturedBadgeTone;
+  } | null;
+  isLoadingFeatured?: boolean;
 }
 
 /**
@@ -25,8 +40,21 @@ interface HeroBannerProps {
  * - Floating featured campground preview on XL screens
  * - Smooth transition to white content below
  */
-export function HeroBanner({ onSearch }: HeroBannerProps) {
+export function HeroBanner({ onSearch, featuredCampground, isLoadingFeatured = false }: HeroBannerProps) {
   const prefersReducedMotion = useReducedMotionSafe();
+  const hasFeatured = !!featuredCampground;
+  const showSkeleton = isLoadingFeatured && !hasFeatured;
+  const featuredLocation = featuredCampground
+    ? [featuredCampground.city, featuredCampground.state].filter(Boolean).join(", ")
+    : "";
+  const hasFeaturedReviews =
+    typeof featuredCampground?.rating === "number" &&
+    (featuredCampground?.reviewCount ?? 0) > 0;
+  const badgeToneStyles: Record<FeaturedBadgeTone, string> = {
+    "world-class": "bg-keepr-evergreen text-white",
+    "top-rated": "bg-amber-500 text-white",
+    "featured": "bg-slate-800 text-white",
+  };
 
   // Animation variants - disabled if user prefers reduced motion
   const fadeUp = prefersReducedMotion
@@ -100,7 +128,7 @@ export function HeroBanner({ onSearch }: HeroBannerProps) {
             {...fadeUpDelayed(0.1)}
             className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white tracking-tight leading-[0.95] mb-6"
           >
-            Find your
+            Find your{" "}
             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-keepr-evergreen to-teal-400">
               perfect escape
             </span>
@@ -142,42 +170,66 @@ export function HeroBanner({ onSearch }: HeroBannerProps) {
       </div>
 
       {/* Floating Card - Featured Campground Preview (XL screens only) */}
-      <motion.div
-        {...fadeInRight}
-        className="hidden xl:block absolute right-16 top-1/2 -translate-y-1/2"
-      >
-        <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 border border-white/20 shadow-2xl">
-          <div className="relative w-64 h-40 rounded-xl overflow-hidden mb-3">
-            <Image
-              src="https://images.unsplash.com/photo-1533873984035-25970ab07461?w=600&h=400&fit=crop"
-              alt="Featured campground"
-              fill
-              className="object-cover"
-              sizes="256px"
-            />
-            <div className="absolute top-2 left-2 px-2 py-1 bg-keepr-evergreen text-white text-xs font-bold rounded-full">
-              Top Rated
-            </div>
+      {(hasFeatured || showSkeleton) && (
+        <motion.div
+          {...fadeInRight}
+          className="hidden xl:block absolute right-16 top-1/2 -translate-y-1/2 z-20"
+        >
+          <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 border border-white/20 shadow-2xl w-[288px]">
+            {showSkeleton ? (
+              <div className="space-y-3">
+                <div className="h-40 rounded-xl bg-white/10 animate-pulse" />
+                <div className="h-5 w-40 bg-white/10 rounded animate-pulse" />
+                <div className="h-4 w-28 bg-white/10 rounded animate-pulse" />
+                <div className="h-4 w-32 bg-white/10 rounded animate-pulse" />
+              </div>
+            ) : featuredCampground ? (
+              <Link
+                href={`/park/${featuredCampground.slug || featuredCampground.id}`}
+                className="block rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-keepr-evergreen focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900/40 hover:-translate-y-0.5 transition-transform"
+                aria-label={`View ${featuredCampground.name}`}
+              >
+                <div className="relative w-64 h-40 rounded-xl overflow-hidden mb-3">
+                  <Image
+                    src={featuredCampground.imageUrl}
+                    alt={featuredCampground.name}
+                    fill
+                    className="object-cover"
+                    sizes="256px"
+                  />
+                  <div
+                    className={`absolute top-2 left-2 px-2 py-1 text-xs font-bold rounded-full ${badgeToneStyles[featuredCampground.badgeTone]}`}
+                  >
+                    {featuredCampground.badgeLabel}
+                  </div>
+                </div>
+                <h3 className="text-white font-semibold mb-1">
+                  {featuredCampground.name}
+                </h3>
+                {featuredLocation && (
+                  <p className="text-white/60 text-sm mb-2">{featuredLocation}</p>
+                )}
+                <div className="flex items-center justify-between">
+                  {hasFeaturedReviews ? (
+                    <div className="flex items-center gap-1">
+                      <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                      <span className="text-white font-medium">
+                        {featuredCampground.rating?.toFixed(1)}
+                      </span>
+                      <span className="text-white/50 text-sm">({featuredCampground.reviewCount})</span>
+                    </div>
+                  ) : (
+                    <span className="text-white/60 text-xs">Verified guest favorite</span>
+                  )}
+                  <span className="text-keepr-evergreen text-sm font-medium hover:underline">
+                    View →
+                  </span>
+                </div>
+              </Link>
+            ) : null}
           </div>
-          <h3 className="text-white font-semibold mb-1">
-            Ponderosa Pines Resort
-          </h3>
-          <p className="text-white/60 text-sm mb-2">Flagstaff, Arizona</p>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1">
-              <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-              <span className="text-white font-medium">4.9</span>
-              <span className="text-white/50 text-sm">(847)</span>
-            </div>
-            <Link
-              href="/park/ponderosa-pines"
-              className="text-keepr-evergreen text-sm font-medium hover:underline"
-            >
-              View →
-            </Link>
-          </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      )}
 
       {/* Bottom gradient for smooth transition to white content */}
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent" />

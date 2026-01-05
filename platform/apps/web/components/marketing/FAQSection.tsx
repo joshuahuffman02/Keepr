@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
-import { ChevronDown, HelpCircle } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useReducedMotionSafe } from "@/hooks/use-reduced-motion-safe";
 
@@ -30,6 +30,8 @@ function FAQCard({
   onToggle: () => void;
 }) {
   const prefersReducedMotion = useReducedMotionSafe();
+  const answerId = `faq-answer-${index}`;
+  const buttonId = `faq-button-${index}`;
 
   return (
     <motion.div
@@ -38,7 +40,7 @@ function FAQCard({
       viewport={{ once: true, margin: "-30px" }}
       transition={prefersReducedMotion ? {} : { duration: 0.4, delay: index * 0.05, ease: "easeOut" }}
       className={cn(
-        "border-2 rounded-xl bg-card overflow-hidden transition-all duration-300",
+        "border rounded-2xl bg-card overflow-hidden transition-all duration-300",
         isOpen
           ? "border-keepr-evergreen/40 shadow-lg shadow-keepr-evergreen/5"
           : "border-border hover:border-keepr-evergreen/20 hover:shadow-md"
@@ -46,8 +48,11 @@ function FAQCard({
     >
       <button
         onClick={onToggle}
-        className="w-full flex items-center justify-between cursor-pointer px-6 py-5 hover:bg-muted/50 transition-colors text-left"
+        id={buttonId}
+        type="button"
+        className="w-full flex items-center justify-between cursor-pointer px-6 py-5 hover:bg-muted/50 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-keepr-evergreen focus-visible:ring-offset-2 focus-visible:ring-offset-card"
         aria-expanded={isOpen}
+        aria-controls={answerId}
       >
         <span
           className={cn(
@@ -82,6 +87,9 @@ function FAQCard({
             exit={prefersReducedMotion ? {} : { height: 0, opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className="overflow-hidden"
+            id={answerId}
+            role="region"
+            aria-labelledby={buttonId}
           >
             <div className="px-6 pb-6 pt-0">
               <div className="border-t border-border pt-4 text-muted-foreground leading-relaxed">
@@ -123,17 +131,16 @@ export function FAQSection({
           initial={prefersReducedMotion ? {} : { opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5 }}
-          className="text-center mb-14"
+          className="text-center max-w-3xl mx-auto mb-12"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-keepr-evergreen/10 text-keepr-evergreen text-sm font-medium mb-4">
-            <HelpCircle className="w-4 h-4" />
-            <span>Got Questions?</span>
-          </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+          <p className="text-sm font-medium text-keepr-evergreen uppercase tracking-wider mb-3">
+            Got Questions?
+          </p>
+          <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
             {title}
           </h2>
           {subtitle && (
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground">
               {subtitle}
             </p>
           )}

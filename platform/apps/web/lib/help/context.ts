@@ -22,6 +22,5 @@ export const helpContextMap: { match: RegExp; topicIds: string[] }[] = [
   { match: /^\/marketing/, topicIds: ["marketing-promotions", "branding"] },
   { match: /^\/forms/, topicIds: ["forms-waivers", "policies-rules"] },
   { match: /^\/updates/, topicIds: ["reports-overview", "support-contact"] },
-  { match: /^\/help/, topicIds: ["support-contact", "reports-overview"] }
+  { match: /^\/dashboard\/help/, topicIds: ["support-contact", "reports-overview"] }
 ];
-

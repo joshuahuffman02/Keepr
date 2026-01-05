@@ -54,7 +54,7 @@ export default function ChangelogPage() {
       <div className="space-y-6">
         <Breadcrumbs
           items={[
-            { label: "Help", href: "/help" },
+            { label: "Help", href: "/dashboard/help" },
             { label: "What's New" }
           ]}
         />
@@ -96,11 +96,11 @@ export default function ChangelogPage() {
                 ))}
               </ul>
               <div className="flex items-center gap-3 text-sm text-emerald-700 font-semibold">
-                <Link href="/help/contact" className="inline-flex items-center gap-2 hover:text-emerald-800">
+                <Link href="/dashboard/help/contact" className="inline-flex items-center gap-2 hover:text-emerald-800">
                   <MessageSquare className="h-4 w-4" />
                   Send feedback on this release
                 </Link>
-                <Link href="/help" className="text-slate-600 hover:text-slate-900 text-sm font-medium">
+                <Link href="/dashboard/help" className="text-slate-600 hover:text-slate-900 text-sm font-medium">
                   View documentation →
                 </Link>
               </div>

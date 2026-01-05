@@ -118,6 +118,7 @@ export function EventCard({
       className="group relative bg-card rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-border"
       whileHover={{ y: -4 }}
       transition={{ duration: 0.2 }}
+      data-event-id={id}
     >
       {/* Image Container */}
       <div className="relative aspect-[4/3] overflow-hidden">
@@ -276,9 +277,9 @@ export function EventCard({
 
       {/* Clickable overlay */}
       <Link
-        href={`/events/${id}`}
+        href={campgroundLink}
         className="absolute inset-0 z-10"
-        aria-label={`View ${title}`}
+        aria-label={`View ${title} at ${campground.name}`}
       />
     </motion.article>
   );

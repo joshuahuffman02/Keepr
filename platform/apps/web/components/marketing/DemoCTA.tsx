@@ -67,7 +67,7 @@ export function DemoCTA() {
   };
 
   return (
-    <section className="py-24 bg-gradient-to-br from-keepr-evergreen to-keepr-evergreen-dark relative overflow-hidden">
+    <section className="py-20 bg-gradient-to-br from-keepr-evergreen to-keepr-evergreen-dark relative overflow-hidden">
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-0 left-0 w-full h-full">
@@ -86,10 +86,13 @@ export function DemoCTA() {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Column - Content */}
           <div className="text-white">
-            <h2 className="text-4xl sm:text-5xl font-bold mb-6">
+            <p className="text-sm font-medium text-white/70 uppercase tracking-wider mb-3">
+              Get Started
+            </p>
+            <h2 className="text-3xl lg:text-4xl font-bold mb-6">
               Ready to modernize your campground?
             </h2>
-            <p className="text-xl text-white/80 mb-8">
+            <p className="text-lg text-white/80 mb-8">
               See how Keepr can streamline your operations with AI-powered tools,
               guest loyalty programs, and integrated staff scheduling.
             </p>

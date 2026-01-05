@@ -18,7 +18,7 @@ export class AiExecutorService {
   private readonly logger = new Logger(AiExecutorService.name);
 
   // Default fallback chain: OpenAI -> Anthropic
-  private readonly DEFAULT_FALLBACK_CHAIN: AiProvider[] = ["openai", "anthropic"];
+  private readonly DEFAULT_FALLBACK_CHAIN: AiProvider[] = ["openai"];
 
   constructor(private readonly aiProvider: AiProviderService) {}
 

@@ -14,8 +14,8 @@ export function HeroSection() {
       {/* Decorative Elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
         <div className="absolute top-20 left-10 w-72 h-72 bg-keepr-evergreen/20 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob" />
-        <div className="absolute top-40 right-10 w-72 h-72 bg-keepr-clay/20 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000" />
-        <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-keepr-evergreen/15 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000" />
+        <div className="absolute top-40 right-10 w-72 h-72 bg-keepr-clay/20 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob [animation-delay:2000ms]" />
+        <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-keepr-evergreen/15 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob [animation-delay:4000ms]" />
       </div>
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -45,7 +45,7 @@ export function HeroSection() {
             </p>
 
             {/* Key Features */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="flex flex-col items-center text-center p-3 rounded-xl bg-card border border-border shadow-sm">
                 <div className="h-10 w-10 rounded-lg bg-keepr-clay/10 flex items-center justify-center mb-2">
                   <Sparkles className="h-5 w-5 text-keepr-clay" />

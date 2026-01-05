@@ -99,6 +99,7 @@ export function PopularFeatures() {
   const [activeFeature, setActiveFeature] = useState(popularFeatures[0]);
   const detailRef = useRef<HTMLDivElement | null>(null);
   const prefersReducedMotion = useReducedMotionSafe();
+  const panelId = "popular-feature-panel";
 
   const handleSelect = (feature: typeof popularFeatures[number]) => {
     setActiveFeature(feature);
@@ -108,7 +109,7 @@ export function PopularFeatures() {
   };
 
   return (
-    <section className="py-24 bg-slate-50">
+    <section className="py-20 bg-slate-50">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
@@ -116,15 +117,15 @@ export function PopularFeatures() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center max-w-3xl mx-auto mb-16"
+          className="text-center max-w-3xl mx-auto mb-12"
         >
-          <h2 className="text-base font-semibold text-keepr-evergreen tracking-wide uppercase mb-3">
+          <p className="text-sm font-medium text-keepr-evergreen uppercase tracking-wider mb-3">
             Popular Features
-          </h2>
-          <p className="text-4xl font-bold text-foreground mb-4">
-            The tools campground owners love most
           </p>
-          <p className="text-xl text-muted-foreground">
+          <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-4">
+            The tools campground owners love most
+          </h2>
+          <p className="text-lg text-muted-foreground">
             Discover the features that make daily operations smoother and guests happier.
           </p>
         </motion.div>
@@ -138,6 +139,8 @@ export function PopularFeatures() {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
             className="space-y-3"
+            role="tablist"
+            aria-orientation="vertical"
           >
             {popularFeatures.map((feature) => {
               const Icon = feature.icon;
@@ -146,8 +149,13 @@ export function PopularFeatures() {
               return (
                 <button
                   key={feature.id}
+                  id={`feature-tab-${feature.id}`}
+                  type="button"
                   onClick={() => handleSelect(feature)}
-                  className={`w-full text-left p-5 rounded-xl border-2 transition-all duration-300 relative overflow-hidden ${isActive
+                  role="tab"
+                  aria-selected={isActive}
+                  aria-controls={panelId}
+                  className={`w-full text-left p-6 rounded-2xl border transition-all duration-300 relative overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-keepr-evergreen focus-visible:ring-offset-2 focus-visible:ring-offset-white ${isActive
                     ? 'border-keepr-evergreen bg-white shadow-lg'
                     : 'border-border bg-white hover:border-keepr-evergreen/30 hover:shadow-md'
                     }`}
@@ -195,15 +203,19 @@ export function PopularFeatures() {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
             className="lg:sticky lg:top-24"
+            role="tabpanel"
+            id={panelId}
+            aria-labelledby={`feature-tab-${activeFeature.id}`}
+            tabIndex={0}
           >
             {/* Browser Chrome Frame */}
             <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
               {/* Browser Header */}
               <div className="flex items-center gap-2 px-4 py-3 bg-slate-100 border-b border-slate-200">
                 <div className="flex gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-red-400" />
-                  <div className="w-3 h-3 rounded-full bg-amber-400" />
-                  <div className="w-3 h-3 rounded-full bg-green-400" />
+                  <div className="w-3 h-3 rounded-full bg-keepr-clay" />
+                  <div className="w-3 h-3 rounded-full bg-keepr-evergreen" />
+                  <div className="w-3 h-3 rounded-full bg-keepr-charcoal-light" />
                 </div>
                 <div className="flex-1 mx-4">
                   <div className="bg-white rounded-md px-3 py-1.5 text-xs text-slate-400 text-center border border-slate-200">

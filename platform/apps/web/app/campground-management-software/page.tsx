@@ -23,7 +23,8 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PublicHeader } from "@/components/public/PublicHeader";
+import { MarketingHeader } from "@/components/marketing/MarketingHeader";
+import { Footer } from "@/components/marketing/Footer";
 import { PRICING, PROOF_POINTS, CTA_COPY, DIFFERENTIATORS } from "@/lib/positioning";
 import { FAQJsonLd } from "@/components/seo";
 
@@ -180,7 +181,7 @@ const featureCategories = [
 export default function CampgroundManagementSoftwarePage() {
   return (
     <div className="min-h-screen bg-white">
-      <PublicHeader />
+      <MarketingHeader />
       <FAQJsonLd faqs={softwareFaqs} />
 
       <script
@@ -189,20 +190,20 @@ export default function CampgroundManagementSoftwarePage() {
       />
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-24 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
+      <section className="relative pt-32 pb-24 bg-gradient-to-br from-keepr-charcoal via-slate-900 to-keepr-charcoal overflow-hidden">
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-emerald-500/10 to-transparent" />
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-keepr-evergreen/10 to-transparent" />
 
         <div className="relative max-w-6xl mx-auto px-6">
           <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/20 border border-emerald-500/30 rounded-full text-emerald-400 text-sm font-semibold mb-8">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-keepr-clay/20 border border-keepr-clay/30 rounded-full text-keepr-clay text-sm font-semibold mb-8">
               <Sparkles className="h-4 w-4" />
               The Modern Alternative to Legacy Software
             </div>
 
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
               Campground Management Software
-              <span className="block text-emerald-400">That Actually Works</span>
+              <span className="block text-keepr-evergreen">That Actually Works</span>
             </h1>
 
             <p className="text-xl md:text-2xl text-slate-300 mb-8 leading-relaxed max-w-3xl mx-auto">
@@ -214,7 +215,7 @@ export default function CampgroundManagementSoftwarePage() {
               <Button
                 asChild
                 size="lg"
-                className="px-8 py-6 text-lg bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400"
+                className="px-8 py-6 text-lg bg-gradient-to-r from-keepr-evergreen to-keepr-evergreen-dark hover:from-keepr-evergreen-light hover:to-keepr-evergreen"
               >
                 <Link href="/signup">
                   Start Free Trial
@@ -234,7 +235,7 @@ export default function CampgroundManagementSoftwarePage() {
             <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-slate-400">
               {PROOF_POINTS.trust.map((point) => (
                 <div key={point} className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-emerald-400" />
+                  <Check className="h-4 w-4 text-keepr-evergreen" />
                   <span>{point}</span>
                 </div>
               ))}
@@ -244,14 +245,14 @@ export default function CampgroundManagementSoftwarePage() {
       </section>
 
       {/* Simple Pricing Banner */}
-      <section className="py-8 bg-emerald-600">
+      <section className="py-8 bg-keepr-evergreen">
         <div className="max-w-6xl mx-auto px-6">
           <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 text-white text-center">
             <span className="text-lg font-semibold">Simple Pricing:</span>
             <span className="text-2xl font-bold">${PRICING.standard.monthlyBase}/month</span>
-            <span className="text-emerald-200">+</span>
+            <span className="text-keepr-off-white/70">+</span>
             <span className="text-2xl font-bold">${PRICING.standard.perBooking}/booking</span>
-            <span className="text-emerald-200">|</span>
+            <span className="text-keepr-off-white/70">|</span>
             <span>${PRICING.standard.aiCreditsIncluded}/month AI credits included</span>
           </div>
         </div>
@@ -272,12 +273,12 @@ export default function CampgroundManagementSoftwarePage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {featureCategories.map((category) => {
               const colorMap: Record<string, string> = {
-                emerald: "bg-emerald-100 text-emerald-600",
-                blue: "bg-blue-100 text-blue-600",
-                violet: "bg-violet-100 text-violet-600",
-                amber: "bg-amber-100 text-amber-600",
-                cyan: "bg-cyan-100 text-cyan-600",
-                pink: "bg-pink-100 text-pink-600",
+                emerald: "bg-keepr-evergreen/10 text-keepr-evergreen",
+                blue: "bg-keepr-evergreen/10 text-keepr-evergreen",
+                violet: "bg-keepr-evergreen/10 text-keepr-evergreen",
+                amber: "bg-keepr-clay/10 text-keepr-clay",
+                cyan: "bg-keepr-evergreen/10 text-keepr-evergreen",
+                pink: "bg-keepr-clay/10 text-keepr-clay",
               };
 
               return (
@@ -292,7 +293,7 @@ export default function CampgroundManagementSoftwarePage() {
                   <ul className="space-y-2">
                     {category.features.map((feature) => (
                       <li key={feature} className="flex items-center gap-2 text-slate-600">
-                        <Check className="h-4 w-4 text-emerald-500 flex-shrink-0" />
+                        <Check className="h-4 w-4 text-keepr-evergreen flex-shrink-0" />
                         {feature}
                       </li>
                     ))}
@@ -308,7 +309,7 @@ export default function CampgroundManagementSoftwarePage() {
       <section className="py-20 bg-slate-50">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-100 border border-emerald-200 rounded-full text-emerald-700 text-sm font-semibold mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-keepr-clay/15 border border-keepr-clay/30 rounded-full text-keepr-clay text-sm font-semibold mb-6">
               <Award className="h-4 w-4" />
               Features Others Don't Have
             </div>
@@ -327,13 +328,13 @@ export default function CampgroundManagementSoftwarePage() {
                 className="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm"
               >
                 <div className="flex items-start gap-4">
-                  <div className="p-3 rounded-xl bg-emerald-100">
-                    <Zap className="h-6 w-6 text-emerald-600" />
+                  <div className="p-3 rounded-xl bg-keepr-evergreen/10">
+                    <Zap className="h-6 w-6 text-keepr-evergreen" />
                   </div>
                   <div>
                     <h3 className="text-xl font-bold text-slate-900 mb-2">{diff.feature}</h3>
                     <p className="text-slate-600 mb-3">{diff.description}</p>
-                    <span className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 rounded-full text-sm text-emerald-700">
+                    <span className="inline-flex items-center gap-2 px-3 py-1 bg-keepr-clay/10 rounded-full text-sm text-keepr-clay">
                       <Star className="h-4 w-4" />
                       {diff.competitorStatus}
                     </span>
@@ -363,7 +364,7 @@ export default function CampgroundManagementSoftwarePage() {
                 key={type}
                 className="text-center p-6 bg-slate-50 rounded-xl border border-slate-200"
               >
-                <Tent className="h-8 w-8 mx-auto text-emerald-600 mb-3" />
+                <Tent className="h-8 w-8 mx-auto text-keepr-evergreen mb-3" />
                 <span className="font-semibold text-slate-700">{type}</span>
               </div>
             ))}
@@ -416,11 +417,11 @@ export default function CampgroundManagementSoftwarePage() {
                     <span className="text-slate-300">{item.issue}</span>
                   </div>
                   <div className="flex items-start gap-2">
-                    <span className="text-emerald-400 font-semibold">Our solution:</span>
+                    <span className="text-keepr-evergreen font-semibold">Our solution:</span>
                     <span className="text-slate-300">{item.solution}</span>
                   </div>
                 </div>
-                <span className="text-emerald-400 font-semibold flex items-center gap-2">
+                <span className="text-keepr-evergreen font-semibold flex items-center gap-2">
                   See full comparison <ArrowRight className="h-4 w-4" />
                 </span>
               </Link>
@@ -449,7 +450,7 @@ export default function CampgroundManagementSoftwarePage() {
               { step: "4", title: "Go Live", description: "Start taking bookings. Your team will be comfortable in hours." },
             ].map((item) => (
               <div key={item.step} className="text-center">
-                <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 font-bold text-xl flex items-center justify-center mx-auto mb-4">
+                <div className="w-12 h-12 rounded-full bg-keepr-evergreen/10 text-keepr-evergreen font-bold text-xl flex items-center justify-center mx-auto mb-4">
                   {item.step}
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 mb-2">{item.title}</h3>
@@ -466,7 +467,7 @@ export default function CampgroundManagementSoftwarePage() {
           <div className="bg-white rounded-3xl p-8 md:p-12 border border-slate-200 shadow-lg text-center">
             <div className="flex justify-center gap-1 mb-6">
               {[1, 2, 3, 4, 5].map((i) => (
-                <Star key={i} className="h-6 w-6 fill-amber-400 text-amber-400" />
+                <Star key={i} className="h-6 w-6 fill-keepr-clay text-keepr-clay" />
               ))}
             </div>
             <blockquote className="text-2xl text-slate-700 mb-6 italic">
@@ -515,12 +516,12 @@ export default function CampgroundManagementSoftwarePage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 bg-gradient-to-br from-emerald-600 to-teal-600">
+      <section className="py-20 bg-gradient-to-br from-keepr-evergreen to-keepr-evergreen-dark">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
             Ready to Modernize Your Campground?
           </h2>
-          <p className="text-xl text-emerald-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-keepr-off-white/90 mb-8 max-w-2xl mx-auto">
             Join hundreds of campgrounds using Keepr to save time, reduce no-shows, and grow revenue.
           </p>
 
@@ -528,7 +529,7 @@ export default function CampgroundManagementSoftwarePage() {
             <Button
               asChild
               size="lg"
-              className="px-8 py-6 text-lg bg-white text-emerald-700 hover:bg-emerald-50"
+              className="px-8 py-6 text-lg bg-white text-keepr-evergreen hover:bg-keepr-off-white"
             >
               <Link href="/signup">
                 Start Free Trial
@@ -537,58 +538,19 @@ export default function CampgroundManagementSoftwarePage() {
             </Button>
             <Link
               href="/demo"
-              className="text-sm font-medium text-emerald-100 hover:text-white transition-colors"
+              className="text-sm font-medium text-keepr-off-white/80 hover:text-white transition-colors"
             >
               or watch a quick demo
             </Link>
           </div>
 
-          <p className="text-emerald-200 text-sm">
+          <p className="text-keepr-off-white/70 text-sm">
             No credit card required. {CTA_COPY.primary.subtext}
           </p>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-slate-900 text-white">
-        <div className="max-w-6xl mx-auto px-6 py-12">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <h4 className="font-semibold mb-4">Compare</h4>
-              <ul className="space-y-2 text-sm text-slate-400">
-                <li><Link href="/compare/campspot" className="hover:text-white">vs Campspot</Link></li>
-                <li><Link href="/compare/newbook" className="hover:text-white">vs Newbook</Link></li>
-                <li><Link href="/compare/camplife" className="hover:text-white">vs CampLife</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Solutions</h4>
-              <ul className="space-y-2 text-sm text-slate-400">
-                <li><Link href="/rv-park-reservation-system" className="hover:text-white">RV Park Software</Link></li>
-                <li><Link href="/switch-from-campspot" className="hover:text-white">Switch from Campspot</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Resources</h4>
-              <ul className="space-y-2 text-sm text-slate-400">
-                <li><Link href="/blog" className="hover:text-white">Blog</Link></li>
-                <li><Link href="/pricing" className="hover:text-white">Pricing</Link></li>
-                <li><Link href="/demo" className="hover:text-white">Demo</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Company</h4>
-              <ul className="space-y-2 text-sm text-slate-400">
-                <li><Link href="/owners" className="hover:text-white">About</Link></li>
-                <li><Link href="/contact" className="hover:text-white">Contact</Link></li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-12 pt-8 border-t border-slate-800 text-center text-sm text-slate-500">
-            Keepr - Modern campground management software.
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

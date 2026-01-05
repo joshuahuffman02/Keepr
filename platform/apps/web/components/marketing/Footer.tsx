@@ -92,7 +92,7 @@ export function Footer() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3l7 7-7 7M12 3l7 7-7 7" />
                   </svg>
                 </div>
-                <span className="font-bold text-xl text-white">
+                <span className="font-bold text-xl text-foreground">
                   Keepr Host
                 </span>
               </Link>
@@ -116,7 +116,7 @@ export function Footer() {
 
             {/* Product Links */}
             <div>
-              <h3 className="text-white font-semibold mb-4">Product</h3>
+              <h3 className="text-foreground font-semibold mb-4">Product</h3>
               <ul className="space-y-3">
                 {navigation.product.map((item) => (
                   <li key={item.name}>
@@ -133,7 +133,7 @@ export function Footer() {
 
             {/* Compare Links */}
             <div>
-              <h3 className="text-white font-semibold mb-4">Compare</h3>
+              <h3 className="text-foreground font-semibold mb-4">Compare</h3>
               <ul className="space-y-3">
                 {navigation.compare.map((item) => (
                   <li key={item.name}>
@@ -150,7 +150,7 @@ export function Footer() {
 
             {/* Resources Links */}
             <div>
-              <h3 className="text-white font-semibold mb-4">Resources</h3>
+              <h3 className="text-foreground font-semibold mb-4">Resources</h3>
               <ul className="space-y-3">
                 {navigation.resources.map((item) => (
                   <li key={item.name}>
@@ -167,7 +167,7 @@ export function Footer() {
 
             {/* Legal Links */}
             <div>
-              <h3 className="text-white font-semibold mb-4">Legal</h3>
+              <h3 className="text-foreground font-semibold mb-4">Legal</h3>
               <ul className="space-y-3">
                 {navigation.legal.map((item) => (
                   <li key={item.name}>

@@ -1323,7 +1323,7 @@ export const PAGE_REGISTRY: PageDefinition[] = [
   // HELP - Help and documentation
   // ============================================
   {
-    href: "/help",
+    href: "/dashboard/help",
     label: "Help Center",
     icon: "form",
     category: "operations",
@@ -1331,7 +1331,7 @@ export const PAGE_REGISTRY: PageDefinition[] = [
     keywords: ["documentation", "support", "how to"],
   },
   {
-    href: "/help/tutorials",
+    href: "/dashboard/help/tutorials",
     label: "Tutorials",
     icon: "form",
     category: "operations",
@@ -1339,7 +1339,7 @@ export const PAGE_REGISTRY: PageDefinition[] = [
     keywords: ["guides", "walkthroughs", "learn"],
   },
   {
-    href: "/help/shortcuts",
+    href: "/dashboard/help/shortcuts",
     label: "Keyboard Shortcuts",
     icon: "form",
     category: "operations",
@@ -1347,7 +1347,7 @@ export const PAGE_REGISTRY: PageDefinition[] = [
     keywords: ["hotkeys", "commands", "quick keys"],
   },
   {
-    href: "/help/changelog",
+    href: "/dashboard/help/changelog",
     label: "Changelog",
     icon: "form",
     category: "operations",
@@ -1355,7 +1355,7 @@ export const PAGE_REGISTRY: PageDefinition[] = [
     keywords: ["updates", "new features", "releases"],
   },
   {
-    href: "/help/faq",
+    href: "/dashboard/help/faq",
     label: "FAQ",
     icon: "form",
     category: "operations",
@@ -1363,7 +1363,7 @@ export const PAGE_REGISTRY: PageDefinition[] = [
     keywords: ["questions", "answers", "common issues"],
   },
   {
-    href: "/help/contact",
+    href: "/dashboard/help/contact",
     label: "Contact Support",
     icon: "message",
     category: "operations",

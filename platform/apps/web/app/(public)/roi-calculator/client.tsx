@@ -18,7 +18,6 @@ import {
   Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PublicHeader } from "@/components/public/PublicHeader";
 
 const KEEPR_BASE = 100;
 const KEEPR_PER_BOOKING = 2.3;
@@ -121,23 +120,22 @@ export function ROICalculatorClient() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <PublicHeader />
+    <div className="min-h-screen bg-keepr-off-white">
 
       {/* Hero */}
-      <section className="relative pt-32 pb-16 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
+      <section className="relative pt-32 pb-16 bg-gradient-to-br from-keepr-charcoal via-slate-900 to-keepr-charcoal overflow-hidden">
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-emerald-500/10 to-transparent" />
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-keepr-evergreen/10 to-transparent" />
 
         <div className="relative max-w-4xl mx-auto px-6 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/20 border border-emerald-500/30 rounded-full text-emerald-400 text-sm font-semibold mb-8">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-keepr-clay/20 border border-keepr-clay/30 rounded-full text-keepr-clay text-sm font-semibold mb-8">
             <Calculator className="h-4 w-4" />
             ROI Calculator
           </div>
 
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
             How Much Could You
-            <span className="block text-emerald-400">Save?</span>
+            <span className="block text-keepr-evergreen">Save?</span>
           </h1>
 
           <p className="text-xl text-slate-300 max-w-2xl mx-auto">
@@ -150,15 +148,15 @@ export function ROICalculatorClient() {
       {/* Calculator */}
       <section className="py-16 -mt-8 relative z-10">
         <div className="max-w-5xl mx-auto px-6">
-          <div className="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+          <div className="bg-card rounded-2xl shadow-xl border border-border overflow-hidden">
             <div className="grid lg:grid-cols-2">
               {/* Input Side */}
-              <div className="p-8 bg-slate-50 border-r border-slate-200">
-                <h2 className="text-xl font-bold text-slate-900 mb-6">Your Park Details</h2>
+              <div className="p-8 bg-muted/40 border-r border-border">
+                <h2 className="text-xl font-bold text-foreground mb-6">Your Park Details</h2>
 
                 {/* Sites */}
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     Number of Sites
                   </label>
                   <div className="flex items-center gap-4">
@@ -168,9 +166,9 @@ export function ROICalculatorClient() {
                       max="300"
                       value={sites}
                       onChange={(e) => setSites(Number(e.target.value))}
-                      className="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                      className="flex-1 h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-keepr-evergreen"
                     />
-                    <span className="w-16 text-right text-lg font-semibold text-slate-900">
+                    <span className="w-16 text-right text-lg font-semibold text-foreground">
                       {sites}
                     </span>
                   </div>
@@ -178,7 +176,7 @@ export function ROICalculatorClient() {
 
                 {/* Monthly Bookings */}
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     Average Monthly Bookings
                   </label>
                   <div className="flex items-center gap-4">
@@ -189,9 +187,9 @@ export function ROICalculatorClient() {
                       step="10"
                       value={monthlyBookings}
                       onChange={(e) => setMonthlyBookings(Number(e.target.value))}
-                      className="flex-1 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                      className="flex-1 h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-keepr-evergreen"
                     />
-                    <span className="w-16 text-right text-lg font-semibold text-slate-900">
+                    <span className="w-16 text-right text-lg font-semibold text-foreground">
                       {monthlyBookings}
                     </span>
                   </div>
@@ -199,13 +197,13 @@ export function ROICalculatorClient() {
 
                 {/* Current Software */}
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                     Current Software
                   </label>
                   <select
                     value={currentSoftware}
                     onChange={(e) => setCurrentSoftware(e.target.value)}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white"
+                    className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-keepr-evergreen focus:border-keepr-evergreen bg-card"
                   >
                     {competitors.map((c) => (
                       <option key={c.id} value={c.id}>
@@ -222,13 +220,13 @@ export function ROICalculatorClient() {
                       type="checkbox"
                       checked={wantsAI}
                       onChange={(e) => setWantsAI(e.target.checked)}
-                      className="w-5 h-5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                      className="w-5 h-5 rounded border-border text-keepr-evergreen focus:ring-keepr-evergreen"
                     />
-                    <span className="text-sm font-medium text-slate-700">
+                    <span className="text-sm font-medium text-foreground">
                       Include AI features (pricing, forecasting)
                     </span>
                   </label>
-                  <p className="text-xs text-slate-500 mt-1 ml-8">
+                  <p className="text-xs text-muted-foreground mt-1 ml-8">
                     Competitors charge $100-200/mo extra. Keepr includes it.
                   </p>
                 </div>
@@ -236,19 +234,19 @@ export function ROICalculatorClient() {
                 {/* Advanced Options */}
                 <button
                   onClick={() => setShowAdvanced(!showAdvanced)}
-                  className="flex items-center gap-2 text-sm text-slate-600 hover:text-slate-900 mb-4"
+                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4"
                 >
                   {showAdvanced ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                   Advanced Options
                 </button>
 
                 {showAdvanced && (
-                  <div className="p-4 bg-white rounded-lg border border-slate-200 mb-4">
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                  <div className="p-4 bg-card rounded-lg border border-border mb-4">
+                    <label className="block text-sm font-medium text-foreground mb-2">
                       Your Actual Monthly Cost (if known)
                     </label>
                     <div className="relative">
-                      <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                      <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                       <input
                         type="number"
                         value={currentMonthlyCost}
@@ -256,10 +254,10 @@ export function ROICalculatorClient() {
                           setCurrentMonthlyCost(e.target.value ? Number(e.target.value) : "")
                         }
                         placeholder="Enter your current monthly cost"
-                        className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                        className="w-full pl-10 pr-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-keepr-evergreen focus:border-keepr-evergreen"
                       />
                     </div>
-                    <p className="text-xs text-slate-500 mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                       Leave blank to use estimated {competitor.name} pricing
                     </p>
                   </div>
@@ -268,7 +266,7 @@ export function ROICalculatorClient() {
 
               {/* Results Side */}
               <div className="p-8">
-                <h2 className="text-xl font-bold text-slate-900 mb-6">Your Potential Savings</h2>
+                <h2 className="text-xl font-bold text-foreground mb-6">Your Potential Savings</h2>
 
                 {/* Cost Comparison */}
                 <div className="space-y-6 mb-8">
@@ -307,14 +305,14 @@ export function ROICalculatorClient() {
                   </div>
 
                   {/* Keepr */}
-                  <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-100">
+                  <div className="p-4 bg-keepr-evergreen/10 rounded-xl border border-keepr-evergreen/20">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-emerald-800">Keepr</span>
-                      <span className="text-xl font-bold text-emerald-600">
+                      <span className="text-sm font-medium text-keepr-evergreen">Keepr</span>
+                      <span className="text-xl font-bold text-keepr-evergreen">
                         {formatCurrency(keeprMonthly)}/mo
                       </span>
                     </div>
-                    <div className="text-xs text-emerald-600 space-y-1">
+                    <div className="text-xs text-keepr-evergreen space-y-1">
                       <div className="flex justify-between">
                         <span>Base fee</span>
                         <span>{formatCurrency(KEEPR_BASE)}</span>
@@ -327,7 +325,7 @@ export function ROICalculatorClient() {
                         <span>AI features</span>
                         <span className="font-medium">Included</span>
                       </div>
-                      <div className="flex justify-between pt-1 border-t border-emerald-200">
+                      <div className="flex justify-between pt-1 border-t border-keepr-evergreen/20">
                         <span>Setup fee</span>
                         <span className="font-medium">$0</span>
                       </div>
@@ -339,54 +337,54 @@ export function ROICalculatorClient() {
                 <div className="bg-slate-900 rounded-xl p-6 text-white mb-6">
                   <div className="grid grid-cols-3 gap-4 text-center">
                     <div>
-                      <div className="text-2xl font-bold text-emerald-400">
+                      <div className="text-2xl font-bold text-keepr-evergreen">
                         {formatCurrency(monthlySavings)}
                       </div>
-                      <div className="text-xs text-slate-400">Monthly Savings</div>
+                      <div className="text-xs text-muted-foreground">Monthly Savings</div>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-emerald-400">
+                      <div className="text-2xl font-bold text-keepr-evergreen">
                         {formatCurrency(annualSavings)}
                       </div>
-                      <div className="text-xs text-slate-400">Annual Savings</div>
+                      <div className="text-xs text-muted-foreground">Annual Savings</div>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-emerald-400">
+                      <div className="text-2xl font-bold text-keepr-evergreen">
                         {formatCurrency(firstYearSavings)}
                       </div>
-                      <div className="text-xs text-slate-400">First Year</div>
+                      <div className="text-xs text-muted-foreground">First Year</div>
                     </div>
                   </div>
                 </div>
 
                 {/* What You Could Do */}
                 {firstYearSavings > 0 && (
-                  <div className="text-sm text-slate-600 mb-6">
-                    <p className="font-medium text-slate-900 mb-2">
+                  <div className="text-sm text-muted-foreground mb-6">
+                    <p className="font-medium text-foreground mb-2">
                       What could {formatCurrency(firstYearSavings)} do for your park?
                     </p>
                     <ul className="space-y-1">
                       {firstYearSavings >= 500 && (
                         <li className="flex items-center gap-2">
-                          <Check className="h-4 w-4 text-emerald-500" />
+                          <Check className="h-4 w-4 text-keepr-evergreen" />
                           New patio furniture for {Math.floor(firstYearSavings / 500)} sites
                         </li>
                       )}
                       {firstYearSavings >= 3000 && (
                         <li className="flex items-center gap-2">
-                          <Check className="h-4 w-4 text-emerald-500" />
+                          <Check className="h-4 w-4 text-keepr-evergreen" />
                           Upgraded WiFi infrastructure
                         </li>
                       )}
                       {firstYearSavings >= 5000 && (
                         <li className="flex items-center gap-2">
-                          <Check className="h-4 w-4 text-emerald-500" />
+                          <Check className="h-4 w-4 text-keepr-evergreen" />
                           Additional part-time staff for peak season
                         </li>
                       )}
                       {firstYearSavings >= 10000 && (
                         <li className="flex items-center gap-2">
-                          <Check className="h-4 w-4 text-emerald-500" />
+                          <Check className="h-4 w-4 text-keepr-evergreen" />
                           Playground or amenity upgrade
                         </li>
                       )}
@@ -402,25 +400,25 @@ export function ROICalculatorClient() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Enter your email for a detailed comparison"
-                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-keepr-evergreen focus:border-keepr-evergreen"
                       required
                     />
                     <Button
                       type="submit"
-                      className="w-full py-6 text-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500"
+                      className="w-full py-6 text-lg bg-gradient-to-r from-keepr-evergreen to-keepr-evergreen-dark hover:from-keepr-evergreen-light hover:to-keepr-evergreen"
                     >
                       Get My Custom Savings Report
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
-                    <p className="text-xs text-slate-500 text-center">
+                    <p className="text-xs text-muted-foreground text-center">
                       We&apos;ll send a detailed PDF with your specific numbers.
                     </p>
                   </form>
                 ) : (
-                  <div className="text-center p-4 bg-emerald-50 rounded-xl border border-emerald-200">
-                    <Check className="h-8 w-8 text-emerald-600 mx-auto mb-2" />
-                    <p className="font-semibold text-emerald-900">Check your inbox!</p>
-                    <p className="text-sm text-emerald-700">
+                  <div className="text-center p-4 bg-keepr-evergreen/10 rounded-xl border border-keepr-evergreen/20">
+                    <Check className="h-8 w-8 text-keepr-evergreen mx-auto mb-2" />
+                    <p className="font-semibold text-keepr-evergreen">Check your inbox!</p>
+                    <p className="text-sm text-keepr-evergreen">
                       We&apos;ll send your custom savings report shortly.
                     </p>
                   </div>
@@ -432,35 +430,35 @@ export function ROICalculatorClient() {
       </section>
 
       {/* Additional Benefits */}
-      <section className="py-16 bg-slate-50">
+      <section className="py-16 bg-muted/40">
         <div className="max-w-5xl mx-auto px-6">
-          <h2 className="text-2xl font-bold text-slate-900 text-center mb-12">
+          <h2 className="text-2xl font-bold text-foreground text-center mb-12">
             Beyond the Savings
           </h2>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-xl p-6 border border-slate-200">
-              <Clock className="h-10 w-10 text-violet-600 mb-4" />
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Time Savings</h3>
-              <p className="text-slate-600 text-sm">
+            <div className="bg-card rounded-xl p-6 border border-border">
+              <Clock className="h-10 w-10 text-keepr-evergreen mb-4" />
+              <h3 className="text-lg font-bold text-foreground mb-2">Time Savings</h3>
+              <p className="text-muted-foreground text-sm">
                 Parks report saving 10-15 hours per week with automated booking, communication,
                 and reporting.
               </p>
             </div>
 
-            <div className="bg-white rounded-xl p-6 border border-slate-200">
-              <Sparkles className="h-10 w-10 text-violet-600 mb-4" />
-              <h3 className="text-lg font-bold text-slate-900 mb-2">AI Revenue Boost</h3>
-              <p className="text-slate-600 text-sm">
+            <div className="bg-card rounded-xl p-6 border border-border">
+              <Sparkles className="h-10 w-10 text-keepr-evergreen mb-4" />
+              <h3 className="text-lg font-bold text-foreground mb-2">AI Revenue Boost</h3>
+              <p className="text-muted-foreground text-sm">
                 Dynamic pricing and demand forecasting typically increase revenue 15-20%.
                 Included free.
               </p>
             </div>
 
-            <div className="bg-white rounded-xl p-6 border border-slate-200">
-              <Zap className="h-10 w-10 text-violet-600 mb-4" />
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Faster Setup</h3>
-              <p className="text-slate-600 text-sm">
+            <div className="bg-card rounded-xl p-6 border border-border">
+              <Zap className="h-10 w-10 text-keepr-evergreen mb-4" />
+              <h3 className="text-lg font-bold text-foreground mb-2">Faster Setup</h3>
+              <p className="text-muted-foreground text-sm">
                 Go live in days, not weeks. No $2,000+ setup fee. We handle data migration.
               </p>
             </div>
@@ -471,10 +469,10 @@ export function ROICalculatorClient() {
       {/* Final CTA */}
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold text-slate-900 mb-6">
+          <h2 className="text-3xl font-bold text-foreground mb-6">
             Ready to See the Full Picture?
           </h2>
-          <p className="text-lg text-slate-600 mb-8">
+          <p className="text-lg text-muted-foreground mb-8">
             Book a demo and we&apos;ll walk through your specific situation.
             No pressure, just honest numbers.
           </p>
@@ -482,7 +480,7 @@ export function ROICalculatorClient() {
             <Button
               asChild
               size="lg"
-              className="px-8 py-6 text-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500"
+              className="px-8 py-6 text-lg bg-gradient-to-r from-keepr-evergreen to-keepr-evergreen-dark hover:from-keepr-evergreen-light hover:to-keepr-evergreen"
             >
               <Link href="/demo">
                 Try the Demo
@@ -496,27 +494,6 @@ export function ROICalculatorClient() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-slate-900 text-white">
-        <div className="max-w-6xl mx-auto px-6 py-12">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <p className="text-slate-400 text-sm">
-              Keepr - Transparent pricing for modern campgrounds.
-            </p>
-            <div className="flex items-center gap-6 text-sm text-slate-400">
-              <Link href="/pricing" className="hover:text-white">
-                Pricing
-              </Link>
-              <Link href="/compare/campspot" className="hover:text-white">
-                vs Campspot
-              </Link>
-              <Link href="/demo" className="hover:text-white">
-                Demo
-              </Link>
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

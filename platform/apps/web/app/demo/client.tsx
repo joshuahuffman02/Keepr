@@ -19,7 +19,8 @@ import {
   Star,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PublicHeader } from "@/components/public/PublicHeader";
+import { MarketingHeader } from "@/components/marketing/MarketingHeader";
+import { Footer } from "@/components/marketing/Footer";
 
 const demoFeatures = [
   {
@@ -88,25 +89,25 @@ export function DemoClient() {
 
   return (
     <div className="min-h-screen bg-white">
-      <PublicHeader />
+      <MarketingHeader />
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
+      <section className="relative pt-32 pb-20 bg-gradient-to-br from-keepr-charcoal via-slate-900 to-keepr-charcoal overflow-hidden">
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-violet-500/10 to-transparent" />
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-keepr-evergreen/10 to-transparent" />
 
         <div className="relative max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left: Content */}
             <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-violet-500/20 border border-violet-500/30 rounded-full text-violet-400 text-sm font-semibold mb-8">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-keepr-clay/20 border border-keepr-clay/30 rounded-full text-keepr-clay text-sm font-semibold mb-8">
                 <Play className="h-4 w-4" />
                 Live Demo Environment
               </div>
 
               <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
                 See Keepr
-                <span className="block text-violet-400">In Action</span>
+                <span className="block text-keepr-evergreen">In Action</span>
               </h1>
 
               <p className="text-xl text-slate-300 mb-8 leading-relaxed">
@@ -122,7 +123,7 @@ export function DemoClient() {
                   "Resets nightly - play freely",
                 ].map((item) => (
                   <div key={item} className="flex items-center gap-3 text-slate-300">
-                    <Check className="h-5 w-5 text-violet-400" />
+                    <Check className="h-5 w-5 text-keepr-evergreen" />
                     <span>{item}</span>
                   </div>
                 ))}
@@ -134,8 +135,8 @@ export function DemoClient() {
               {!submitted ? (
                 <>
                   <div className="text-center mb-6">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-violet-100 mb-4">
-                      <Zap className="h-8 w-8 text-violet-600" />
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-keepr-evergreen/10 mb-4">
+                      <Zap className="h-8 w-8 text-keepr-evergreen" />
                     </div>
                     <h2 className="text-2xl font-bold text-slate-900 mb-2">
                       Access the Demo
@@ -156,7 +157,7 @@ export function DemoClient() {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="Sarah Johnson"
-                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-colors"
+                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-keepr-evergreen focus:border-keepr-evergreen transition-colors"
                         required
                       />
                     </div>
@@ -171,7 +172,7 @@ export function DemoClient() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="sarah@mountainviewrv.com"
-                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-colors"
+                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-keepr-evergreen focus:border-keepr-evergreen transition-colors"
                         required
                       />
                     </div>
@@ -186,14 +187,14 @@ export function DemoClient() {
                         value={parkName}
                         onChange={(e) => setParkName(e.target.value)}
                         placeholder="Mountain View RV Park"
-                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500 transition-colors"
+                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-keepr-evergreen focus:border-keepr-evergreen transition-colors"
                       />
                     </div>
 
                     <Button
                       type="submit"
                       disabled={loading}
-                      className="w-full py-6 text-lg bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500"
+                      className="w-full py-6 text-lg bg-gradient-to-r from-keepr-evergreen to-keepr-evergreen-dark hover:from-keepr-evergreen-light hover:to-keepr-evergreen"
                     >
                       {loading ? (
                         <span className="flex items-center gap-2">
@@ -232,7 +233,7 @@ export function DemoClient() {
                     <div className="flex items-center justify-center gap-2 text-sm text-slate-500">
                       <Eye className="h-4 w-4" />
                       <span>Or</span>
-                      <Link href="/demo/preview" className="text-violet-600 hover:text-violet-700 font-medium">
+                      <Link href="/demo/preview" className="text-keepr-evergreen hover:text-keepr-evergreen-light font-medium">
                         browse without signing up
                       </Link>
                     </div>
@@ -240,8 +241,8 @@ export function DemoClient() {
                 </>
               ) : (
                 <div className="text-center py-8">
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-100 mb-6">
-                    <Check className="h-8 w-8 text-emerald-600" />
+                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-keepr-evergreen/10 mb-6">
+                    <Check className="h-8 w-8 text-keepr-evergreen" />
                   </div>
                   <h2 className="text-2xl font-bold text-slate-900 mb-4">
                     You're In!
@@ -252,7 +253,7 @@ export function DemoClient() {
                   </p>
                   <Button
                     asChild
-                    className="w-full py-6 text-lg bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500"
+                    className="w-full py-6 text-lg bg-gradient-to-r from-keepr-evergreen to-keepr-evergreen-dark hover:from-keepr-evergreen-light hover:to-keepr-evergreen"
                   >
                     <Link href="/auth/signin?demo=true">
                       Open Demo Now
@@ -287,7 +288,7 @@ export function DemoClient() {
                 key={feature.title}
                 className="bg-slate-50 rounded-2xl p-8 border border-slate-200"
               >
-                <feature.icon className="h-10 w-10 text-violet-600 mb-4" />
+                <feature.icon className="h-10 w-10 text-keepr-evergreen mb-4" />
                 <h3 className="text-xl font-bold text-slate-900 mb-2">{feature.title}</h3>
                 <p className="text-slate-600">{feature.description}</p>
               </div>
@@ -309,7 +310,7 @@ export function DemoClient() {
             <div className="grid md:grid-cols-2 gap-4">
               {whatYouCanExplore.map((item) => (
                 <div key={item} className="flex items-center gap-3">
-                  <Check className="h-5 w-5 text-emerald-500 flex-shrink-0" />
+                  <Check className="h-5 w-5 text-keepr-evergreen flex-shrink-0" />
                   <span className="text-slate-700">{item}</span>
                 </div>
               ))}
@@ -319,13 +320,13 @@ export function DemoClient() {
       </section>
 
       {/* Demo Mode Banner */}
-      <section className="py-12 bg-violet-600">
+      <section className="py-12 bg-keepr-evergreen">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <div className="flex items-center justify-center gap-3 text-white mb-4">
             <Lock className="h-6 w-6" />
             <span className="text-lg font-semibold">Demo Mode = Safe Mode</span>
           </div>
-          <p className="text-violet-100 max-w-2xl mx-auto">
+          <p className="text-keepr-off-white/90 max-w-2xl mx-auto">
             The demo environment is completely sandboxed. Create reservations, modify rates,
             experiment with settings - nothing you do affects real data. The demo resets every night.
           </p>
@@ -345,7 +346,7 @@ export function DemoClient() {
             <Button
               asChild
               size="lg"
-              className="px-8 py-6 text-lg bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500"
+              className="px-8 py-6 text-lg bg-gradient-to-r from-keepr-evergreen to-keepr-evergreen-dark hover:from-keepr-evergreen-light hover:to-keepr-evergreen"
             >
               <a href="#top">
                 Get Demo Access
@@ -364,21 +365,7 @@ export function DemoClient() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-slate-900 text-white">
-        <div className="max-w-6xl mx-auto px-6 py-12">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <p className="text-slate-400 text-sm">
-              Keepr - Try before you buy.
-            </p>
-            <div className="flex items-center gap-6 text-sm text-slate-400">
-              <Link href="/pricing" className="hover:text-white">Pricing</Link>
-              <Link href="/compare/campspot" className="hover:text-white">vs Campspot</Link>
-              <Link href="/signup" className="hover:text-white">Sign Up</Link>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

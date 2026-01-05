@@ -19,7 +19,8 @@ import {
   MapPin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PublicHeader } from "@/components/public/PublicHeader";
+import { MarketingHeader } from "@/components/marketing/MarketingHeader";
+import { Footer } from "@/components/marketing/Footer";
 import { PRICING, PROOF_POINTS, CTA_COPY, DIFFERENTIATORS } from "@/lib/positioning";
 
 export const metadata: Metadata = {
@@ -106,7 +107,7 @@ const rvSpecificFeatures = [
 export default function RvParkReservationSystemPage() {
   return (
     <div className="min-h-screen bg-white">
-      <PublicHeader />
+      <MarketingHeader />
 
       <script
         type="application/ld+json"
@@ -114,20 +115,20 @@ export default function RvParkReservationSystemPage() {
       />
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-24 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
+      <section className="relative pt-32 pb-24 bg-gradient-to-br from-keepr-charcoal via-slate-900 to-keepr-charcoal overflow-hidden">
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-blue-500/10 to-transparent" />
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-keepr-evergreen/10 to-transparent" />
 
         <div className="relative max-w-6xl mx-auto px-6">
           <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/20 border border-blue-500/30 rounded-full text-blue-400 text-sm font-semibold mb-8">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-keepr-clay/20 border border-keepr-clay/30 rounded-full text-keepr-clay text-sm font-semibold mb-8">
               <Truck className="h-4 w-4" />
               Built Specifically for RV Parks
             </div>
 
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
               RV Park Reservation System
-              <span className="block text-blue-400">With Hookup Management Built In</span>
+              <span className="block text-keepr-evergreen">With Hookup Management Built In</span>
             </h1>
 
             <p className="text-xl md:text-2xl text-slate-300 mb-8 leading-relaxed max-w-3xl mx-auto">
@@ -139,7 +140,7 @@ export default function RvParkReservationSystemPage() {
               <Button
                 asChild
                 size="lg"
-                className="px-8 py-6 text-lg bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-400 hover:to-cyan-400"
+                className="px-8 py-6 text-lg bg-gradient-to-r from-keepr-evergreen to-keepr-evergreen-dark hover:from-keepr-evergreen-light hover:to-keepr-evergreen"
               >
                 <Link href="/signup">
                   Start Free Trial
@@ -165,7 +166,7 @@ export default function RvParkReservationSystemPage() {
                 { value: "48hrs", label: "Go Live", note: "Free data migration" },
               ].map((stat) => (
                 <div key={stat.label} className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-blue-400">
+                  <div className="text-3xl md:text-4xl font-bold text-keepr-evergreen">
                     {stat.value}
                   </div>
                   <div className="text-sm text-slate-300 font-medium">{stat.label}</div>
@@ -178,14 +179,14 @@ export default function RvParkReservationSystemPage() {
       </section>
 
       {/* Pricing Banner */}
-      <section className="py-8 bg-blue-600">
+      <section className="py-8 bg-keepr-evergreen">
         <div className="max-w-6xl mx-auto px-6">
           <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 text-white text-center">
             <span className="text-lg font-semibold">Simple Pricing:</span>
             <span className="text-2xl font-bold">${PRICING.standard.monthlyBase}/month</span>
-            <span className="text-blue-200">+</span>
+            <span className="text-keepr-off-white/70">+</span>
             <span className="text-2xl font-bold">${PRICING.standard.perBooking}/booking</span>
-            <span className="text-blue-200">|</span>
+            <span className="text-keepr-off-white/70">|</span>
             <span>Utility metering included</span>
           </div>
         </div>
@@ -210,8 +211,8 @@ export default function RvParkReservationSystemPage() {
                 className="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm hover:shadow-lg transition-shadow"
               >
                 <div className="flex items-start gap-4">
-                  <div className="p-3 rounded-xl bg-blue-100">
-                    <feature.icon className="h-6 w-6 text-blue-600" />
+                  <div className="p-3 rounded-xl bg-keepr-evergreen/10">
+                    <feature.icon className="h-6 w-6 text-keepr-evergreen" />
                   </div>
                   <div className="flex-1">
                     <h3 className="text-xl font-bold text-slate-900 mb-2">{feature.title}</h3>
@@ -219,7 +220,7 @@ export default function RvParkReservationSystemPage() {
                     <ul className="grid grid-cols-2 gap-2">
                       {feature.features.map((f) => (
                         <li key={f} className="flex items-center gap-2 text-sm text-slate-600">
-                          <Check className="h-4 w-4 text-blue-500 flex-shrink-0" />
+                          <Check className="h-4 w-4 text-keepr-evergreen flex-shrink-0" />
                           {f}
                         </li>
                       ))}
@@ -263,7 +264,7 @@ export default function RvParkReservationSystemPage() {
               },
             ].map((item) => (
               <div key={item.step} className="bg-white rounded-2xl p-8 border border-slate-200 text-center">
-                <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-600 font-bold text-xl flex items-center justify-center mx-auto mb-4">
+                <div className="w-12 h-12 rounded-full bg-keepr-evergreen/10 text-keepr-evergreen font-bold text-xl flex items-center justify-center mx-auto mb-4">
                   {item.step}
                 </div>
                 <h3 className="text-lg font-bold text-slate-900 mb-2">{item.title}</h3>
@@ -297,7 +298,7 @@ export default function RvParkReservationSystemPage() {
                 key={item.title}
                 className="bg-slate-50 rounded-xl p-6 border border-slate-200 text-center"
               >
-                <item.icon className="h-8 w-8 mx-auto text-blue-600 mb-3" />
+                <item.icon className="h-8 w-8 mx-auto text-keepr-evergreen mb-3" />
                 <h3 className="font-bold text-slate-900 mb-1">{item.title}</h3>
                 <p className="text-sm text-slate-600">{item.desc}</p>
               </div>
@@ -344,9 +345,9 @@ export default function RvParkReservationSystemPage() {
                 <h3 className="text-xl font-bold text-white mb-4">vs {item.competitor}</h3>
                 <div className="space-y-2 mb-6 text-sm">
                   <div className="text-red-400">Their issue: {item.issue}</div>
-                  <div className="text-blue-400">Our solution: {item.solution}</div>
+                  <div className="text-keepr-evergreen">Our solution: {item.solution}</div>
                 </div>
-                <span className="text-blue-400 font-semibold flex items-center gap-2">
+                <span className="text-keepr-evergreen font-semibold flex items-center gap-2">
                   Full comparison <ArrowRight className="h-4 w-4" />
                 </span>
               </Link>
@@ -358,10 +359,10 @@ export default function RvParkReservationSystemPage() {
       {/* Testimonial */}
       <section className="py-20">
         <div className="max-w-4xl mx-auto px-6">
-          <div className="bg-blue-50 rounded-3xl p-8 md:p-12 border border-blue-100 text-center">
+          <div className="bg-keepr-evergreen/10 rounded-3xl p-8 md:p-12 border border-keepr-evergreen/20 text-center">
             <div className="flex justify-center gap-1 mb-6">
               {[1, 2, 3, 4, 5].map((i) => (
-                <Star key={i} className="h-6 w-6 fill-amber-400 text-amber-400" />
+                <Star key={i} className="h-6 w-6 fill-keepr-clay text-keepr-clay" />
               ))}
             </div>
             <blockquote className="text-2xl text-slate-700 mb-6 italic">
@@ -377,12 +378,12 @@ export default function RvParkReservationSystemPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 bg-gradient-to-br from-blue-600 to-cyan-600">
+      <section className="py-20 bg-gradient-to-br from-keepr-evergreen to-keepr-evergreen-dark">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
             Ready to Upgrade Your RV Park?
           </h2>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-keepr-off-white/90 mb-8 max-w-2xl mx-auto">
             Join RV parks across the country using Keepr for reservations, utility billing, and more.
           </p>
 
@@ -390,7 +391,7 @@ export default function RvParkReservationSystemPage() {
             <Button
               asChild
               size="lg"
-              className="px-8 py-6 text-lg bg-white text-blue-700 hover:bg-blue-50"
+              className="px-8 py-6 text-lg bg-white text-keepr-evergreen hover:bg-keepr-off-white"
             >
               <Link href="/signup">
                 Start Free Trial
@@ -407,27 +408,13 @@ export default function RvParkReservationSystemPage() {
             </Button>
           </div>
 
-          <p className="text-blue-200 text-sm">
+          <p className="text-keepr-off-white/70 text-sm">
             No credit card required. {CTA_COPY.primary.subtext}
           </p>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-slate-900 text-white">
-        <div className="max-w-6xl mx-auto px-6 py-12">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <p className="text-slate-400 text-sm">
-              Keepr - RV park reservation system built for modern parks.
-            </p>
-            <div className="flex items-center gap-6 text-sm text-slate-400">
-              <Link href="/campground-management-software" className="hover:text-white">Campground Software</Link>
-              <Link href="/pricing" className="hover:text-white">Pricing</Link>
-              <Link href="/demo" className="hover:text-white">Demo</Link>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

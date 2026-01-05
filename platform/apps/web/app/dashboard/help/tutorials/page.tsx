@@ -164,7 +164,7 @@ export default function TutorialsPage() {
       <div className="space-y-6">
         <Breadcrumbs
           items={[
-            { label: "Help", href: "/help" },
+            { label: "Help", href: "/dashboard/help" },
             { label: "Video Tutorials" }
           ]}
         />
@@ -279,7 +279,7 @@ export default function TutorialsPage() {
                     Watch now
                   </a>
                   <Link
-                    href="/help/contact"
+                    href="/dashboard/help/contact"
                     className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-200 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                   >
                     Request a video
@@ -372,7 +372,7 @@ export default function TutorialsPage() {
             We're constantly adding new tutorials. Have a topic request?
           </p>
           <Link
-            href="/help/contact"
+            href="/dashboard/help/contact"
             className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
           >
             Request a Tutorial

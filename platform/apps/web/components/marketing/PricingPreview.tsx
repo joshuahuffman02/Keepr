@@ -1,81 +1,164 @@
 'use client';
 
-import { Check, X, ArrowRight, Star, Clock, Users, Zap, Crown, Rocket, Gift, Shield, Wrench, Database, Headphones, Sparkles } from 'lucide-react';
+import { Check, X, ArrowRight, Star, Clock, Users, Zap, Crown, Rocket, Gift, Shield, Wrench, Database, Headphones, Sparkles, type LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useReducedMotionSafe } from '@/hooks/use-reduced-motion-safe';
 
-// Early Access Tiers - Waterfall: first fills, then next opens
-const earlyAccessTiers = [
-  {
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api";
+
+type EarlyAccessTierKey = "founders_circle" | "pioneer" | "trailblazer";
+
+type TierPricing = {
+  bookingFeeCents: number;
+  monthlyFeeCents: number;
+  monthlyDurationMonths: number | null;
+  postPromoMonthlyFeeCents: number;
+};
+
+type TierAvailability = {
+  tier: EarlyAccessTierKey;
+  totalSpots: number;
+  remainingSpots: number;
+  isSoldOut: boolean;
+  pricing: TierPricing;
+};
+
+type TierContent = {
+  name: string;
+  icon: LucideIcon;
+  highlight: string;
+  color: "amber" | "emerald" | "violet";
+  cta: string;
+  benefits: (pricing: TierPricing) => string[];
+};
+
+const tierOrder: EarlyAccessTierKey[] = ["founders_circle", "pioneer", "trailblazer"];
+
+const fallbackAvailability: Record<EarlyAccessTierKey, { totalSpots: number; pricing: TierPricing }> = {
+  founders_circle: {
+    totalSpots: 5,
+    pricing: {
+      bookingFeeCents: 75,
+      monthlyFeeCents: 0,
+      monthlyDurationMonths: null,
+      postPromoMonthlyFeeCents: 0,
+    },
+  },
+  pioneer: {
+    totalSpots: 15,
+    pricing: {
+      bookingFeeCents: 100,
+      monthlyFeeCents: 0,
+      monthlyDurationMonths: 12,
+      postPromoMonthlyFeeCents: 2900,
+    },
+  },
+  trailblazer: {
+    totalSpots: 25,
+    pricing: {
+      bookingFeeCents: 125,
+      monthlyFeeCents: 1450,
+      monthlyDurationMonths: 6,
+      postPromoMonthlyFeeCents: 2900,
+    },
+  },
+};
+
+const formatCurrency = (cents: number, options: { forceDecimals?: boolean } = {}) => {
+  const amount = cents / 100;
+  if (!Number.isFinite(amount)) return "$0";
+  const formatted = options.forceDecimals
+    ? amount.toFixed(2)
+    : amount % 1 === 0
+      ? amount.toFixed(0)
+      : amount.toFixed(2);
+  return `$${formatted}`;
+};
+
+const formatAmount = (cents: number) => {
+  const amount = cents / 100;
+  if (!Number.isFinite(amount)) return "0";
+  return amount % 1 === 0 ? amount.toFixed(0) : amount.toFixed(2);
+};
+
+const formatDuration = (months: number | null) => {
+  if (months === null) return "forever";
+  return `for ${months} months`;
+};
+
+const tierContent: Record<EarlyAccessTierKey, TierContent> = {
+  founders_circle: {
     name: "Founder's Circle",
-    spots: 5,
-    spotsRemaining: 5, // Update this as spots fill
     icon: Crown,
-    monthlyPrice: 0,
-    monthlyDuration: "forever",
-    bookingFee: 0.75,
     highlight: "Best Deal",
     color: "amber",
-    benefits: [
-      "$0/month forever (not a typo)",
-      "$0.75 per booking (locked forever)",
+    cta: "Claim Founder Spot",
+    benefits: (pricing) => [
+      `${formatCurrency(pricing.monthlyFeeCents)}/month forever (not a typo)`,
+      `${formatCurrency(pricing.bookingFeeCents, { forceDecimals: true })} per booking (locked forever)`,
       "Lifetime 'Founder' badge on your listing",
       "Direct line to founders (phone/text)",
       "Co-create features with us",
       "Your logo on our website",
       "First access to every new feature",
     ],
-    cta: "Claim Founder Spot",
-    urgency: "Only 5 spots",
   },
-  {
+  pioneer: {
     name: "Pioneer",
-    spots: 15,
-    spotsRemaining: 15,
     icon: Rocket,
-    monthlyPrice: 0,
-    monthlyDuration: "for 12 months",
-    bookingFee: 1.00,
     highlight: "Most Popular",
     color: "emerald",
-    benefits: [
-      "$0/month for first 12 months",
-      "$1.00 per booking (locked forever)",
-      "Then just $29/month",
-      "Priority support forever",
-      "Early access to new features",
-      "Quarterly strategy calls",
-      "Free data migration",
-    ],
     cta: "Become a Pioneer",
-    urgency: "15 spots available",
+    benefits: (pricing) => {
+      const durationLabel = pricing.monthlyDurationMonths
+        ? `for first ${pricing.monthlyDurationMonths} months`
+        : "for a limited time";
+      const postPromoLabel = pricing.postPromoMonthlyFeeCents
+        ? `Then just ${formatCurrency(pricing.postPromoMonthlyFeeCents)}/month`
+        : "Then standard pricing";
+      return [
+        `${formatCurrency(pricing.monthlyFeeCents)}/month ${durationLabel}`,
+        `${formatCurrency(pricing.bookingFeeCents, { forceDecimals: true })} per booking (locked forever)`,
+        postPromoLabel,
+        "Priority support forever",
+        "Early access to new features",
+        "Quarterly strategy calls",
+        "Free data migration",
+      ];
+    },
   },
-  {
+  trailblazer: {
     name: "Trailblazer",
-    spots: 25,
-    spotsRemaining: 25,
     icon: Star,
-    monthlyPrice: 14.50,
-    monthlyDuration: "for 6 months",
-    bookingFee: 1.25,
     highlight: "Great Value",
     color: "violet",
-    benefits: [
-      "50% off for first 6 months ($14.50/mo)",
-      "$1.25 per booking (locked forever)",
-      "Then $29/month",
-      "Early access to new features",
-      "Priority email support",
-      "Free data migration",
-      "Onboarding call included",
-    ],
     cta: "Join Trailblazers",
-    urgency: "25 spots available",
+    benefits: (pricing) => {
+      const durationLabel = pricing.monthlyDurationMonths
+        ? `for first ${pricing.monthlyDurationMonths} months`
+        : "for a limited time";
+      const postPromoLabel = pricing.postPromoMonthlyFeeCents
+        ? `Then ${formatCurrency(pricing.postPromoMonthlyFeeCents)}/month`
+        : "Then standard pricing";
+      const discountPercent = pricing.postPromoMonthlyFeeCents
+        ? Math.round(100 - (pricing.monthlyFeeCents / pricing.postPromoMonthlyFeeCents) * 100)
+        : null;
+      const discountLabel = discountPercent ? `${discountPercent}% off` : "Discounted";
+      return [
+        `${discountLabel} ${durationLabel} (${formatCurrency(pricing.monthlyFeeCents)}/mo)`,
+        `${formatCurrency(pricing.bookingFeeCents, { forceDecimals: true })} per booking (locked forever)`,
+        postPromoLabel,
+        "Early access to new features",
+        "Priority email support",
+        "Free data migration",
+        "Onboarding call included",
+      ];
+    },
   },
-];
+};
 
 // Competitor comparison data
 const competitors = [
@@ -198,18 +281,104 @@ const featureLabels: Record<string, string> = {
   multiProperty: "Multi-Property",
 };
 
+type TierModel = {
+  key: EarlyAccessTierKey;
+  name: string;
+  icon: LucideIcon;
+  highlight: string;
+  color: "amber" | "emerald" | "violet";
+  cta: string;
+  benefits: string[];
+  spots: number;
+  spotsRemaining: number | null;
+  monthlyPriceDisplay: string;
+  monthlyDuration: string;
+  bookingFeeDisplay: string;
+};
+
 export function PricingPreview() {
   const [showComparison, setShowComparison] = useState(false);
+  const [availability, setAvailability] = useState<TierAvailability[]>([]);
+  const [availabilityStatus, setAvailabilityStatus] = useState<"loading" | "ready" | "error">("loading");
   const prefersReducedMotion = useReducedMotionSafe();
 
-  // Determine which tier is currently active (first one with spots remaining)
-  const { activeTier, upcomingTiers, filledTiers } = useMemo(() => {
-    let active = null;
-    const upcoming: typeof earlyAccessTiers = [];
-    const filled: typeof earlyAccessTiers = [];
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchAvailability() {
+      try {
+        const res = await fetch(`${API_BASE}/early-access/availability`);
+        if (!res.ok) throw new Error("Failed to fetch early access availability");
+        const data = (await res.json()) as TierAvailability[];
+        if (isMounted) {
+          setAvailability(data);
+          setAvailabilityStatus("ready");
+        }
+      } catch (err) {
+        console.error("Failed to fetch early access availability:", err);
+        if (isMounted) {
+          setAvailabilityStatus("error");
+        }
+      }
+    }
+    fetchAvailability();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
-    for (const tier of earlyAccessTiers) {
-      if (tier.spotsRemaining > 0 && !active) {
+  const availabilityByTier = useMemo(
+    () => new Map(availability.map((tier) => [tier.tier, tier])),
+    [availability]
+  );
+
+  const tiers = useMemo<TierModel[]>(() => {
+    return tierOrder.map((tierKey) => {
+      const content = tierContent[tierKey];
+      const live = availabilityByTier.get(tierKey);
+      const fallback = fallbackAvailability[tierKey];
+      const pricing = live?.pricing ?? fallback.pricing;
+      const spots = live?.totalSpots ?? fallback.totalSpots;
+      const spotsRemaining = live?.remainingSpots ?? null;
+
+      return {
+        key: tierKey,
+        name: content.name,
+        icon: content.icon,
+        highlight: content.highlight,
+        color: content.color,
+        cta: content.cta,
+        benefits: content.benefits(pricing),
+        spots,
+        spotsRemaining,
+        monthlyPriceDisplay: formatAmount(pricing.monthlyFeeCents),
+        monthlyDuration: formatDuration(pricing.monthlyDurationMonths),
+        bookingFeeDisplay: formatCurrency(pricing.bookingFeeCents, { forceDecimals: true }),
+      };
+    });
+  }, [availabilityByTier]);
+
+  const hasLiveAvailability = availabilityStatus === "ready" && availability.length > 0;
+
+  const { activeTier, upcomingTiers, filledTiers } = useMemo(() => {
+    if (!tiers.length) {
+      return { activeTier: null, upcomingTiers: [], filledTiers: [] };
+    }
+
+    if (!hasLiveAvailability) {
+      return {
+        activeTier: tiers[0],
+        upcomingTiers: tiers.slice(1),
+        filledTiers: [],
+      };
+    }
+
+    let active: TierModel | null = null;
+    const upcoming: TierModel[] = [];
+    const filled: TierModel[] = [];
+
+    for (const tier of tiers) {
+      const remaining = tier.spotsRemaining ?? 0;
+      if (remaining > 0 && !active) {
         active = tier;
       } else if (active) {
         upcoming.push(tier);
@@ -219,12 +388,13 @@ export function PricingPreview() {
     }
 
     return { activeTier: active, upcomingTiers: upcoming, filledTiers: filled };
-  }, []);
+  }, [tiers, hasLiveAvailability]);
 
-  // Calculate total spots and remaining
-  const totalSpots = earlyAccessTiers.reduce((sum, t) => sum + t.spots, 0);
-  const totalRemaining = earlyAccessTiers.reduce((sum, t) => sum + t.spotsRemaining, 0);
-  const spotsFilled = totalSpots - totalRemaining;
+  const totalSpots = tiers.reduce((sum, tier) => sum + tier.spots, 0);
+  const totalRemaining = hasLiveAvailability
+    ? tiers.reduce((sum, tier) => sum + (tier.spotsRemaining ?? 0), 0)
+    : null;
+  const spotsFilled = totalRemaining === null ? null : totalSpots - totalRemaining;
 
   const containerVariants = {
     hidden: { opacity: prefersReducedMotion ? 1 : 0 },
@@ -236,8 +406,40 @@ export function PricingPreview() {
     visible: { opacity: 1, y: 0, transition: prefersReducedMotion ? undefined : { duration: 0.5 } }
   };
 
+  const availabilityLabel =
+    availabilityStatus === "loading"
+      ? "Checking early access availability"
+      : availabilityStatus === "error" || !hasLiveAvailability
+        ? "Early access availability unavailable"
+        : activeTier
+          ? `NOW OPEN: ${activeTier.name}`
+          : "Early Access Closed";
+  const availabilityHint =
+    availabilityStatus === "loading"
+      ? "Checking availability..."
+      : availabilityStatus === "error"
+        ? "Availability unavailable right now."
+        : "Availability updates live. Check back shortly.";
+
+  const hasClaimedSpots = spotsFilled !== null && spotsFilled > 0;
+  const progressPercent =
+    hasLiveAvailability && spotsFilled !== null && totalSpots > 0
+      ? (spotsFilled / totalSpots) * 100
+      : 0;
+  const remainingSpots =
+    hasLiveAvailability && totalRemaining !== null ? totalRemaining : totalSpots;
+  const remainingLabel = hasLiveAvailability ? "Founding spots left" : "Founding spots total";
+  const joinMessage =
+    hasLiveAvailability && totalRemaining !== null
+      ? totalRemaining > 0
+        ? `Join the next ${totalRemaining} campgrounds building the future of reservation software.`
+        : "Early access is full. Standard pricing is available now."
+      : `Join the first ${totalSpots} campgrounds building the future of reservation software.`;
+  const ctaLink = hasLiveAvailability && totalRemaining === 0 ? "/pricing" : "/signup";
+  const ctaLabel = hasLiveAvailability && totalRemaining === 0 ? "See Standard Pricing" : "Claim Your Founding Spot";
+
   return (
-    <section id="pricing" className="py-24 bg-gradient-to-br from-keepr-charcoal via-slate-900 to-keepr-charcoal">
+    <section id="pricing" className="py-20 bg-gradient-to-br from-keepr-charcoal via-slate-900 to-keepr-charcoal scroll-mt-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
         {/* Early Access Hero */}
@@ -250,39 +452,47 @@ export function PricingPreview() {
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-keepr-clay/15 border border-keepr-clay/30 rounded-full text-keepr-clay text-sm font-semibold mb-6">
             <Sparkles className="h-4 w-4" />
-            {activeTier ? `NOW OPEN: ${activeTier.name}` : 'Early Access Closed'}
+            {availabilityLabel}
           </div>
 
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            {spotsFilled > 0
-              ? `${spotsFilled} of 45 Spots Claimed`
-              : 'Be One of Our First 45 Founding Campgrounds'
+            {hasClaimedSpots
+              ? `${spotsFilled} of ${totalSpots} Spots Claimed`
+              : `Be One of Our First ${totalSpots} Founding Campgrounds`
             }
           </h2>
 
-          <p className="text-xl text-muted-foreground mb-8">
+          <p className="text-xl text-slate-300 mb-8">
             Early access tiers fill in order — once {activeTier?.name || 'a tier'} is full, the next tier opens.
             Lock in per-booking fees that will never increase.
           </p>
 
           {/* Overall Progress Bar */}
           <div className="max-w-md mx-auto mb-8">
-            <div className="flex justify-between text-sm mb-2">
-              <span className="text-muted-foreground">{spotsFilled} claimed</span>
-              <span className="text-keepr-clay font-semibold">{totalRemaining} spots left</span>
-            </div>
-            <div className="h-3 bg-white/10 rounded-full overflow-hidden">
-              <motion.div
-                className="h-full bg-gradient-to-r from-keepr-clay to-keepr-evergreen rounded-full"
-                initial={{ width: 0 }}
-                whileInView={{ width: `${(spotsFilled / totalSpots) * 100}%` }}
-                viewport={{ once: true }}
-                transition={{ duration: 1, delay: 0.3 }}
-              />
-            </div>
+            {hasLiveAvailability ? (
+              <>
+                <div className="flex justify-between text-sm mb-2">
+                  <span className="text-slate-300">{spotsFilled} claimed</span>
+                  <span className="text-keepr-clay font-semibold">{totalRemaining} spots left</span>
+                </div>
+                <div className="h-3 bg-white/10 rounded-full overflow-hidden">
+                  <motion.div
+                    className="h-full bg-gradient-to-r from-keepr-clay to-keepr-evergreen rounded-full"
+                    initial={{ width: 0 }}
+                    whileInView={{ width: `${progressPercent}%` }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 1, delay: 0.3 }}
+                  />
+                </div>
+              </>
+            ) : (
+              <div className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-300">
+                {availabilityHint}
+              </div>
+            )}
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-6 text-muted-foreground">
+          <div className="flex flex-wrap items-center justify-center gap-6 text-slate-300">
             <div className="flex items-center gap-2">
               <Shield className="h-5 w-5 text-keepr-clay" />
               <span>Per-booking fee locked forever</span>
@@ -314,44 +524,54 @@ export function PricingPreview() {
               {/* Badge */}
               <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-6 py-2 bg-keepr-clay text-white text-sm font-bold rounded-full shadow-lg flex items-center gap-2">
                 <Sparkles className="h-4 w-4" />
-                NOW OPEN
+                {hasLiveAvailability ? "NOW OPEN" : "EARLY ACCESS"}
               </div>
 
               {/* Header */}
               <div className="text-center mb-8 pt-4">
                 <activeTier.icon className="h-16 w-16 mx-auto mb-4 text-keepr-clay" />
                 <h3 className="text-3xl font-bold text-white mb-2">{activeTier.name}</h3>
-                <p className="text-muted-foreground">First-come, first-served</p>
+                <p className="text-slate-300">First-come, first-served</p>
 
                 {/* Spots Progress */}
                 <div className="mt-6 max-w-xs mx-auto">
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-white font-medium">{activeTier.spotsRemaining} of {activeTier.spots} spots left</span>
-                  </div>
-                  <div className="h-4 bg-white/10 rounded-full overflow-hidden">
-                    <motion.div
-                      className="h-full bg-keepr-clay rounded-full"
-                      initial={{ width: '100%' }}
-                      whileInView={{ width: `${(activeTier.spotsRemaining / activeTier.spots) * 100}%` }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.8, delay: 0.5 }}
-                    />
-                  </div>
+                  {hasLiveAvailability && activeTier.spotsRemaining !== null ? (
+                    <>
+                      <div className="flex justify-between text-sm mb-2">
+                        <span className="text-white font-medium">
+                          {activeTier.spotsRemaining} of {activeTier.spots} spots left
+                        </span>
+                      </div>
+                      <div className="h-4 bg-white/10 rounded-full overflow-hidden">
+                        <motion.div
+                          className="h-full bg-keepr-clay rounded-full"
+                          initial={{ width: '100%' }}
+                          whileInView={{ width: `${(activeTier.spotsRemaining / activeTier.spots) * 100}%` }}
+                          viewport={{ once: true }}
+                          transition={{ duration: 0.8, delay: 0.5 }}
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-sm text-slate-300">
+                      {availabilityHint}
+                    </div>
+                  )}
                 </div>
 
                 {/* Pricing */}
                 <div className="mt-8 space-y-2">
                   <div className="flex items-baseline justify-center gap-1">
-                    <span className="text-3xl text-muted-foreground">$</span>
-                    <span className="text-7xl font-bold text-white">{activeTier.monthlyPrice}</span>
-                    <span className="text-xl text-muted-foreground">/mo</span>
+                    <span className="text-3xl text-slate-300">$</span>
+                    <span className="text-7xl font-bold text-white">{activeTier.monthlyPriceDisplay}</span>
+                    <span className="text-xl text-slate-300">/mo</span>
                   </div>
-                  <p className="text-lg text-muted-foreground">{activeTier.monthlyDuration}</p>
+                  <p className="text-lg text-slate-300">{activeTier.monthlyDuration}</p>
                   <div className="pt-3 mt-3 border-t border-white/10">
                     <span className="text-2xl text-keepr-clay font-bold">
-                      ${activeTier.bookingFee.toFixed(2)} per booking
+                      {activeTier.bookingFeeDisplay} per booking
                     </span>
-                    <span className="text-muted-foreground text-sm block mt-1">
+                    <span className="text-slate-300 text-sm block mt-1">
                       (pass to guest or absorb — locked forever)
                     </span>
                   </div>
@@ -373,7 +593,7 @@ export function PricingPreview() {
                 asChild
                 className="w-full py-7 text-xl font-bold bg-keepr-clay hover:bg-keepr-clay-light text-white shadow-lg shadow-keepr-clay/30"
               >
-                <Link href={`/signup?tier=${activeTier.name.toLowerCase().replace(/['\s]/g, '_').replace(/__/g, '_')}`}>
+                <Link href={`/signup?tier=${activeTier.key}`}>
                   {activeTier.cta}
                   <ArrowRight className="ml-2 h-6 w-6" />
                 </Link>
@@ -392,7 +612,7 @@ export function PricingPreview() {
             className="max-w-4xl mx-auto mb-16"
           >
             <div className="text-center mb-6">
-              <p className="text-muted-foreground text-sm uppercase tracking-wider font-medium">
+              <p className="text-slate-300 text-sm uppercase tracking-wider font-medium">
                 Coming Next — Opens when {activeTier?.name} fills
               </p>
             </div>
@@ -415,14 +635,14 @@ export function PricingPreview() {
                     </div>
                     <div className="flex-1">
                       <h4 className="text-lg font-bold text-white/70">{tier.name}</h4>
-                      <p className="text-sm text-muted-foreground">{tier.spots} spots</p>
+                      <p className="text-sm text-slate-300">{tier.spots} spots</p>
 
                       <div className="mt-3 flex items-baseline gap-2">
-                        <span className="text-2xl font-bold text-white/60">${tier.monthlyPrice}</span>
-                        <span className="text-sm text-muted-foreground">/mo {tier.monthlyDuration}</span>
+                        <span className="text-2xl font-bold text-white/60">${tier.monthlyPriceDisplay}</span>
+                        <span className="text-sm text-slate-300">/mo {tier.monthlyDuration}</span>
                       </div>
                       <p className="text-sm text-white/50 mt-1">
-                        ${tier.bookingFee.toFixed(2)} per booking
+                        {tier.bookingFeeDisplay} per booking
                       </p>
                     </div>
                   </div>
@@ -435,7 +655,7 @@ export function PricingPreview() {
         {/* Filled Tiers (if any) */}
         {filledTiers.length > 0 && (
           <div className="max-w-2xl mx-auto mb-16 text-center">
-            <p className="text-muted-foreground text-sm">
+            <p className="text-slate-300 text-sm">
               Already filled: {filledTiers.map(t => t.name).join(', ')}
             </p>
           </div>
@@ -443,10 +663,10 @@ export function PricingPreview() {
 
         {/* After Early Access Note */}
         <div className="text-center mb-16">
-          <p className="text-muted-foreground">
+          <p className="text-slate-300">
             After early access fills: <span className="text-white font-semibold">$100/month + $2.30/booking</span>
           </p>
-          <p className="text-muted-foreground text-sm mt-2">
+          <p className="text-slate-300 text-sm mt-2">
             Includes $5/month AI credits. SMS at cost + small markup.
           </p>
         </div>
@@ -461,7 +681,7 @@ export function PricingPreview() {
             <h3 className="text-3xl font-bold text-white mb-4">
               Want Help Getting Set Up?
             </h3>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-slate-300 max-w-2xl mx-auto">
               DIY setup is always free with our guides and documentation. But if you'd rather have us handle
               the heavy lifting, we've got you covered.
             </p>
@@ -476,41 +696,41 @@ export function PricingPreview() {
                 </div>
                 <div>
                   <h4 className="text-xl font-bold text-white">Quick Start</h4>
-                  <p className="text-muted-foreground text-sm">We configure, you relax</p>
+                  <p className="text-slate-300 text-sm">We configure, you relax</p>
                 </div>
               </div>
 
               <div className="flex items-baseline gap-1 mb-6">
-                <span className="text-2xl text-muted-foreground">$</span>
+                <span className="text-2xl text-slate-300">$</span>
                 <span className="text-5xl font-bold text-white">249</span>
-                <span className="text-muted-foreground">one-time</span>
+                <span className="text-slate-300">one-time</span>
               </div>
 
               <ul className="space-y-3 mb-8">
                 <li className="flex items-start gap-3">
                   <Check className="h-5 w-5 text-keepr-evergreen flex-shrink-0 mt-0.5" />
-                  <span className="text-muted-foreground">Site & rate configuration</span>
+                  <span className="text-slate-300">Site & rate configuration</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Check className="h-5 w-5 text-keepr-evergreen flex-shrink-0 mt-0.5" />
-                  <span className="text-muted-foreground">Payment gateway setup</span>
+                  <span className="text-slate-300">Payment gateway setup</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Check className="h-5 w-5 text-keepr-evergreen flex-shrink-0 mt-0.5" />
-                  <span className="text-muted-foreground">30-minute training call</span>
+                  <span className="text-slate-300">30-minute training call</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <Check className="h-5 w-5 text-keepr-evergreen flex-shrink-0 mt-0.5" />
-                  <span className="text-muted-foreground">Policy & email template setup</span>
+                  <span className="text-slate-300">Policy & email template setup</span>
                 </li>
               </ul>
 
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-slate-300">
                 Perfect for campgrounds who want to hit the ground running.
               </p>
 
               <div className="mt-6 pt-6 border-t border-border/50">
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-slate-300">
                   <span className="text-keepr-evergreen font-medium">Prefer to pay over time?</span>{" "}
                   Add $1/booking until paid off.
                 </p>
@@ -525,39 +745,39 @@ export function PricingPreview() {
                 </div>
                 <div>
                   <h4 className="text-xl font-bold text-white">Data Import Service</h4>
-                  <p className="text-muted-foreground text-sm">We import your existing reservations</p>
+                  <p className="text-slate-300 text-sm">We import your existing reservations</p>
                 </div>
               </div>
 
-              <p className="text-muted-foreground mb-6">
+              <p className="text-slate-300 mb-6">
                 You export from your old system, we clean it up and import it. No more manual data entry.
               </p>
 
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between items-center py-2 border-b border-border/50">
-                  <span className="text-muted-foreground">Up to 500 reservations</span>
+                  <span className="text-slate-300">Up to 500 reservations</span>
                   <span className="text-white font-semibold">$299</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-border/50">
-                  <span className="text-muted-foreground">501 – 2,000 reservations</span>
+                  <span className="text-slate-300">501 – 2,000 reservations</span>
                   <span className="text-white font-semibold">$599</span>
                 </div>
                 <div className="flex justify-between items-center py-2 border-b border-border/50">
-                  <span className="text-muted-foreground">2,001 – 5,000 reservations</span>
+                  <span className="text-slate-300">2,001 – 5,000 reservations</span>
                   <span className="text-white font-semibold">$999</span>
                 </div>
                 <div className="flex justify-between items-center py-2">
-                  <span className="text-muted-foreground">5,000+ reservations</span>
+                  <span className="text-slate-300">5,000+ reservations</span>
                   <span className="text-keepr-clay font-semibold">Custom quote</span>
                 </div>
               </div>
 
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-slate-300">
                 Includes guest data, reservation history, and QA review.
               </p>
 
               <div className="mt-6 pt-6 border-t border-border/50">
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-slate-300">
                   <span className="text-keepr-clay font-medium">Prefer to pay over time?</span>{" "}
                   Add $1/booking until paid off.
                 </p>
@@ -565,7 +785,7 @@ export function PricingPreview() {
             </div>
           </div>
 
-          <p className="text-center text-muted-foreground text-sm mt-8">
+          <p className="text-center text-slate-300 text-sm mt-8">
             Early access tiers include free data migration assistance.
           </p>
         </div>
@@ -587,7 +807,7 @@ export function PricingPreview() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-border">
-                  <th className="text-left p-4 text-muted-foreground font-medium">Feature</th>
+                  <th className="text-left p-4 text-slate-300 font-medium">Feature</th>
                   {competitors.map((c) => (
                     <th
                       key={c.name}
@@ -606,7 +826,7 @@ export function PricingPreview() {
               <tbody>
                 {/* Pricing rows */}
                 <tr className="border-b border-border/50">
-                  <td className="p-4 text-muted-foreground">Monthly Base</td>
+                  <td className="p-4 text-slate-300">Monthly Base</td>
                   {competitors.map((c) => (
                     <td key={c.name} className={`p-4 text-center ${c.isUs ? "bg-keepr-evergreen/10 text-keepr-evergreen font-semibold" : "text-white"}`}>
                       {c.monthlyBase}
@@ -614,7 +834,7 @@ export function PricingPreview() {
                   ))}
                 </tr>
                 <tr className="border-b border-border/50">
-                  <td className="p-4 text-muted-foreground">Per Booking Fee</td>
+                  <td className="p-4 text-slate-300">Per Booking Fee</td>
                   {competitors.map((c) => (
                     <td key={c.name} className={`p-4 text-center ${c.isUs ? "bg-keepr-evergreen/10 text-keepr-evergreen font-semibold" : "text-white"}`}>
                       {c.perBooking}
@@ -622,7 +842,7 @@ export function PricingPreview() {
                   ))}
                 </tr>
                 <tr className="border-b border-border/50">
-                  <td className="p-4 text-muted-foreground">Marketplace Commission</td>
+                  <td className="p-4 text-slate-300">Marketplace Commission</td>
                   {competitors.map((c) => (
                     <td key={c.name} className={`p-4 text-center ${c.isUs ? "bg-keepr-evergreen/10 text-keepr-evergreen font-semibold" : c.marketplaceCommission === "10%" ? "text-red-400" : "text-white"}`}>
                       {c.marketplaceCommission}
@@ -630,7 +850,7 @@ export function PricingPreview() {
                   ))}
                 </tr>
                 <tr className="border-b border-border/50">
-                  <td className="p-4 text-muted-foreground">Setup Fee</td>
+                  <td className="p-4 text-slate-300">Setup Fee</td>
                   {competitors.map((c) => (
                     <td key={c.name} className={`p-4 text-center ${c.isUs ? "bg-keepr-evergreen/10 text-keepr-evergreen font-semibold" : "text-white"}`}>
                       {c.setupFee}
@@ -638,7 +858,7 @@ export function PricingPreview() {
                   ))}
                 </tr>
                 <tr className="border-b border-border/50">
-                  <td className="p-4 text-muted-foreground">Free Trial</td>
+                  <td className="p-4 text-slate-300">Free Trial</td>
                   {competitors.map((c) => (
                     <td key={c.name} className={`p-4 text-center ${c.isUs ? "bg-keepr-evergreen/10 text-keepr-evergreen font-semibold" : "text-white"}`}>
                       {c.freeTrialDays === "No" ? <X className="h-5 w-5 mx-auto text-red-400" /> : c.freeTrialDays + " days"}
@@ -649,13 +869,13 @@ export function PricingPreview() {
                 {/* Feature rows */}
                 {Object.entries(featureLabels).map(([key, label]) => (
                   <tr key={key} className="border-b border-border/50">
-                    <td className="p-4 text-muted-foreground">{label}</td>
+                    <td className="p-4 text-slate-300">{label}</td>
                     {competitors.map((c) => (
                       <td key={c.name} className={`p-4 text-center ${c.isUs ? "bg-keepr-evergreen/10" : ""}`}>
                         {c.features[key as keyof typeof c.features] ? (
                           <Check className={`h-5 w-5 mx-auto ${c.isUs ? "text-keepr-clay" : "text-keepr-evergreen/70"}`} />
                         ) : (
-                          <X className="h-5 w-5 mx-auto text-muted-foreground" />
+                          <X className="h-5 w-5 mx-auto text-slate-400" />
                         )}
                       </td>
                     ))}
@@ -668,16 +888,16 @@ export function PricingPreview() {
 
         {/* Bottom CTA */}
         <div className="mt-16 text-center">
-          <p className="text-muted-foreground mb-6">
-            Join the first 45 campgrounds building the future of reservation software.
+          <p className="text-slate-300 mb-6">
+            {joinMessage}
           </p>
           <Button
             asChild
             variant="outline"
             className="border-border bg-muted text-foreground hover:bg-muted px-8 py-6 text-lg"
           >
-            <Link href="/signup">
-              Claim Your Founding Spot
+            <Link href={ctaLink}>
+              {ctaLabel}
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>
@@ -687,20 +907,20 @@ export function PricingPreview() {
         <div className="mt-16 pt-16 border-t border-border">
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-4xl font-bold text-keepr-clay mb-2">45</div>
-              <p className="text-muted-foreground">Founding spots available</p>
+              <div className="text-4xl font-bold text-keepr-clay mb-2">{remainingSpots}</div>
+              <p className="text-slate-300">{remainingLabel}</p>
             </div>
             <div>
               <div className="text-4xl font-bold text-white mb-2">30-Day</div>
-              <p className="text-muted-foreground">Money-back guarantee</p>
+              <p className="text-slate-300">Money-back guarantee</p>
             </div>
             <div>
               <div className="text-4xl font-bold text-white mb-2">48 Hours</div>
-              <p className="text-muted-foreground">Average time to go live</p>
+              <p className="text-slate-300">Average time to go live</p>
             </div>
             <div>
               <div className="text-4xl font-bold text-white mb-2">Free</div>
-              <p className="text-muted-foreground">DIY setup with guides</p>
+              <p className="text-slate-300">DIY setup with guides</p>
             </div>
           </div>
         </div>

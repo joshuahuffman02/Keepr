@@ -327,13 +327,13 @@ export function SupportChatWidget() {
         return {
           message:
             "I apologize, but I'm having trouble connecting to the support system right now. Here are some helpful resources:\n\n" +
-            "- Check our [Help Center](/help) for answers to common questions\n" +
-            "- Browse the [FAQ](/help/faq) section\n" +
-            "- [Submit a support ticket](/help/contact) for personalized assistance",
+            "- Check our [Help Center](/dashboard/help) for answers to common questions\n" +
+            "- Browse the [FAQ](/dashboard/help/faq) section\n" +
+            "- [Submit a support ticket](/dashboard/help/contact) for personalized assistance",
           helpArticles: [
-            { title: "Help Center", url: "/help" },
-            { title: "FAQs", url: "/help/faq" },
-            { title: "Contact Support", url: "/help/contact" },
+            { title: "Help Center", url: "/dashboard/help" },
+            { title: "FAQs", url: "/dashboard/help/faq" },
+            { title: "Contact Support", url: "/dashboard/help/contact" },
           ],
           showTicketPrompt: true,
         };
@@ -656,7 +656,7 @@ export function SupportChatWidget() {
                   <div className="mt-3 pt-3 border-t border-border">
                     <p className="text-xs text-muted-foreground mb-2">Need more help?</p>
                     <Link
-                      href="/help/contact"
+                      href="/dashboard/help/contact"
                       className="inline-flex items-center gap-2 bg-status-info text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-status-info/80 transition-colors"
                     >
                       <Ticket className="w-4 h-4" />
@@ -957,9 +957,9 @@ export function SupportChatWidget() {
       <div className="px-4 py-2 border-t border-border flex gap-2 overflow-x-auto">
         {isSupportMode ? (
           [
-            { label: "Help Center", href: "/help" },
-            { label: "FAQs", href: "/help/faq" },
-            { label: "Contact", href: "/help/contact" },
+            { label: "Help Center", href: "/dashboard/help" },
+            { label: "FAQs", href: "/dashboard/help/faq" },
+            { label: "Contact", href: "/dashboard/help/contact" },
           ].map((link) => (
             <Link
               key={link.href}

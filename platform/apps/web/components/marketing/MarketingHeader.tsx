@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { LogoImage } from '@/components/brand';
@@ -9,6 +10,12 @@ import { LogoImage } from '@/components/brand';
 export function MarketingHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [compareOpen, setCompareOpen] = useState(false);
+  const pathname = usePathname();
+  const isOwnersPage = pathname === '/owners' || pathname?.startsWith('/owners/');
+  const isPricingPage = pathname === '/pricing' || pathname?.startsWith('/pricing/');
+  const ownersBase = isOwnersPage ? '' : '/owners';
+  const compareMenuId = 'marketing-compare-menu';
+  const mobileMenuId = 'marketing-mobile-menu';
 
   // Prevent background scroll when mobile menu is open
   useEffect(() => {
@@ -22,9 +29,15 @@ export function MarketingHeader() {
     }
   }, [mobileMenuOpen]);
 
+  const pricingHref = isOwnersPage
+    ? '#pricing'
+    : isPricingPage
+      ? '#pricing'
+      : '/pricing';
+
   const navigation = [
-    { name: 'Features', href: '#features' },
-    { name: 'Pricing', href: '#pricing' },
+    { name: 'Features', href: `${ownersBase}#features` },
+    { name: 'Pricing', href: pricingHref },
     { name: 'Demo', href: '/demo' },
     { name: 'ROI Calculator', href: '/roi-calculator' },
   ];
@@ -42,7 +55,7 @@ export function MarketingHeader() {
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
-            <Link href="/owners" className="flex items-center">
+            <Link href="/owners" className="flex items-center" aria-label="Keepr for Campground Owners">
               <LogoImage size="md" />
             </Link>
           </div>
@@ -53,7 +66,7 @@ export function MarketingHeader() {
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-foreground hover:text-keepr-evergreen transition-colors font-medium"
+                className="text-foreground hover:text-keepr-evergreen transition-colors font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-keepr-evergreen focus-visible:ring-offset-2 focus-visible:ring-offset-card"
               >
                 {item.name}
               </Link>
@@ -63,18 +76,32 @@ export function MarketingHeader() {
               <button
                 onClick={() => setCompareOpen(!compareOpen)}
                 onBlur={() => setTimeout(() => setCompareOpen(false), 150)}
-                className="flex items-center gap-1 text-foreground hover:text-keepr-evergreen transition-colors font-medium"
+                onKeyDown={(event) => {
+                  if (event.key === 'Escape') {
+                    setCompareOpen(false);
+                  }
+                }}
+                className="flex items-center gap-1 text-foreground hover:text-keepr-evergreen transition-colors font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-keepr-evergreen focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+                aria-haspopup="menu"
+                aria-expanded={compareOpen}
+                aria-controls={compareMenuId}
               >
                 Compare
                 <ChevronDown className={`h-4 w-4 transition-transform ${compareOpen ? 'rotate-180' : ''}`} />
               </button>
               {compareOpen && (
-                <div className="absolute top-full left-0 mt-2 w-48 bg-card rounded-lg shadow-lg border border-border py-2 z-50">
+                <div
+                  id={compareMenuId}
+                  role="menu"
+                  className="absolute top-full left-0 mt-2 w-48 bg-card rounded-lg shadow-lg border border-border py-2 z-50"
+                >
                   {compareLinks.map((link) => (
                     <Link
                       key={link.href}
                       href={link.href}
-                      className="block px-4 py-2 text-sm text-foreground hover:bg-keepr-evergreen/10 hover:text-keepr-evergreen"
+                      role="menuitem"
+                      className="block px-4 py-2 text-sm text-foreground hover:bg-keepr-evergreen/10 hover:text-keepr-evergreen focus-visible:outline-none focus-visible:bg-keepr-evergreen/10 focus-visible:text-keepr-evergreen"
+                      onClick={() => setCompareOpen(false)}
                     >
                       {link.name}
                     </Link>
@@ -109,6 +136,9 @@ export function MarketingHeader() {
               variant="ghost"
               size="sm"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileMenuOpen}
+              aria-controls={mobileMenuId}
             >
               {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
@@ -117,15 +147,19 @@ export function MarketingHeader() {
 
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 space-y-2 max-h-[70vh] overflow-y-auto">
-            <Link href="/" className="block px-3 py-2 rounded-md text-base font-medium text-keepr-evergreen bg-keepr-evergreen/10">
+          <div id={mobileMenuId} className="md:hidden py-4 space-y-2 max-h-[70vh] overflow-y-auto">
+            <Link
+              href="/"
+              className="block px-3 py-2 rounded-md text-base font-medium text-keepr-evergreen bg-keepr-evergreen/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-keepr-evergreen focus-visible:ring-offset-2 focus-visible:ring-offset-card"
+              onClick={() => setMobileMenuOpen(false)}
+            >
               Book a Campsite
             </Link>
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className="block px-3 py-2 rounded-md text-base font-medium text-foreground hover:bg-muted"
+                className="block px-3 py-2 rounded-md text-base font-medium text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-keepr-evergreen focus-visible:ring-offset-2 focus-visible:ring-offset-card"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {item.name}
@@ -138,7 +172,7 @@ export function MarketingHeader() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="block px-3 py-2 rounded-md text-base font-medium text-foreground hover:bg-muted"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-keepr-evergreen focus-visible:ring-offset-2 focus-visible:ring-offset-card"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {link.name}

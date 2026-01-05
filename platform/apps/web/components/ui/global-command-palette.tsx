@@ -224,7 +224,7 @@ export function GlobalCommandPalette() {
       id: "help",
       label: "Help & Support",
       icon: HelpCircle,
-      action: () => router.push("/help"),
+      action: () => router.push("/dashboard/help"),
       keywords: ["support", "docs", "documentation"],
     },
   ];

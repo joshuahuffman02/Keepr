@@ -181,6 +181,7 @@ export function CharityImpactSection({ variant = "full", showCTA = true }: Chari
   return (
     <section
       ref={ref}
+      id="charity"
       className="py-20 bg-gradient-to-br from-amber-50 via-orange-50/30 to-rose-50/20 overflow-hidden"
     >
       <div className="max-w-7xl mx-auto px-6">

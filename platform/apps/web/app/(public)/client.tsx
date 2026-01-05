@@ -6,6 +6,7 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 import { motion, useInView } from "framer-motion";
 import { useReducedMotionSafe } from "@/hooks/use-reduced-motion-safe";
+import { useGeolocation, getStateAbbreviation } from "@/hooks/use-geolocation";
 import { Search, Calendar, Sparkles, MapPin, Mountain } from "lucide-react";
 import Link from "next/link";
 import { CampgroundCard } from "../../components/public/CampgroundCard";
@@ -59,6 +60,7 @@ const COMMON_AMENITIES = [
     { name: "Pool", icon: "/images/icons/pool.png" },
     { name: "Playground", icon: "/images/icons/playground.png" },
     { name: "Pet Friendly", icon: "/images/icons/pet-friendly.png" },
+    { name: "Lakefront", icon: "/images/icons/regions/lake.png" },
     { name: "Fishing", icon: "/images/icons/fishing.png" },
     { name: "Hiking", icon: "/images/icons/hiking.png" },
     { name: "Store", icon: "/images/icons/store.png" },
@@ -84,6 +86,27 @@ const DATE_RANGES = [
     { value: "next-month", label: "Next Month" }
 ];
 
+const resolveStateFromLocation = (location?: string | null) => {
+    if (!location) return null;
+    const trimmed = location.trim();
+    if (!trimmed) return null;
+
+    const abbreviationMatch = trimmed.match(/\b([A-Z]{2})\b/);
+    if (abbreviationMatch) return abbreviationMatch[1].toUpperCase();
+
+    const directMatch = getStateAbbreviation(trimmed);
+    if (directMatch) return directMatch;
+
+    const parts = trimmed.split(",");
+    if (parts.length > 1) {
+        const lastPart = parts[parts.length - 1]?.trim();
+        const partMatch = getStateAbbreviation(lastPart);
+        if (partMatch) return partMatch;
+    }
+
+    return null;
+};
+
 export function HomeClient() {
     const searchParams = useSearchParams();
     const router = useRouter();
@@ -98,10 +121,22 @@ export function HomeClient() {
     // Initialize state from URL params
     const [searchQuery, setSearchQuery] = useState("");
     const [stateFilter, setStateFilter] = useState<string>(searchParams.get("state") || "");
-    const [amenityFilters, setAmenityFilters] = useState<string[]>([]);
-    const [activeCategory, setActiveCategory] = useState<CategoryType>(
-        (searchParams.get("category") as CategoryType) || "all"
+    const [amenityFilters, setAmenityFilters] = useState<string[]>(
+        searchParams
+            .getAll("amenity")
+            .filter(Boolean)
+            .map((amenity) => {
+                const match = COMMON_AMENITIES.find(
+                    (item) => item.name.toLowerCase() === amenity.toLowerCase()
+                );
+                return match?.name ?? amenity;
+            })
     );
+    const categoryParam = searchParams.get("category");
+    const initialCategory = categories.some((c) => c.id === categoryParam)
+        ? (categoryParam as CategoryType)
+        : "all";
+    const [activeCategory, setActiveCategory] = useState<CategoryType>(initialCategory);
     const [eventTypeFilter, setEventTypeFilter] = useState<string>(searchParams.get("eventType") || "");
     const [dateRangeFilter, setDateRangeFilter] = useState<string>(searchParams.get("dateRange") || "");
     const [sortBy, setSortBy] = useState<"recommended" | "name" | "rating" | "reviews">("recommended");
@@ -111,6 +146,7 @@ export function HomeClient() {
         dates: { checkIn: string; checkOut: string };
         guests: number;
     } | null>(null);
+    const { state: geoState } = useGeolocation({ autoDetect: false });
 
     // Update URL when filters change
     const updateUrlParams = useCallback((updates: Record<string, string | undefined>) => {
@@ -122,6 +158,14 @@ export function HomeClient() {
                 params.delete(key);
             }
         });
+        const newUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
+        router.replace(newUrl, { scroll: false });
+    }, [searchParams, pathname, router]);
+
+    const updateAmenityParams = useCallback((nextFilters: string[]) => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete("amenity");
+        nextFilters.forEach((amenity) => params.append("amenity", amenity));
         const newUrl = params.toString() ? `${pathname}?${params.toString()}` : pathname;
         router.replace(newUrl, { scroll: false });
     }, [searchParams, pathname, router]);
@@ -165,6 +209,71 @@ export function HomeClient() {
         queryKey: ["public-campgrounds"],
         queryFn: () => apiClient.getPublicCampgrounds()
     });
+
+    const preferredState = useMemo(() => {
+        const fromSearch = resolveStateFromLocation(searchFilters?.location);
+        if (fromSearch) return fromSearch;
+        if (stateFilter) return stateFilter;
+        if (geoState) return geoState;
+        return null;
+    }, [searchFilters?.location, stateFilter, geoState]);
+
+    const heroFeatured = useMemo(() => {
+        if (!internalCampgrounds.length) return null;
+
+        const withImages = internalCampgrounds.filter((cg) =>
+            !cg.isExternal && (cg.heroImageUrl || (cg.photos?.length ?? 0) > 0)
+        );
+
+        const hasWorldClassNps = (cg: typeof internalCampgrounds[number]) =>
+            (typeof cg.npsScore === "number" && cg.npsScore >= 70) || cg.isWorldClassNps;
+
+        const scoreByQuality = (a: typeof internalCampgrounds[number], b: typeof internalCampgrounds[number]) => {
+            const npsA = typeof a.npsScore === "number" ? a.npsScore : a.isWorldClassNps ? 70 : 0;
+            const npsB = typeof b.npsScore === "number" ? b.npsScore : b.isWorldClassNps ? 70 : 0;
+            if (npsB !== npsA) return npsB - npsA;
+            const ratingA = a.reviewScore ?? 0;
+            const ratingB = b.reviewScore ?? 0;
+            if (ratingB !== ratingA) return ratingB - ratingA;
+            return (b.reviewCount ?? 0) - (a.reviewCount ?? 0);
+        };
+
+        const worldClass = withImages.filter(hasWorldClassNps);
+        const prioritizedWorldClass = preferredState
+            ? worldClass.filter((cg) => cg.state === preferredState)
+            : worldClass;
+
+        let selected = [...prioritizedWorldClass].sort(scoreByQuality)[0] ?? [...worldClass].sort(scoreByQuality)[0];
+        let badgeLabel = "World-Class Service";
+        let badgeTone: "world-class" | "top-rated" | "featured" = "world-class";
+
+        if (!selected) {
+            const fallbackList = preferredState
+                ? withImages.filter((cg) => cg.state === preferredState)
+                : withImages;
+            selected = [...fallbackList].sort(scoreByQuality)[0];
+            badgeLabel = "Featured Campground";
+            badgeTone = "featured";
+        }
+
+        if (!selected) return null;
+
+        const imageUrl = selected.heroImageUrl || selected.photos?.[0];
+        if (!imageUrl) return null;
+
+        return {
+            id: selected.id,
+            name: selected.name,
+            slug: selected.slug,
+            city: selected.city,
+            state: selected.state,
+            imageUrl,
+            rating: selected.reviewScore ?? null,
+            reviewCount: selected.reviewCount ?? null,
+            badgeLabel,
+            badgeTone
+        };
+    }, [internalCampgrounds, preferredState]);
 
     // Calculate date range only after mount to prevent hydration mismatch
     const { startDate, endDate } = hasMounted ? getDateRange(dateRangeFilter) : { startDate: undefined, endDate: undefined };
@@ -359,11 +468,20 @@ export function HomeClient() {
     const featuredRef = useRef(null);
     const featuredInView = useInView(featuredRef, { once: true, margin: "-100px" });
     const prefersReducedMotion = useReducedMotionSafe();
+    const hasActiveSearch =
+        searchQuery.trim().length > 0 ||
+        Boolean(searchFilters?.location) ||
+        Boolean(stateFilter) ||
+        amenityFilters.length > 0;
 
     return (
         <div className="min-h-screen">
             {/* Hero Section with Hormozi-style messaging */}
-            <HeroBanner onSearch={handleSearch} />
+            <HeroBanner
+                onSearch={handleSearch}
+                featuredCampground={heroFeatured}
+                isLoadingFeatured={isLoading}
+            />
 
             {/* Live Activity Feed - Social proof inline after hero */}
             <InlineActivityFeed className="border-b border-slate-100" />
@@ -442,7 +560,7 @@ export function HomeClient() {
                                         ? "Upcoming Events"
                                         : activeCategory !== "all"
                                         ? categories.find((c) => c.id === activeCategory)?.label || "Campgrounds"
-                                        : searchQuery || stateFilter || amenityFilters.length > 0
+                                        : hasActiveSearch
                                         ? "Search Results"
                                         : "Featured Campgrounds"}
                                 </h2>
@@ -557,16 +675,17 @@ export function HomeClient() {
                     {/* Amenity Filter Chips - hide for events */}
                     <div className="flex flex-wrap gap-2">
                         {activeCategory !== "events" && COMMON_AMENITIES.slice(0, 8).map((amenity) => {
-                            const isSelected = amenityFilters.includes(amenity.name);
+                            const amenityKey = amenity.name.toLowerCase();
+                            const isSelected = amenityFilters.some((filter) => filter.toLowerCase() === amenityKey);
                             return (
                                 <button
                                     key={amenity.name}
                                     onClick={() => {
-                                        if (isSelected) {
-                                            setAmenityFilters(amenityFilters.filter((a) => a !== amenity.name));
-                                        } else {
-                                            setAmenityFilters([...amenityFilters, amenity.name]);
-                                        }
+                                        const nextFilters = isSelected
+                                            ? amenityFilters.filter((filter) => filter.toLowerCase() !== amenityKey)
+                                            : [...amenityFilters, amenity.name];
+                                        setAmenityFilters(nextFilters);
+                                        updateAmenityParams(nextFilters);
                                         setDisplayCount(24);
                                     }}
                                     className={`inline-flex items-center gap-2 px-3 py-1.5 text-sm rounded-full border transition-all ${

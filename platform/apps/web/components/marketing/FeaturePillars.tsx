@@ -17,7 +17,7 @@ const features = [
     name: 'AI-Powered Intelligence',
     description: 'Predict demand, optimize pricing, and reduce no-shows with built-in AI.',
     icon: Brain,
-    color: 'blue',
+    color: 'evergreen' as const,
     features: [
       'AI demand forecasting',
       'AI pricing recommendations',
@@ -29,7 +29,7 @@ const features = [
     name: 'Loyalty & Gamification',
     description: 'Turn one-time guests into lifetime campers with XP, levels, and rewards.',
     icon: Sparkles,
-    color: 'purple',
+    color: 'clay' as const,
     features: [
       'XP system & leveling',
       'Rewards marketplace',
@@ -41,7 +41,7 @@ const features = [
     name: 'Staff Scheduling & Payroll',
     description: 'Schedule staff based on occupancy with integrated time tracking and payroll.',
     icon: Calendar,
-    color: 'emerald',
+    color: 'evergreen' as const,
     features: [
       'Shift scheduling',
       'Time clock & tracking',
@@ -53,7 +53,7 @@ const features = [
     name: 'Reservations & Revenue',
     description: 'Maximize bookings with dynamic pricing and intelligent revenue management.',
     icon: TrendingUp,
-    color: 'teal',
+    color: 'clay' as const,
     features: [
       'Drag-and-drop calendar',
       'Dynamic pricing rules',
@@ -65,7 +65,7 @@ const features = [
     name: 'Guest Experience',
     description: 'Delight guests with seamless booking, check-in, and communication.',
     icon: Users,
-    color: 'pink',
+    color: 'evergreen' as const,
     features: [
       'Online booking engine',
       'Self-service portal',
@@ -77,7 +77,7 @@ const features = [
     name: 'Operations & Integrations',
     description: 'Run your entire park from one place. Connect to your favorite tools.',
     icon: Settings,
-    color: 'amber',
+    color: 'clay' as const,
     features: [
       'Housekeeping management',
       'Maintenance tickets',
@@ -88,35 +88,17 @@ const features = [
 ];
 
 const colorClasses = {
-  emerald: {
+  evergreen: {
     bg: 'bg-keepr-evergreen/10',
     icon: 'text-keepr-evergreen',
     hover: 'hover:border-keepr-evergreen/30',
+    check: 'text-keepr-evergreen',
   },
-  blue: {
-    bg: 'bg-keepr-evergreen/10',
-    icon: 'text-keepr-evergreen',
-    hover: 'hover:border-keepr-evergreen/30',
-  },
-  purple: {
-    bg: 'bg-keepr-evergreen/10',
-    icon: 'text-keepr-evergreen',
-    hover: 'hover:border-keepr-evergreen/30',
-  },
-  pink: {
-    bg: 'bg-keepr-evergreen/10',
-    icon: 'text-keepr-evergreen',
-    hover: 'hover:border-keepr-evergreen/30',
-  },
-  amber: {
+  clay: {
     bg: 'bg-keepr-clay/10',
     icon: 'text-keepr-clay',
     hover: 'hover:border-keepr-clay/30',
-  },
-  teal: {
-    bg: 'bg-keepr-evergreen/10',
-    icon: 'text-keepr-evergreen',
-    hover: 'hover:border-keepr-evergreen/30',
+    check: 'text-keepr-clay',
   },
 };
 
@@ -143,7 +125,7 @@ export function FeaturePillars() {
   };
 
   return (
-    <section ref={ref} id="features" className="py-24 bg-card">
+    <section ref={ref} id="features" className="py-24 bg-card scroll-mt-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div
@@ -173,13 +155,13 @@ export function FeaturePillars() {
         >
           {features.map((feature) => {
             const Icon = feature.icon;
-            const colors = colorClasses[feature.color as keyof typeof colorClasses];
+            const colors = colorClasses[feature.color];
 
             return (
               <motion.div
                 key={feature.name}
                 variants={itemVariants}
-                className={`group relative bg-card rounded-2xl border-2 border-border p-8 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${colors.hover}`}
+                className={`group relative bg-card rounded-2xl border border-border p-8 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 ${colors.hover}`}
               >
                 {/* Icon */}
                 <div className={`inline-flex h-14 w-14 items-center justify-center rounded-xl ${colors.bg} mb-6 transition-transform duration-300 group-hover:scale-110`}>
@@ -187,7 +169,7 @@ export function FeaturePillars() {
                 </div>
 
                 {/* Content */}
-                <h3 className="text-xl font-bold text-foreground mb-3">
+                <h3 className="text-xl font-semibold text-foreground mb-3">
                   {feature.name}
                 </h3>
                 <p className="text-muted-foreground mb-6">
@@ -199,7 +181,7 @@ export function FeaturePillars() {
                   {feature.features.map((item) => (
                     <li key={item} className="flex items-center text-sm text-muted-foreground">
                       <svg
-                        className="h-5 w-5 text-keepr-clay mr-2 flex-shrink-0"
+                        className={`h-5 w-5 ${colors.check} mr-2 flex-shrink-0`}
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -214,8 +196,8 @@ export function FeaturePillars() {
                   ))}
                 </ul>
 
-                {/* Hover Effect */}
-                <div className="absolute inset-0 -z-10 rounded-2xl bg-gradient-to-br from-keepr-evergreen/10 to-keepr-clay/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                {/* Hover Effect - matches card color */}
+                <div className={`absolute inset-0 -z-10 rounded-2xl ${colors.bg} opacity-0 group-hover:opacity-50 transition-opacity duration-300`} />
               </motion.div>
             );
           })}

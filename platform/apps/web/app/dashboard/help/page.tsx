@@ -95,7 +95,7 @@ export default function HelpPage() {
   };
 
   const copyLink = async (id: string) => {
-    const url = typeof window !== "undefined" ? `${window.location.origin}/help#${id}` : `/help#${id}`;
+    const url = typeof window !== "undefined" ? `${window.location.origin}/dashboard/help#${id}` : `/dashboard/help#${id}`;
     try {
       await navigator.clipboard.writeText(url);
     } catch {
@@ -124,7 +124,7 @@ export default function HelpPage() {
           </p>
           <div className="mt-4 flex gap-2">
             <Link
-              href="/auth/signin?callbackUrl=/help"
+              href="/auth/signin?callbackUrl=/dashboard/help"
               className="px-4 py-2 bg-emerald-600 text-white text-sm font-semibold rounded-lg hover:bg-emerald-700"
             >
               Sign in
@@ -160,7 +160,7 @@ export default function HelpPage() {
         <Breadcrumbs
           items={[
             { label: "Home", href: "/dashboard" },
-            { label: "Help", href: "/help" }
+            { label: "Help", href: "/dashboard/help" }
           ]}
         />
 
@@ -383,7 +383,7 @@ function HelpCard({
               </Link>
             ))}
             <Link
-              href={`/help#${topic.id}`}
+              href={`/dashboard/help#${topic.id}`}
               onClick={() => onVisit?.(topic.id)}
               className="inline-flex items-center gap-1 text-emerald-600 font-semibold"
             >
@@ -401,7 +401,7 @@ function HelpCard({
               <PinIcon filled={pinned} />
               {pinned ? "Pinned" : "Pin"}
             </button>
-            <Link href="/help" className="inline-flex items-center gap-1 text-slate-500 hover:text-emerald-700 ml-auto">
+            <Link href="/dashboard/help" className="inline-flex items-center gap-1 text-slate-500 hover:text-emerald-700 ml-auto">
               Back to top
               <ArrowUpIcon />
             </Link>
@@ -463,4 +463,3 @@ function PinIcon({ filled }: { filled?: boolean }) {
     </svg>
   );
 }
-

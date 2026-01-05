@@ -1,14 +1,16 @@
 "use client";
 
+import { useState, type FormEvent } from "react";
 import Link from "next/link";
-import { Heart, Facebook, Instagram, Twitter, MapPin, Mail, Phone } from "lucide-react";
+import { Heart, Facebook, Instagram, Twitter, MapPin, Mail } from "lucide-react";
+import { apiClient } from "@/lib/api-client";
 
 const navigation = {
   explore: [
     { name: "Find Campgrounds", href: "/camping" },
-    { name: "National Parks", href: "/camping?category=national-parks" },
-    { name: "RV Parks", href: "/camping?category=rv" },
-    { name: "Cabins & Lodges", href: "/camping?category=cabins" },
+    { name: "National Parks", href: "/national-parks" },
+    { name: "RV Parks", href: "/?category=rv" },
+    { name: "Cabins & Lodges", href: "/?category=cabins" },
     { name: "Browse by State", href: "/camping" },
   ],
   company: [
@@ -37,6 +39,28 @@ const social = [
 ];
 
 export function PublicFooter() {
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+
+  const handleSubscribe = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!email.trim()) return;
+
+    setStatus("sending");
+    try {
+      await apiClient.saveLead({
+        name: "Newsletter subscriber",
+        email: email.trim(),
+        interest: "newsletter",
+        source: "public-footer"
+      });
+      setEmail("");
+      setStatus("success");
+    } catch {
+      setStatus("error");
+    }
+  };
+
   return (
     <footer className="bg-slate-900 text-white mt-20">
       {/* Newsletter Section */}
@@ -47,19 +71,36 @@ export function PublicFooter() {
               <h3 className="text-xl font-semibold mb-2">Get camping inspiration & deals</h3>
               <p className="text-slate-400 text-sm">Join thousands of families discovering their next adventure.</p>
             </div>
-            <form className="flex gap-3 w-full md:w-auto">
-              <input
-                type="email"
-                placeholder="Your email address"
-                className="flex-1 md:w-64 px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-keepr-evergreen focus:ring-1 focus:ring-keepr-evergreen"
-              />
-              <button
-                type="submit"
-                className="px-6 py-3 bg-keepr-evergreen hover:bg-keepr-evergreen/90 text-white font-semibold rounded-lg transition-colors whitespace-nowrap"
-              >
-                Subscribe
-              </button>
-            </form>
+            <div className="w-full md:w-auto space-y-2">
+              <form className="flex gap-3 w-full md:w-auto" onSubmit={handleSubscribe}>
+                <div className="flex-1 md:w-64">
+                  <label htmlFor="newsletter-email" className="sr-only">
+                    Email address
+                  </label>
+                  <input
+                    id="newsletter-email"
+                    type="email"
+                    placeholder="Your email address"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                    className="w-full px-4 py-3 rounded-lg bg-slate-800 border border-slate-700 text-white placeholder:text-slate-500 focus:outline-none focus:border-keepr-evergreen focus:ring-1 focus:ring-keepr-evergreen"
+                    autoComplete="email"
+                    required
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="px-6 py-3 bg-keepr-evergreen hover:bg-keepr-evergreen/90 text-white font-semibold rounded-lg transition-colors whitespace-nowrap"
+                  disabled={status === "sending"}
+                >
+                  {status === "sending" ? "Subscribing..." : "Subscribe"}
+                </button>
+              </form>
+              <p className="text-xs text-slate-400 md:text-right" aria-live="polite">
+                {status === "success" && "Thanks for subscribing! Check your inbox for updates."}
+                {status === "error" && "We couldn't subscribe you right now. Try again soon."}
+              </p>
+            </div>
           </div>
         </div>
       </div>

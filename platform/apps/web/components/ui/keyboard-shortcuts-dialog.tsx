@@ -231,7 +231,7 @@ export function KeyboardShortcutsDialog() {
             Press <kbd className="px-2 py-0.5 bg-card rounded text-foreground border border-border text-[10px]">ESC</kbd> to close
           </span>
           <a
-            href="/help/shortcuts"
+            href="/dashboard/help/shortcuts"
             className="text-xs text-action-primary hover:text-action-primary-hover font-medium"
             onClick={() => setShowShortcutsDialog(false)}
           >

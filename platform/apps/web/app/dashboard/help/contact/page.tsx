@@ -87,7 +87,7 @@ export default function ContactSupportPage() {
         <div className="space-y-6">
           <Breadcrumbs
             items={[
-              { label: "Help", href: "/help" },
+              { label: "Help", href: "/dashboard/help" },
               { label: "Contact Support" },
             ]}
           />
@@ -126,7 +126,7 @@ export default function ContactSupportPage() {
               >
                 Send Another Message
               </Button>
-              <Link href="/help">
+              <Link href="/dashboard/help">
                 <Button>Back to Help Center</Button>
               </Link>
             </div>
@@ -141,7 +141,7 @@ export default function ContactSupportPage() {
       <div className="space-y-6">
         <Breadcrumbs
           items={[
-            { label: "Help", href: "/help" },
+            { label: "Help", href: "/dashboard/help" },
             { label: "Contact Support" },
           ]}
         />
@@ -331,7 +331,7 @@ export default function ContactSupportPage() {
                   </div>
                 </div>
                 <Link
-                  href="/help"
+                  href="/dashboard/help"
                   className="flex items-center gap-3 text-sm text-slate-600 hover:text-emerald-600 transition-colors"
                 >
                   <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
@@ -351,7 +351,7 @@ export default function ContactSupportPage() {
               </h2>
               <div className="space-y-3">
                 <Link
-                  href="/help/faq"
+                  href="/dashboard/help/faq"
                   className="flex items-center gap-2 text-sm text-slate-600 hover:text-emerald-600 transition-colors"
                 >
                   <HelpCircle className="h-4 w-4" />
@@ -359,7 +359,7 @@ export default function ContactSupportPage() {
                   <ExternalLink className="h-3 w-3 ml-auto" />
                 </Link>
                 <Link
-                  href="/help/tutorials"
+                  href="/dashboard/help/tutorials"
                   className="flex items-center gap-2 text-sm text-slate-600 hover:text-emerald-600 transition-colors"
                 >
                   <FileText className="h-4 w-4" />
@@ -367,7 +367,7 @@ export default function ContactSupportPage() {
                   <ExternalLink className="h-3 w-3 ml-auto" />
                 </Link>
                 <Link
-                  href="/help"
+                  href="/dashboard/help"
                   className="flex items-center gap-2 text-sm text-slate-600 hover:text-emerald-600 transition-colors"
                 >
                   <FileText className="h-4 w-4" />

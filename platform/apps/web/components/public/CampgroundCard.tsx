@@ -74,7 +74,6 @@ export function CampgroundCard({
     showNoHiddenFeesBadge = false
 }: CampgroundCardProps) {
     const adaBadge = adaCertificationLevel ? getAdaBadgeInfo(adaCertificationLevel) : null;
-    const [isHovered, setIsHovered] = useState(false);
     const [isFavorited, setIsFavorited] = useState(false);
     const [isHeartAnimating, setIsHeartAnimating] = useState(false);
     const prefersReducedMotion = useReducedMotionSafe();
@@ -152,11 +151,7 @@ export function CampgroundCard({
     const hasRating = typeof rating === "number" && Number.isFinite(rating);
 
     return (
-        <div
-            className="group relative bg-card rounded-2xl overflow-hidden shadow-lg shadow-slate-900/5 hover:shadow-2xl hover:shadow-slate-900/10 transition-all duration-300 transform hover:-translate-y-1"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-        >
+        <div className="group relative bg-card rounded-2xl overflow-hidden shadow-lg shadow-slate-900/5 hover:shadow-2xl hover:shadow-slate-900/10 transition-all duration-300 transform hover:-translate-y-1">
             {/* Image container */}
             <div className="relative aspect-[4/3] overflow-hidden">
                 {imageUrl ? (
@@ -297,8 +292,7 @@ export function CampgroundCard({
                 {/* Quick action button on hover */}
                 <Link
                     href={campgroundPath}
-                    className={`absolute bottom-4 left-4 right-4 py-3 bg-card/95 backdrop-blur-sm text-center text-sm font-semibold rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2 ${isHovered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-                        } ${isExternal ? "text-foreground" : "text-foreground"}`}
+                    className="absolute bottom-4 left-4 right-4 py-3 bg-card/95 backdrop-blur-sm text-center text-sm font-semibold rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2 opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 group-focus-within:opacity-100 group-focus-within:translate-y-0 focus-visible:opacity-100 focus-visible:translate-y-0 text-foreground"
                 >
                     {isExternal ? (
                         <>

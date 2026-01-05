@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-import { MarketingHeader } from '@/components/marketing/MarketingHeader';
 import { HeroSection } from '@/components/marketing/HeroSection';
 import { FeaturePillars } from '@/components/marketing/FeaturePillars';
 import { PopularFeatures } from '@/components/marketing/PopularFeatures';
@@ -90,9 +89,6 @@ export default function OwnersPage() {
     <div className="min-h-screen bg-card">
       <FAQJsonLd faqs={ownerFaqs} />
 
-      {/* Header */}
-      <MarketingHeader />
-
       {/* 1. Hero Section */}
       <HeroSection />
 
@@ -103,19 +99,17 @@ export default function OwnersPage() {
       <FeaturePillars />
 
       {/* 4. Popular Features Showcase */}
-      <section id="resources">
+      <section id="resources" className="scroll-mt-24">
         <PopularFeatures />
       </section>
 
       {/* 5. Early Access Benefits */}
-      <section id="about">
+      <section id="about" className="scroll-mt-24">
         <Testimonials />
       </section>
 
       {/* 6. Pricing - Waterfall tier system */}
-      <section id="pricing">
-        <PricingPreview />
-      </section>
+      <PricingPreview />
 
       {/* 7. FAQ Section */}
       <FAQSection

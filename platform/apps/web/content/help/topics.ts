@@ -519,7 +519,6 @@ export const helpTopics: HelpTopic[] = [
       "Describe the path you took to reach the issue.",
       "If payments fail, include gateway reference IDs."
     ],
-    links: [{ label: "Open support form", href: "/help/contact" }]
+    links: [{ label: "Open support form", href: "/dashboard/help/contact" }]
   }
 ];
-

@@ -380,7 +380,7 @@ export default function ReferralsPage() {
         <p className="text-center text-sm text-muted-foreground">
           Credits are applied to your account after your referral receives their first booking.
           Credits can be used toward monthly fees or booking fees.{" "}
-          <a href="/help/referrals" className="text-emerald-600 hover:underline">
+          <a href="/dashboard/help?query=referrals" className="text-emerald-600 hover:underline">
             View full terms
           </a>
         </p>

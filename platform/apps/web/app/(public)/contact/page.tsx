@@ -74,14 +74,14 @@ export default function ContactPage() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50">
+        <div className="min-h-screen bg-keepr-off-white">
             <div className="max-w-6xl mx-auto px-6 py-16">
                 {/* Header */}
                 <div className="text-center mb-16">
-                    <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+                    <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
                         Contact Us
                     </h1>
-                    <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+                    <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                         Have a question or need assistance? We&apos;d love to hear from you.
                     </p>
                 </div>
@@ -89,49 +89,49 @@ export default function ContactPage() {
                 <div className="grid lg:grid-cols-3 gap-8">
                     {/* Contact Info */}
                     <div className="space-y-6">
-                        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+                        <div className="bg-card rounded-xl p-6 border border-border shadow-sm">
                             <div className="flex items-center gap-4 mb-2">
-                                <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
-                                    <Mail className="w-6 h-6 text-emerald-600" />
+                                <div className="w-12 h-12 bg-keepr-evergreen/10 rounded-lg flex items-center justify-center">
+                                    <Mail className="w-6 h-6 text-keepr-evergreen" />
                                 </div>
                                 <div>
-                                    <h3 className="font-semibold text-slate-900">General inquiries</h3>
-                                    <a href="mailto:hello@keeprstay.com" className="text-emerald-600 hover:underline">
+                                    <h3 className="font-semibold text-foreground">General inquiries</h3>
+                                    <a href="mailto:hello@keeprstay.com" className="text-keepr-evergreen hover:underline">
                                         hello@keeprstay.com
                                     </a>
                                 </div>
                             </div>
-                            <p className="text-sm text-slate-500">
+                            <p className="text-sm text-muted-foreground">
                                 Partnerships, press, and general questions.
                             </p>
                         </div>
 
-                        <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
+                        <div className="bg-card rounded-xl p-6 border border-border shadow-sm">
                             <div className="flex items-center gap-4 mb-2">
-                                <div className="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center">
-                                    <LifeBuoy className="w-6 h-6 text-slate-600" />
+                                <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center">
+                                    <LifeBuoy className="w-6 h-6 text-muted-foreground" />
                                 </div>
                                 <div>
-                                    <h3 className="font-semibold text-slate-900">Product support</h3>
-                                    <a href="mailto:support@keeprstay.com" className="text-emerald-600 hover:underline">
+                                    <h3 className="font-semibold text-foreground">Product support</h3>
+                                    <a href="mailto:support@keeprstay.com" className="text-keepr-evergreen hover:underline">
                                         support@keeprstay.com
                                     </a>
                                 </div>
                             </div>
-                            <p className="text-sm text-slate-500">
+                            <p className="text-sm text-muted-foreground">
                                 For campground operators needing help in the app.
                             </p>
                         </div>
 
-                        <div className="bg-slate-100 rounded-xl p-6 border border-slate-200">
+                        <div className="bg-muted rounded-xl p-6 border border-border">
                             <div className="flex items-center gap-3 mb-3">
-                                <Clock className="w-5 h-5 text-slate-600" />
-                                <h3 className="font-semibold text-slate-900">Response time</h3>
+                                <Clock className="w-5 h-5 text-muted-foreground" />
+                                <h3 className="font-semibold text-foreground">Response time</h3>
                             </div>
-                            <p className="text-sm text-slate-600 mb-3">
+                            <p className="text-sm text-muted-foreground mb-3">
                                 Typical response within one business day.
                             </p>
-                            <Link href="/help" className="text-sm font-semibold text-emerald-600 hover:underline">
+                            <Link href="/help" className="text-sm font-semibold text-keepr-evergreen hover:underline">
                                 Visit the help center
                             </Link>
                         </div>
@@ -139,18 +139,18 @@ export default function ContactPage() {
 
                     {/* Contact Form */}
                     <div className="lg:col-span-2">
-                        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+                        <div className="bg-card rounded-2xl shadow-sm border border-border p-8">
                             {submitted ? (
                                 <div className="text-center py-12">
-                                    <div className="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                                        <Send className="w-8 h-8 text-emerald-600" />
+                                    <div className="w-16 h-16 bg-keepr-evergreen/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                                        <Send className="w-8 h-8 text-keepr-evergreen" />
                                     </div>
-                                    <h2 className="text-2xl font-bold text-slate-900 mb-2">Message Sent!</h2>
-                                    <p className="text-slate-600 mb-2">
+                                    <h2 className="text-2xl font-bold text-foreground mb-2">Message Sent!</h2>
+                                    <p className="text-muted-foreground mb-2">
                                         Thank you for reaching out. We&apos;ll get back to you within 24 hours.
                                     </p>
                                     {ticketId && (
-                                        <p className="text-sm text-slate-500 mb-6">Ticket ID: {ticketId}</p>
+                                        <p className="text-sm text-muted-foreground mb-6">Ticket ID: {ticketId}</p>
                                     )}
                                     <button
                                         onClick={() => {
@@ -159,7 +159,7 @@ export default function ContactPage() {
                                             setErrorMessage(null);
                                             setFormData({ name: "", email: "", subject: "", message: "" });
                                         }}
-                                        className="text-emerald-600 font-semibold hover:underline"
+                                        className="text-keepr-evergreen font-semibold hover:underline"
                                     >
                                         Send another message
                                     </button>
@@ -168,7 +168,7 @@ export default function ContactPage() {
                                 <form onSubmit={handleSubmit} className="space-y-6">
                                     <div className="grid md:grid-cols-2 gap-6">
                                         <div>
-                                            <label htmlFor="name" className="block text-sm font-medium text-slate-700 mb-2">
+                                            <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
                                                 Your Name
                                             </label>
                                             <input
@@ -177,12 +177,12 @@ export default function ContactPage() {
                                                 required
                                                 value={formData.name}
                                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                                className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
+                                                className="w-full px-4 py-3 rounded-lg border border-border focus:border-keepr-evergreen focus:ring-2 focus:ring-keepr-evergreen/20 outline-none transition-all"
                                                 placeholder="John Doe"
                                             />
                                         </div>
                                         <div>
-                                            <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
+                                            <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
                                                 Email Address
                                             </label>
                                             <input
@@ -191,14 +191,14 @@ export default function ContactPage() {
                                                 required
                                                 value={formData.email}
                                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                                className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
+                                                className="w-full px-4 py-3 rounded-lg border border-border focus:border-keepr-evergreen focus:ring-2 focus:ring-keepr-evergreen/20 outline-none transition-all"
                                                 placeholder="john@example.com"
                                             />
                                         </div>
                                     </div>
 
                                     <div>
-                                        <label htmlFor="subject" className="block text-sm font-medium text-slate-700 mb-2">
+                                        <label htmlFor="subject" className="block text-sm font-medium text-foreground mb-2">
                                             Topic
                                         </label>
                                         <select
@@ -206,7 +206,7 @@ export default function ContactPage() {
                                             required
                                             value={formData.subject}
                                             onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                                            className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all"
+                                            className="w-full px-4 py-3 rounded-lg border border-border focus:border-keepr-evergreen focus:ring-2 focus:ring-keepr-evergreen/20 outline-none transition-all"
                                         >
                                             <option value="">Select a topic...</option>
                                             {topicOptions.map((option) => (
@@ -218,7 +218,7 @@ export default function ContactPage() {
                                     </div>
 
                                     <div>
-                                        <label htmlFor="message" className="block text-sm font-medium text-slate-700 mb-2">
+                                        <label htmlFor="message" className="block text-sm font-medium text-foreground mb-2">
                                             Message
                                         </label>
                                         <textarea
@@ -227,7 +227,7 @@ export default function ContactPage() {
                                             rows={5}
                                             value={formData.message}
                                             onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                                            className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none transition-all resize-none"
+                                            className="w-full px-4 py-3 rounded-lg border border-border focus:border-keepr-evergreen focus:ring-2 focus:ring-keepr-evergreen/20 outline-none transition-all resize-none"
                                             placeholder="Tell us how we can help..."
                                         />
                                     </div>

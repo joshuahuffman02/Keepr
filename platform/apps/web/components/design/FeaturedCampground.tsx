@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { Star, MapPin, Sparkles, ArrowRight, Shield, Users, Wifi, Flame, Mountain, Trophy } from "lucide-react";
+import { Star, MapPin, Sparkles, ArrowRight, Shield, Wifi, Flame, Mountain, Trophy } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
 import { apiClient } from "@/lib/api-client";
@@ -25,19 +25,38 @@ export function FeaturedCampground({ variant = "refined", className }: FeaturedC
     retry: false,
   });
 
-  // Find the best featured campground:
-  // Priority: Top campground with NPS badge > highest rated with 5+ reviews > any with image
-  const featured = campgrounds
-    ?.filter(c => !c.isExternal && c.heroImageUrl) // Only internal campgrounds with images
-    .sort((a, b) => {
-      // Prioritize top campground badges
-      if (a.isTopCampground && !b.isTopCampground) return -1;
-      if (!a.isTopCampground && b.isTopCampground) return 1;
-      // Then by review score * sqrt(review count) for balance
-      const scoreA = (a.reviewScore ?? 0) * Math.sqrt(a.reviewCount ?? 0);
-      const scoreB = (b.reviewScore ?? 0) * Math.sqrt(b.reviewCount ?? 0);
-      return scoreB - scoreA;
-    })?.[0];
+  const eligibleCampgrounds = campgrounds?.filter((c) => {
+    const hasHero = Boolean(c.heroImageUrl);
+    const hasGallery = (c.photos?.length ?? 0) > 0;
+    return !c.isExternal && hasHero && hasGallery;
+  }) ?? [];
+
+  const scoreByQuality = (a: typeof eligibleCampgrounds[number], b: typeof eligibleCampgrounds[number]) => {
+    const npsA = typeof a.npsScore === "number" ? a.npsScore : a.isWorldClassNps ? 70 : 0;
+    const npsB = typeof b.npsScore === "number" ? b.npsScore : b.isWorldClassNps ? 70 : 0;
+    if (npsB !== npsA) return npsB - npsA;
+    const ratingA = (a.reviewScore ?? 0) * Math.sqrt(a.reviewCount ?? 0);
+    const ratingB = (b.reviewScore ?? 0) * Math.sqrt(b.reviewCount ?? 0);
+    return ratingB - ratingA;
+  };
+
+  const scoreByImprovement = (a: typeof eligibleCampgrounds[number], b: typeof eligibleCampgrounds[number]) => {
+    const risingA = a.isRisingStar ? 1 : 0;
+    const risingB = b.isRisingStar ? 1 : 0;
+    if (risingB !== risingA) return risingB - risingA;
+    const improvementA = typeof a.npsImprovement === "number" ? a.npsImprovement : 0;
+    const improvementB = typeof b.npsImprovement === "number" ? b.npsImprovement : 0;
+    if (improvementB !== improvementA) return improvementB - improvementA;
+    return scoreByQuality(a, b);
+  };
+
+  const risingStarCandidates = eligibleCampgrounds.filter(
+    (c) => c.isRisingStar || (typeof c.npsImprovement === "number" && c.npsImprovement > 0)
+  );
+
+  const featured = (risingStarCandidates.length > 0
+    ? [...risingStarCandidates].sort(scoreByImprovement)[0]
+    : [...eligibleCampgrounds].sort(scoreByQuality)[0]);
 
   const variantStyles = {
     refined: {
@@ -107,13 +126,22 @@ export function FeaturedCampground({ variant = "refined", className }: FeaturedC
   const reviewCount = featured.reviewCount ?? 0;
   const hasReviews = reviewCount >= 3;
   const amenities = featured.amenities?.slice(0, 4) ?? [];
-  const tagline = featured.tagline || "Discover nature's beauty and create lasting memories";
+  const heroImage = featured.heroImageUrl || featured.photos?.[0] || null;
+  const npsScore = typeof featured.npsScore === "number" ? featured.npsScore : null;
+  const hasNpsScore = npsScore !== null;
+  const hasWorldClassNps = hasNpsScore ? npsScore >= 70 : featured.isWorldClassNps;
+  const hasImprovement = typeof featured.npsImprovement === "number" && featured.npsImprovement > 0;
+  const isRisingStar = featured.isRisingStar || hasImprovement;
+  const tagline = featured.tagline
+    || (amenities.length > 0 ? `Popular amenities: ${amenities.slice(0, 3).join(", ")}` : "");
 
   // Determine badge text based on campground status
-  const badgeText = featured.isTopCampground
+  const badgeText = isRisingStar
+    ? "Rising Star"
+    : featured.isTopCampground
     ? "Top Rated Campground"
-    : featured.isWorldClassNps
-    ? "World-Class Experience"
+    : hasWorldClassNps
+    ? "World-Class Service"
     : hasReviews && rating >= 4.5
     ? "Highly Rated"
     : "Featured Pick";
@@ -145,7 +173,7 @@ export function FeaturedCampground({ variant = "refined", className }: FeaturedC
             styles.badgeBg
           )}>
             <Sparkles className="w-4 h-4" />
-            <span>Featured Destination</span>
+            <span>{isRisingStar ? "Rising Star" : "Featured Destination"}</span>
           </div>
 
           <h2 className={cn(
@@ -167,39 +195,41 @@ export function FeaturedCampground({ variant = "refined", className }: FeaturedC
             isDark ? "shadow-black/30" : "shadow-slate-200/50"
           )}
         >
-          <div className="grid lg:grid-cols-2">
+          <div className={cn("grid", heroImage ? "lg:grid-cols-2" : "grid-cols-1")}>
             {/* Image Section */}
-            <div className="relative aspect-[4/3] lg:aspect-auto lg:min-h-[400px]">
-              <Image
-                src={featured.heroImageUrl || featured.photos?.[0] || "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1600&h=900&fit=crop"}
-                alt={featured.name}
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                priority
-              />
+            {heroImage && (
+              <div className="relative aspect-[4/3] lg:aspect-auto lg:min-h-[400px]">
+                <Image
+                  src={heroImage}
+                  alt={featured.name}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  priority
+                />
 
-              {/* Overlay Gradient */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                {/* Overlay Gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
-              {/* Badge */}
-              <div className={cn(
-                "absolute top-6 left-6 px-4 py-2 rounded-full text-sm font-bold text-white shadow-lg flex items-center gap-2",
-                styles.accentBg
-              )}>
-                {featured.isTopCampground && <Trophy className="w-4 h-4" />}
-                {badgeText}
-              </div>
-
-              {/* Rating on image - only show if we have reviews */}
-              {hasReviews && (
-                <div className="absolute bottom-6 left-6 flex items-center gap-2 bg-white/95 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg">
-                  <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
-                  <span className="font-bold text-slate-900">{rating.toFixed(1)}</span>
-                  <span className="text-slate-500 text-sm">({reviewCount} reviews)</span>
+                {/* Badge */}
+                <div className={cn(
+                  "absolute top-6 left-6 px-4 py-2 rounded-full text-sm font-bold text-white shadow-lg flex items-center gap-2",
+                  styles.accentBg
+                )}>
+                  {featured.isTopCampground && <Trophy className="w-4 h-4" />}
+                  {badgeText}
                 </div>
-              )}
-            </div>
+
+                {/* Rating on image - only show if we have reviews */}
+                {hasReviews && (
+                  <div className="absolute bottom-6 left-6 flex items-center gap-2 bg-white/95 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg">
+                    <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
+                    <span className="font-bold text-slate-900">{rating.toFixed(1)}</span>
+                    <span className="text-slate-500 text-sm">({reviewCount} reviews)</span>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Content Section */}
             <div className="p-8 lg:p-12 flex flex-col justify-center">
@@ -221,12 +251,14 @@ export function FeaturedCampground({ variant = "refined", className }: FeaturedC
               )}>
                 {featured.name}
               </h3>
-              <p className={cn(
-                "text-lg mb-6",
-                isDark ? "text-slate-400" : "text-slate-600"
-              )}>
-                {tagline}
-              </p>
+              {tagline && (
+                <p className={cn(
+                  "text-lg mb-6",
+                  isDark ? "text-slate-400" : "text-slate-600"
+                )}>
+                  {tagline}
+                </p>
+              )}
 
               {/* Features */}
               {amenities.length > 0 && (
@@ -257,14 +289,20 @@ export function FeaturedCampground({ variant = "refined", className }: FeaturedC
                 variant === "bold" ? "border-keepr-clay" :
                 "border-keepr-evergreen"
               )}>
-                <p className={cn(
-                  "mb-2",
-                  isDark ? "text-slate-300" : "text-slate-600"
-                )}>
-                  {hasReviews && rating >= 4.5
-                    ? `Loved by ${reviewCount}+ families who've stayed here. Book with confidence.`
-                    : "A hidden gem waiting to be discovered. Be one of the first to experience it."}
-                </p>
+                {(hasReviews || hasImprovement || hasWorldClassNps || amenities.length > 0) && (
+                  <p className={cn(
+                    "mb-2",
+                    isDark ? "text-slate-300" : "text-slate-600"
+                  )}>
+                    {hasImprovement
+                      ? "Guest satisfaction is climbing fast with recent stays."
+                      : hasReviews
+                      ? `Rated ${rating.toFixed(1)} by ${reviewCount} guests.`
+                      : hasWorldClassNps
+                      ? "Recognized for standout guest care."
+                      : `Popular amenities include ${amenities.slice(0, 3).join(", ")}.`}
+                  </p>
+                )}
                 <div className={cn(
                   "text-sm font-medium flex items-center gap-2",
                   isDark ? "text-slate-400" : "text-slate-500"

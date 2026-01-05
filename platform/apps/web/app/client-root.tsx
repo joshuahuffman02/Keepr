@@ -2,6 +2,7 @@
 
 import { ReactNode, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
+import { usePathname } from "next/navigation";
 import { Toaster } from "@/components/ui/toaster";
 import { useToast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
@@ -23,8 +24,29 @@ interface WindowWithSW extends Window {
 
 export default function ClientRoot({ children }: { children: ReactNode }) {
   const { toast } = useToast();
+  const pathname = usePathname();
   const [pendingUpdate, setPendingUpdate] = useState<string | null>(null);
   const updateToastId = useRef<string | null>(null);
+  const hideTicketWidgetPaths = [
+    "/owners",
+    "/compare",
+    "/about",
+    "/contact",
+    "/terms",
+    "/privacy",
+    "/help",
+    "/cookies",
+    "/national-parks",
+    "/roi-calculator",
+    "/demo",
+    "/pricing",
+    "/campground-management-software",
+    "/rv-park-reservation-system",
+    "/switch-from-campspot"
+  ];
+  const shouldHideTicketWidget = hideTicketWidgetPaths.some(
+    (path) => pathname === path || pathname.startsWith(`${path}/`)
+  );
 
   // Prompt reload when the service worker broadcasts activation.
   useEffect(() => {
@@ -68,7 +90,7 @@ export default function ClientRoot({ children }: { children: ReactNode }) {
         <EasterEggsProvider>
           <SkipToContent />
           {children}
-          <FloatingTicketWidget />
+          {!shouldHideTicketWidget && <FloatingTicketWidget />}
           <Toaster />
           <WebVitals />
         </EasterEggsProvider>
@@ -76,4 +98,3 @@ export default function ClientRoot({ children }: { children: ReactNode }) {
     </SyncStatusProvider>
   );
 }
-

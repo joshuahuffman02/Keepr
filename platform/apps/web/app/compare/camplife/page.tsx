@@ -16,7 +16,8 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PublicHeader } from "@/components/public/PublicHeader";
+import { MarketingHeader } from "@/components/marketing/MarketingHeader";
+import { Footer } from "@/components/marketing/Footer";
 import {
   COMPETITOR_PAIN_POINTS,
   FEATURE_COMPARISON,
@@ -57,7 +58,7 @@ const structuredData = {
 export default function CompareCamplifePage() {
   return (
     <div className="min-h-screen bg-white">
-      <PublicHeader />
+      <MarketingHeader />
 
       <script
         type="application/ld+json"
@@ -65,13 +66,13 @@ export default function CompareCamplifePage() {
       />
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
+      <section className="relative pt-32 pb-20 bg-gradient-to-br from-keepr-charcoal via-slate-900 to-keepr-charcoal overflow-hidden">
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-cyan-500/10 to-transparent" />
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-keepr-evergreen/10 to-transparent" />
 
         <div className="relative max-w-6xl mx-auto px-6">
           <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500/20 border border-cyan-500/30 rounded-full text-cyan-400 text-sm font-semibold mb-8">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-keepr-clay/20 border border-keepr-clay/30 rounded-full text-keepr-clay text-sm font-semibold mb-8">
               <Sparkles className="h-4 w-4" />
               2025 Comparison Guide
             </div>
@@ -82,7 +83,7 @@ export default function CompareCamplifePage() {
 
             <p className="text-xl md:text-2xl text-slate-300 mb-8 leading-relaxed">
               CampLife simplicity.{" "}
-              <span className="text-cyan-400 font-semibold">
+              <span className="text-keepr-evergreen font-semibold">
                 Enterprise features.
               </span>{" "}
               Multi-property support and AI included.
@@ -92,7 +93,7 @@ export default function CompareCamplifePage() {
               <Button
                 asChild
                 size="lg"
-                className="px-8 py-6 text-lg bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400"
+                className="px-8 py-6 text-lg bg-gradient-to-r from-keepr-evergreen to-keepr-evergreen-dark hover:from-keepr-evergreen-light hover:to-keepr-evergreen"
               >
                 <Link href="/signup">
                   {CTA_COPY.switch.button}
@@ -118,7 +119,7 @@ export default function CompareCamplifePage() {
                 { value: "Loyalty", label: "Program Built-in", note: "CampLife lacks this" },
               ].map((stat) => (
                 <div key={stat.label} className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-cyan-400">
+                  <div className="text-3xl md:text-4xl font-bold text-keepr-evergreen">
                     {stat.value}
                   </div>
                   <div className="text-sm text-slate-300 font-medium">{stat.label}</div>
@@ -149,8 +150,8 @@ export default function CompareCamplifePage() {
                 className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow"
               >
                 <div className="flex items-start gap-4">
-                  <div className="p-2 rounded-lg bg-amber-100">
-                    <AlertTriangle className="h-5 w-5 text-amber-600" />
+                  <div className="p-2 rounded-lg bg-red-100">
+                    <AlertTriangle className="h-5 w-5 text-red-600" />
                   </div>
                   <p className="text-slate-700 font-medium">{painPoint}</p>
                 </div>
@@ -162,7 +163,7 @@ export default function CompareCamplifePage() {
             <p className="text-slate-600 mb-6">
               Ready to grow beyond CampLife's limitations?
             </p>
-            <Button asChild className="bg-cyan-600 hover:bg-cyan-500">
+            <Button asChild className="bg-keepr-evergreen hover:bg-keepr-evergreen-light">
               <Link href="/signup">
                 Start Your Free Trial
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -189,9 +190,9 @@ export default function CompareCamplifePage() {
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-200">
                   <th className="text-left p-4 text-slate-600 font-semibold">Feature</th>
-                  <th className="p-4 text-center bg-cyan-50 border-x border-cyan-100">
-                    <div className="text-cyan-700 font-bold">Keepr</div>
-                    <div className="text-xs text-cyan-600 mt-1">That's us!</div>
+                  <th className="p-4 text-center bg-keepr-evergreen/10 border-x border-keepr-evergreen/20">
+                    <div className="text-keepr-evergreen font-bold">Keepr</div>
+                    <div className="text-xs text-keepr-evergreen/80 mt-1">That's us!</div>
                   </th>
                   <th className="p-4 text-center">
                     <div className="text-slate-700 font-bold">CampLife</div>
@@ -207,8 +208,8 @@ export default function CompareCamplifePage() {
                 </tr>
                 <tr className="border-b border-slate-100">
                   <td className="p-4 text-slate-700">Multi-Property Support</td>
-                  <td className="p-4 text-center bg-cyan-50/30 border-x border-cyan-50">
-                    <Check className="h-5 w-5 mx-auto text-cyan-600" />
+                  <td className="p-4 text-center bg-keepr-evergreen/5 border-x border-keepr-evergreen/10">
+                    <Check className="h-5 w-5 mx-auto text-keepr-evergreen" />
                   </td>
                   <td className="p-4 text-center">
                     <X className="h-5 w-5 mx-auto text-red-400" />
@@ -216,8 +217,8 @@ export default function CompareCamplifePage() {
                 </tr>
                 <tr className="border-b border-slate-100">
                   <td className="p-4 text-slate-700">Portfolio Analytics</td>
-                  <td className="p-4 text-center bg-cyan-50/30 border-x border-cyan-50">
-                    <Check className="h-5 w-5 mx-auto text-cyan-600" />
+                  <td className="p-4 text-center bg-keepr-evergreen/5 border-x border-keepr-evergreen/10">
+                    <Check className="h-5 w-5 mx-auto text-keepr-evergreen" />
                   </td>
                   <td className="p-4 text-center">
                     <X className="h-5 w-5 mx-auto text-slate-400" />
@@ -225,8 +226,8 @@ export default function CompareCamplifePage() {
                 </tr>
                 <tr className="border-b border-slate-100">
                   <td className="p-4 text-slate-700">Central Rate Push</td>
-                  <td className="p-4 text-center bg-cyan-50/30 border-x border-cyan-50">
-                    <Check className="h-5 w-5 mx-auto text-cyan-600" />
+                  <td className="p-4 text-center bg-keepr-evergreen/5 border-x border-keepr-evergreen/10">
+                    <Check className="h-5 w-5 mx-auto text-keepr-evergreen" />
                   </td>
                   <td className="p-4 text-center">
                     <X className="h-5 w-5 mx-auto text-slate-400" />
@@ -234,8 +235,11 @@ export default function CompareCamplifePage() {
                 </tr>
                 <tr className="border-b border-slate-100">
                   <td className="p-4 text-slate-700">Transparent Pricing</td>
-                  <td className="p-4 text-center bg-cyan-50/30 border-x border-cyan-50">
-                    <span className="text-cyan-700 font-semibold">$100/mo + $2.30/booking</span>
+                  <td className="p-4 text-center bg-keepr-evergreen/5 border-x border-keepr-evergreen/10">
+                    <span className="text-keepr-evergreen font-semibold">$100/mo + $2.30/booking</span>
+                    <span className="block text-xs text-keepr-evergreen/80">
+                      SMS at cost. AI beyond included credits billed separately.
+                    </span>
                   </td>
                   <td className="p-4 text-center text-slate-600">Undisclosed (demo required)</td>
                 </tr>
@@ -251,18 +255,18 @@ export default function CompareCamplifePage() {
                     {category.features.map((feature) => (
                       <tr key={feature.name} className="border-b border-slate-100">
                         <td className="p-4 text-slate-700">{feature.name}</td>
-                        <td className="p-4 text-center bg-cyan-50/30 border-x border-cyan-50">
+                        <td className="p-4 text-center bg-keepr-evergreen/5 border-x border-keepr-evergreen/10">
                           {feature.us === true ? (
-                            <Check className="h-5 w-5 mx-auto text-cyan-600" />
+                            <Check className="h-5 w-5 mx-auto text-keepr-evergreen" />
                           ) : feature.us === false ? (
                             <X className="h-5 w-5 mx-auto text-slate-400" />
                           ) : (
-                            <span className="text-cyan-600">{feature.us}</span>
+                            <span className="text-keepr-evergreen">{feature.us}</span>
                           )}
                         </td>
                         <td className="p-4 text-center">
                           {feature.camplife === true ? (
-                            <Check className="h-5 w-5 mx-auto text-emerald-600" />
+                            <Check className="h-5 w-5 mx-auto text-keepr-evergreen" />
                           ) : feature.camplife === false ? (
                             <X className="h-5 w-5 mx-auto text-slate-400" />
                           ) : (
@@ -280,10 +284,10 @@ export default function CompareCamplifePage() {
       </section>
 
       {/* Growth Features Section */}
-      <section className="py-20 bg-gradient-to-br from-cyan-900 to-slate-900">
+      <section className="py-20 bg-gradient-to-br from-keepr-charcoal to-slate-900">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500/20 border border-cyan-500/30 rounded-full text-cyan-400 text-sm font-semibold mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-keepr-evergreen/20 border border-keepr-evergreen/30 rounded-full text-keepr-evergreen text-sm font-semibold mb-6">
               <TrendingUp className="h-4 w-4" />
               Built for Growth
             </div>
@@ -332,7 +336,7 @@ export default function CompareCamplifePage() {
                 key={feature.title}
                 className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-8"
               >
-                <feature.icon className="h-10 w-10 text-cyan-400 mb-4" />
+                <feature.icon className="h-10 w-10 text-keepr-evergreen mb-4" />
                 <h3 className="text-xl font-bold text-white mb-2">{feature.title}</h3>
                 <p className="text-slate-300">{feature.description}</p>
               </div>
@@ -350,30 +354,31 @@ export default function CompareCamplifePage() {
                 Transparent Pricing. No Demo Required.
               </h2>
               <p className="text-slate-600">
-                CampLife requires a demo just to see pricing. We believe you should know what you're paying before you talk to sales.
+                CampLife requires a demo just to see pricing. Keepr publishes its base pricing up front, with usage-based add-ons billed separately.
               </p>
             </div>
 
             <div className="grid md:grid-cols-2 gap-8 mb-8">
               <div className="text-center p-8 bg-white rounded-xl border border-slate-200">
                 <div className="text-sm font-semibold text-slate-500 mb-2">CAMPLIFE</div>
-                <div className="text-4xl font-bold text-slate-400 mb-2">???</div>
+                <div className="text-4xl font-bold text-slate-400 mb-2">Pricing hidden</div>
                 <div className="text-slate-600">"Contact us for pricing"</div>
                 <div className="text-sm text-slate-500 mt-2">Demo required</div>
               </div>
-              <div className="text-center p-8 bg-cyan-50 rounded-xl border border-cyan-200">
-                <div className="text-sm font-semibold text-cyan-600 mb-2">CAMP EVERYDAY</div>
-                <div className="text-4xl font-bold text-cyan-700 mb-2">$100/mo</div>
+              <div className="text-center p-8 bg-keepr-evergreen/10 rounded-xl border border-keepr-evergreen/20">
+                <div className="text-sm font-semibold text-keepr-evergreen mb-2">KEEPR</div>
+                <div className="text-4xl font-bold text-keepr-evergreen mb-2">$100/mo</div>
                 <div className="text-slate-600">+ $2.30 per booking</div>
-                <div className="text-sm text-cyan-600 mt-2">$5/mo AI credits included</div>
+                <div className="text-sm text-keepr-evergreen mt-2">$5/mo AI credits included</div>
+                <div className="text-xs text-slate-500 mt-2">SMS at cost · AI overage billed separately</div>
               </div>
             </div>
 
             <div className="text-center">
               <p className="text-slate-600 mb-4">
-                Know exactly what you'll pay. No surprises, no hidden fees.
+                Transparent base pricing with usage-based add-ons billed separately.
               </p>
-              <Button asChild size="lg" className="bg-cyan-600 hover:bg-cyan-500">
+              <Button asChild size="lg" className="bg-keepr-evergreen hover:bg-keepr-evergreen-light">
                 <Link href="/pricing">
                   See Full Pricing Details
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -405,8 +410,8 @@ export default function CompareCamplifePage() {
                   { icon: CreditCard, text: "No contracts, cancel anytime" },
                 ].map((item) => (
                   <div key={item.text} className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-cyan-100">
-                      <item.icon className="h-5 w-5 text-cyan-600" />
+                    <div className="p-2 rounded-lg bg-keepr-evergreen/10">
+                      <item.icon className="h-5 w-5 text-keepr-evergreen" />
                     </div>
                     <span className="text-slate-700 font-medium">{item.text}</span>
                   </div>
@@ -426,7 +431,7 @@ export default function CompareCamplifePage() {
                   "Email templates",
                 ].map((item, index) => (
                   <div key={index} className="flex items-center gap-3">
-                    <Check className="h-5 w-5 text-cyan-600" />
+                    <Check className="h-5 w-5 text-keepr-evergreen" />
                     <span className="text-slate-700">{item}</span>
                   </div>
                 ))}
@@ -450,7 +455,7 @@ export default function CompareCamplifePage() {
             <Button
               asChild
               size="lg"
-              className="px-8 py-6 text-lg bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400"
+              className="px-8 py-6 text-lg bg-gradient-to-r from-keepr-evergreen to-keepr-evergreen-dark hover:from-keepr-evergreen-light hover:to-keepr-evergreen"
             >
               <Link href="/signup">
                 Start Free Trial
@@ -473,29 +478,7 @@ export default function CompareCamplifePage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-slate-900 text-white border-t border-slate-800">
-        <div className="max-w-6xl mx-auto px-6 py-12">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="text-center md:text-left">
-              <p className="text-slate-400 text-sm">
-                Keepr - The modern alternative to legacy campground software.
-              </p>
-            </div>
-            <div className="flex items-center gap-6 text-sm text-slate-400">
-              <Link href="/compare/campspot" className="hover:text-white transition-colors">
-                vs Campspot
-              </Link>
-              <Link href="/compare/newbook" className="hover:text-white transition-colors">
-                vs Newbook
-              </Link>
-              <Link href="/pricing" className="hover:text-white transition-colors">
-                Pricing
-              </Link>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

@@ -55,7 +55,7 @@ export default function ShortcutsPage() {
       <div className="space-y-6">
         <Breadcrumbs
           items={[
-            { label: "Help", href: "/help" },
+            { label: "Help", href: "/dashboard/help" },
             { label: "Keyboard Shortcuts" }
           ]}
         />
@@ -163,7 +163,7 @@ export default function ShortcutsPage() {
         {/* Back Link */}
         <div className="text-center">
           <Link
-            href="/help"
+            href="/dashboard/help"
             className="inline-flex items-center gap-2 text-sm text-emerald-600 hover:text-emerald-700 font-medium"
           >
             ← Back to Documentation

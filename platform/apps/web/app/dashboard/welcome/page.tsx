@@ -297,7 +297,7 @@ export default function WelcomePage() {
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Button asChild variant="outline">
-              <Link href="/help">
+              <Link href="/dashboard/help">
                 Browse Help Center
               </Link>
             </Button>

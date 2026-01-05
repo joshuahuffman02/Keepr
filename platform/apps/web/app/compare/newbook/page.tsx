@@ -15,7 +15,8 @@ import {
   CreditCard,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PublicHeader } from "@/components/public/PublicHeader";
+import { MarketingHeader } from "@/components/marketing/MarketingHeader";
+import { Footer } from "@/components/marketing/Footer";
 import {
   COMPETITOR_PAIN_POINTS,
   FEATURE_COMPARISON,
@@ -56,7 +57,7 @@ const structuredData = {
 export default function CompareNewbookPage() {
   return (
     <div className="min-h-screen bg-white">
-      <PublicHeader />
+      <MarketingHeader />
 
       <script
         type="application/ld+json"
@@ -64,13 +65,13 @@ export default function CompareNewbookPage() {
       />
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
+      <section className="relative pt-32 pb-20 bg-gradient-to-br from-keepr-charcoal via-slate-900 to-keepr-charcoal overflow-hidden">
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-violet-500/10 to-transparent" />
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-keepr-evergreen/10 to-transparent" />
 
         <div className="relative max-w-6xl mx-auto px-6">
           <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-violet-500/20 border border-violet-500/30 rounded-full text-violet-400 text-sm font-semibold mb-8">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-keepr-clay/20 border border-keepr-clay/30 rounded-full text-keepr-clay text-sm font-semibold mb-8">
               <Sparkles className="h-4 w-4" />
               2025 Comparison Guide
             </div>
@@ -81,7 +82,7 @@ export default function CompareNewbookPage() {
 
             <p className="text-xl md:text-2xl text-slate-300 mb-8 leading-relaxed">
               Enterprise features.{" "}
-              <span className="text-violet-400 font-semibold">
+              <span className="text-keepr-evergreen font-semibold">
                 No $3,000 setup fee.
               </span>{" "}
               Go live in 48 hours, not weeks.
@@ -91,7 +92,7 @@ export default function CompareNewbookPage() {
               <Button
                 asChild
                 size="lg"
-                className="px-8 py-6 text-lg bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-400 hover:to-purple-400"
+                className="px-8 py-6 text-lg bg-gradient-to-r from-keepr-evergreen to-keepr-evergreen-dark hover:from-keepr-evergreen-light hover:to-keepr-evergreen"
               >
                 <Link href="/signup">
                   {CTA_COPY.switch.button}
@@ -114,10 +115,10 @@ export default function CompareNewbookPage() {
                 { value: "$0", label: "Setup Fee", note: "vs $1K-$3K at Newbook" },
                 { value: "$100", label: "Per Month", note: "vs $150+ at Newbook" },
                 { value: "48hrs", label: "Go Live Time", note: "vs weeks at Newbook" },
-                { value: "Simple", label: "Pricing", note: "No hidden fees" },
+                { value: "Simple", label: "Pricing", note: "Add-ons clearly priced" },
               ].map((stat) => (
                 <div key={stat.label} className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-violet-400">
+                  <div className="text-3xl md:text-4xl font-bold text-keepr-evergreen">
                     {stat.value}
                   </div>
                   <div className="text-sm text-slate-300 font-medium">{stat.label}</div>
@@ -148,8 +149,8 @@ export default function CompareNewbookPage() {
                 className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition-shadow"
               >
                 <div className="flex items-start gap-4">
-                  <div className="p-2 rounded-lg bg-amber-100">
-                    <AlertTriangle className="h-5 w-5 text-amber-600" />
+                  <div className="p-2 rounded-lg bg-red-100">
+                    <AlertTriangle className="h-5 w-5 text-red-600" />
                   </div>
                   <p className="text-slate-700 font-medium">{painPoint}</p>
                 </div>
@@ -161,7 +162,7 @@ export default function CompareNewbookPage() {
             <p className="text-slate-600 mb-6">
               Looking for something simpler? We built Keepr for you.
             </p>
-            <Button asChild className="bg-violet-600 hover:bg-violet-500">
+            <Button asChild className="bg-keepr-evergreen hover:bg-keepr-evergreen-light">
               <Link href="/signup">
                 Start Your Free Trial
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -188,9 +189,9 @@ export default function CompareNewbookPage() {
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-200">
                   <th className="text-left p-4 text-slate-600 font-semibold">Feature</th>
-                  <th className="p-4 text-center bg-violet-50 border-x border-violet-100">
-                    <div className="text-violet-700 font-bold">Keepr</div>
-                    <div className="text-xs text-violet-600 mt-1">That's us!</div>
+                  <th className="p-4 text-center bg-keepr-evergreen/10 border-x border-keepr-evergreen/20">
+                    <div className="text-keepr-evergreen font-bold">Keepr</div>
+                    <div className="text-xs text-keepr-evergreen/80 mt-1">That's us!</div>
                   </th>
                   <th className="p-4 text-center">
                     <div className="text-slate-700 font-bold">Newbook</div>
@@ -206,8 +207,8 @@ export default function CompareNewbookPage() {
                 </tr>
                 <tr className="border-b border-slate-100">
                   <td className="p-4 text-slate-700">Setup Fee</td>
-                  <td className="p-4 text-center bg-violet-50/30 border-x border-violet-50">
-                    <span className="text-violet-700 font-bold">$0</span>
+                  <td className="p-4 text-center bg-keepr-evergreen/5 border-x border-keepr-evergreen/10">
+                    <span className="text-keepr-evergreen font-bold">$0</span>
                   </td>
                   <td className="p-4 text-center">
                     <span className="text-red-600 font-semibold">$1,000 - $3,000</span>
@@ -215,29 +216,29 @@ export default function CompareNewbookPage() {
                 </tr>
                 <tr className="border-b border-slate-100">
                   <td className="p-4 text-slate-700">Monthly Base</td>
-                  <td className="p-4 text-center bg-violet-50/30 border-x border-violet-50">
-                    <span className="text-violet-700 font-semibold">$100/month</span>
+                  <td className="p-4 text-center bg-keepr-evergreen/5 border-x border-keepr-evergreen/10">
+                    <span className="text-keepr-evergreen font-semibold">$100/month</span>
                   </td>
                   <td className="p-4 text-center text-slate-600">$150+/month</td>
                 </tr>
                 <tr className="border-b border-slate-100">
                   <td className="p-4 text-slate-700">Time to Go Live</td>
-                  <td className="p-4 text-center bg-violet-50/30 border-x border-violet-50">
-                    <span className="text-violet-700 font-semibold">48 hours</span>
+                  <td className="p-4 text-center bg-keepr-evergreen/5 border-x border-keepr-evergreen/10">
+                    <span className="text-keepr-evergreen font-semibold">48 hours</span>
                   </td>
                   <td className="p-4 text-center text-slate-600">Weeks</td>
                 </tr>
                 <tr className="border-b border-slate-100">
                   <td className="p-4 text-slate-700">Learning Curve</td>
-                  <td className="p-4 text-center bg-violet-50/30 border-x border-violet-50">
-                    <span className="text-violet-700 font-semibold">Simple</span>
+                  <td className="p-4 text-center bg-keepr-evergreen/5 border-x border-keepr-evergreen/10">
+                    <span className="text-keepr-evergreen font-semibold">Simple</span>
                   </td>
                   <td className="p-4 text-center text-slate-600">Complex</td>
                 </tr>
                 <tr className="border-b border-slate-100">
                   <td className="p-4 text-slate-700">AI Credits Included</td>
-                  <td className="p-4 text-center bg-violet-50/30 border-x border-violet-50">
-                    <span className="text-violet-700 font-semibold">$5/month</span>
+                  <td className="p-4 text-center bg-keepr-evergreen/5 border-x border-keepr-evergreen/10">
+                    <span className="text-keepr-evergreen font-semibold">$5/month</span>
                   </td>
                   <td className="p-4 text-center">
                     <X className="h-5 w-5 mx-auto text-slate-400" />
@@ -255,18 +256,18 @@ export default function CompareNewbookPage() {
                     {category.features.map((feature) => (
                       <tr key={feature.name} className="border-b border-slate-100">
                         <td className="p-4 text-slate-700">{feature.name}</td>
-                        <td className="p-4 text-center bg-violet-50/30 border-x border-violet-50">
+                        <td className="p-4 text-center bg-keepr-evergreen/5 border-x border-keepr-evergreen/10">
                           {feature.us === true ? (
-                            <Check className="h-5 w-5 mx-auto text-violet-600" />
+                            <Check className="h-5 w-5 mx-auto text-keepr-evergreen" />
                           ) : feature.us === false ? (
                             <X className="h-5 w-5 mx-auto text-slate-400" />
                           ) : (
-                            <span className="text-violet-600">{feature.us}</span>
+                            <span className="text-keepr-evergreen">{feature.us}</span>
                           )}
                         </td>
                         <td className="p-4 text-center">
                           {feature.newbook === true ? (
-                            <Check className="h-5 w-5 mx-auto text-emerald-600" />
+                            <Check className="h-5 w-5 mx-auto text-keepr-evergreen" />
                           ) : feature.newbook === false ? (
                             <X className="h-5 w-5 mx-auto text-slate-400" />
                           ) : (
@@ -284,10 +285,10 @@ export default function CompareNewbookPage() {
       </section>
 
       {/* Exclusive Features Section */}
-      <section className="py-20 bg-gradient-to-br from-violet-900 to-slate-900">
+      <section className="py-20 bg-gradient-to-br from-keepr-charcoal to-slate-900">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-violet-500/20 border border-violet-500/30 rounded-full text-violet-400 text-sm font-semibold mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-keepr-evergreen/20 border border-keepr-evergreen/30 rounded-full text-keepr-evergreen text-sm font-semibold mb-6">
               <Award className="h-4 w-4" />
               Exclusive to Keepr
             </div>
@@ -307,9 +308,9 @@ export default function CompareNewbookPage() {
               >
                 <h3 className="text-xl font-bold text-white mb-2">{diff.feature}</h3>
                 <p className="text-slate-300 mb-4">{diff.description}</p>
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-violet-500/20 rounded-full">
-                  <Zap className="h-4 w-4 text-violet-400" />
-                  <span className="text-sm text-violet-400">{diff.competitorStatus}</span>
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-keepr-clay/20 rounded-full">
+                  <Zap className="h-4 w-4 text-keepr-clay" />
+                  <span className="text-sm text-keepr-clay">{diff.competitorStatus}</span>
                 </div>
               </div>
             ))}
@@ -337,16 +338,16 @@ export default function CompareNewbookPage() {
                 <div className="text-slate-600">Setup fee before you start</div>
                 <div className="text-sm text-slate-500 mt-2">+ $150+/month subscription</div>
               </div>
-              <div className="text-center p-8 bg-violet-50 rounded-xl border border-violet-200">
-                <div className="text-sm font-semibold text-violet-600 mb-2">CAMP EVERYDAY</div>
-                <div className="text-4xl font-bold text-violet-700 mb-2">$0</div>
+              <div className="text-center p-8 bg-keepr-evergreen/10 rounded-xl border border-keepr-evergreen/20">
+                <div className="text-sm font-semibold text-keepr-evergreen mb-2">KEEPR</div>
+                <div className="text-4xl font-bold text-keepr-evergreen mb-2">$0</div>
                 <div className="text-slate-600">No setup fee, ever</div>
                 <div className="text-sm text-slate-500 mt-2">Just $100/month + usage</div>
               </div>
             </div>
 
             <div className="text-center">
-              <Button asChild size="lg" className="bg-violet-600 hover:bg-violet-500">
+              <Button asChild size="lg" className="bg-keepr-evergreen hover:bg-keepr-evergreen-light">
                 <Link href="/signup">
                   Start Without the Big Upfront Cost
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -378,8 +379,8 @@ export default function CompareNewbookPage() {
                   { icon: CreditCard, text: "No contracts, cancel anytime" },
                 ].map((item) => (
                   <div key={item.text} className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-violet-100">
-                      <item.icon className="h-5 w-5 text-violet-600" />
+                    <div className="p-2 rounded-lg bg-keepr-evergreen/10">
+                      <item.icon className="h-5 w-5 text-keepr-evergreen" />
                     </div>
                     <span className="text-slate-700 font-medium">{item.text}</span>
                   </div>
@@ -398,10 +399,10 @@ export default function CompareNewbookPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="w-24 text-sm font-semibold text-violet-600">Keepr</div>
-                  <div className="flex-1 bg-violet-100 rounded-full h-4 relative">
-                    <div className="absolute left-0 top-0 h-full w-[15%] bg-violet-500 rounded-full" />
-                    <span className="absolute left-[18%] top-1/2 -translate-y-1/2 text-xs text-violet-700">48 hours</span>
+                  <div className="w-24 text-sm font-semibold text-keepr-evergreen">Keepr</div>
+                  <div className="flex-1 bg-keepr-evergreen/15 rounded-full h-4 relative">
+                    <div className="absolute left-0 top-0 h-full w-[15%] bg-keepr-evergreen rounded-full" />
+                    <span className="absolute left-[18%] top-1/2 -translate-y-1/2 text-xs text-keepr-evergreen">48 hours</span>
                   </div>
                 </div>
               </div>
@@ -424,7 +425,7 @@ export default function CompareNewbookPage() {
             <Button
               asChild
               size="lg"
-              className="px-8 py-6 text-lg bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-400 hover:to-purple-400"
+              className="px-8 py-6 text-lg bg-gradient-to-r from-keepr-evergreen to-keepr-evergreen-dark hover:from-keepr-evergreen-light hover:to-keepr-evergreen"
             >
               <Link href="/signup">
                 Start Free Trial
@@ -447,29 +448,7 @@ export default function CompareNewbookPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-slate-900 text-white border-t border-slate-800">
-        <div className="max-w-6xl mx-auto px-6 py-12">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="text-center md:text-left">
-              <p className="text-slate-400 text-sm">
-                Keepr - The modern alternative to legacy campground software.
-              </p>
-            </div>
-            <div className="flex items-center gap-6 text-sm text-slate-400">
-              <Link href="/compare/campspot" className="hover:text-white transition-colors">
-                vs Campspot
-              </Link>
-              <Link href="/compare/camplife" className="hover:text-white transition-colors">
-                vs CampLife
-              </Link>
-              <Link href="/pricing" className="hover:text-white transition-colors">
-                Pricing
-              </Link>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

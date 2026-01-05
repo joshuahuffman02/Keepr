@@ -19,7 +19,8 @@ import {
   Database,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PublicHeader } from "@/components/public/PublicHeader";
+import { MarketingHeader } from "@/components/marketing/MarketingHeader";
+import { Footer } from "@/components/marketing/Footer";
 import { PRICING, COMPETITOR_PAIN_POINTS, CTA_COPY } from "@/lib/positioning";
 
 export const metadata: Metadata = {
@@ -99,23 +100,23 @@ const whatYouLose = [
 export default function SwitchFromCampspotPage() {
   return (
     <div className="min-h-screen bg-white">
-      <PublicHeader />
+      <MarketingHeader />
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-24 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
+      <section className="relative pt-32 pb-24 bg-gradient-to-br from-keepr-charcoal via-slate-900 to-keepr-charcoal overflow-hidden">
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-emerald-500/10 to-transparent" />
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-keepr-evergreen/10 to-transparent" />
 
         <div className="relative max-w-6xl mx-auto px-6">
           <div className="text-center max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/20 border border-emerald-500/30 rounded-full text-emerald-400 text-sm font-semibold mb-8">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-keepr-clay/20 border border-keepr-clay/30 rounded-full text-keepr-clay text-sm font-semibold mb-8">
               <Gift className="h-4 w-4" />
               Free Migration - Limited Time
             </div>
 
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
               Switch from Campspot
-              <span className="block text-emerald-400">Keep Everything. Lose the Fees.</span>
+              <span className="block text-keepr-evergreen">Keep Everything. Lose the Fees.</span>
             </h1>
 
             <p className="text-xl md:text-2xl text-slate-300 mb-8 leading-relaxed max-w-3xl mx-auto">
@@ -127,7 +128,7 @@ export default function SwitchFromCampspotPage() {
               <Button
                 asChild
                 size="lg"
-                className="px-8 py-6 text-lg bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400"
+                className="px-8 py-6 text-lg bg-gradient-to-r from-keepr-evergreen to-keepr-evergreen-dark hover:from-keepr-evergreen-light hover:to-keepr-evergreen"
               >
                 <Link href="/signup">
                   Start Free Migration
@@ -153,7 +154,7 @@ export default function SwitchFromCampspotPage() {
                 { value: "$0", label: "Migration Fee", note: "We handle everything" },
               ].map((stat) => (
                 <div key={stat.label} className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold text-emerald-400">
+                  <div className="text-3xl md:text-4xl font-bold text-keepr-evergreen">
                     {stat.value}
                   </div>
                   <div className="text-sm text-slate-300 font-medium">{stat.label}</div>
@@ -199,7 +200,7 @@ export default function SwitchFromCampspotPage() {
       <section className="py-20">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-100 border border-emerald-200 rounded-full text-emerald-700 text-sm font-semibold mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-keepr-evergreen/10 border border-keepr-evergreen/20 rounded-full text-keepr-evergreen text-sm font-semibold mb-6">
               <Clock className="h-4 w-4" />
               48-Hour Migration
             </div>
@@ -216,16 +217,16 @@ export default function SwitchFromCampspotPage() {
               <div key={index} className="relative">
                 <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm h-full">
                   <div className="flex items-center gap-3 mb-4">
-                    <span className="px-3 py-1 bg-emerald-100 text-emerald-700 text-sm font-semibold rounded-full">
+                    <span className="px-3 py-1 bg-keepr-evergreen/10 text-keepr-evergreen text-sm font-semibold rounded-full">
                       {step.day}
                     </span>
                   </div>
-                  <step.icon className="h-8 w-8 text-emerald-600 mb-4" />
+                  <step.icon className="h-8 w-8 text-keepr-evergreen mb-4" />
                   <h3 className="text-lg font-bold text-slate-900 mb-2">{step.title}</h3>
                   <p className="text-slate-600 text-sm">{step.description}</p>
                 </div>
                 {index < migrationSteps.length - 1 && (
-                  <div className="hidden lg:block absolute top-1/2 -right-4 w-8 h-0.5 bg-emerald-200" />
+                  <div className="hidden lg:block absolute top-1/2 -right-4 w-8 h-0.5 bg-keepr-evergreen/20" />
                 )}
               </div>
             ))}
@@ -249,15 +250,15 @@ export default function SwitchFromCampspotPage() {
             {/* What You Keep */}
             <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-8">
               <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 rounded-lg bg-blue-500/20">
-                  <Shield className="h-6 w-6 text-blue-400" />
+                <div className="p-2 rounded-lg bg-keepr-evergreen/20">
+                  <Shield className="h-6 w-6 text-keepr-evergreen" />
                 </div>
                 <h3 className="text-xl font-bold text-white">What You Keep</h3>
               </div>
               <ul className="space-y-3">
                 {whatYouKeep.map((item) => (
                   <li key={item} className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                    <Check className="h-5 w-5 text-keepr-evergreen flex-shrink-0 mt-0.5" />
                     <span className="text-slate-300">{item}</span>
                   </li>
                 ))}
@@ -265,17 +266,17 @@ export default function SwitchFromCampspotPage() {
             </div>
 
             {/* What You Gain */}
-            <div className="bg-emerald-500/10 backdrop-blur border border-emerald-500/20 rounded-2xl p-8">
+            <div className="bg-keepr-evergreen/10 backdrop-blur border border-keepr-evergreen/20 rounded-2xl p-8">
               <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 rounded-lg bg-emerald-500/20">
-                  <Sparkles className="h-6 w-6 text-emerald-400" />
+                <div className="p-2 rounded-lg bg-keepr-evergreen/20">
+                  <Sparkles className="h-6 w-6 text-keepr-evergreen" />
                 </div>
                 <h3 className="text-xl font-bold text-white">What You Gain</h3>
               </div>
               <ul className="space-y-3">
                 {whatYouGain.map((item) => (
                   <li key={item} className="flex items-start gap-3">
-                    <Check className="h-5 w-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+                    <Check className="h-5 w-5 text-keepr-evergreen flex-shrink-0 mt-0.5" />
                     <span className="text-slate-300">{item}</span>
                   </li>
                 ))}
@@ -306,7 +307,7 @@ export default function SwitchFromCampspotPage() {
       {/* ROI Example */}
       <section className="py-20">
         <div className="max-w-4xl mx-auto px-6">
-          <div className="bg-emerald-50 rounded-3xl p-8 md:p-12 border border-emerald-100">
+          <div className="bg-keepr-evergreen/10 rounded-3xl p-8 md:p-12 border border-keepr-evergreen/20">
             <div className="text-center mb-8">
               <h2 className="text-3xl font-bold text-slate-900 mb-4">
                 Calculate Your Savings
@@ -316,7 +317,7 @@ export default function SwitchFromCampspotPage() {
               </p>
             </div>
 
-            <div className="bg-white rounded-2xl p-8 border border-emerald-200 mb-8">
+            <div className="bg-white rounded-2xl p-8 border border-keepr-evergreen/20 mb-8">
               <h3 className="text-lg font-semibold text-slate-900 mb-6">
                 Example: Park with 300 bookings/month at $75 avg
               </h3>
@@ -324,19 +325,19 @@ export default function SwitchFromCampspotPage() {
               <div className="space-y-4">
                 <div className="flex justify-between items-center py-3 border-b border-slate-100">
                   <span className="text-slate-600">Per-booking savings ($3.00 vs $2.30)</span>
-                  <span className="text-emerald-600 font-bold">+$210/month</span>
+                  <span className="text-keepr-evergreen font-bold">+$210/month</span>
                 </div>
                 <div className="flex justify-between items-center py-3 border-b border-slate-100">
                   <span className="text-slate-600">10% marketplace commission eliminated</span>
-                  <span className="text-emerald-600 font-bold">+$2,250/month*</span>
+                  <span className="text-keepr-evergreen font-bold">+$2,250/month*</span>
                 </div>
                 <div className="flex justify-between items-center py-3 border-b border-slate-100">
                   <span className="text-slate-600">AI no-show reduction (est. 10%)</span>
-                  <span className="text-emerald-600 font-bold">+$225/month</span>
+                  <span className="text-keepr-evergreen font-bold">+$225/month</span>
                 </div>
-                <div className="flex justify-between items-center py-3 border-t-2 border-emerald-200">
+                <div className="flex justify-between items-center py-3 border-t-2 border-keepr-evergreen/20">
                   <span className="text-slate-900 font-bold text-lg">Potential Annual Savings</span>
-                  <span className="text-emerald-600 font-bold text-2xl">$32,000+</span>
+                  <span className="text-keepr-evergreen font-bold text-2xl">$32,000+</span>
                 </div>
               </div>
 
@@ -346,7 +347,7 @@ export default function SwitchFromCampspotPage() {
             </div>
 
             <div className="text-center">
-              <Button asChild size="lg" className="bg-emerald-600 hover:bg-emerald-500">
+              <Button asChild size="lg" className="bg-keepr-evergreen hover:bg-keepr-evergreen-light">
                 <Link href="/roi-calculator">
                   Calculate Your Exact Savings
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -363,7 +364,7 @@ export default function SwitchFromCampspotPage() {
           <div className="bg-white rounded-3xl p-8 md:p-12 border border-slate-200 shadow-lg text-center">
             <div className="flex justify-center gap-1 mb-6">
               {[1, 2, 3, 4, 5].map((i) => (
-                <Star key={i} className="h-6 w-6 fill-amber-400 text-amber-400" />
+                <Star key={i} className="h-6 w-6 fill-keepr-clay text-keepr-clay" />
               ))}
             </div>
             <blockquote className="text-2xl text-slate-700 mb-6 italic">
@@ -379,12 +380,12 @@ export default function SwitchFromCampspotPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 bg-gradient-to-br from-emerald-600 to-teal-600">
+      <section className="py-20 bg-gradient-to-br from-keepr-evergreen to-keepr-evergreen-dark">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
             Ready to Leave Campspot Behind?
           </h2>
-          <p className="text-xl text-emerald-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-keepr-off-white/90 mb-8 max-w-2xl mx-auto">
             Free migration, 48-hour go-live, 30-day money-back guarantee. No risk, just better software.
           </p>
 
@@ -392,7 +393,7 @@ export default function SwitchFromCampspotPage() {
             <Button
               asChild
               size="lg"
-              className="px-8 py-6 text-lg bg-white text-emerald-700 hover:bg-emerald-50"
+              className="px-8 py-6 text-lg bg-white text-keepr-evergreen hover:bg-keepr-off-white"
             >
               <Link href="/signup">
                 Start Free Migration
@@ -409,7 +410,7 @@ export default function SwitchFromCampspotPage() {
             </Button>
           </div>
 
-          <p className="text-emerald-200 text-sm">
+          <p className="text-keepr-off-white/70 text-sm">
             Questions? Email us at{" "}
             <a href="mailto:switch@keeprstay.com" className="underline">
               switch@keeprstay.com
@@ -418,21 +419,7 @@ export default function SwitchFromCampspotPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-slate-900 text-white">
-        <div className="max-w-6xl mx-auto px-6 py-12">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <p className="text-slate-400 text-sm">
-              Keepr - The Campspot alternative parks are switching to.
-            </p>
-            <div className="flex items-center gap-6 text-sm text-slate-400">
-              <Link href="/compare/campspot" className="hover:text-white">Full Comparison</Link>
-              <Link href="/pricing" className="hover:text-white">Pricing</Link>
-              <Link href="/demo" className="hover:text-white">Demo</Link>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

@@ -12,7 +12,8 @@ import {
   Lock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { PublicHeader } from "@/components/public/PublicHeader";
+import { MarketingHeader } from "@/components/marketing/MarketingHeader";
+import { Footer } from "@/components/marketing/Footer";
 
 export const metadata: Metadata = {
   title: "Demo Preview | Keepr - Explore Without Signing Up",
@@ -62,10 +63,10 @@ const previewScreens = [
 export default function DemoPreviewPage() {
   return (
     <div className="min-h-screen bg-white">
-      <PublicHeader />
+      <MarketingHeader />
 
       {/* Hero */}
-      <section className="relative pt-32 pb-16 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
+      <section className="relative pt-32 pb-16 bg-gradient-to-br from-keepr-charcoal via-slate-900 to-keepr-charcoal overflow-hidden">
         <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
 
         <div className="relative max-w-4xl mx-auto px-6 text-center">
@@ -86,7 +87,7 @@ export default function DemoPreviewPage() {
           <Button
             asChild
             size="lg"
-            className="px-8 py-6 text-lg bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500"
+            className="px-8 py-6 text-lg bg-gradient-to-r from-keepr-evergreen to-keepr-evergreen-dark hover:from-keepr-evergreen-light hover:to-keepr-evergreen"
           >
             <Link href="/demo">
               Get Full Demo Access
@@ -112,7 +113,7 @@ export default function DemoPreviewPage() {
             {previewScreens.map((screen) => (
               <div
                 key={screen.title}
-                className="group bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-xl hover:border-violet-300 transition-all cursor-pointer"
+                className="group bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-xl hover:border-keepr-evergreen/40 transition-all cursor-pointer"
               >
                 {/* Preview Image Placeholder */}
                 <div className="aspect-video bg-gradient-to-br from-slate-100 to-slate-200 relative">
@@ -122,10 +123,10 @@ export default function DemoPreviewPage() {
                       <span className="text-sm text-slate-500">Preview</span>
                     </div>
                   </div>
-                  <div className="absolute inset-0 bg-violet-600/0 group-hover:bg-violet-600/10 transition-colors flex items-center justify-center">
+                  <div className="absolute inset-0 bg-keepr-evergreen/0 group-hover:bg-keepr-evergreen/10 transition-colors flex items-center justify-center">
                     <div className="opacity-0 group-hover:opacity-100 transition-opacity">
                       <div className="bg-white rounded-full p-3 shadow-lg">
-                        <Play className="h-6 w-6 text-violet-600" />
+                        <Play className="h-6 w-6 text-keepr-evergreen" />
                       </div>
                     </div>
                   </div>
@@ -133,7 +134,7 @@ export default function DemoPreviewPage() {
 
                 {/* Content */}
                 <div className="p-6">
-                  <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-violet-600 transition-colors">
+                  <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-keepr-evergreen transition-colors">
                     {screen.title}
                   </h3>
                   <p className="text-slate-600 text-sm">{screen.description}</p>
@@ -145,20 +146,20 @@ export default function DemoPreviewPage() {
       </section>
 
       {/* Upgrade CTA */}
-      <section className="py-16 bg-violet-600">
+      <section className="py-16 bg-keepr-evergreen">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <div className="flex items-center justify-center gap-3 text-white mb-4">
             <Lock className="h-6 w-6" />
             <span className="text-lg font-semibold">Want hands-on access?</span>
           </div>
-          <p className="text-violet-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-keepr-off-white/90 mb-8 max-w-2xl mx-auto">
             Get full demo credentials to create reservations, modify rates,
             and explore every feature. Takes 30 seconds.
           </p>
           <Button
             asChild
             size="lg"
-            className="px-8 py-6 text-lg bg-white text-violet-600 hover:bg-violet-50"
+            className="px-8 py-6 text-lg bg-white text-keepr-evergreen hover:bg-keepr-off-white"
           >
             <Link href="/demo">
               Get Demo Credentials
@@ -168,27 +169,7 @@ export default function DemoPreviewPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-slate-900 text-white">
-        <div className="max-w-6xl mx-auto px-6 py-12">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <p className="text-slate-400 text-sm">
-              Keepr - Preview without commitment.
-            </p>
-            <div className="flex items-center gap-6 text-sm text-slate-400">
-              <Link href="/pricing" className="hover:text-white">
-                Pricing
-              </Link>
-              <Link href="/demo" className="hover:text-white">
-                Full Demo
-              </Link>
-              <Link href="/signup" className="hover:text-white">
-                Sign Up
-              </Link>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

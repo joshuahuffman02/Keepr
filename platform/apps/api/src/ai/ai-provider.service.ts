@@ -75,7 +75,7 @@ export class AiProviderService {
             throw new BadRequestException('AI features are not enabled for this campground');
         }
 
-        const provider = campground.aiProvider || 'openai';
+        const provider = 'openai';
 
         try {
             const response = await this.callProvider(provider, {
@@ -167,7 +167,7 @@ export class AiProviderService {
             throw new BadRequestException('AI features are not enabled for this campground');
         }
 
-        const provider = campground.aiProvider || 'openai';
+        const provider = 'openai';
 
         try {
             const response = await this.callToolProvider(provider, {

@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import { redirect } from "next/navigation";
 import {
   MapPin,
   Mountain,
@@ -65,7 +66,35 @@ async function getPopularDestinations(): Promise<PopularDestination[]> {
   }
 }
 
-export default async function CampingIndexPage() {
+const CATEGORY_REDIRECTS: Record<string, string> = {
+  tent: "tents",
+  tents: "tents",
+  rv: "rv",
+  cabins: "cabins",
+  cabin: "cabins",
+  glamping: "glamping",
+  lodges: "lodges",
+  lodge: "lodges",
+  unique: "unique",
+  events: "events",
+};
+
+export default async function CampingIndexPage({
+  searchParams,
+}: {
+  searchParams?: { category?: string };
+}) {
+  const rawCategory = searchParams?.category?.toLowerCase();
+  if (rawCategory) {
+    if (rawCategory === "national-parks") {
+      redirect("/national-parks");
+    }
+    const redirectCategory = CATEGORY_REDIRECTS[rawCategory];
+    if (redirectCategory) {
+      redirect(`/?category=${redirectCategory}`);
+    }
+  }
+
   const [states, popularDestinations] = await Promise.all([
     getStates(),
     getPopularDestinations(),
@@ -284,7 +313,7 @@ export default async function CampingIndexPage() {
                 icon: "/images/icons/bouncing-tent.png",
                 title: "Tent Camping",
                 description: "Traditional camping with tent sites and basic amenities.",
-                href: "/?category=tent",
+                href: "/?category=tents",
               },
               {
                 icon: "/images/icons/electric-hookup.png",
@@ -296,13 +325,13 @@ export default async function CampingIndexPage() {
                 icon: "/images/icons/regions/lake.png",
                 title: "Lakefront Camping",
                 description: "Waterfront sites with beach access and water activities.",
-                href: "/?amenity=lakefront",
+                href: "/?amenity=Lakefront",
               },
               {
                 icon: "/images/icons/regions/mountain.png",
                 title: "Backcountry",
                 description: "Remote wilderness camping for the adventurous spirit.",
-                href: "/?category=backcountry",
+                href: "/?category=unique",
               },
             ].map((type) => (
               <Link
