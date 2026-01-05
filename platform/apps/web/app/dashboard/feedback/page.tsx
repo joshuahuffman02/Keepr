@@ -651,7 +651,7 @@ export default function FeedbackDashboard() {
                       type="email"
                       value={inviteEmail}
                       onChange={(e) => setInviteEmail(e.target.value)}
-                      placeholder="guest@example.com"
+                      placeholder="hello@keeprstay.com"
                       className="w-full border border-border rounded-lg pl-12 pr-4 py-3 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 focus:outline-none transition-shadow"
                       aria-describedby="email-help"
                     />

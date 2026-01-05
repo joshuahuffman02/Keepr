@@ -111,7 +111,7 @@ export const conversationalCopy = {
   placeholders: {
     search: "Where will your next adventure take you?",
     location: "Mountains, beaches, forests...",
-    email: "your.email@adventure.com",
+    email: "hello@keeprstay.com",
     phone: "(555) 123-4567",
     review: "Share the magic of your adventure...",
     message: "What's on your mind, explorer?",

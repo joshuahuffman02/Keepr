@@ -110,9 +110,9 @@ const recentActivity = {
         { id: 3, title: "Account access question", priority: "low", createdAt: "3 hours ago" },
     ],
     userLogins: [
-        { id: 1, email: "john@example.com", loginAt: "5 minutes ago" },
-        { id: 2, email: "sarah@campground.com", loginAt: "12 minutes ago" },
-        { id: 3, email: "admin@platform.com", loginAt: "1 hour ago" },
+        { id: 1, email: "hello@keeprstay.com", loginAt: "5 minutes ago" },
+        { id: 2, email: "hello@keeprstay.com", loginAt: "12 minutes ago" },
+        { id: 3, email: "hello@keeprstay.com", loginAt: "1 hour ago" },
     ],
 };
 

@@ -482,8 +482,8 @@ function Step1Upload({
               <button
                 onClick={() => {
                   const template = `arrival_date,departure_date,first_name,last_name,email,phone,site_number,total_amount,paid_amount,adults,children,confirmation_number,status,notes
-2025-01-15,2025-01-18,John,Doe,john@example.com,555-1234,A1,150.00,150.00,2,1,RES-001,confirmed,Returning guest
-2025-01-20,2025-01-22,Jane,Smith,jane@example.com,555-5678,B3,100.00,50.00,2,0,RES-002,confirmed,`;
+2025-01-15,2025-01-18,John,Doe,hello@keeprstay.com,555-1234,A1,150.00,150.00,2,1,RES-001,confirmed,Returning guest
+2025-01-20,2025-01-22,Jane,Smith,hello@keeprstay.com,555-5678,B3,100.00,50.00,2,0,RES-002,confirmed,`;
                   const blob = new Blob([template], { type: "text/csv" });
                   const url = URL.createObjectURL(blob);
                   const a = document.createElement("a");

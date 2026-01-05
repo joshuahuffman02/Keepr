@@ -301,7 +301,7 @@ export default function ClaimCampgroundPage({
                         setFormData({ ...formData, contactEmail: e.target.value })
                       }
                       className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                      placeholder="john@campground.com"
+                      placeholder="hello@keeprstay.com"
                     />
                   </div>
 

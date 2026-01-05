@@ -520,7 +520,7 @@ export function ParkProfile({
               value={data.email}
               onChange={(v) => setData((prev) => ({ ...prev, email: v }))}
               type="email"
-              placeholder="info@sunnyacres.com"
+              placeholder="hello@keeprstay.com"
               required
             />
           </div>

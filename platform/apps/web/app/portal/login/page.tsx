@@ -66,7 +66,7 @@ export default function GuestLoginPage() {
                             <Input
                                 id="email"
                                 type="email"
-                                placeholder="you@example.com"
+                                placeholder="hello@keeprstay.com"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required

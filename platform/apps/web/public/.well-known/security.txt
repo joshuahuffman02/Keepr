@@ -2,7 +2,7 @@
 # https://securitytxt.org/
 
 # If you discover a security vulnerability, please report it to us
-Contact: mailto:security@campreserv.com
+Contact: mailto:hello@keeprstay.com
 Contact: https://campreserv.com/security
 
 # Encryption (if you prefer to encrypt your report)

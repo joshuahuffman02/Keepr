@@ -21,7 +21,7 @@ export default function PrivacySettingsPage() {
       {
         resource: "guest",
         sample: {
-          email: "guest@example.com",
+          email: "hello@keeprstay.com",
           phone: "555-222-3333",
           notes: "Call Anna tomorrow at 555-000-9999"
         }

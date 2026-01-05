@@ -10,7 +10,7 @@ vi.mock("@/components/ui/use-toast", () => ({
 }));
 
 vi.mock("next-auth/react", () => ({
-  useSession: () => ({ data: { user: { id: "u1", email: "staff@test.com" } } }),
+  useSession: () => ({ data: { user: { id: "u1", email: "hello@keeprstay.com" } } }),
 }));
 
 vi.mock("@/hooks/use-whoami", () => ({

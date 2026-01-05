@@ -129,7 +129,7 @@ function TeamMemberCard({
           type="email"
           value={member.email}
           onChange={(e) => onUpdate({ ...member, email: e.target.value })}
-          placeholder="john@example.com"
+          placeholder="hello@keeprstay.com"
           className="bg-slate-800/50 border-slate-600 text-white"
         />
       </div>

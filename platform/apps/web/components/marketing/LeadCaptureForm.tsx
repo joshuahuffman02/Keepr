@@ -102,7 +102,7 @@ export function LeadCaptureForm({
             type="email"
             value={form.email}
             onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
-            placeholder="alex@example.com"
+            placeholder="hello@keeprstay.com"
             required
           />
         </div>

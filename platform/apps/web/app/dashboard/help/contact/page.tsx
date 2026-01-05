@@ -195,7 +195,7 @@ export default function ContactSupportPage() {
                         setFormState({ ...formState, email: e.target.value })
                       }
                       className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                      placeholder="john@example.com"
+                      placeholder="hello@keeprstay.com"
                     />
                   </div>
                 </div>

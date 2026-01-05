@@ -171,7 +171,7 @@ export function DemoClient() {
                         id="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="sarah@mountainviewrv.com"
+                        placeholder="hello@keeprstay.com"
                         className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-keepr-evergreen focus:border-keepr-evergreen transition-colors"
                         required
                       />

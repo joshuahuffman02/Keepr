@@ -810,7 +810,7 @@ export default function TicketsPage() {
                   <label className="text-sm font-medium text-foreground">Email</label>
                   <Input
                     type="email"
-                    placeholder="your@email.com"
+                    placeholder="hello@keeprstay.com"
                     value={newTicket.email}
                     onChange={(e) => setNewTicket(prev => ({ ...prev, email: e.target.value }))}
                   />

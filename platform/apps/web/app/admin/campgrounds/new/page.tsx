@@ -361,7 +361,7 @@ Note: The admin will be required to change their password on first login.`;
                                 value={form.email}
                                 onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
                                 className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                placeholder="info@campground.com"
+                                placeholder="hello@keeprstay.com"
                             />
                         </div>
                     </div>
@@ -414,7 +414,7 @@ Note: The admin will be required to change their password on first login.`;
                             onChange={(e) => setForm((prev) => ({ ...prev, adminEmail: e.target.value }))}
                             required
                             className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="owner@campground.com"
+                            placeholder="hello@keeprstay.com"
                         />
                         <p className="text-xs text-muted-foreground mt-1">
                             A temporary password will be generated. The admin must change it on first login.

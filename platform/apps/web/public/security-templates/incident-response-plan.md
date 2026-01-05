@@ -32,7 +32,7 @@ This plan establishes procedures for responding to security incidents including 
 | IT Support/MSP | | |
 | Legal Counsel | | |
 | PR/Communications Firm | | |
-| Campreserv Support | support@campreserv.com | |
+| Campreserv Support | support@keeprstay.com | |
 
 ---
 

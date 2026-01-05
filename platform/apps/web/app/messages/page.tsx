@@ -218,7 +218,7 @@ export default function MessagesPage() {
             return [{
                 reservationId: "demo-reservation",
                 guestName: "Demo Guest",
-                guestEmail: "demo@example.com",
+                guestEmail: "demo@keeprstay.com",
                 guestPhone: "(555) 123-4567",
                 guestId: "demo-guest",
                 siteName: "Site A-1",

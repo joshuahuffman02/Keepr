@@ -1,9 +1,8 @@
 FROM node:22-alpine AS base
-# Force rebuild v4
-ARG CACHE_BUST=v4
 RUN corepack enable && corepack prepare pnpm@7.33.6 --activate
 WORKDIR /app
-RUN echo "Build cache bust: ${CACHE_BUST}"
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+ENV NEXT_TELEMETRY_DISABLED=1
 
 # Install dependencies
 FROM base AS deps
@@ -12,7 +11,7 @@ COPY scripts ./scripts
 COPY platform/packages/shared/package.json ./platform/packages/shared/
 COPY platform/apps/api/package.json ./platform/apps/api/
 COPY platform/apps/web/package.json ./platform/apps/web/
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --prefer-offline
 
 # Build shared package
 FROM deps AS shared

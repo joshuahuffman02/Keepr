@@ -196,7 +196,7 @@ export function CompactGuestForm({
             type="email"
             value={data.email}
             onChange={(e) => updateField("email", e.target.value.toLowerCase())}
-            placeholder="john@example.com"
+            placeholder="hello@keeprstay.com"
             className={cn(errors.email && "border-red-500")}
             aria-invalid={!!errors.email}
           />

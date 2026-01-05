@@ -35,6 +35,7 @@ export class RedisRateLimitService {
         maxRequests: 100,
         keyPrefix: "rate_limit:",
     };
+    private warnedNoRedis = false;
 
     // Specific limits for different contexts
     private readonly limits: Record<string, RateLimitConfig> = {
@@ -99,13 +100,18 @@ export class RedisRateLimitService {
         try {
             const client = this.redis.getClient();
             if (!client) {
-                // Redis unavailable, allow request but log warning
-                this.logger.warn("Redis unavailable, allowing request");
+                if (!this.warnedNoRedis) {
+                    this.logger.warn("Redis unavailable, rate limiting disabled");
+                    this.warnedNoRedis = true;
+                }
                 return {
                     allowed: true,
                     remaining: config.maxRequests,
                     resetTime: now + config.windowMs,
                 };
+            }
+            if (this.warnedNoRedis) {
+                this.warnedNoRedis = false;
             }
 
             // Use sorted set for sliding window

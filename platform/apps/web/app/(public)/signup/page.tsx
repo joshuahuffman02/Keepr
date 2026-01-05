@@ -646,7 +646,7 @@ export default function SignupPage() {
                     required
                     value={email}
                     onChange={setEmail}
-                    placeholder="john@example.com"
+                    placeholder="hello@keeprstay.com"
                     validation="email"
                     successMessage="Valid email!"
                   />

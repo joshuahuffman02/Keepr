@@ -77,8 +77,8 @@ function MyComponent() {
   ];
 
   const data = [
-    { id: "1", name: "John", email: "john@example.com", phone: "555-0100" },
-    { id: "2", name: "Jane", email: "jane@example.com", phone: "555-0101" },
+    { id: "1", name: "John", email: "hello@keeprstay.com", phone: "555-0100" },
+    { id: "2", name: "Jane", email: "hello@keeprstay.com", phone: "555-0101" },
   ];
 
   return (

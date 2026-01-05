@@ -79,7 +79,7 @@ const availability = await client.availability.check({
 const reservation = await client.reservations.create({
   campgroundId: 'camp_123',
   siteId: 'site_456',
-  guestEmail: 'guest@example.com',
+  guestEmail: 'hello@keeprstay.com',
   arrivalDate: '2024-06-15',
   departureDate: '2024-06-18',
 });`,

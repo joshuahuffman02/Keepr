@@ -183,7 +183,7 @@ export function CommunicationSetup({
               <div className="flex items-start gap-2 bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
                 <Info className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
                 <p className="text-xs text-slate-300">
-                  Using your own domain (e.g., reservations@mypark.com)
+                  Using your own domain (e.g., hello@keeprstay.com)
                   improves email deliverability and builds trust with guests.
                 </p>
               </div>
@@ -223,7 +223,7 @@ export function CommunicationSetup({
                     type="email"
                     value={customDomain}
                     onChange={(e) => setCustomDomain(e.target.value)}
-                    placeholder="reservations@mypark.com"
+                    placeholder="hello@keeprstay.com"
                     className="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </motion.div>

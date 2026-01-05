@@ -123,11 +123,11 @@ const mockNpsData = {
     { season: "Winter", score: 44, responses: 397, promoters: 210, passives: 100, detractors: 87 },
   ],
   detractorFollowUps: [
-    { id: "d1", score: 2, comment: "Terrible experience. Site was dirty and staff was rude.", campgroundName: "Needs Attention 1", guestEmail: "guest1@example.com", createdAt: new Date("2024-12-15"), followedUp: false, resolved: false },
-    { id: "d2", score: 4, comment: "WiFi didn't work at all. Very disappointing.", campgroundName: "Needs Attention 2", guestEmail: "guest2@example.com", createdAt: new Date("2024-12-14"), followedUp: true, followUpAt: new Date("2024-12-15"), resolved: false },
-    { id: "d3", score: 3, comment: "Noisy neighbors all night. No quiet hours enforced.", campgroundName: "Needs Attention 3", guestEmail: "guest3@example.com", createdAt: new Date("2024-12-13"), followedUp: true, followUpAt: new Date("2024-12-14"), followUpNote: "Offered refund", resolved: true },
-    { id: "d4", score: 5, comment: "Bathrooms were in poor condition.", campgroundName: "Needs Attention 4", guestEmail: "guest4@example.com", createdAt: new Date("2024-12-12"), followedUp: false, resolved: false },
-    { id: "d5", score: 1, comment: "Complete waste of money. Nothing as advertised.", campgroundName: "Needs Attention 5", guestEmail: "guest5@example.com", createdAt: new Date("2024-12-11"), followedUp: false, resolved: false },
+    { id: "d1", score: 2, comment: "Terrible experience. Site was dirty and staff was rude.", campgroundName: "Needs Attention 1", guestEmail: "hello@keeprstay.com", createdAt: new Date("2024-12-15"), followedUp: false, resolved: false },
+    { id: "d2", score: 4, comment: "WiFi didn't work at all. Very disappointing.", campgroundName: "Needs Attention 2", guestEmail: "hello@keeprstay.com", createdAt: new Date("2024-12-14"), followedUp: true, followUpAt: new Date("2024-12-15"), resolved: false },
+    { id: "d3", score: 3, comment: "Noisy neighbors all night. No quiet hours enforced.", campgroundName: "Needs Attention 3", guestEmail: "hello@keeprstay.com", createdAt: new Date("2024-12-13"), followedUp: true, followUpAt: new Date("2024-12-14"), followUpNote: "Offered refund", resolved: true },
+    { id: "d4", score: 5, comment: "Bathrooms were in poor condition.", campgroundName: "Needs Attention 4", guestEmail: "hello@keeprstay.com", createdAt: new Date("2024-12-12"), followedUp: false, resolved: false },
+    { id: "d5", score: 1, comment: "Complete waste of money. Nothing as advertised.", campgroundName: "Needs Attention 5", guestEmail: "hello@keeprstay.com", createdAt: new Date("2024-12-11"), followedUp: false, resolved: false },
   ],
 };
 

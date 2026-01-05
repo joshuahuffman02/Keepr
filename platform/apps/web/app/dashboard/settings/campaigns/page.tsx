@@ -237,7 +237,7 @@ export default function CampaignsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <Label>From email</Label>
-                  <Input value={fromEmail} onChange={(e) => setFromEmail(e.target.value)} placeholder="hello@yourcamp.com" />
+                  <Input value={fromEmail} onChange={(e) => setFromEmail(e.target.value)} placeholder="hello@keeprstay.com" />
                 </div>
                 <div className="space-y-1">
                   <Label>From name (optional)</Label>

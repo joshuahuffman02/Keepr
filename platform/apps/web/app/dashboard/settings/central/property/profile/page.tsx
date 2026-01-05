@@ -204,7 +204,7 @@ export default function ProfilePage() {
               <Input
                 id="email"
                 type="email"
-                placeholder="info@campground.com"
+                placeholder="hello@keeprstay.com"
                 value={profile.email || ""}
                 onChange={(e) => setProfile({ ...profile, email: e.target.value || null })}
               />

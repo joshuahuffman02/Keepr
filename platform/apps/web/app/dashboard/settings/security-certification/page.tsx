@@ -1055,7 +1055,7 @@ export default function SecurityCertificationPage() {
                         type="email"
                         value={auditorEmail}
                         onChange={(e) => setAuditorEmail(e.target.value)}
-                        placeholder="auditor@example.com"
+                        placeholder="hello@keeprstay.com"
                         className="focus:ring-2 focus:ring-blue-500"
                       />
                     </div>

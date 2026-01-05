@@ -932,7 +932,7 @@ function TestTriggerModal({
                 type="email"
                 value={testEmail}
                 onChange={e => setTestEmail(e.target.value)}
-                placeholder="your@email.com"
+                placeholder="hello@keeprstay.com"
                 className="w-full px-3 py-2 border border-border rounded-lg
                   focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
               />

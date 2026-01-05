@@ -176,7 +176,7 @@ export function DemoCTA() {
                         value={formData.email}
                         onChange={handleChange}
                         className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-keepr-clay focus:border-keepr-clay outline-none transition"
-                        placeholder="john@example.com"
+                        placeholder="hello@keeprstay.com"
                       />
                     </div>
                   </div>

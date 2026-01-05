@@ -202,7 +202,7 @@ export default function UsersPage() {
                 <FormField
                   label="Email"
                   type="email"
-                  placeholder="staff@example.com"
+                  placeholder="hello@keeprstay.com"
                   error={inviteForm.formState.errors.email?.message}
                   showSuccess
                   {...inviteForm.register("email")}
@@ -265,7 +265,7 @@ export default function UsersPage() {
                 <FormField
                   label="Recipient email"
                   type="email"
-                  placeholder="owner@camp.com"
+                  placeholder="hello@keeprstay.com"
                   error={onboardingForm.formState.errors.email?.message}
                   showSuccess
                   {...onboardingForm.register("email")}

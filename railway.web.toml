@@ -1,5 +1,4 @@
 [build]
-# Clean deploy v4
 builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile.web"
 buildCacheMounts = ["/root/.local/share/pnpm/store"]
@@ -7,8 +6,7 @@ buildArgs = [
   "NEXT_PUBLIC_API_BASE",
   "AUTH_URL",
   "AUTH_SECRET",
-  "AUTH_TRUST_HOST",
-  "CACHE_BUST"
+  "AUTH_TRUST_HOST"
 ]
 
 [deploy]

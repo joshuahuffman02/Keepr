@@ -141,7 +141,7 @@ export default function BlogPostPage({ params }: Props) {
                                 <form className="flex gap-2 max-w-md mx-auto">
                                     <input
                                         type="email"
-                                        placeholder="your@email.com"
+                                        placeholder="hello@keeprstay.com"
                                         className="flex-1 px-4 py-3 rounded-lg border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 outline-none"
                                     />
                                     <button

@@ -1073,7 +1073,7 @@ function GuestStep({
                             }
                         }}
                         className="w-full px-4 py-3 border border-border rounded-xl focus:ring-2 focus:ring-keepr-evergreen focus:border-keepr-evergreen"
-                        placeholder="john@example.com"
+                        placeholder="hello@keeprstay.com"
                         required
                     />
                 </div>

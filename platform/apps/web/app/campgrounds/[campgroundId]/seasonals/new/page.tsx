@@ -366,7 +366,7 @@ export default function NewSeasonalGuestPage() {
                     <Label>Email</Label>
                     <Input
                       type="email"
-                      placeholder="john.smith@example.com"
+                      placeholder="hello@keeprstay.com"
                       value={newGuestEmail}
                       onChange={(e) => setNewGuestEmail(e.target.value)}
                     />

@@ -233,7 +233,7 @@ export function CampgroundProfileForm({ campground }: CampgroundProfileFormProps
                   <Input
                     value={form.email}
                     onChange={(e) => setForm((s) => ({ ...s, email: e.target.value }))}
-                    placeholder="reservations@yourpark.com"
+                    placeholder="hello@keeprstay.com"
                   />
                 </div>
               </div>

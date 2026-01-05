@@ -108,7 +108,7 @@ export function GuestCheckoutForm({
         <EmailFormField
           label="Email"
           name="email"
-          placeholder="john@example.com"
+          placeholder="hello@keeprstay.com"
           required
           {...form.getFieldProps("email")}
         />
