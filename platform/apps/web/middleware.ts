@@ -8,6 +8,7 @@ const PUBLIC_PATHS = [
   "/roadmap/public",
   "/auth/signin",
   "/auth/callback",
+  "/auth/error",
   "/privacy",
   "/terms",
   "/robots.txt",
@@ -24,62 +25,18 @@ const PUBLIC_PREFIXES = [
   "/manifest",
 ];
 
-const PROTECTED_PREFIXES = [
-  "/dashboard",
-  "/campgrounds",
-  "/reservations",
-  "/guests",
-  "/booking",
-  "/groups",
-  "/billing",
-  "/finance",
-  "/ledger",
-  "/payouts",
-  "/disputes",
-  "/admin",
-  "/owners",
-  "/help",
-  "/updates",
-  "/roadmap",
-  "/messages",
-  "/nps",
-  "/reports",
-  "/reports-v2",
-  "/settings",
-  "/store",
-  "/pos",
-  "/maintenance",
-  "/pwa",
-  "/portal",
-  "/analytics",
-  "/approvals",
-  "/operations",
-  "/inventory",
-  "/calendar",
-  "/calendar-v2",
-  "/pricing",
-  "/tech",
-  "/security",
-];
-
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   const isPublicPath =
     PUBLIC_PATHS.includes(pathname) ||
     PUBLIC_PREFIXES.some((prefix) => pathname.startsWith(prefix));
-  if (isPublicPath) {
-    return NextResponse.next();
-  }
+  if (isPublicPath) return NextResponse.next();
 
-  const isProtected = PROTECTED_PREFIXES.some(
-    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
-  );
-  if (!isProtected) {
-    return NextResponse.next();
-  }
-
-  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  const token = await getToken({
+    req,
+    secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET
+  });
   if (!token) {
     const signInUrl = new URL("/auth/signin", req.url);
     signInUrl.searchParams.set("callbackUrl", req.nextUrl.pathname + req.nextUrl.search);
