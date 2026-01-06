@@ -5,6 +5,13 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/components/ui/use-toast";
 import { apiClient } from "@/lib/api-client";
@@ -75,46 +82,49 @@ export default function LocalizationSettingsPage() {
           <CardContent className="space-y-3">
             <div>
               <div className="text-sm font-semibold text-foreground">Language</div>
-              <select
-                className="mt-1 w-full rounded-md border border-border px-3 py-2 text-sm"
-                value={locale}
-                onChange={(e) => setLocale(e.target.value)}
-              >
-                {(localesQuery.data ?? []).map((opt) => (
-                  <option key={opt.code} value={opt.code}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
+              <Select value={locale} onValueChange={setLocale}>
+                <SelectTrigger className="mt-1 w-full text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {(localesQuery.data ?? []).map((opt) => (
+                    <SelectItem key={opt.code} value={opt.code}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <div className="text-xs text-muted-foreground mt-1">Includes date/number formats.</div>
             </div>
             <div>
               <div className="text-sm font-semibold text-foreground">Currency</div>
-              <select
-                className="mt-1 w-full rounded-md border border-border px-3 py-2 text-sm"
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value)}
-              >
-                {currencies.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
+              <Select value={currency} onValueChange={setCurrency}>
+                <SelectTrigger className="mt-1 w-full text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {currencies.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <div className="text-sm font-semibold text-foreground">Time zone</div>
-              <select
-                className="mt-1 w-full rounded-md border border-border px-3 py-2 text-sm"
-                value={timezone}
-                onChange={(e) => setTimezone(e.target.value)}
-              >
-                {timezones.map((tz) => (
-                  <option key={tz} value={tz}>
-                    {tz}
-                  </option>
-                ))}
-              </select>
+              <Select value={timezone} onValueChange={setTimezone}>
+                <SelectTrigger className="mt-1 w-full text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {timezones.map((tz) => (
+                    <SelectItem key={tz} value={tz}>
+                      {tz}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <Button onClick={handleSave} disabled={updateMutation.isPending}>
               Save

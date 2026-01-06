@@ -9,6 +9,16 @@ import { apiClient } from "../../../../lib/api-client";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/ui/card";
 import { Badge } from "../../../../components/ui/badge";
 import { Button } from "../../../../components/ui/button";
+import { Checkbox } from "../../../../components/ui/checkbox";
+import { Input } from "../../../../components/ui/input";
+import { Label } from "../../../../components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../../components/ui/select";
 import { format } from "date-fns";
 import {
   Users,
@@ -388,15 +398,15 @@ export default function GroupsPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-foreground">Sites</label>
+                  <Label className="text-sm font-medium text-foreground">Sites</Label>
                   <div className="mt-1 max-h-40 overflow-auto border border-border rounded p-2 space-y-1">
                     {sites.map((site: any) => (
-                      <label key={site.id} className="flex items-center gap-2 text-sm">
-                        <input
-                          type="checkbox"
+                      <div key={site.id} className="flex items-center gap-2 text-sm">
+                        <Checkbox
+                          id={`block-site-${site.id}`}
                           checked={newBlock.siteIds.includes(site.id)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
+                          onCheckedChange={(checked) => {
+                            if (checked) {
                               setNewBlock({
                                 ...newBlock,
                                 siteIds: [...newBlock.siteIds, site.id],
@@ -408,10 +418,12 @@ export default function GroupsPage() {
                               });
                             }
                           }}
-                          className="rounded border-border"
+                          aria-label={`Select ${site.name} site ${site.siteNumber}`}
                         />
-                        {site.name} #{site.siteNumber}
-                      </label>
+                        <Label htmlFor={`block-site-${site.id}`} className="text-sm font-normal">
+                          {site.name} #{site.siteNumber}
+                        </Label>
+                      </div>
                     ))}
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">
@@ -421,40 +433,46 @@ export default function GroupsPage() {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="text-sm font-medium text-foreground">Start Date</label>
-                    <input
+                    <Label htmlFor="block-start" className="text-sm font-medium text-foreground">Start Date</Label>
+                    <Input
+                      id="block-start"
                       type="date"
                       value={newBlock.windowStart}
                       onChange={(e) =>
                         setNewBlock({ ...newBlock, windowStart: e.target.value })
                       }
-                      className="w-full mt-1 border border-border rounded px-3 py-2 text-sm"
+                      className="mt-1"
                     />
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-foreground">End Date</label>
-                    <input
+                    <Label htmlFor="block-end" className="text-sm font-medium text-foreground">End Date</Label>
+                    <Input
+                      id="block-end"
                       type="date"
                       value={newBlock.windowEnd}
                       onChange={(e) =>
                         setNewBlock({ ...newBlock, windowEnd: e.target.value })
                       }
-                      className="w-full mt-1 border border-border rounded px-3 py-2 text-sm"
+                      className="mt-1"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-foreground">Reason</label>
-                  <select
+                  <Label htmlFor="block-reason" className="text-sm font-medium text-foreground">Reason</Label>
+                  <Select
                     value={newBlock.reason}
-                    onChange={(e) => setNewBlock({ ...newBlock, reason: e.target.value })}
-                    className="w-full mt-1 border border-border rounded px-3 py-2"
+                    onValueChange={(value) => setNewBlock({ ...newBlock, reason: value })}
                   >
-                    <option value="group_hold">Group Hold</option>
-                    <option value="maintenance">Maintenance</option>
-                    <option value="other">Other</option>
-                  </select>
+                    <SelectTrigger id="block-reason" className="mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="group_hold">Group Hold</SelectItem>
+                      <SelectItem value="maintenance">Maintenance</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="flex gap-2 pt-2">
@@ -530,13 +548,12 @@ export default function GroupsPage() {
                         One guest pays for all reservations in the group
                       </div>
                     </div>
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       checked={newGroup.sharedPayment}
-                      onChange={(e) =>
-                        setNewGroup({ ...newGroup, sharedPayment: e.target.checked })
+                      onCheckedChange={(checked) =>
+                        setNewGroup({ ...newGroup, sharedPayment: Boolean(checked) })
                       }
-                      className="h-4 w-4 rounded border-border"
+                      aria-label="Shared payment"
                     />
                   </div>
 
@@ -547,13 +564,12 @@ export default function GroupsPage() {
                         Send group-wide emails and updates
                       </div>
                     </div>
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       checked={newGroup.sharedComm}
-                      onChange={(e) =>
-                        setNewGroup({ ...newGroup, sharedComm: e.target.checked })
+                      onCheckedChange={(checked) =>
+                        setNewGroup({ ...newGroup, sharedComm: Boolean(checked) })
                       }
-                      className="h-4 w-4 rounded border-border"
+                      aria-label="Shared communications"
                     />
                   </div>
                 </div>

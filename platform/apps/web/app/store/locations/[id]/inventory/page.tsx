@@ -129,7 +129,7 @@ export default function LocationInventoryPage() {
         return (
             <DashboardShell>
                 <div className="flex items-center justify-center py-12">
-                    <div className="text-slate-500">Loading...</div>
+                    <div className="text-muted-foreground">Loading...</div>
                 </div>
             </DashboardShell>
         );
@@ -140,15 +140,15 @@ export default function LocationInventoryPage() {
             <div className="space-y-6">
                 <div className="flex items-center gap-4">
                     <Link href="/store/locations">
-                        <Button variant="ghost" size="icon">
+                        <Button variant="ghost" size="icon" aria-label="Back to locations">
                             <ArrowLeft className="w-4 h-4" />
                         </Button>
                     </Link>
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+                        <h1 className="text-2xl font-bold tracking-tight text-foreground">
                             {location?.name} Inventory
                         </h1>
-                        <p className="text-slate-500">
+                        <p className="text-muted-foreground">
                             Manage stock levels for this location
                         </p>
                     </div>
@@ -159,11 +159,12 @@ export default function LocationInventoryPage() {
                         <div className="flex items-center justify-between">
                             <CardTitle className="text-base">Product Stock</CardTitle>
                             <div className="relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                                 <Input
                                     placeholder="Search products..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
+                                    aria-label="Search products"
                                     className="pl-9 w-64"
                                 />
                             </div>
@@ -171,17 +172,17 @@ export default function LocationInventoryPage() {
                     </CardHeader>
                     <CardContent>
                         {inventoryLoading ? (
-                            <div className="text-center py-8 text-slate-500">Loading inventory...</div>
+                            <div className="text-center py-8 text-muted-foreground">Loading inventory...</div>
                         ) : filteredInventory.length === 0 ? (
                             <div className="text-center py-8">
-                                <Package className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                                <p className="text-slate-500 mb-2">
+                                <Package className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                                <p className="text-muted-foreground mb-2">
                                     {searchQuery
                                         ? "No products match your search"
                                         : "No inventory tracked at this location yet"}
                                 </p>
                                 {!searchQuery && availableProducts.length > 0 && (
-                                    <p className="text-sm text-slate-400">
+                                    <p className="text-sm text-muted-foreground">
                                         Add products below to start tracking inventory
                                     </p>
                                 )}
@@ -208,7 +209,7 @@ export default function LocationInventoryPage() {
                                                 <TableCell className="font-medium">
                                                     {item.product?.name}
                                                 </TableCell>
-                                                <TableCell className="text-slate-500">
+                                                <TableCell className="text-muted-foreground">
                                                     {item.product?.sku || "—"}
                                                 </TableCell>
                                                 <TableCell className="text-right">
@@ -218,16 +219,16 @@ export default function LocationInventoryPage() {
                                                     <span
                                                         className={cn(
                                                             "font-medium",
-                                                            isLowStock && "text-amber-600"
+                                                            isLowStock && "text-status-warning"
                                                         )}
                                                     >
                                                         {item.stockQty}
                                                     </span>
                                                     {isLowStock && (
-                                                        <AlertTriangle className="inline-block w-4 h-4 ml-1 text-amber-500" />
+                                                        <AlertTriangle className="inline-block w-4 h-4 ml-1 text-status-warning" />
                                                     )}
                                                 </TableCell>
-                                                <TableCell className="text-right text-slate-500">
+                                                <TableCell className="text-right text-muted-foreground">
                                                     {item.lowStockAlert ?? "—"}
                                                 </TableCell>
                                                 <TableCell>
@@ -240,6 +241,7 @@ export default function LocationInventoryPage() {
                                                                 setAdjustmentType("adjust");
                                                                 setAdjustmentValue(-1);
                                                             }}
+                                                            aria-label={`Decrease stock for ${item.product?.name ?? "product"}`}
                                                         >
                                                             <Minus className="w-4 h-4" />
                                                         </Button>
@@ -251,6 +253,7 @@ export default function LocationInventoryPage() {
                                                                 setAdjustmentType("adjust");
                                                                 setAdjustmentValue(1);
                                                             }}
+                                                            aria-label={`Increase stock for ${item.product?.name ?? "product"}`}
                                                         >
                                                             <Plus className="w-4 h-4" />
                                                         </Button>
@@ -263,6 +266,7 @@ export default function LocationInventoryPage() {
                                                                 setAdjustmentValue(item.stockQty);
                                                                 setLowStockAlert(item.lowStockAlert ?? undefined);
                                                             }}
+                                                            aria-label={`Edit stock settings for ${item.product?.name ?? "product"}`}
                                                         >
                                                             <Edit2 className="w-4 h-4" />
                                                         </Button>
@@ -301,17 +305,17 @@ export default function LocationInventoryPage() {
                                             setAdjustmentValue(0);
                                             setLowStockAlert(product.lowStockAlert ?? undefined);
                                         }}
-                                        className="p-3 rounded-lg border border-dashed border-slate-300 hover:border-blue-500 hover:bg-blue-50 transition-colors text-left"
+                                        className="p-3 rounded-lg border border-dashed border-border hover:border-primary hover:bg-primary/10 transition-colors text-left"
                                     >
                                         <div className="font-medium text-sm truncate">{product.name}</div>
-                                        <div className="text-xs text-slate-500 mt-1">
+                                        <div className="text-xs text-muted-foreground mt-1">
                                             {product.sku || "No SKU"}
                                         </div>
                                     </button>
                                 ))}
                             </div>
                             {availableProducts.length > 12 && (
-                                <p className="text-sm text-slate-500 mt-3">
+                                <p className="text-sm text-muted-foreground mt-3">
                                     And {availableProducts.length - 12} more products...
                                 </p>
                             )}
@@ -336,6 +340,7 @@ export default function LocationInventoryPage() {
                             <Button
                                 variant={adjustmentType === "adjust" ? "default" : "outline"}
                                 onClick={() => setAdjustmentType("adjust")}
+                                aria-pressed={adjustmentType === "adjust"}
                                 className="flex-1"
                             >
                                 Quick Adjust
@@ -343,6 +348,7 @@ export default function LocationInventoryPage() {
                             <Button
                                 variant={adjustmentType === "set" ? "default" : "outline"}
                                 onClick={() => setAdjustmentType("set")}
+                                aria-pressed={adjustmentType === "set"}
                                 className="flex-1"
                             >
                                 Set Exact
@@ -351,16 +357,18 @@ export default function LocationInventoryPage() {
 
                         {adjustmentType === "adjust" ? (
                             <div className="space-y-2">
-                                <Label>Adjustment Amount</Label>
+                                <Label htmlFor="adjustment-amount">Adjustment Amount</Label>
                                 <div className="flex items-center gap-3">
                                     <Button
                                         variant="outline"
                                         size="icon"
                                         onClick={() => setAdjustmentValue((v) => v - 1)}
+                                        aria-label="Decrease adjustment amount"
                                     >
                                         <Minus className="w-4 h-4" />
                                     </Button>
                                     <Input
+                                        id="adjustment-amount"
                                         type="number"
                                         value={adjustmentValue}
                                         onChange={(e) => setAdjustmentValue(parseInt(e.target.value) || 0)}
@@ -370,11 +378,12 @@ export default function LocationInventoryPage() {
                                         variant="outline"
                                         size="icon"
                                         onClick={() => setAdjustmentValue((v) => v + 1)}
+                                        aria-label="Increase adjustment amount"
                                     >
                                         <Plus className="w-4 h-4" />
                                     </Button>
                                 </div>
-                                <p className="text-sm text-slate-500">
+                                <p className="text-sm text-muted-foreground">
                                     Current: {adjustingItem?.stockQty ?? 0} →{" "}
                                     <span className="font-medium">
                                         {Math.max(0, (adjustingItem?.stockQty ?? 0) + adjustmentValue)}
@@ -384,8 +393,9 @@ export default function LocationInventoryPage() {
                         ) : (
                             <div className="space-y-4">
                                 <div className="space-y-2">
-                                    <Label>Stock Quantity</Label>
+                                    <Label htmlFor="stock-quantity">Stock Quantity</Label>
                                     <Input
+                                        id="stock-quantity"
                                         type="number"
                                         min={0}
                                         value={adjustmentValue}
@@ -393,8 +403,9 @@ export default function LocationInventoryPage() {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label>Low Stock Alert (optional)</Label>
+                                    <Label htmlFor="low-stock-alert">Low Stock Alert (optional)</Label>
                                     <Input
+                                        id="low-stock-alert"
                                         type="number"
                                         min={0}
                                         value={lowStockAlert ?? ""}
@@ -406,8 +417,9 @@ export default function LocationInventoryPage() {
                         )}
 
                         <div className="space-y-2">
-                            <Label>Notes (optional)</Label>
+                            <Label htmlFor="adjustment-notes">Notes (optional)</Label>
                             <Input
+                                id="adjustment-notes"
                                 value={adjustmentNotes}
                                 onChange={(e) => setAdjustmentNotes(e.target.value)}
                                 placeholder="Reason for adjustment..."

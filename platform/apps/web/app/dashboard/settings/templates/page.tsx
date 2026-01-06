@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef, useMemo } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { FormField } from "@/components/ui/form-field";
@@ -12,6 +12,14 @@ if (typeof window !== "undefined") {
   DOMPurify = require("dompurify");
 }
 import { FormTextarea } from "@/components/ui/form-textarea";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { apiClient } from "@/lib/api-client";
 import {
   Mail,
@@ -817,7 +825,7 @@ function TemplateEditor({
       <div className="px-5 py-4 border-b border-border flex items-center justify-between">
         <div className="flex items-center gap-3">
           <span className="text-muted-foreground">{template.channel === "email" ? <Mail className="h-5 w-5" /> : <Smartphone className="h-5 w-5" />}</span>
-          <input
+          <Input
             type="text"
             {...register("name")}
             className="font-semibold text-foreground bg-transparent border-none outline-none focus:ring-0 text-lg"
@@ -939,6 +947,7 @@ function CreateTemplateModal({
     formState: { errors },
     watch,
     setValue,
+    control,
   } = useForm<CreateTemplateFormData>({
     defaultValues: {
       name: "",
@@ -1050,16 +1059,27 @@ function CreateTemplateModal({
 
           <div>
             <label htmlFor="category-select" className="block text-sm font-medium text-foreground mb-1">Category</label>
-            <select
-              id="category-select"
-              className="w-full px-3 py-2 border border-border rounded-lg
-                focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
-              {...register("category")}
-            >
-              {CATEGORIES.map(cat => (
-                <option key={cat} value={cat} className="capitalize">{cat}</option>
-              ))}
-            </select>
+            <Controller
+              name="category"
+              control={control}
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger
+                    id="category-select"
+                    className="w-full"
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CATEGORIES.map(cat => (
+                      <SelectItem key={cat} value={cat} className="capitalize">
+                        {cat}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
           </div>
 
           <div className="flex gap-3 pt-4">

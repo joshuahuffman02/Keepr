@@ -1,6 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Button } from "../../../../components/ui/button";
+import { Input } from "../../../../components/ui/input";
+import { Label } from "../../../../components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../../components/ui/select";
 
 type Workflow = {
   id: string;
@@ -70,39 +80,44 @@ export default function WorkflowsPage({ params }: { params: { campgroundId: stri
         <div className="rounded-lg border p-4" data-testid="workflow-create-card">
           <h2 className="text-lg font-medium mb-2">Create Workflow</h2>
           <div className="space-y-2">
-            <label className="block text-sm font-medium">Name</label>
-            <input
-              className="w-full rounded border px-3 py-2"
+            <Label htmlFor="workflow-name" className="block text-sm font-medium">Name</Label>
+            <Input
+              id="workflow-name"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
             />
-            <label className="block text-sm font-medium">Trigger</label>
-            <select
-              className="w-full rounded border px-3 py-2"
+            <Label htmlFor="workflow-trigger" className="block text-sm font-medium">Trigger</Label>
+            <Select
               value={form.trigger}
-              onChange={(e) => setForm({ ...form, trigger: e.target.value })}
+              onValueChange={(value) => setForm({ ...form, trigger: value })}
             >
-              <option value="reservation_created">Reservation Created</option>
-              <option value="check_in">Check-in</option>
-              <option value="check_out">Check-out</option>
-              <option value="payment_received">Payment Received</option>
-              <option value="payment_failed">Payment Failed</option>
-              <option value="review_received">Review Received</option>
-            </select>
-            <label className="block text-sm font-medium">Priority</label>
-            <input
+              <SelectTrigger id="workflow-trigger" className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="reservation_created">Reservation Created</SelectItem>
+                <SelectItem value="check_in">Check-in</SelectItem>
+                <SelectItem value="check_out">Check-out</SelectItem>
+                <SelectItem value="payment_received">Payment Received</SelectItem>
+                <SelectItem value="payment_failed">Payment Failed</SelectItem>
+                <SelectItem value="review_received">Review Received</SelectItem>
+              </SelectContent>
+            </Select>
+            <Label htmlFor="workflow-priority" className="block text-sm font-medium">Priority</Label>
+            <Input
+              id="workflow-priority"
               type="number"
-              className="w-24 rounded border px-3 py-2"
+              className="w-24"
               value={form.priority}
               onChange={(e) => setForm({ ...form, priority: Number(e.target.value) })}
             />
-            <button
-              className="mt-2 rounded bg-indigo-600 px-4 py-2 text-white"
+            <Button
+              className="mt-2"
               onClick={create}
               data-testid="workflow-trigger-button"
             >
               Save Workflow
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -143,4 +158,3 @@ export default function WorkflowsPage({ params }: { params: { campgroundId: stri
     </div>
   );
 }
-

@@ -5,6 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 import { DashboardShell } from "../../components/ui/layout/DashboardShell";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
 import { TableEmpty } from "../../components/ui/table";
 import { apiClient } from "../../lib/api-client";
 import { HelpAnchor } from "../../components/help/HelpAnchor";
@@ -172,6 +174,7 @@ export default function LedgerPage() {
                   <button
                     key={preset.label}
                     onClick={() => applyPreset(preset)}
+                    aria-pressed={start === preset.start && end === preset.end}
                     className={`px-3 py-1.5 text-sm rounded-full transition-all duration-150 ${
                       start === preset.start && end === preset.end
                         ? "bg-status-success/15 text-status-success border-2 border-status-success font-medium"
@@ -186,51 +189,51 @@ export default function LedgerPage() {
               {/* Custom Date Range & Filters */}
               <div className="flex flex-wrap gap-3 items-end">
                 <div className="space-y-1">
-                  <label htmlFor="ledger-start" className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+                  <Label htmlFor="ledger-start" className="text-xs font-medium text-muted-foreground flex items-center gap-1">
                     <Calendar className="h-3 w-3" />
                     Start Date
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     id="ledger-start"
                     type="date"
-                    className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                    className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-ring focus:border-ring outline-none"
                     value={start}
                     onChange={(e) => setStart(e.target.value)}
                   />
                 </div>
                 <div className="space-y-1">
-                  <label htmlFor="ledger-end" className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+                  <Label htmlFor="ledger-end" className="text-xs font-medium text-muted-foreground flex items-center gap-1">
                     <Calendar className="h-3 w-3" />
                     End Date
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     id="ledger-end"
                     type="date"
-                    className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                    className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-ring focus:border-ring outline-none"
                     value={end}
                     onChange={(e) => setEnd(e.target.value)}
                   />
                 </div>
                 <div className="space-y-1">
-                  <label htmlFor="ledger-gl" className="text-xs font-medium text-muted-foreground">
+                  <Label htmlFor="ledger-gl" className="text-xs font-medium text-muted-foreground">
                     GL Code
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     id="ledger-gl"
-                    className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                    className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-ring focus:border-ring outline-none"
                     placeholder="Filter by GL code"
                     value={glCode}
                     onChange={(e) => setGlCode(e.target.value)}
                   />
                 </div>
                 <div className="space-y-1">
-                  <label htmlFor="ledger-search" className="text-xs font-medium text-muted-foreground flex items-center gap-1">
+                  <Label htmlFor="ledger-search" className="text-xs font-medium text-muted-foreground flex items-center gap-1">
                     <Search className="h-3 w-3" />
                     Search
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     id="ledger-search"
-                    className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                    className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-ring focus:border-ring outline-none"
                     placeholder="Description, account..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -312,7 +315,7 @@ export default function LedgerPage() {
                     {summaryQuery.data?.map((row) => (
                       <div key={row.glCode} className="rounded-lg border border-border bg-muted px-3 py-2 hover:bg-muted transition-colors cursor-pointer" onClick={() => setGlCode(row.glCode)}>
                         <div className="text-xs text-muted-foreground">GL {row.glCode}</div>
-                        <div className={`text-sm font-semibold ${row.netCents >= 0 ? "text-emerald-700" : "text-rose-700"}`}>
+                        <div className={`text-sm font-semibold ${row.netCents >= 0 ? "text-status-success" : "text-status-error"}`}>
                           {row.netCents >= 0 ? "+" : "-"}${(Math.abs(row.netCents) / 100).toFixed(2)}
                         </div>
                       </div>
@@ -324,7 +327,7 @@ export default function LedgerPage() {
               {agingQuery.data && (
                 <div>
                   <h3 className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-amber-600" />
+                    <Clock className="h-4 w-4 text-status-warning" />
                     Aging Receivables
                   </h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -343,18 +346,18 @@ export default function LedgerPage() {
                             !hasBalance
                               ? "border-border bg-muted"
                               : b.severity === "critical"
-                              ? "border-red-200 bg-red-50"
+                              ? "border-status-error/20 bg-status-error/10"
                               : b.severity === "high"
-                              ? "border-orange-200 bg-orange-50"
+                              ? "border-status-warning/20 bg-status-warning/10"
                               : b.severity === "medium"
-                              ? "border-amber-200 bg-amber-50"
-                              : "border-emerald-200 bg-emerald-50"
+                              ? "border-status-warning/20 bg-status-warning/10"
+                              : "border-status-success/20 bg-status-success/10"
                           }`}
                         >
-                          <div className={`text-xs ${hasBalance ? (b.severity === "critical" ? "text-red-700" : b.severity === "high" ? "text-orange-700" : b.severity === "medium" ? "text-amber-700" : "text-emerald-700") : "text-muted-foreground"}`}>
+                          <div className={`text-xs ${hasBalance ? (b.severity === "critical" ? "text-status-error" : b.severity === "high" ? "text-status-warning" : b.severity === "medium" ? "text-status-warning" : "text-status-success") : "text-muted-foreground"}`}>
                             {b.label}
                           </div>
-                          <div className={`text-sm font-semibold ${hasBalance ? (b.severity === "critical" ? "text-red-900" : b.severity === "high" ? "text-orange-900" : b.severity === "medium" ? "text-amber-900" : "text-emerald-900") : "text-muted-foreground"}`}>
+                          <div className={`text-sm font-semibold ${hasBalance ? (b.severity === "critical" ? "text-status-error" : b.severity === "high" ? "text-status-warning" : b.severity === "medium" ? "text-status-warning" : "text-status-success") : "text-muted-foreground"}`}>
                             ${(amount / 100).toFixed(2)}
                           </div>
                         </div>
@@ -383,9 +386,9 @@ export default function LedgerPage() {
                     <div className="flex items-center justify-between mb-3">
                       <h3 className="font-semibold text-foreground flex items-center gap-2">
                         {isBalanced ? (
-                          <CheckCircle className="h-5 w-5 text-emerald-600" />
+                          <CheckCircle className="h-5 w-5 text-status-success" />
                         ) : needsReview ? (
-                          <AlertTriangle className="h-5 w-5 text-amber-600" />
+                          <AlertTriangle className="h-5 w-5 text-status-warning" />
                         ) : null}
                         Balance Verification
                       </h3>
@@ -400,10 +403,10 @@ export default function LedgerPage() {
 
                     {isBalanced && (
                       <div className="mb-3 p-3 bg-status-success/10 rounded-lg border border-status-success/20">
-                        <p className="text-sm text-emerald-800 font-medium">
+                        <p className="text-sm text-status-success font-medium">
                           Great news! Your books are balanced for this period.
                         </p>
-                        <p className="text-xs text-emerald-600 mt-1">
+                        <p className="text-xs text-status-success mt-1">
                           All entries have GL codes assigned and debits equal credits.
                         </p>
                       </div>
@@ -412,13 +415,13 @@ export default function LedgerPage() {
                     {needsReview && (
                       <div className="mb-3 p-3 bg-status-warning/10 rounded-lg border border-status-warning/20 space-y-1">
                         {hasUnbalanced && (
-                          <div className="flex items-center gap-2 text-sm text-amber-800">
+                          <div className="flex items-center gap-2 text-sm text-status-warning">
                             <AlertTriangle className="h-4 w-4 flex-shrink-0" />
                             <span>Unbalanced by <strong>${(Math.abs(netBalance) / 100).toFixed(2)}</strong></span>
                           </div>
                         )}
                         {missingGlCount > 0 && (
-                          <div className="flex items-center gap-2 text-sm text-amber-800">
+                          <div className="flex items-center gap-2 text-sm text-status-warning">
                             <AlertTriangle className="h-4 w-4 flex-shrink-0" />
                             <span><strong>{missingGlCount}</strong> {missingGlCount === 1 ? 'entry is' : 'entries are'} missing GL codes</span>
                           </div>
@@ -429,21 +432,21 @@ export default function LedgerPage() {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                       <div>
                         <div className="text-muted-foreground text-xs">Total Credits</div>
-                        <div className="font-bold text-emerald-700 text-lg">${(totalCredits / 100).toFixed(2)}</div>
+                        <div className="font-bold text-status-success text-lg">${(totalCredits / 100).toFixed(2)}</div>
                       </div>
                       <div>
                         <div className="text-muted-foreground text-xs">Total Debits</div>
-                        <div className="font-bold text-rose-700 text-lg">${(totalDebits / 100).toFixed(2)}</div>
+                        <div className="font-bold text-status-error text-lg">${(totalDebits / 100).toFixed(2)}</div>
                       </div>
                       <div>
                         <div className="text-muted-foreground text-xs">Net Balance</div>
-                        <div className={`font-bold text-lg ${netBalance >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+                        <div className={`font-bold text-lg ${netBalance >= 0 ? 'text-status-success' : 'text-status-error'}`}>
                           {netBalance >= 0 ? '+' : ''}${(netBalance / 100).toFixed(2)}
                         </div>
                       </div>
                       <div>
                         <div className="text-muted-foreground text-xs">Missing GL Codes</div>
-                        <div className={`font-bold text-lg ${missingGlCount > 0 ? 'text-amber-700' : 'text-muted-foreground'}`}>
+                        <div className={`font-bold text-lg ${missingGlCount > 0 ? 'text-status-warning' : 'text-muted-foreground'}`}>
                           {missingGlCount}
                         </div>
                       </div>
@@ -472,7 +475,7 @@ export default function LedgerPage() {
                             className="flex items-center gap-1 font-medium hover:text-foreground transition-colors"
                           >
                             Date
-                            <ArrowUpDown className={`h-3.5 w-3.5 ${sortField === "occurredAt" ? "text-emerald-600" : "text-muted-foreground"}`} />
+                            <ArrowUpDown className={`h-3.5 w-3.5 ${sortField === "occurredAt" ? "text-primary" : "text-muted-foreground"}`} />
                           </button>
                         </th>
                         <th scope="col" className="px-3 py-3">
@@ -481,7 +484,7 @@ export default function LedgerPage() {
                             className="flex items-center gap-1 font-medium hover:text-foreground transition-colors"
                           >
                             GL Code
-                            <ArrowUpDown className={`h-3.5 w-3.5 ${sortField === "glCode" ? "text-emerald-600" : "text-muted-foreground"}`} />
+                            <ArrowUpDown className={`h-3.5 w-3.5 ${sortField === "glCode" ? "text-primary" : "text-muted-foreground"}`} />
                           </button>
                         </th>
                         <th scope="col" className="px-3 py-3 font-medium">Account</th>
@@ -492,7 +495,7 @@ export default function LedgerPage() {
                             className="flex items-center gap-1 font-medium hover:text-foreground transition-colors"
                           >
                             Type
-                            <ArrowUpDown className={`h-3.5 w-3.5 ${sortField === "direction" ? "text-emerald-600" : "text-muted-foreground"}`} />
+                            <ArrowUpDown className={`h-3.5 w-3.5 ${sortField === "direction" ? "text-primary" : "text-muted-foreground"}`} />
                           </button>
                         </th>
                         <th scope="col" className="px-3 py-3">
@@ -501,7 +504,7 @@ export default function LedgerPage() {
                             className="flex items-center gap-1 font-medium hover:text-foreground transition-colors"
                           >
                             Amount
-                            <ArrowUpDown className={`h-3.5 w-3.5 ${sortField === "amountCents" ? "text-emerald-600" : "text-muted-foreground"}`} />
+                            <ArrowUpDown className={`h-3.5 w-3.5 ${sortField === "amountCents" ? "text-primary" : "text-muted-foreground"}`} />
                           </button>
                         </th>
                         <th scope="col" className="px-3 py-3 font-medium">Description</th>
@@ -519,7 +522,7 @@ export default function LedgerPage() {
                                 {row.glCode}
                               </span>
                             ) : (
-                              <span className="text-amber-600 text-xs">Missing</span>
+                              <span className="text-status-warning text-xs">Missing</span>
                             )}
                           </td>
                           <td className="px-3 py-3 text-foreground">{row.account || "—"}</td>
@@ -568,7 +571,7 @@ export default function LedgerPage() {
                               {!start && !end && (
                                 <button
                                   onClick={() => applyPreset(datePresets[2])} // This Month
-                                  className="mt-2 px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors"
+                                  className="mt-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
                                 >
                                   View This Month
                                 </button>

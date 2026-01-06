@@ -5,6 +5,7 @@ import Link from "next/link";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { BookOpen, HelpCircle, MessageCircle, Search, Sparkles } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 interface FAQItem {
   id: string;
@@ -125,7 +126,7 @@ export default function FAQPage() {
 
           <div className="relative mb-4">
             <Search className="absolute left-4 top-3.5 h-5 w-5 text-slate-400" />
-            <input
+            <Input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search FAQ (e.g. payments, reports, wifi)"

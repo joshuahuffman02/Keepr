@@ -78,6 +78,7 @@ export default function PayoutsPage() {
                 size="sm"
                 variant={status === (s === "all" ? undefined : s) ? "default" : "outline"}
                 onClick={() => setStatus(s === "all" ? undefined : s)}
+                aria-pressed={status === (s === "all" ? undefined : s)}
               >
                 {s === "all" ? "All" : s.replace("_", " ")}
               </Button>
@@ -106,12 +107,13 @@ export default function PayoutsPage() {
                   <TableHead>Net</TableHead>
                   <TableHead>Arrival</TableHead>
                   <TableHead>Lines</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {!data && isLoading && (
                   <TableRow>
-                    <TableCell colSpan={7} className="p-4">
+                    <TableCell colSpan={8} className="p-4">
                       <div className="space-y-3">
                         {[...Array(4)].map((_, i) => (
                           <div key={i} className="animate-pulse flex items-center gap-4 p-2">
@@ -127,7 +129,7 @@ export default function PayoutsPage() {
                 )}
                 {data?.length === 0 && !isLoading && (
                   <TableRow>
-                    <TableCell colSpan={7} className="h-32 text-center">
+                    <TableCell colSpan={8} className="h-32 text-center">
                       <div className="flex flex-col items-center gap-2">
                         <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
                           <svg className="w-5 h-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -143,7 +145,7 @@ export default function PayoutsPage() {
                 {data?.map((payout) => (
                   <TableRow key={payout.id}>
                     <TableCell className="font-mono text-xs">
-                      <Link className="text-indigo-600 hover:underline" href={`/finance/payouts/${payout.id}`}>
+                      <Link className="text-primary hover:underline" href={`/finance/payouts/${payout.id}`}>
                         {payout.stripePayoutId}
                       </Link>
                     </TableCell>
@@ -203,4 +205,3 @@ export default function PayoutsPage() {
     </DashboardShell>
   );
 }
-

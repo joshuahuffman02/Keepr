@@ -6,6 +6,16 @@ import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Mail,
   Clock,
@@ -161,13 +171,13 @@ export default function ContactSupportPage() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
-                    <label
+                    <Label
                       htmlFor="name"
                       className="block text-sm font-medium text-slate-700 mb-1"
                     >
                       Your Name
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                       id="name"
                       type="text"
                       required
@@ -180,13 +190,13 @@ export default function ContactSupportPage() {
                     />
                   </div>
                   <div>
-                    <label
+                    <Label
                       htmlFor="email"
                       className="block text-sm font-medium text-slate-700 mb-1"
                     >
                       Email Address
-                    </label>
-                    <input
+                    </Label>
+                    <Input
                       id="email"
                       type="email"
                       required
@@ -201,37 +211,40 @@ export default function ContactSupportPage() {
                 </div>
 
                 <div>
-                  <label
+                  <Label
                     htmlFor="category"
                     className="block text-sm font-medium text-slate-700 mb-1"
                   >
                     Category
-                  </label>
-                  <select
-                    id="category"
+                  </Label>
+                  <Select
                     value={formState.category}
-                    onChange={(e) =>
-                      setFormState({ ...formState, category: e.target.value })
+                    onValueChange={(value) =>
+                      setFormState({ ...formState, category: value })
                     }
-                    className="w-full px-4 py-2.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
                   >
-                    <option value="general">General Question</option>
-                    <option value="billing">Billing & Payments</option>
-                    <option value="technical">Technical Issue</option>
-                    <option value="feature">Feature Request</option>
-                    <option value="account">Account & Access</option>
-                    <option value="other">Other</option>
-                  </select>
+                    <SelectTrigger id="category" className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="general">General Question</SelectItem>
+                      <SelectItem value="billing">Billing & Payments</SelectItem>
+                      <SelectItem value="technical">Technical Issue</SelectItem>
+                      <SelectItem value="feature">Feature Request</SelectItem>
+                      <SelectItem value="account">Account & Access</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div>
-                  <label
+                  <Label
                     htmlFor="subject"
                     className="block text-sm font-medium text-slate-700 mb-1"
                   >
                     Subject
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     id="subject"
                     type="text"
                     required
@@ -245,13 +258,13 @@ export default function ContactSupportPage() {
                 </div>
 
                 <div>
-                  <label
+                  <Label
                     htmlFor="message"
                     className="block text-sm font-medium text-slate-700 mb-1"
                   >
                     Message
-                  </label>
-                  <textarea
+                  </Label>
+                  <Textarea
                     id="message"
                     required
                     rows={5}

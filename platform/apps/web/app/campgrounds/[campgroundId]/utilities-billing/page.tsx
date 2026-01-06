@@ -6,7 +6,15 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { apiClient } from "@/lib/api-client";
 
@@ -51,6 +59,7 @@ const BILLING_MODES = [
   { value: "annual", label: "Annual true-up" },
   { value: "manual", label: "Manual" }
 ];
+const EMPTY_SELECT_VALUE = "__empty";
 
 export default function UtilitiesBillingPage() {
   const params = useParams();
@@ -313,32 +322,42 @@ export default function UtilitiesBillingPage() {
           <div className="grid gap-4 md:grid-cols-3">
             <div className="space-y-2">
               <Label className="text-xs text-muted-foreground">Site class</Label>
-              <select
-                className="w-full rounded border border-border px-3 py-2 text-sm"
-                value={selectedClassId}
-                onChange={(e) => selectClass(e.target.value)}
+              <Select
+                value={selectedClassId || EMPTY_SELECT_VALUE}
+                onValueChange={(value) => selectClass(value === EMPTY_SELECT_VALUE ? "" : value)}
               >
-                <option value="">Select a site class</option>
-                {siteClasses.map((sc: any) => (
-                  <option key={sc.id} value={sc.id}>
-                    {sc.name}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className="w-full text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={EMPTY_SELECT_VALUE}>Select a site class</SelectItem>
+                  {siteClasses.map((sc: any) => (
+                    <SelectItem key={sc.id} value={sc.id}>
+                      {sc.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label className="text-xs text-muted-foreground">Meter type</Label>
-              <select
-                className="w-full rounded border border-border px-3 py-2 text-sm"
-                value={classDraft.meteredType ?? ""}
-                onChange={(e) => setClassDraft((d) => ({ ...d, meteredType: e.target.value }))}
+              <Select
+                value={classDraft.meteredType || EMPTY_SELECT_VALUE}
+                onValueChange={(value) =>
+                  setClassDraft((d) => ({ ...d, meteredType: value === EMPTY_SELECT_VALUE ? "" : value }))
+                }
                 disabled={!selectedClassId}
               >
-                <option value="">Choose</option>
-                <option value="power">Power</option>
-                <option value="water">Water</option>
-                <option value="sewer">Sewer</option>
-              </select>
+                <SelectTrigger className="w-full text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={EMPTY_SELECT_VALUE}>Choose</SelectItem>
+                  <SelectItem value="power">Power</SelectItem>
+                  <SelectItem value="water">Water</SelectItem>
+                  <SelectItem value="sewer">Sewer</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="flex items-center gap-2 pt-6">
               <Switch
@@ -353,37 +372,45 @@ export default function UtilitiesBillingPage() {
           <div className="grid gap-4 md:grid-cols-4">
             <div className="space-y-2">
               <Label className="text-xs text-muted-foreground">Billing mode</Label>
-              <select
-                className="w-full rounded border border-border px-3 py-2 text-sm"
+              <Select
                 value={classDraft.meteredBillingMode ?? "cycle"}
-                onChange={(e) => setClassDraft((d) => ({ ...d, meteredBillingMode: e.target.value }))}
+                onValueChange={(value) => setClassDraft((d) => ({ ...d, meteredBillingMode: value }))}
                 disabled={!selectedClassId}
               >
-                {BILLING_MODES.map((m) => (
-                  <option key={m.value} value={m.value}>
-                    {m.label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className="w-full text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {BILLING_MODES.map((m) => (
+                    <SelectItem key={m.value} value={m.value}>
+                      {m.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label className="text-xs text-muted-foreground">Bill to</Label>
-              <select
-                className="w-full rounded border border-border px-3 py-2 text-sm"
+              <Select
                 value={classDraft.meteredBillTo ?? "reservation"}
-                onChange={(e) => setClassDraft((d) => ({ ...d, meteredBillTo: e.target.value }))}
+                onValueChange={(value) => setClassDraft((d) => ({ ...d, meteredBillTo: value }))}
                 disabled={!selectedClassId}
               >
-                <option value="reservation">Reservation</option>
-                <option value="guest">Guest</option>
-              </select>
+                <SelectTrigger className="w-full text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="reservation">Reservation</SelectItem>
+                  <SelectItem value="guest">Guest</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label className="text-xs text-muted-foreground">Usage multiplier</Label>
-              <input
+              <Input
                 type="number"
                 step="0.01"
-                className="w-full rounded border border-border px-3 py-2 text-sm"
+                className="w-full text-sm"
                 value={classDraft.meteredMultiplier ?? 1}
                 onChange={(e) => setClassDraft((d) => ({ ...d, meteredMultiplier: Number(e.target.value) }))}
                 disabled={!selectedClassId}
@@ -391,23 +418,32 @@ export default function UtilitiesBillingPage() {
             </div>
             <div className="space-y-2">
               <Label className="text-xs text-muted-foreground">Rate plan</Label>
-              <select
-                className="w-full rounded border border-border px-3 py-2 text-sm"
-                value={classDraft.meteredRatePlanId ?? ""}
-                onChange={(e) => setClassDraft((d) => ({ ...d, meteredRatePlanId: e.target.value || undefined }))}
+              <Select
+                value={classDraft.meteredRatePlanId || EMPTY_SELECT_VALUE}
+                onValueChange={(value) =>
+                  setClassDraft((d) => ({
+                    ...d,
+                    meteredRatePlanId: value === EMPTY_SELECT_VALUE ? undefined : value,
+                  }))
+                }
                 disabled={!selectedClassId}
               >
-                <option value="">No plan</option>
-                {(
-                  classDraft.meteredType
-                    ? ratePlansByType.get(classDraft.meteredType) ?? []
-                    : ratePlans ?? []
-                ).map((rp) => (
-                  <option key={rp.id} value={rp.id}>
-                    {rp.type} @ {(rp.baseRateCents / 100).toFixed(2)} (from {new Date(rp.effectiveFrom).toLocaleDateString()})
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className="w-full text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={EMPTY_SELECT_VALUE}>No plan</SelectItem>
+                  {(
+                    classDraft.meteredType
+                      ? ratePlansByType.get(classDraft.meteredType) ?? []
+                      : ratePlans ?? []
+                  ).map((rp) => (
+                    <SelectItem key={rp.id} value={rp.id}>
+                      {rp.type} @ {(rp.baseRateCents / 100).toFixed(2)} (from {new Date(rp.effectiveFrom).toLocaleDateString()})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
@@ -440,24 +476,26 @@ export default function UtilitiesBillingPage() {
           <div className="flex flex-wrap items-center gap-3">
             <div className="flex flex-col text-sm">
               <Label className="text-xs text-muted-foreground">Meter type</Label>
-              <select
-                className="rounded border border-border px-3 py-2 text-sm"
-                value={filterType}
-                onChange={(e) => setFilterType(e.target.value)}
-              >
-                <option value="all">All</option>
-                <option value="power">Power</option>
-                <option value="water">Water</option>
-                <option value="sewer">Sewer</option>
-              </select>
+              <Select value={filterType} onValueChange={setFilterType}>
+                <SelectTrigger className="w-[140px] text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="power">Power</SelectItem>
+                  <SelectItem value="water">Water</SelectItem>
+                  <SelectItem value="sewer">Sewer</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="flex flex-col text-sm">
               <Label className="text-xs text-muted-foreground">Search site or meter</Label>
-              <input
-                className="rounded border border-border px-3 py-2 text-sm"
+              <Input
                 placeholder="e.g. SITE-12 or meter id"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
+                className="w-[220px] text-sm"
+                aria-label="Search site or meter"
               />
             </div>
             {metersQuery.isFetching && <span className="text-xs text-muted-foreground">Refreshing…</span>}
@@ -516,17 +554,21 @@ export default function UtilitiesBillingPage() {
                   <div className="col-span-1 capitalize text-foreground">{m.type}</div>
 
                   <div className="col-span-2">
-                    <select
-                      className="w-full rounded border border-border px-2 py-1 text-sm"
+                    <Select
                       value={billingMode}
-                      onChange={(e) => applyDraft(m.id, { billingMode: e.target.value })}
+                      onValueChange={(value) => applyDraft(m.id, { billingMode: value })}
                     >
-                      {BILLING_MODES.map((mode) => (
-                        <option key={mode.value} value={mode.value}>
-                          {mode.label}
-                        </option>
-                      ))}
-                    </select>
+                      <SelectTrigger className="w-full h-8 text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {BILLING_MODES.map((mode) => (
+                          <SelectItem key={mode.value} value={mode.value}>
+                            {mode.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
                       <Switch
                         checked={autoEmail}
@@ -538,21 +580,25 @@ export default function UtilitiesBillingPage() {
                   </div>
 
                   <div className="col-span-1">
-                    <select
-                      className="w-full rounded border border-border px-2 py-1 text-sm"
+                    <Select
                       value={billTo}
-                      onChange={(e) => applyDraft(m.id, { billTo: e.target.value })}
+                      onValueChange={(value) => applyDraft(m.id, { billTo: value })}
                     >
-                      <option value="reservation">Reservation</option>
-                      <option value="guest">Guest</option>
-                    </select>
+                      <SelectTrigger className="w-full h-8 text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="reservation">Reservation</SelectItem>
+                        <SelectItem value="guest">Guest</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <div className="col-span-1">
-                    <input
+                    <Input
                       type="number"
                       step="0.01"
-                      className="w-full rounded border border-border px-2 py-1 text-right text-sm"
+                      className="w-full h-8 text-right text-sm"
                       value={multiplier}
                       onChange={(e) => applyDraft(m.id, { multiplier: Number(e.target.value) })}
                     />
@@ -560,18 +606,24 @@ export default function UtilitiesBillingPage() {
                   </div>
 
                   <div className="col-span-1">
-                    <select
-                      className="w-full rounded border border-border px-2 py-1 text-sm"
-                      value={draft.ratePlanId ?? m.ratePlanId ?? ""}
-                      onChange={(e) => applyDraft(m.id, { ratePlanId: e.target.value || null })}
+                    <Select
+                      value={draft.ratePlanId ?? m.ratePlanId ?? EMPTY_SELECT_VALUE}
+                      onValueChange={(value) =>
+                        applyDraft(m.id, { ratePlanId: value === EMPTY_SELECT_VALUE ? null : value })
+                      }
                     >
-                      <option value="">No plan</option>
-                      {(ratePlansByType.get(m.type) || ratePlans).map((rp) => (
-                        <option key={rp.id} value={rp.id}>
-                          {(rp.baseRateCents / 100).toFixed(2)} · {rp.type}
-                        </option>
-                      ))}
-                    </select>
+                      <SelectTrigger className="w-full h-8 text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={EMPTY_SELECT_VALUE}>No plan</SelectItem>
+                        {(ratePlansByType.get(m.type) || ratePlans).map((rp) => (
+                          <SelectItem key={rp.id} value={rp.id}>
+                            {(rp.baseRateCents / 100).toFixed(2)} · {rp.type}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   <div className="col-span-1 text-sm text-foreground">
@@ -606,23 +658,26 @@ export default function UtilitiesBillingPage() {
 
                   <div className="col-span-2">
                     <div className="flex flex-col gap-1">
-                      <input
-                        className="rounded border border-border px-2 py-1 text-sm"
+                      <Input
+                        className="h-8 text-sm"
                         placeholder="Reading value"
                         value={readDraft.readingValue}
                         onChange={(e) => applyReadDraft(m.id, { readingValue: e.target.value })}
+                        aria-label="Reading value"
                       />
-                      <input
-                        className="rounded border border-border px-2 py-1 text-sm"
+                      <Input
+                        className="h-8 text-sm"
                         type="datetime-local"
                         value={readDraft.readAt}
                         onChange={(e) => applyReadDraft(m.id, { readAt: e.target.value })}
+                        aria-label="Read at"
                       />
-                      <input
-                        className="rounded border border-border px-2 py-1 text-sm"
+                      <Input
+                        className="h-8 text-sm"
                         placeholder="Note (optional)"
                         value={readDraft.note ?? ""}
                         onChange={(e) => applyReadDraft(m.id, { note: e.target.value })}
+                        aria-label="Note"
                       />
                       <div className="text-[11px] text-muted-foreground">
                         {(() => {

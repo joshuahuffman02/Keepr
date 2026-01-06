@@ -4,6 +4,8 @@ import { useEffect, useState, useMemo } from "react";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { StaffNavigation } from "@/components/staff/StaffNavigation";
 import { useWhoami } from "@/hooks/use-whoami";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Download,
@@ -312,6 +314,7 @@ export default function PayrollExportPage({ params }: { params: { campgroundId: 
                 ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/20"
                 : "bg-card border border-border text-muted-foreground hover:bg-muted/60"
             )}
+            aria-pressed={activeTab === "export"}
           >
             <Download className="w-4 h-4" />
             New Export
@@ -324,6 +327,7 @@ export default function PayrollExportPage({ params }: { params: { campgroundId: 
                 ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/20"
                 : "bg-card border border-border text-muted-foreground hover:bg-muted/60"
             )}
+            aria-pressed={activeTab === "history"}
           >
             <History className="w-4 h-4" />
             Export History
@@ -336,6 +340,7 @@ export default function PayrollExportPage({ params }: { params: { campgroundId: 
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 flex items-center gap-2"
+            role="alert"
           >
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
             {error}
@@ -386,6 +391,7 @@ export default function PayrollExportPage({ params }: { params: { campgroundId: 
                           ? "border-status-success/40 bg-status-success/10"
                           : "border-border hover:border-border hover:bg-muted/60"
                       )}
+                      aria-pressed={provider === p.id}
                     >
                       <div className="flex items-center gap-3 mb-2">
                         <div
@@ -439,8 +445,9 @@ export default function PayrollExportPage({ params }: { params: { campgroundId: 
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">Start Date</label>
-                      <input
+                      <Label htmlFor="payroll-start-date" className="block text-sm font-medium text-foreground mb-2">Start Date</Label>
+                      <Input
+                        id="payroll-start-date"
                         type="date"
                         value={periodStart}
                         onChange={(e) => setPeriodStart(e.target.value)}
@@ -448,8 +455,9 @@ export default function PayrollExportPage({ params }: { params: { campgroundId: 
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">End Date</label>
-                      <input
+                      <Label htmlFor="payroll-end-date" className="block text-sm font-medium text-foreground mb-2">End Date</Label>
+                      <Input
+                        id="payroll-end-date"
                         type="date"
                         value={periodEnd}
                         onChange={(e) => setPeriodEnd(e.target.value)}

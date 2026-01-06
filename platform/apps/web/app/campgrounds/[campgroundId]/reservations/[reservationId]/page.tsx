@@ -10,6 +10,7 @@ import { Badge } from "../../../../../components/ui/badge";
 import { Button } from "../../../../../components/ui/button";
 import { Input } from "../../../../../components/ui/input";
 import { Label } from "../../../../../components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../../components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../../components/ui/tabs";
 import { format } from "date-fns";
 import {
@@ -467,7 +468,13 @@ export default function ReservationDetailPage() {
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           {/* Left: Back button + Guest info */}
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={() => router.back()} className="shrink-0">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => router.back()}
+              className="shrink-0"
+              aria-label="Back to reservations"
+            >
               <ArrowLeft className="h-4 w-4" />
             </Button>
             <div className="min-w-0">
@@ -1024,8 +1031,12 @@ export default function ReservationDetailPage() {
             <Card>
               <CardHeader>
                 <button
+                  type="button"
                   onClick={() => setShowAdvanced(!showAdvanced)}
                   className="w-full flex items-center justify-between"
+                  aria-expanded={showAdvanced}
+                  aria-controls="reservation-advanced-panel"
+                  id="reservation-advanced-toggle"
                 >
                   <CardTitle className="flex items-center gap-2">
                     <Sparkles className="h-5 w-5 text-amber-500" />
@@ -1041,6 +1052,9 @@ export default function ReservationDetailPage() {
               <AnimatePresence>
                 {showAdvanced && (
                   <motion.div
+                    id="reservation-advanced-panel"
+                    role="region"
+                    aria-labelledby="reservation-advanced-toggle"
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: "auto", opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
@@ -1489,32 +1503,36 @@ export default function ReservationDetailPage() {
               <CardContent className="space-y-4">
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div className="space-y-1">
-                    <Label className="text-xs">License Plate</Label>
+                    <Label htmlFor="vehicle-plate" className="text-xs">License Plate</Label>
                     <Input
+                      id="vehicle-plate"
                       value={vehiclePlate}
                       onChange={(e) => setVehiclePlate(e.target.value.toUpperCase())}
                       placeholder="ABC123"
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-xs">State</Label>
+                    <Label htmlFor="vehicle-state" className="text-xs">State</Label>
                     <Input
+                      id="vehicle-state"
                       value={vehicleState}
                       onChange={(e) => setVehicleState(e.target.value.toUpperCase())}
                       placeholder="CA"
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-xs">Rig Type</Label>
+                    <Label htmlFor="vehicle-rig-type" className="text-xs">Rig Type</Label>
                     <Input
+                      id="vehicle-rig-type"
                       value={vehicleRigType}
                       onChange={(e) => setVehicleRigType(e.target.value)}
                       placeholder="RV / Trailer"
                     />
                   </div>
                   <div className="space-y-1">
-                    <Label className="text-xs">Length (ft)</Label>
+                    <Label htmlFor="vehicle-rig-length" className="text-xs">Length (ft)</Label>
                     <Input
+                      id="vehicle-rig-length"
                       type="number"
                       value={vehicleRigLength}
                       onChange={(e) => setVehicleRigLength(e.target.value)}
@@ -1548,15 +1566,16 @@ export default function ReservationDetailPage() {
                       <div className="font-medium">Access Control</div>
                       <div className="text-xs text-muted-foreground">Gate/lock credentials</div>
                     </div>
-                    <select
-                      value={accessProvider}
-                      onChange={(e) => setAccessProvider(e.target.value as any)}
-                      className="text-sm border rounded px-2 py-1"
-                    >
-                      <option value="kisi">Kisi</option>
-                      <option value="brivo">Brivo</option>
-                      <option value="cloudkey">CloudKey</option>
-                    </select>
+                    <Select value={accessProvider} onValueChange={(value) => setAccessProvider(value as any)}>
+                      <SelectTrigger className="h-9 w-[140px]" aria-label="Access provider">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="kisi">Kisi</SelectItem>
+                        <SelectItem value="brivo">Brivo</SelectItem>
+                        <SelectItem value="cloudkey">CloudKey</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="flex gap-2">
                     <Input
@@ -1564,6 +1583,7 @@ export default function ReservationDetailPage() {
                       onChange={(e) => setAccessCode(e.target.value)}
                       placeholder="PIN / Code"
                       className="flex-1"
+                      aria-label="Access code"
                     />
                     <Button
                       size="sm"
@@ -1664,26 +1684,29 @@ export default function ReservationDetailPage() {
                       placeholder="Email"
                       value={signatureEmail}
                       onChange={(e) => setSignatureEmail(e.target.value)}
+                      aria-label="Signature recipient email"
                     />
-                    <select
-                      className="rounded-md border px-3 py-2 text-sm"
-                      value={signatureType}
-                      onChange={(e) => setSignatureType(e.target.value)}
-                    >
-                      <option value="long_term_stay">Long-term stay</option>
-                      <option value="park_rules">Park rules</option>
-                      <option value="waiver">Waiver</option>
-                      <option value="other">Other</option>
-                    </select>
-                    <select
-                      className="rounded-md border px-3 py-2 text-sm"
-                      value={deliveryChannel}
-                      onChange={(e) => setDeliveryChannel(e.target.value as any)}
-                    >
-                      <option value="email">Email</option>
-                      <option value="email_and_sms">Email + SMS</option>
-                      <option value="sms">SMS only</option>
-                    </select>
+                    <Select value={signatureType} onValueChange={(value) => setSignatureType(value)}>
+                      <SelectTrigger className="h-10" aria-label="Signature document type">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="long_term_stay">Long-term stay</SelectItem>
+                        <SelectItem value="park_rules">Park rules</SelectItem>
+                        <SelectItem value="waiver">Waiver</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select value={deliveryChannel} onValueChange={(value) => setDeliveryChannel(value as any)}>
+                      <SelectTrigger className="h-10" aria-label="Signature delivery channel">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="email">Email</SelectItem>
+                        <SelectItem value="email_and_sms">Email + SMS</SelectItem>
+                        <SelectItem value="sms">SMS only</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <Button
                       onClick={() => createSignatureMutation.mutate()}
                       disabled={createSignatureMutation.isPending}
@@ -1705,12 +1728,14 @@ export default function ReservationDetailPage() {
                       placeholder="COI URL"
                       value={coiUrl}
                       onChange={(e) => setCoiUrl(e.target.value)}
+                      aria-label="Certificate of insurance URL"
                     />
                     <Input
                       type="date"
                       placeholder="Expiry"
                       value={coiExpiresAt}
                       onChange={(e) => setCoiExpiresAt(e.target.value)}
+                      aria-label="Certificate of insurance expiry date"
                     />
                     <Button
                       variant="outline"
@@ -1806,17 +1831,25 @@ export default function ReservationDetailPage() {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <Label>Metered Utilities</Label>
+                  <Label htmlFor="convert-metered">Metered Utilities</Label>
                   <p className="text-xs text-muted-foreground">Guest pays for usage separately</p>
                 </div>
-                <Switch checked={convertIsMetered} onCheckedChange={setConvertIsMetered} />
+                <Switch
+                  id="convert-metered"
+                  checked={convertIsMetered}
+                  onCheckedChange={setConvertIsMetered}
+                />
               </div>
               <div className="flex items-center justify-between">
                 <div>
-                  <Label>Pays in Full</Label>
+                  <Label htmlFor="convert-pays-in-full">Pays in Full</Label>
                   <p className="text-xs text-muted-foreground">Full payment upfront vs monthly</p>
                 </div>
-                <Switch checked={convertPaysInFull} onCheckedChange={setConvertPaysInFull} />
+                <Switch
+                  id="convert-pays-in-full"
+                  checked={convertPaysInFull}
+                  onCheckedChange={setConvertPaysInFull}
+                />
               </div>
             </div>
           </div>

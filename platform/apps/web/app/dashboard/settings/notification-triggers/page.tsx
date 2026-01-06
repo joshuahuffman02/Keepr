@@ -4,6 +4,16 @@ import Link from "next/link";
 import { useEffect, useState, useCallback, useRef, ReactNode } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api-client";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Ticket,
   CheckCircle,
@@ -91,6 +101,7 @@ const EVENT_OPTIONS: { value: TriggerEvent; label: string; description: string }
   { value: "waitlist_match", label: "Waitlist Match", description: "When a site becomes available" },
   { value: "group_update", label: "Group Update", description: "When group booking changes" },
 ];
+const EMPTY_SELECT_VALUE = "__empty";
 
 const CHANNEL_OPTIONS: { value: string; label: string; icon: ReactNode }[] = [
   { value: "email", label: "Email", icon: <Mail className="h-4 w-4" /> },
@@ -657,23 +668,25 @@ function TriggerModal({
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Event Select */}
           <div>
-            <label htmlFor="event-select" className="block text-sm font-medium text-foreground mb-1">
+            <Label htmlFor="event-select" className="block text-sm font-medium text-foreground mb-1">
               When this happens...
-            </label>
-            <select
-              id="event-select"
-              ref={firstFocusRef}
-              value={event}
-              onChange={e => setEvent(e.target.value as TriggerEvent)}
-              className="w-full px-3 py-2 border border-border rounded-lg
-                focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
-            >
-              {EVENT_OPTIONS.map(opt => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
+            </Label>
+            <Select value={event} onValueChange={(value) => setEvent(value as TriggerEvent)}>
+              <SelectTrigger
+                id="event-select"
+                ref={firstFocusRef}
+                className="w-full"
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {EVENT_OPTIONS.map(opt => (
+                  <SelectItem key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Channel Select */}
@@ -721,20 +734,22 @@ function TriggerModal({
                 </p>
               </div>
             ) : (
-              <select
-                id="template-select"
-                value={templateId ?? ""}
-                onChange={e => setTemplateId(e.target.value || null)}
-                className="w-full px-3 py-2 border border-border rounded-lg
-                  focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
+              <Select
+                value={templateId ?? EMPTY_SELECT_VALUE}
+                onValueChange={(value) => setTemplateId(value === EMPTY_SELECT_VALUE ? null : value)}
               >
-                <option value="">Default system message</option>
-                {compatibleTemplates.map(t => (
-                  <option key={t.id} value={t.id}>
-                    {t.name} {t.channel !== channel && t.channel !== "both" ? `(${t.channel})` : ""}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger id="template-select" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={EMPTY_SELECT_VALUE}>Default system message</SelectItem>
+                  {compatibleTemplates.map(t => (
+                    <SelectItem key={t.id} value={t.id}>
+                      {t.name} {t.channel !== channel && t.channel !== "both" ? `(${t.channel})` : ""}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             )}
             <p className="mt-1 text-xs text-muted-foreground">
               Choose a template or use the default message
@@ -778,7 +793,7 @@ function TriggerModal({
 
             {showCustomDelay && (
               <div className="mt-2 flex items-center gap-2">
-                <input
+                <Input
                   type="number"
                   min="0"
                   value={delayMinutes}
@@ -793,18 +808,17 @@ function TriggerModal({
           </div>
 
           {/* Enabled Toggle */}
-          <label className="flex items-center gap-3 p-3 border border-border rounded-lg cursor-pointer hover:bg-muted transition-colors">
-            <input
-              type="checkbox"
+          <div className="flex items-center gap-3 p-3 border border-border rounded-lg hover:bg-muted transition-colors">
+            <Checkbox
+              id="trigger-enabled"
               checked={enabled}
-              onChange={e => setEnabled(e.target.checked)}
-              className="rounded border-border text-violet-600 focus:ring-violet-500"
+              onCheckedChange={(checked) => setEnabled(Boolean(checked))}
             />
-            <div>
+            <Label htmlFor="trigger-enabled" className="cursor-pointer">
               <div className="font-medium text-foreground">Enabled</div>
               <div className="text-sm text-muted-foreground">Trigger will fire when event occurs</div>
-            </div>
-          </label>
+            </Label>
+          </div>
 
           {/* Actions */}
           <div className="flex gap-3 pt-2">
@@ -923,10 +937,10 @@ function TestTriggerModal({
         ) : (
           <>
             <div className="mb-4">
-              <label htmlFor="test-email" className="block text-sm font-medium text-foreground mb-1">
+              <Label htmlFor="test-email" className="block text-sm font-medium text-foreground mb-1">
                 Send test to
-              </label>
-              <input
+              </Label>
+              <Input
                 id="test-email"
                 ref={inputRef}
                 type="email"

@@ -186,7 +186,7 @@ export default function FinancePage() {
         eyebrow="Finance"
         title={(
           <span className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
               <DollarSign className="h-5 w-5" />
             </span>
             <span>Financial Overview</span>
@@ -202,7 +202,7 @@ export default function FinancePage() {
               payoutsQuery.refetch();
               disputesQuery.refetch();
             }}
-            className="transition-all duration-200 hover:border-emerald-300 hover:bg-emerald-50"
+            className="transition-all duration-200 hover:border-primary/30 hover:bg-primary/10"
           >
             <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`} />
             Refresh
@@ -241,17 +241,17 @@ export default function FinancePage() {
                   animate={shouldReduceMotion ? {} : { y: [0, -3, 0], rotate: [0, 5, -5, 0] }}
                   transition={{ duration: 0.6, repeat: 2 }}
                 >
-                  <Trophy className="h-5 w-5 text-amber-600" />
+                  <Trophy className="h-5 w-5 text-status-warning" />
                 </motion.div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-amber-900">
+                  <h3 className="font-semibold text-status-warning">
                     Dispute resolved in your favor!
                   </h3>
-                  <p className="text-sm text-amber-700 mt-1">
+                  <p className="text-sm text-status-warning mt-1">
                     Your evidence was accepted. The funds have been protected.
                   </p>
                 </div>
-                <CheckCircle2 className="h-4 w-4 text-amber-600" />
+                <CheckCircle2 className="h-4 w-4 text-status-warning" />
               </div>
             </motion.div>
           )}
@@ -263,17 +263,17 @@ export default function FinancePage() {
               className="rounded-xl bg-status-error/10 border border-status-error/20 p-4"
             >
               <div className="flex items-start gap-3">
-                <AlertTriangle className="h-5 w-5 text-rose-600 flex-shrink-0" />
+                <AlertTriangle className="h-5 w-5 text-status-error flex-shrink-0" />
                 <div className="flex-1">
-                  <h3 className="font-semibold text-rose-900">
+                  <h3 className="font-semibold text-status-error">
                     Action needed: {metrics.urgentDisputes.length} dispute{metrics.urgentDisputes.length > 1 ? "s" : ""} due soon
                   </h3>
-                  <p className="text-sm text-rose-700 mt-1">
+                  <p className="text-sm text-status-error mt-1">
                     Submit evidence within 48 hours to protect your revenue.
                   </p>
                 </div>
                 <Link href="/finance/disputes">
-                  <Button size="sm" className="bg-rose-600 hover:bg-rose-700 text-white">
+                  <Button size="sm" className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
                     Review now
                   </Button>
                 </Link>
@@ -290,8 +290,8 @@ export default function FinancePage() {
                 className="rounded-xl border border-border bg-card p-5 cursor-pointer transition-colors"
               >
                 <div className="flex items-start justify-between mb-3">
-                  <div className="rounded-full bg-emerald-100 p-2">
-                    <DollarSign className="h-5 w-5 text-emerald-700" />
+                  <div className="rounded-full bg-primary/10 p-2">
+                    <DollarSign className="h-5 w-5 text-primary" />
                   </div>
                   {metrics.nextPayout && (
                     <Badge className="bg-status-success/15 text-status-success border-status-success">
@@ -332,8 +332,8 @@ export default function FinancePage() {
                 className="rounded-xl border border-border bg-card p-5 cursor-pointer transition-colors"
               >
                 <div className="flex items-start justify-between mb-3">
-                  <div className="rounded-full bg-blue-100 p-2">
-                    <TrendingUp className="h-5 w-5 text-blue-700" />
+                  <div className="rounded-full bg-status-info/10 p-2">
+                    <TrendingUp className="h-5 w-5 text-status-info" />
                   </div>
                   {metrics.revenueChange !== 0 && (
                     <Badge className={`${
@@ -368,12 +368,12 @@ export default function FinancePage() {
                 <div className="flex items-start justify-between mb-3">
                   <div className={`rounded-full p-2 ${
                     metrics.disputeSummary.open > 0
-                      ? "bg-amber-100"
+                      ? "bg-status-warning/10"
                       : "bg-muted"
                   }`}>
                     <Shield className={`h-5 w-5 ${
                       metrics.disputeSummary.open > 0
-                        ? "text-amber-700"
+                        ? "text-status-warning"
                         : "text-muted-foreground"
                     }`} />
                   </div>
@@ -394,20 +394,20 @@ export default function FinancePage() {
                   <>
                     <div className="flex items-center gap-4 mt-2">
                       <div className="flex items-center gap-1">
-                        <Clock className="h-4 w-4 text-amber-600" />
-                        <span className="text-lg font-semibold text-amber-700">
+                        <Clock className="h-4 w-4 text-status-warning" />
+                        <span className="text-lg font-semibold text-status-warning">
                           {metrics.disputeSummary.open}
                         </span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                        <span className="text-lg font-semibold text-emerald-700">
+                        <CheckCircle2 className="h-4 w-4 text-status-success" />
+                        <span className="text-lg font-semibold text-status-success">
                           {metrics.disputeSummary.won}
                         </span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <XCircle className="h-4 w-4 text-rose-600" />
-                        <span className="text-lg font-semibold text-rose-700">
+                        <XCircle className="h-4 w-4 text-status-error" />
+                        <span className="text-lg font-semibold text-status-error">
                           {metrics.disputeSummary.lost}
                         </span>
                       </div>
@@ -448,11 +448,11 @@ export default function FinancePage() {
                 <motion.div
                   whileHover={shouldReduceMotion ? {} : { scale: 1.02, boxShadow: "0 8px 16px rgba(0,0,0,0.1)" }}
                   whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
-                  className="h-full rounded-xl border border-border bg-card p-5 cursor-pointer transition-all hover:border-emerald-300"
+                  className="h-full rounded-xl border border-border bg-card p-5 cursor-pointer transition-all hover:border-primary/30"
                 >
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="rounded-full bg-emerald-100 p-2">
-                      <CreditCard className="h-5 w-5 text-emerald-700" />
+                    <div className="rounded-full bg-primary/10 p-2">
+                      <CreditCard className="h-5 w-5 text-primary" />
                     </div>
                     <h3 className="font-semibold text-foreground">
                       Payouts & Deposits
@@ -466,7 +466,7 @@ export default function FinancePage() {
                       Last payout: {formatMoney(metrics.latestPayout.amountCents || 0)}
                     </p>
                   )}
-                  <div className="flex items-center gap-1 text-sm font-medium text-emerald-600 mt-3">
+                  <div className="flex items-center gap-1 text-sm font-medium text-primary mt-3">
                     View all payouts
                     <ArrowRight className="h-4 w-4" />
                   </div>
@@ -480,19 +480,19 @@ export default function FinancePage() {
                   whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
                   className={`h-full rounded-xl border p-5 cursor-pointer transition-all ${
                     metrics.disputeSummary.open > 0
-                      ? "border-amber-200 bg-amber-50/50 hover:border-amber-300"
+                      ? "border-status-warning/20 bg-status-warning/10 hover:border-status-warning/30"
                       : "border-border bg-card hover:border-border"
                   }`}
                 >
                   <div className="flex items-center gap-3 mb-3">
                     <div className={`rounded-full p-2 ${
                       metrics.disputeSummary.open > 0
-                        ? "bg-amber-100"
+                        ? "bg-status-warning/10"
                         : "bg-muted"
                     }`}>
                       <Shield className={`h-5 w-5 ${
                         metrics.disputeSummary.open > 0
-                          ? "text-amber-700"
+                          ? "text-status-warning"
                           : "text-muted-foreground"
                       }`} />
                     </div>
@@ -509,13 +509,13 @@ export default function FinancePage() {
                     Handle chargebacks and submit evidence
                   </p>
                   {metrics.disputeSummary.open > 0 && (
-                    <p className="text-xs text-amber-700">
+                    <p className="text-xs text-status-warning">
                       {metrics.disputeSummary.open} dispute{metrics.disputeSummary.open > 1 ? "s" : ""} need response
                     </p>
                   )}
                   <div className={`flex items-center gap-1 text-sm font-medium mt-3 ${
                     metrics.disputeSummary.open > 0
-                      ? "text-amber-600"
+                      ? "text-status-warning"
                       : "text-muted-foreground"
                   }`}>
                     Manage disputes
@@ -529,11 +529,11 @@ export default function FinancePage() {
                 <motion.div
                   whileHover={shouldReduceMotion ? {} : { scale: 1.02, boxShadow: "0 8px 16px rgba(0,0,0,0.1)" }}
                   whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
-                  className="h-full rounded-xl border border-border bg-card p-5 cursor-pointer transition-all hover:border-indigo-300"
+                  className="h-full rounded-xl border border-border bg-card p-5 cursor-pointer transition-all hover:border-primary/30"
                 >
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="rounded-full bg-indigo-100 p-2">
-                      <Gift className="h-5 w-5 text-indigo-700" />
+                    <div className="rounded-full bg-primary/10 p-2">
+                      <Gift className="h-5 w-5 text-primary" />
                     </div>
                     <h3 className="font-semibold text-foreground">
                       Gift Cards & Credits
@@ -542,7 +542,7 @@ export default function FinancePage() {
                   <p className="text-sm text-muted-foreground mb-3">
                     Issue gift cards and track redemptions
                   </p>
-                  <div className="flex items-center gap-1 text-sm font-medium text-indigo-600 mt-3">
+                  <div className="flex items-center gap-1 text-sm font-medium text-primary mt-3">
                     Manage gift cards
                     <ArrowRight className="h-4 w-4" />
                   </div>
@@ -574,16 +574,16 @@ export default function FinancePage() {
                         <div className="flex items-center gap-3">
                           <div className={`rounded-full p-1.5 ${
                             payout.status === "paid"
-                              ? "bg-emerald-100"
+                              ? "bg-status-success/15"
                               : payout.status === "pending" || payout.status === "in_transit"
-                              ? "bg-blue-100"
+                              ? "bg-status-info/15"
                               : "bg-muted"
                           }`}>
                             <DollarSign className={`h-4 w-4 ${
                               payout.status === "paid"
-                                ? "text-emerald-600"
+                                ? "text-status-success"
                                 : payout.status === "pending" || payout.status === "in_transit"
-                                ? "text-blue-600"
+                                ? "text-status-info"
                                 : "text-muted-foreground"
                             }`} />
                           </div>
@@ -600,7 +600,7 @@ export default function FinancePage() {
                         </div>
                         <span className={`font-semibold ${
                           payout.status === "paid"
-                            ? "text-emerald-700"
+                            ? "text-status-success"
                             : "text-foreground"
                         }`}>
                           {formatMoney(payout.amountCents || 0)}

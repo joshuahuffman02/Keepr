@@ -8,6 +8,13 @@ import { DoorOpen, KeyRound, RefreshCcw } from "lucide-react";
 import { apiClient } from "../../../../lib/api-client";
 import { Input } from "../../../../components/ui/input";
 import { Label } from "../../../../components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../../components/ui/select";
 import { Textarea } from "../../../../components/ui/textarea";
 import { Button } from "../../../../components/ui/button";
 import { useToast } from "../../../../components/ui/use-toast";
@@ -149,17 +156,21 @@ export default function AccessControlSettingsPage() {
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="space-y-1">
               <Label className="text-xs text-muted-foreground">Provider</Label>
-              <select
-                className="border border-border rounded px-2 py-1 text-sm"
+              <Select
                 value={selectedProvider}
-                onChange={(e) => setSelectedProvider(e.target.value as typeof selectedProvider)}
+                onValueChange={(value) => setSelectedProvider(value as typeof selectedProvider)}
               >
-                {PROVIDERS.map((p) => (
-                  <option key={p} value={p}>
-                    {p.toUpperCase()}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className="w-full text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {PROVIDERS.map((p) => (
+                    <SelectItem key={p} value={p}>
+                      {p.toUpperCase()}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-1">
               <Label className="text-xs text-muted-foreground">Display name</Label>
@@ -167,14 +178,15 @@ export default function AccessControlSettingsPage() {
             </div>
             <div className="space-y-1">
               <Label className="text-xs text-muted-foreground">Status</Label>
-              <select
-                className="border border-border rounded px-2 py-1 text-sm"
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-              >
-                <option value="enabled">enabled</option>
-                <option value="disabled">disabled</option>
-              </select>
+              <Select value={status} onValueChange={setStatus}>
+                <SelectTrigger className="w-full text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="enabled">enabled</SelectItem>
+                  <SelectItem value="disabled">disabled</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-1">
               <Label className="text-xs text-muted-foreground flex items-center gap-1">

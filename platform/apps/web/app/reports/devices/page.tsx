@@ -66,11 +66,11 @@ export default function DeviceAnalyticsPage() {
   const getDeviceColor = (type: string) => {
     switch (type?.toLowerCase()) {
       case "mobile":
-        return "bg-blue-50 text-blue-700 border-blue-200";
+        return "bg-primary/10 text-primary border-primary/20";
       case "desktop":
-        return "bg-emerald-50 text-emerald-700 border-emerald-200";
+        return "bg-status-success/10 text-status-success border-status-success/20";
       case "tablet":
-        return "bg-purple-50 text-purple-700 border-purple-200";
+        return "bg-primary/10 text-primary border-primary/20";
       default:
         return "bg-muted text-foreground border-border";
     }
@@ -98,7 +98,7 @@ export default function DeviceAnalyticsPage() {
             </p>
           </div>
           <Select value={days} onValueChange={setDays}>
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="w-[140px]" aria-label="Date range">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -118,12 +118,12 @@ export default function DeviceAnalyticsPage() {
           </Card>
         ) : isLoading ? (
           <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-status-success/30" />
           </div>
         ) : error ? (
           <Card>
-            <CardContent className="py-12 text-center">
-              <p className="text-red-600">Failed to load device analytics</p>
+            <CardContent className="py-12 text-center" role="alert">
+              <p className="text-status-error">Failed to load device analytics</p>
             </CardContent>
           </Card>
         ) : (
@@ -146,12 +146,12 @@ export default function DeviceAnalyticsPage() {
               <Card>
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-emerald-100 rounded-lg">
-                      <ShoppingCart className="w-5 h-5 text-emerald-600" />
+                    <div className="p-2 bg-status-success/10 rounded-lg">
+                      <ShoppingCart className="w-5 h-5 text-status-success" />
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Total Bookings</p>
-                      <p className="text-2xl font-bold text-emerald-600">{totalBookings.toLocaleString()}</p>
+                      <p className="text-2xl font-bold text-status-success">{totalBookings.toLocaleString()}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -159,12 +159,12 @@ export default function DeviceAnalyticsPage() {
               <Card>
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-blue-100 rounded-lg">
-                      <Percent className="w-5 h-5 text-blue-600" />
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <Percent className="w-5 h-5 text-primary" />
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Conversion Rate</p>
-                      <p className="text-2xl font-bold text-blue-600">{overallConversion}%</p>
+                      <p className="text-2xl font-bold text-primary">{overallConversion}%</p>
                     </div>
                   </div>
                 </CardContent>
@@ -172,12 +172,12 @@ export default function DeviceAnalyticsPage() {
               <Card>
                 <CardContent className="pt-6">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-purple-100 rounded-lg">
-                      <TrendingUp className="w-5 h-5 text-purple-600" />
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <TrendingUp className="w-5 h-5 text-primary" />
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Device Types</p>
-                      <p className="text-2xl font-bold text-purple-600">{data?.devices?.length || 0}</p>
+                      <p className="text-2xl font-bold text-primary">{data?.devices?.length || 0}</p>
                     </div>
                   </div>
                 </CardContent>
@@ -285,27 +285,27 @@ export default function DeviceAnalyticsPage() {
                             key={idx}
                             className={`rounded-lg p-4 ${
                               insight.type === "warning"
-                                ? "bg-amber-50 border border-amber-200"
+                                ? "bg-status-warning/10 border border-status-warning/20"
                                 : insight.type === "success"
-                                  ? "bg-emerald-50 border border-emerald-200"
-                                  : "bg-blue-50 border border-blue-200"
+                                  ? "bg-status-success/10 border border-status-success/20"
+                                  : "bg-primary/10 border border-primary/20"
                             }`}
                           >
                             <h4 className={`font-semibold ${
                               insight.type === "warning"
-                                ? "text-amber-800"
+                                ? "text-status-warning"
                                 : insight.type === "success"
-                                  ? "text-emerald-800"
-                                  : "text-blue-800"
+                                  ? "text-status-success"
+                                  : "text-primary"
                             }`}>
                               {insight.title}
                             </h4>
                             <p className={`text-sm mt-1 ${
                               insight.type === "warning"
-                                ? "text-amber-700"
+                                ? "text-status-warning"
                                 : insight.type === "success"
-                                  ? "text-emerald-700"
-                                  : "text-blue-700"
+                                  ? "text-status-success"
+                                  : "text-primary"
                             }`}>
                               {insight.description}
                             </p>

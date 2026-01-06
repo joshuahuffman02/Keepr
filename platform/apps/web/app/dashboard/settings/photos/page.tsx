@@ -5,6 +5,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/components/ui/use-toast";
 import { apiClient } from "@/lib/api-client";
 
@@ -127,18 +129,18 @@ export default function PhotosPage() {
                   </Button>
                 </div>
 
-                <div className="space-y-2">
+                <RadioGroup
+                  className="space-y-2"
+                  value={hero ?? ""}
+                  onValueChange={(value) => setHero(value || null)}
+                >
                   {photos.length === 0 && <div className="text-sm text-muted-foreground">No photos yet.</div>}
                   {photos.map((url, idx) => (
                     <div key={url} className="flex items-center gap-3 border border-border rounded-lg p-3">
-                      <input
-                        type="radio"
-                        name="hero"
-                        checked={hero === url}
-                        onChange={() => setHero(url)}
-                        title="Set as hero"
-                      />
-                      <div className="flex-1 truncate text-sm">{url}</div>
+                      <RadioGroupItem id={`hero-${idx}`} value={url} />
+                      <Label htmlFor={`hero-${idx}`} className="flex-1 truncate text-sm">
+                        {url}
+                      </Label>
                       <div className="flex gap-2">
                         <Button variant="outline" size="sm" onClick={() => move(idx, -1)} disabled={idx === 0}>
                           ↑
@@ -152,7 +154,7 @@ export default function PhotosPage() {
                       </div>
                     </div>
                   ))}
-                </div>
+                </RadioGroup>
 
                 <div className="flex justify-end gap-2">
                   <Button variant="outline" onClick={() => campgroundQuery.refetch()} disabled={campgroundQuery.isFetching}>

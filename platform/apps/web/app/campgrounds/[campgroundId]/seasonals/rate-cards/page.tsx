@@ -8,9 +8,17 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../../../../components/ui/card";
 import { Badge } from "../../../../../components/ui/badge";
 import { Button } from "../../../../../components/ui/button";
+import { Checkbox } from "../../../../../components/ui/checkbox";
 import { Input } from "../../../../../components/ui/input";
 import { Textarea } from "../../../../../components/ui/textarea";
 import { Label } from "../../../../../components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../../../components/ui/select";
 import { format } from "date-fns";
 import {
   Plus,
@@ -399,17 +407,21 @@ export default function RateCardsPage() {
             </p>
           </div>
           <div className="flex gap-2">
-            <select
-              value={selectedYear}
-              onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-              className="text-sm border border-border rounded px-3 py-2"
+            <Select
+              value={String(selectedYear)}
+              onValueChange={(value) => setSelectedYear(Number(value))}
             >
-              {[currentYear - 1, currentYear, currentYear + 1, currentYear + 2].map((year) => (
-                <option key={year} value={year}>
-                  {year} Season
-                </option>
-              ))}
-            </select>
+              <SelectTrigger className="h-9 w-[140px] text-sm" aria-label="Season year">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {[currentYear - 1, currentYear, currentYear + 1, currentYear + 2].map((year) => (
+                  <SelectItem key={year} value={String(year)}>
+                    {year} Season
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <Button onClick={() => setShowCreateModal(true)}>
               <Plus className="h-4 w-4 mr-1" />
               New Rate Card
@@ -577,33 +589,35 @@ export default function RateCardsPage() {
                   <div className="border-t pt-4">
                     <div className="flex items-center gap-4 mb-3 text-sm">
                       <label className="flex items-center gap-1">
-                        <input
-                          type="checkbox"
+                        <Checkbox
                           checked={previewMetered}
-                          onChange={(e) => setPreviewMetered(e.target.checked)}
-                          className="rounded"
+                          onCheckedChange={(checked) => setPreviewMetered(Boolean(checked))}
+                          aria-label="Metered utilities"
                         />
                         Metered
                       </label>
                       <label className="flex items-center gap-1">
-                        <input
-                          type="checkbox"
+                        <Checkbox
                           checked={previewPayInFull}
-                          onChange={(e) => setPreviewPayInFull(e.target.checked)}
-                          className="rounded"
+                          onCheckedChange={(checked) => setPreviewPayInFull(Boolean(checked))}
+                          aria-label="Pay in full"
                         />
                         Pay in Full
                       </label>
-                      <select
+                      <Select
                         value={previewPaymentMethod}
-                        onChange={(e) => setPreviewPaymentMethod(e.target.value)}
-                        className="text-xs border rounded px-2 py-1"
+                        onValueChange={setPreviewPaymentMethod}
                       >
-                        <option value="check">Check</option>
-                        <option value="cash">Cash</option>
-                        <option value="card">Card</option>
-                        <option value="ach">ACH</option>
-                      </select>
+                        <SelectTrigger className="h-8 w-[100px] text-xs" aria-label="Payment method">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="check">Check</SelectItem>
+                          <SelectItem value="cash">Cash</SelectItem>
+                          <SelectItem value="card">Card</SelectItem>
+                          <SelectItem value="ach">ACH</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                     <PricingPreview
                       rateCard={rateCard}
@@ -624,23 +638,25 @@ export default function RateCardsPage() {
             <Card className="w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Create Rate Card</CardTitle>
-                <Button variant="ghost" size="icon" onClick={() => setShowCreateModal(false)}>
+                <Button variant="ghost" size="icon" onClick={() => setShowCreateModal(false)} aria-label="Close rate card form">
                   <X className="h-4 w-4" />
                 </Button>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label>Name</Label>
+                    <Label htmlFor="rate-card-name">Name</Label>
                     <Input
+                      id="rate-card-name"
                       value={newRateCard.name}
                       onChange={(e) => setNewRateCard({ ...newRateCard, name: e.target.value })}
                       placeholder="2025 Season"
                     />
                   </div>
                   <div>
-                    <Label>Season Year</Label>
+                    <Label htmlFor="rate-card-season-year">Season Year</Label>
                     <Input
+                      id="rate-card-season-year"
                       type="number"
                       value={newRateCard.seasonYear}
                       onChange={(e) =>
@@ -652,8 +668,9 @@ export default function RateCardsPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label>Base Rate ($)</Label>
+                    <Label htmlFor="rate-card-base-rate">Base Rate ($)</Label>
                     <Input
+                      id="rate-card-base-rate"
                       type="number"
                       value={newRateCard.baseRate}
                       onChange={(e) =>
@@ -662,29 +679,34 @@ export default function RateCardsPage() {
                     />
                   </div>
                   <div>
-                    <Label>Billing Frequency</Label>
-                    <select
+                    <Label htmlFor="rate-card-billing-frequency">Billing Frequency</Label>
+                    <Select
                       value={newRateCard.billingFrequency}
-                      onChange={(e) =>
+                      onValueChange={(value) =>
                         setNewRateCard({
                           ...newRateCard,
-                          billingFrequency: e.target.value as BillingFrequency,
+                          billingFrequency: value as BillingFrequency,
                         })
                       }
-                      className="w-full border rounded px-3 py-2"
                     >
-                      <option value="monthly">Monthly</option>
-                      <option value="quarterly">Quarterly</option>
-                      <option value="semi_annual">Semi-Annual</option>
-                      <option value="seasonal">Full Season</option>
-                    </select>
+                      <SelectTrigger id="rate-card-billing-frequency" className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="monthly">Monthly</SelectItem>
+                        <SelectItem value="quarterly">Quarterly</SelectItem>
+                        <SelectItem value="semi_annual">Semi-Annual</SelectItem>
+                        <SelectItem value="seasonal">Full Season</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label>Season Start</Label>
+                    <Label htmlFor="rate-card-season-start">Season Start</Label>
                     <Input
+                      id="rate-card-season-start"
                       type="date"
                       value={newRateCard.seasonStartDate}
                       onChange={(e) =>
@@ -693,8 +715,9 @@ export default function RateCardsPage() {
                     />
                   </div>
                   <div>
-                    <Label>Season End</Label>
+                    <Label htmlFor="rate-card-season-end">Season End</Label>
                     <Input
+                      id="rate-card-season-end"
                       type="date"
                       value={newRateCard.seasonEndDate}
                       onChange={(e) =>
@@ -705,8 +728,9 @@ export default function RateCardsPage() {
                 </div>
 
                 <div>
-                  <Label>Description</Label>
+                  <Label htmlFor="rate-card-description">Description</Label>
                   <Textarea
+                    id="rate-card-description"
                     value={newRateCard.description}
                     onChange={(e) => setNewRateCard({ ...newRateCard, description: e.target.value })}
                     placeholder="Includes water, sewer, WiFi..."
@@ -715,12 +739,11 @@ export default function RateCardsPage() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     id="isDefault"
                     checked={newRateCard.isDefault}
-                    onChange={(e) => setNewRateCard({ ...newRateCard, isDefault: e.target.checked })}
-                    className="rounded"
+                    onCheckedChange={(checked) => setNewRateCard({ ...newRateCard, isDefault: Boolean(checked) })}
+                    aria-label="Set as default rate card"
                   />
                   <Label htmlFor="isDefault" className="cursor-pointer">
                     Set as default rate card for new seasonals
@@ -750,14 +773,15 @@ export default function RateCardsPage() {
             <Card className="w-full max-w-md mx-4">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Add Discount</CardTitle>
-                <Button variant="ghost" size="icon" onClick={() => setShowDiscountModal(false)}>
+                <Button variant="ghost" size="icon" onClick={() => setShowDiscountModal(false)} aria-label="Close discount form">
                   <X className="h-4 w-4" />
                 </Button>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label>Discount Name</Label>
+                  <Label htmlFor="discount-name">Discount Name</Label>
                   <Input
+                    id="discount-name"
                     value={newDiscount.name}
                     onChange={(e) => setNewDiscount({ ...newDiscount, name: e.target.value })}
                     placeholder="Metered Electric Discount"
@@ -765,29 +789,34 @@ export default function RateCardsPage() {
                 </div>
 
                 <div>
-                  <Label>Condition</Label>
-                  <select
+                  <Label htmlFor="discount-condition">Condition</Label>
+                  <Select
                     value={newDiscount.conditionType}
-                    onChange={(e) =>
+                    onValueChange={(value) =>
                       setNewDiscount({
                         ...newDiscount,
-                        conditionType: e.target.value as DiscountCondition,
+                        conditionType: value as DiscountCondition,
                       })
                     }
-                    className="w-full border rounded px-3 py-2"
                   >
-                    {Object.entries(conditionLabels).map(([value, label]) => (
-                      <option key={value} value={value}>
-                        {label}
-                      </option>
-                    ))}
-                  </select>
+                    <SelectTrigger id="discount-condition" className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(conditionLabels).map(([value, label]) => (
+                        <SelectItem key={value} value={value}>
+                          {label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {newDiscount.conditionType === "payment_method" && (
                   <div>
-                    <Label>Allowed Methods (comma-separated)</Label>
+                    <Label htmlFor="discount-methods">Allowed Methods (comma-separated)</Label>
                     <Input
+                      id="discount-methods"
                       placeholder="check, cash"
                       onChange={(e) =>
                         setNewDiscount({
@@ -803,27 +832,32 @@ export default function RateCardsPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label>Discount Type</Label>
-                    <select
+                    <Label htmlFor="discount-type">Discount Type</Label>
+                    <Select
                       value={newDiscount.discountType}
-                      onChange={(e) =>
+                      onValueChange={(value) =>
                         setNewDiscount({
                           ...newDiscount,
-                          discountType: e.target.value as DiscountType,
+                          discountType: value as DiscountType,
                         })
                       }
-                      className="w-full border rounded px-3 py-2"
                     >
-                      {Object.entries(discountTypeLabels).map(([value, label]) => (
-                        <option key={value} value={value}>
-                          {label}
-                        </option>
-                      ))}
-                    </select>
+                      <SelectTrigger id="discount-type" className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(discountTypeLabels).map(([value, label]) => (
+                          <SelectItem key={value} value={value}>
+                            {label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div>
-                    <Label>Amount</Label>
+                    <Label htmlFor="discount-amount">Amount</Label>
                     <Input
+                      id="discount-amount"
                       type="number"
                       value={newDiscount.discountAmount}
                       onChange={(e) =>
@@ -837,12 +871,11 @@ export default function RateCardsPage() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     id="stackable"
                     checked={newDiscount.stackable}
-                    onChange={(e) => setNewDiscount({ ...newDiscount, stackable: e.target.checked })}
-                    className="rounded"
+                    onCheckedChange={(checked) => setNewDiscount({ ...newDiscount, stackable: Boolean(checked) })}
+                    aria-label="Stackable discount"
                   />
                   <Label htmlFor="stackable" className="cursor-pointer">
                     Can stack with other discounts
@@ -872,14 +905,15 @@ export default function RateCardsPage() {
             <Card className="w-full max-w-md mx-4">
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle>Add Incentive</CardTitle>
-                <Button variant="ghost" size="icon" onClick={() => setShowIncentiveModal(false)}>
+                <Button variant="ghost" size="icon" onClick={() => setShowIncentiveModal(false)} aria-label="Close incentive form">
                   <X className="h-4 w-4" />
                 </Button>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label>Incentive Name</Label>
+                  <Label htmlFor="incentive-name">Incentive Name</Label>
                   <Input
+                    id="incentive-name"
                     value={newIncentive.name}
                     onChange={(e) => setNewIncentive({ ...newIncentive, name: e.target.value })}
                     placeholder="Pay in Full Guest Pass Bonus"
@@ -887,48 +921,57 @@ export default function RateCardsPage() {
                 </div>
 
                 <div>
-                  <Label>Condition</Label>
-                  <select
+                  <Label htmlFor="incentive-condition">Condition</Label>
+                  <Select
                     value={newIncentive.conditionType}
-                    onChange={(e) =>
+                    onValueChange={(value) =>
                       setNewIncentive({
                         ...newIncentive,
-                        conditionType: e.target.value as DiscountCondition,
+                        conditionType: value as DiscountCondition,
                       })
                     }
-                    className="w-full border rounded px-3 py-2"
                   >
-                    {Object.entries(conditionLabels).map(([value, label]) => (
-                      <option key={value} value={value}>
-                        {label}
-                      </option>
-                    ))}
-                  </select>
+                    <SelectTrigger id="incentive-condition" className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(conditionLabels).map(([value, label]) => (
+                        <SelectItem key={value} value={value}>
+                          {label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label>Incentive Type</Label>
-                    <select
+                    <Label htmlFor="incentive-type">Incentive Type</Label>
+                    <Select
                       value={newIncentive.incentiveType}
-                      onChange={(e) =>
+                      onValueChange={(value) =>
                         setNewIncentive({
                           ...newIncentive,
-                          incentiveType: e.target.value as IncentiveType,
+                          incentiveType: value as IncentiveType,
                         })
                       }
-                      className="w-full border rounded px-3 py-2"
                     >
-                      {Object.entries(incentiveTypeLabels).map(([value, label]) => (
-                        <option key={value} value={value}>
-                          {label}
-                        </option>
-                      ))}
-                    </select>
+                      <SelectTrigger id="incentive-type" className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(incentiveTypeLabels).map(([value, label]) => (
+                          <SelectItem key={value} value={value}>
+                            {label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div>
-                    <Label>Value ($)</Label>
+                    <Label htmlFor="incentive-value">Value ($)</Label>
                     <Input
+                      id="incentive-value"
                       type="number"
                       value={newIncentive.incentiveValue}
                       onChange={(e) =>

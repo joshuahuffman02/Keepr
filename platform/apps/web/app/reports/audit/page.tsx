@@ -86,12 +86,24 @@ export default function AuditLogPage() {
           </div>
           <div className="flex flex-wrap gap-2">
             <div className="flex items-center gap-2">
-              <Input type="date" value={start} onChange={(e) => setStart(e.target.value)} className="w-40" />
+              <Input
+                type="date"
+                value={start}
+                onChange={(e) => setStart(e.target.value)}
+                className="w-40"
+                aria-label="Start date"
+              />
               <span className="text-muted-foreground text-xs">to</span>
-              <Input type="date" value={end} onChange={(e) => setEnd(e.target.value)} className="w-40" />
+              <Input
+                type="date"
+                value={end}
+                onChange={(e) => setEnd(e.target.value)}
+                className="w-40"
+                aria-label="End date"
+              />
             </div>
             <Select value={actionFilter} onValueChange={setActionFilter}>
-              <SelectTrigger className="w-48">
+              <SelectTrigger className="w-48" aria-label="Action filter">
                 <SelectValue placeholder="Action" />
               </SelectTrigger>
               <SelectContent>
@@ -102,7 +114,7 @@ export default function AuditLogPage() {
               </SelectContent>
             </Select>
             <Select value={entityFilter} onValueChange={setEntityFilter}>
-              <SelectTrigger className="w-48">
+              <SelectTrigger className="w-48" aria-label="Entity filter">
                 <SelectValue placeholder="Entity" />
               </SelectTrigger>
               <SelectContent>
@@ -137,6 +149,11 @@ export default function AuditLogPage() {
             </Button>
           </div>
         </div>
+        {auditQuery.isError && (
+          <div role="alert" className="rounded-md border border-status-error/30 bg-status-error/10 px-3 py-2 text-sm text-status-error">
+            Failed to load audit log entries. Please try again.
+          </div>
+        )}
 
         <div className="card">
           <div className="p-4 border-b border-border flex items-center justify-between">
@@ -162,7 +179,7 @@ export default function AuditLogPage() {
                   </tr>
                 ) : rows.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-3 py-4 text-sm text-muted-foreground">No audit entries yet.</td>
+                    <td colSpan={7} className="px-3 py-4 text-sm text-muted-foreground">No audit entries yet.</td>
                   </tr>
                 ) : (
                   rows.map((row) => (

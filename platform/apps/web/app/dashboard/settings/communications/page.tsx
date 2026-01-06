@@ -6,6 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
 import { apiClient } from "@/lib/api-client";
@@ -24,6 +31,7 @@ const buildEntry = (): ScheduleEntry => ({
   templateId: null,
   enabled: true
 });
+const EMPTY_SELECT_VALUE = "__empty";
 
 function computeSendTime(entry: ScheduleEntry, sendHour: number, arrival: Date, departure: Date) {
   const base = entry.anchor === "arrival" ? arrival : departure;
@@ -150,16 +158,22 @@ export default function CommunicationsSettingsPage() {
               </div>
               <div className="space-y-1 md:col-span-2">
                 <Label>Default template</Label>
-                <select
-                  className="h-10 w-full rounded border border-border bg-card px-2 text-sm"
-                  value={defaultTemplateId || ""}
-                  onChange={(e) => setDefaultTemplateId(e.target.value || null)}
+                <Select
+                  value={defaultTemplateId || EMPTY_SELECT_VALUE}
+                  onValueChange={(value) => setDefaultTemplateId(value === EMPTY_SELECT_VALUE ? null : value)}
                 >
-                  <option value="">(Use fallback copy)</option>
-                  {templateOptions.map((t) => (
-                    <option key={t.id} value={t.id}>{t.name} (v{t.version})</option>
-                  ))}
-                </select>
+                  <SelectTrigger className="h-10 w-full text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={EMPTY_SELECT_VALUE}>(Use fallback copy)</SelectItem>
+                    {templateOptions.map((t) => (
+                      <SelectItem key={t.id} value={t.id}>
+                        {t.name} (v{t.version})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <p className="text-xs text-muted-foreground">Templates with <code>{"{nps_link}"}</code> or <code>{"{npsLink}"}</code> will have the NPS link injected.</p>
               </div>
             </div>
@@ -192,18 +206,22 @@ export default function CommunicationsSettingsPage() {
                     }} />
                     <span className="text-sm text-foreground">On</span>
                   </div>
-                  <select
-                    className="h-9 rounded border border-border bg-card px-2 text-sm"
+                  <Select
                     value={entry.direction}
-                    onChange={(e) => {
+                    onValueChange={(value) => {
                       const next = [...schedule];
-                      next[idx] = { ...entry, direction: e.target.value as ScheduleEntry["direction"] };
+                      next[idx] = { ...entry, direction: value as ScheduleEntry["direction"] };
                       setSchedule(next);
                     }}
                   >
-                    <option value="before">Before</option>
-                    <option value="after">After</option>
-                  </select>
+                    <SelectTrigger className="h-9 text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="before">Before</SelectItem>
+                      <SelectItem value="after">After</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <Input
                     type="number"
                     value={entry.offset}
@@ -213,44 +231,58 @@ export default function CommunicationsSettingsPage() {
                       setSchedule(next);
                     }}
                   />
-                  <select
-                    className="h-9 rounded border border-border bg-card px-2 text-sm"
+                  <Select
                     value={entry.unit}
-                    onChange={(e) => {
+                    onValueChange={(value) => {
                       const next = [...schedule];
-                      next[idx] = { ...entry, unit: e.target.value as ScheduleEntry["unit"] };
+                      next[idx] = { ...entry, unit: value as ScheduleEntry["unit"] };
                       setSchedule(next);
                     }}
                   >
-                    <option value="hours">Hours</option>
-                    <option value="days">Days</option>
-                  </select>
-                  <select
-                    className="h-9 rounded border border-border bg-card px-2 text-sm"
+                    <SelectTrigger className="h-9 text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="hours">Hours</SelectItem>
+                      <SelectItem value="days">Days</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select
                     value={entry.anchor}
-                    onChange={(e) => {
+                    onValueChange={(value) => {
                       const next = [...schedule];
-                      next[idx] = { ...entry, anchor: e.target.value as ScheduleEntry["anchor"] };
+                      next[idx] = { ...entry, anchor: value as ScheduleEntry["anchor"] };
                       setSchedule(next);
                     }}
                   >
-                    <option value="arrival">Arrival</option>
-                    <option value="departure">Departure</option>
-                  </select>
-                  <select
-                    className="h-9 rounded border border-border bg-card px-2 text-sm"
-                    value={entry.templateId || ""}
-                    onChange={(e) => {
+                    <SelectTrigger className="h-9 text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="arrival">Arrival</SelectItem>
+                      <SelectItem value="departure">Departure</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select
+                    value={entry.templateId || EMPTY_SELECT_VALUE}
+                    onValueChange={(value) => {
                       const next = [...schedule];
-                      next[idx] = { ...entry, templateId: e.target.value || null };
+                      next[idx] = { ...entry, templateId: value === EMPTY_SELECT_VALUE ? null : value };
                       setSchedule(next);
                     }}
                   >
-                    <option value="">Default</option>
-                    {templateOptions.map((t) => (
-                      <option key={t.id} value={t.id}>{t.name} (v{t.version})</option>
-                    ))}
-                  </select>
+                    <SelectTrigger className="h-9 text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={EMPTY_SELECT_VALUE}>Default</SelectItem>
+                      {templateOptions.map((t) => (
+                        <SelectItem key={t.id} value={t.id}>
+                          {t.name} (v{t.version})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <Button variant="ghost" className="text-sm text-red-600" onClick={() => {
                     setSchedule(schedule.filter((_, i) => i !== idx));
                   }}>
@@ -290,4 +322,3 @@ export default function CommunicationsSettingsPage() {
     </div>
   );
 }
-

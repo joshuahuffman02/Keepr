@@ -3,6 +3,8 @@
 import { useEffect, useState, useMemo } from "react";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { StaffNavigation } from "@/components/staff/StaffNavigation";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Clock,
@@ -315,6 +317,7 @@ export default function AvailabilityPage({ params }: { params: { campgroundId: s
               whileTap={{ scale: 0.95 }}
               onClick={goToPreviousWeek}
               className="p-2 rounded-lg border border-border hover:bg-muted/60 transition-colors"
+              aria-label="Previous week"
             >
               <ChevronLeft className="w-4 h-4" />
             </motion.button>
@@ -329,6 +332,7 @@ export default function AvailabilityPage({ params }: { params: { campgroundId: s
               whileTap={{ scale: 0.95 }}
               onClick={goToNextWeek}
               className="p-2 rounded-lg border border-border hover:bg-muted/60 transition-colors"
+              aria-label="Next week"
             >
               <ChevronRight className="w-4 h-4" />
             </motion.button>
@@ -341,6 +345,7 @@ export default function AvailabilityPage({ params }: { params: { campgroundId: s
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 flex items-center gap-2"
+            role="alert"
           >
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
             {error}
@@ -493,6 +498,7 @@ export default function AvailabilityPage({ params }: { params: { campgroundId: s
                   <button
                     onClick={() => setSelectedCell(null)}
                     className="p-1 rounded-lg hover:bg-card/50 transition-colors"
+                    aria-label="Close override dialog"
                   >
                     <X className="w-5 h-5 text-muted-foreground" />
                   </button>
@@ -509,6 +515,7 @@ export default function AvailabilityPage({ params }: { params: { campgroundId: s
                           ? "border-status-success bg-status-success/15 text-status-success"
                           : "border-border text-muted-foreground hover:border-border"
                       )}
+                      aria-pressed={overrideAvailable}
                     >
                       <CheckCircle2 className="w-4 h-4" />
                       Available
@@ -521,6 +528,7 @@ export default function AvailabilityPage({ params }: { params: { campgroundId: s
                           ? "border-status-error bg-status-error/15 text-status-error"
                           : "border-border text-muted-foreground hover:border-border"
                       )}
+                      aria-pressed={!overrideAvailable}
                     >
                       <XCircle className="w-4 h-4" />
                       Unavailable
@@ -531,8 +539,9 @@ export default function AvailabilityPage({ params }: { params: { campgroundId: s
                   {overrideAvailable && (
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-foreground mb-2">Start Time</label>
-                        <input
+                        <Label htmlFor="override-start" className="block text-sm font-medium text-foreground mb-2">Start Time</Label>
+                        <Input
+                          id="override-start"
                           type="time"
                           value={overrideStartTime}
                           onChange={(e) => setOverrideStartTime(e.target.value)}
@@ -540,8 +549,9 @@ export default function AvailabilityPage({ params }: { params: { campgroundId: s
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-foreground mb-2">End Time</label>
-                        <input
+                        <Label htmlFor="override-end" className="block text-sm font-medium text-foreground mb-2">End Time</Label>
+                        <Input
+                          id="override-end"
                           type="time"
                           value={overrideEndTime}
                           onChange={(e) => setOverrideEndTime(e.target.value)}
@@ -553,10 +563,11 @@ export default function AvailabilityPage({ params }: { params: { campgroundId: s
 
                   {/* Reason */}
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
+                    <Label htmlFor="override-reason" className="block text-sm font-medium text-foreground mb-2">
                       Reason <span className="text-muted-foreground">(optional)</span>
-                    </label>
-                    <input
+                    </Label>
+                    <Input
+                      id="override-reason"
                       type="text"
                       value={overrideReason}
                       onChange={(e) => setOverrideReason(e.target.value)}

@@ -238,8 +238,8 @@ export default function ShiftSwapsPage({ params }: { params: { campgroundId: str
           className="mb-8"
         >
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center">
-              <ArrowLeftRight className="w-6 h-6 text-purple-600" />
+            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+              <ArrowLeftRight className="w-6 h-6 text-primary" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-foreground">Shift Swaps</h1>
@@ -268,7 +268,8 @@ export default function ShiftSwapsPage({ params }: { params: { campgroundId: str
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700"
+            className="mb-6 p-4 bg-status-error/10 border border-status-error/20 rounded-xl text-status-error"
+            role="alert"
           >
             {error}
           </motion.div>
@@ -283,13 +284,14 @@ export default function ShiftSwapsPage({ params }: { params: { campgroundId: str
               className={cn(
                 "px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2",
                 activeTab === tab.id
-                  ? "bg-violet-100 text-violet-700"
+                  ? "bg-primary/10 text-primary"
                   : "text-muted-foreground hover:bg-muted"
               )}
+              aria-pressed={activeTab === tab.id}
             >
               {tab.label}
               {tab.badge && tab.badge > 0 && (
-                <span className="px-1.5 py-0.5 text-xs bg-red-500 text-white rounded-full">
+                <span className="px-1.5 py-0.5 text-xs bg-status-error text-white rounded-full">
                   {tab.badge}
                 </span>
               )}
@@ -300,7 +302,7 @@ export default function ShiftSwapsPage({ params }: { params: { campgroundId: str
         {/* Content */}
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin text-violet-500" />
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
           </div>
         ) : filteredSwaps.length === 0 ? (
           <motion.div
@@ -352,7 +354,7 @@ export default function ShiftSwapsPage({ params }: { params: { campgroundId: str
                       <div className="flex items-center gap-4">
                         {/* Requester */}
                         <div className="flex items-center gap-2">
-                          <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-semibold">
+                          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold">
                             {swap.requester?.firstName?.[0] || "?"}
                           </div>
                           <div>

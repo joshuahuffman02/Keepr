@@ -8,6 +8,7 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
 import { helpTopics, type HelpTopic } from "@/content/help/topics";
 import { getContextTopics, searchTopics } from "@/lib/help";
 import { useWhoami } from "@/hooks/use-whoami";
+import { Input } from "@/components/ui/input";
 
 const LS_PINS = "campreserv:help:pins";
 const LS_RECENT = "campreserv:help:recent";
@@ -188,7 +189,7 @@ export default function HelpPage() {
 
           <div className="mt-4 grid gap-3 md:grid-cols-[2fr,1fr]">
             <div className="relative">
-              <input
+              <Input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search how-tos, e.g. refunds, pricing rules, OTA mapping"

@@ -18,6 +18,13 @@ import { TableEmpty } from "../../components/ui/table";
 import Link from "next/link";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../../components/ui/dialog";
 import { Label } from "../../components/ui/label";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "../../components/ui/select";
 import { Input } from "../../components/ui/input";
 import { Textarea } from "../../components/ui/textarea";
 import { Checkbox } from "../../components/ui/checkbox";
@@ -40,6 +47,7 @@ const posApi = {
         apiClient.createStoreOrder(campgroundId, payload),
     getLocations: (campgroundId: string) => apiClient.getStoreLocations(campgroundId),
 };
+const EMPTY_SELECT_VALUE = "__empty";
 
 // Local types based on schemas
 type Product = {
@@ -159,19 +167,24 @@ function RefundExchangeDialog({ open, onClose, orders, defaultOrderId, onSubmit,
                 <div className="space-y-4">
                     <div className="space-y-2">
                         <Label htmlFor="order-select">Recent POS order</Label>
-                        <select
-                            id="order-select"
-                            className="w-full rounded-md border border-border bg-card px-3 py-2 text-sm"
-                            value={orderId}
-                            onChange={(e) => setOrderId(e.target.value)}
+                        <Select
+                            value={orderId || EMPTY_SELECT_VALUE}
+                            onValueChange={(value) => setOrderId(value === EMPTY_SELECT_VALUE ? "" : value)}
                         >
-                            {orders.length === 0 && <option value="">No orders found</option>}
-                            {orders.map((order) => (
-                                <option key={order.id} value={order.id}>
-                                    #{order.id.slice(0, 8)} • ${(order.totalCents / 100).toFixed(2)} • {order.createdAt ? new Date(order.createdAt).toLocaleString() : "recent"}
-                                </option>
-                            ))}
-                        </select>
+                            <SelectTrigger id="order-select" className="w-full">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value={EMPTY_SELECT_VALUE} disabled={orders.length === 0}>
+                                    {orders.length === 0 ? "No orders found" : "Select an order"}
+                                </SelectItem>
+                                {orders.map((order) => (
+                                    <SelectItem key={order.id} value={order.id}>
+                                        #{order.id.slice(0, 8)} • ${(order.totalCents / 100).toFixed(2)} • {order.createdAt ? new Date(order.createdAt).toLocaleString() : "recent"}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
 
                     {activeOrder && (
@@ -253,7 +266,7 @@ function RefundExchangeDialog({ open, onClose, orders, defaultOrderId, onSubmit,
                     )}
 
                     {error && (
-                        <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                        <div role="alert" className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
                             {error}
                         </div>
                     )}
@@ -634,17 +647,21 @@ export default function POSPage() {
                         <div className="flex items-center gap-3">
                             <h1 className="text-2xl font-semibold tracking-tight text-foreground">Point of Sale</h1>
                             {locations.length > 1 && (
-                                <select
-                                    value={selectedLocationId || ""}
-                                    onChange={(e) => setSelectedLocationId(e.target.value || null)}
-                                    className="rounded-md border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground shadow-sm hover:bg-muted focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                                <Select
+                                    value={selectedLocationId || EMPTY_SELECT_VALUE}
+                                    onValueChange={(value) => setSelectedLocationId(value === EMPTY_SELECT_VALUE ? null : value)}
                                 >
-                                    {locations.map((loc) => (
-                                        <option key={loc.id} value={loc.id}>
-                                            {loc.name}{loc.isDefault ? " (Default)" : ""}
-                                        </option>
-                                    ))}
-                                </select>
+                                    <SelectTrigger className="h-9 w-[200px] text-sm font-medium" aria-label="Location">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {locations.map((loc) => (
+                                            <SelectItem key={loc.id} value={loc.id}>
+                                                {loc.name}{loc.isDefault ? " (Default)" : ""}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             )}
                             {locations.length === 1 && (
                                 <Badge variant="secondary" className="text-xs">
@@ -698,6 +715,7 @@ export default function POSPage() {
                                     placeholder="Search products..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
+                                    aria-label="Search products"
                                     className="h-10 w-full pl-10 pr-10 text-sm"
                                 />
                                 <svg

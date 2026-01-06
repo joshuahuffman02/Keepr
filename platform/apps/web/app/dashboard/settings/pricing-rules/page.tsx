@@ -1,10 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "../../../../components/ui/button";
+import { Checkbox } from "../../../../components/ui/checkbox";
 import { FormField } from "../../../../components/ui/form-field";
+import { Label } from "../../../../components/ui/label";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "../../../../components/ui/select";
 import { apiClient } from "../../../../lib/api-client";
 import { Plus, Pencil, Trash2, Calendar, TrendingUp, Sun, Gift, BarChart3 } from "lucide-react";
 import {
@@ -144,6 +153,7 @@ const stackModeLabels: Record<string, string> = {
 };
 
 const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const EMPTY_SELECT_VALUE = "__empty";
 
 export default function PricingRulesV2Page() {
   const [campgroundId, setCampgroundId] = useState<string | null>(null);
@@ -159,6 +169,7 @@ export default function PricingRulesV2Page() {
     reset,
     watch,
     setValue,
+    control,
   } = useForm<FormData>({
     defaultValues: defaultFormData,
     mode: "onChange",
@@ -445,15 +456,25 @@ export default function PricingRulesV2Page() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">Type</label>
-                  <select
-                    className="w-full rounded-lg border border-border px-3 py-2 text-sm"
-                    {...register("type")}
-                  >
-                    {Object.entries(ruleTypeLabels).map(([key, val]) => (
-                      <option key={key} value={key}>{val.label}</option>
-                    ))}
-                  </select>
+                  <Label className="block text-sm font-medium text-foreground mb-1">Type</Label>
+                  <Controller
+                    name="type"
+                    control={control}
+                    render={({ field }) => (
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger className="w-full text-sm">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.entries(ruleTypeLabels).map(([key, val]) => (
+                            <SelectItem key={key} value={key}>
+                              {val.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-1">
@@ -512,26 +533,44 @@ export default function PricingRulesV2Page() {
                     maxWidth={360}
                   />
                 </div>
-                <select
-                  className="w-full rounded-lg border border-border px-3 py-2 text-sm"
-                  {...register("stackMode")}
-                >
-                  {Object.entries(stackModeLabels).map(([key, label]) => (
-                    <option key={key} value={key}>{label}</option>
-                  ))}
-                </select>
+                <Controller
+                  name="stackMode"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger className="w-full text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(stackModeLabels).map(([key, label]) => (
+                          <SelectItem key={key} value={key}>
+                            {label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">Adjustment Type</label>
-                  <select
-                    className="w-full rounded-lg border border-border px-3 py-2 text-sm"
-                    {...register("adjustmentType")}
-                  >
-                    <option value="percent">Percentage (%)</option>
-                    <option value="flat">Flat ($)</option>
-                  </select>
+                  <Label className="block text-sm font-medium text-foreground mb-1">Adjustment Type</Label>
+                  <Controller
+                    name="adjustmentType"
+                    control={control}
+                    render={({ field }) => (
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger className="w-full text-sm">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="percent">Percentage (%)</SelectItem>
+                          <SelectItem value="flat">Flat ($)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
                 </div>
                 <FormField
                   label={`Value ${formData.adjustmentType === "percent" ? "(%)" : "($)"}`}
@@ -545,16 +584,29 @@ export default function PricingRulesV2Page() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Site Class</label>
-                <select
-                  className="w-full rounded-lg border border-border px-3 py-2 text-sm"
-                  {...register("siteClassId")}
-                >
-                  <option value="">All Site Classes</option>
-                  {siteClassesQuery.data?.map((sc: SiteClass) => (
-                    <option key={sc.id} value={sc.id}>{sc.name}</option>
-                  ))}
-                </select>
+                <Label className="block text-sm font-medium text-foreground mb-1">Site Class</Label>
+                <Controller
+                  name="siteClassId"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      value={field.value || EMPTY_SELECT_VALUE}
+                      onValueChange={(value) => field.onChange(value === EMPTY_SELECT_VALUE ? "" : value)}
+                    >
+                      <SelectTrigger className="w-full text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={EMPTY_SELECT_VALUE}>All Site Classes</SelectItem>
+                        {siteClassesQuery.data?.map((sc: SiteClass) => (
+                          <SelectItem key={sc.id} value={sc.id}>
+                            {sc.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
               </div>
 
               {formData.type === "weekend" && (
@@ -652,13 +704,18 @@ export default function PricingRulesV2Page() {
               </div>
 
               <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="active"
-                  className="rounded border-border"
-                  {...register("active")}
+                <Controller
+                  name="active"
+                  control={control}
+                  render={({ field }) => (
+                    <Checkbox
+                      id="active"
+                      checked={field.value}
+                      onCheckedChange={(checked) => field.onChange(Boolean(checked))}
+                    />
+                  )}
                 />
-                <label htmlFor="active" className="text-sm text-foreground">Active</label>
+                <Label htmlFor="active" className="text-sm text-foreground">Active</Label>
               </div>
 
               <div className="mt-6 flex justify-end gap-3">

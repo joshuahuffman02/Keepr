@@ -193,10 +193,10 @@ export default function TransfersPage() {
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+                        <h1 className="text-2xl font-bold tracking-tight text-foreground">
                             Inventory Transfers
                         </h1>
-                        <p className="text-slate-500">
+                        <p className="text-muted-foreground">
                             Move inventory between store locations
                         </p>
                     </div>
@@ -207,9 +207,9 @@ export default function TransfersPage() {
                 </div>
 
                 {locations.length < 2 && (
-                    <Card className="border-amber-200 bg-amber-50">
+                    <Card className="border-status-warning/20 bg-status-warning/10">
                         <CardContent className="py-4">
-                            <p className="text-amber-800 text-sm">
+                            <p className="text-status-warning text-sm">
                                 You need at least 2 store locations to create transfers.
                                 <a href="/store/locations" className="underline ml-1">
                                     Add locations
@@ -224,7 +224,7 @@ export default function TransfersPage() {
                         <div className="flex items-center justify-between">
                             <CardTitle className="text-base">All Transfers</CardTitle>
                             <Select value={statusFilter} onValueChange={setStatusFilter}>
-                                <SelectTrigger className="w-40">
+                                <SelectTrigger className="w-40" aria-label="Status filter">
                                     <SelectValue placeholder="Status" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -239,11 +239,11 @@ export default function TransfersPage() {
                     </CardHeader>
                     <CardContent>
                         {isLoading ? (
-                            <div className="text-center py-8 text-slate-500">Loading transfers...</div>
+                            <div className="text-center py-8 text-muted-foreground">Loading transfers...</div>
                         ) : transfers.length === 0 ? (
                             <div className="text-center py-8">
-                                <ArrowLeftRight className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                                <p className="text-slate-500">No transfers found</p>
+                                <ArrowLeftRight className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                                <p className="text-muted-foreground">No transfers found</p>
                             </div>
                         ) : (
                             <Table>
@@ -262,16 +262,29 @@ export default function TransfersPage() {
                                         const config = STATUS_CONFIG[t.status];
                                         const StatusIcon = config.icon;
                                         return (
-                                            <TableRow key={t.id} className="cursor-pointer" onClick={() => setViewingTransfer(t)}>
-                                                <TableCell className="text-sm text-slate-500">
-                                                    {formatDate(t.createdAt)}
-                                                </TableCell>
+                                            <TableRow
+                                                key={t.id}
+                                                className="cursor-pointer"
+                                                onClick={() => setViewingTransfer(t)}
+                                                onKeyDown={(event) => {
+                                                    if (event.key === "Enter" || event.key === " ") {
+                                                        event.preventDefault();
+                                                        setViewingTransfer(t);
+                                                    }
+                                                }}
+                                                role="button"
+                                                tabIndex={0}
+                                                aria-label={`View transfer ${t.id.slice(0, 8)}`}
+                                            >
+                                            <TableCell className="text-sm text-muted-foreground">
+                                                {formatDate(t.createdAt)}
+                                            </TableCell>
                                                 <TableCell>
                                                     <div className="flex items-center gap-2">
                                                         <Badge variant="outline">
                                                             {t.fromLocation?.code || t.fromLocation?.name}
                                                         </Badge>
-                                                        <ArrowLeftRight className="w-4 h-4 text-slate-400" />
+                                                        <ArrowLeftRight className="w-4 h-4 text-muted-foreground" />
                                                         <Badge variant="outline">
                                                             {t.toLocation?.code || t.toLocation?.name}
                                                         </Badge>
@@ -279,7 +292,7 @@ export default function TransfersPage() {
                                                 </TableCell>
                                                 <TableCell>
                                                     <span className="flex items-center gap-1">
-                                                        <Package className="w-4 h-4 text-slate-400" />
+                                                        <Package className="w-4 h-4 text-muted-foreground" />
                                                         {t._count?.items ?? t.items?.length ?? 0} items
                                                     </span>
                                                 </TableCell>
@@ -298,7 +311,7 @@ export default function TransfersPage() {
                                                     {(t.status === "pending" || t.status === "in_transit") && (
                                                         <DropdownMenu>
                                                             <DropdownMenuTrigger asChild>
-                                                                <Button variant="ghost" size="icon">
+                                                                <Button variant="ghost" size="icon" aria-label={`Open actions for transfer ${t.id.slice(0, 8)}`}>
                                                                     <MoreVertical className="w-4 h-4" />
                                                                 </Button>
                                                             </DropdownMenuTrigger>
@@ -318,7 +331,7 @@ export default function TransfersPage() {
                                                                     Complete Transfer
                                                                 </DropdownMenuItem>
                                                                 <DropdownMenuItem
-                                                                    className="text-red-600"
+                                                                    className="text-destructive"
                                                                     onClick={() => cancelMutation.mutate(t.id)}
                                                                 >
                                                                     <XCircle className="w-4 h-4 mr-2" />
@@ -350,9 +363,9 @@ export default function TransfersPage() {
                     <div className="space-y-4 py-4">
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label>From Location</Label>
+                                <Label htmlFor="transfer-from-location">From Location</Label>
                                 <Select value={fromLocationId} onValueChange={setFromLocationId}>
-                                    <SelectTrigger>
+                                    <SelectTrigger id="transfer-from-location">
                                         <SelectValue placeholder="Select source" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -367,9 +380,9 @@ export default function TransfersPage() {
                                 </Select>
                             </div>
                             <div className="space-y-2">
-                                <Label>To Location</Label>
+                                <Label htmlFor="transfer-to-location">To Location</Label>
                                 <Select value={toLocationId} onValueChange={setToLocationId}>
-                                    <SelectTrigger>
+                                    <SelectTrigger id="transfer-to-location">
                                         <SelectValue placeholder="Select destination" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -386,10 +399,10 @@ export default function TransfersPage() {
                         </div>
 
                         <div className="space-y-2">
-                            <Label>Add Products</Label>
+                            <Label htmlFor="transfer-product">Add Products</Label>
                             <div className="flex gap-2">
                                 <Select value={selectedProductId} onValueChange={setSelectedProductId}>
-                                    <SelectTrigger className="flex-1">
+                                    <SelectTrigger id="transfer-product" className="flex-1">
                                         <SelectValue placeholder="Select product" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -407,6 +420,7 @@ export default function TransfersPage() {
                                     min={1}
                                     value={selectedQty}
                                     onChange={(e) => setSelectedQty(parseInt(e.target.value) || 1)}
+                                    aria-label="Transfer quantity"
                                     className="w-20"
                                 />
                                 <Button onClick={addItem} disabled={!selectedProductId}>
@@ -426,13 +440,14 @@ export default function TransfersPage() {
                                         >
                                             <span className="font-medium">{getProductName(item.productId)}</span>
                                             <div className="flex items-center gap-3">
-                                                <span className="text-slate-600">Qty: {item.qty}</span>
+                                                <span className="text-muted-foreground">Qty: {item.qty}</span>
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
                                                     onClick={() => removeItem(item.productId)}
+                                                    aria-label={`Remove ${getProductName(item.productId)} from transfer`}
                                                 >
-                                                    <Trash2 className="w-4 h-4 text-red-500" />
+                                                    <Trash2 className="w-4 h-4 text-destructive" />
                                                 </Button>
                                             </div>
                                         </div>
@@ -442,8 +457,9 @@ export default function TransfersPage() {
                         )}
 
                         <div className="space-y-2">
-                            <Label>Notes (optional)</Label>
+                            <Label htmlFor="transfer-notes">Notes (optional)</Label>
                             <Textarea
+                                id="transfer-notes"
                                 value={notes}
                                 onChange={(e) => setNotes(e.target.value)}
                                 placeholder="Reason for transfer..."
@@ -483,7 +499,7 @@ export default function TransfersPage() {
                                     <Badge variant="outline">
                                         {viewingTransfer.fromLocation?.name}
                                     </Badge>
-                                    <ArrowLeftRight className="w-4 h-4 text-slate-400" />
+                                    <ArrowLeftRight className="w-4 h-4 text-muted-foreground" />
                                     <Badge variant="outline">
                                         {viewingTransfer.toLocation?.name}
                                     </Badge>
@@ -495,7 +511,7 @@ export default function TransfersPage() {
 
                             <div className="grid grid-cols-2 gap-4 text-sm">
                                 <div>
-                                    <span className="text-slate-500">Requested By:</span>
+                                    <span className="text-muted-foreground">Requested By:</span>
                                     <p className="font-medium">
                                         {viewingTransfer.requestedBy
                                             ? `${viewingTransfer.requestedBy.firstName} ${viewingTransfer.requestedBy.lastName}`
@@ -503,14 +519,14 @@ export default function TransfersPage() {
                                     </p>
                                 </div>
                                 <div>
-                                    <span className="text-slate-500">Created:</span>
+                                    <span className="text-muted-foreground">Created:</span>
                                     <p className="font-medium">{formatDate(viewingTransfer.createdAt)}</p>
                                 </div>
                             </div>
 
                             {viewingTransfer.notes && (
                                 <div className="text-sm">
-                                    <span className="text-slate-500">Notes:</span>
+                                    <span className="text-muted-foreground">Notes:</span>
                                     <p className="mt-1">{viewingTransfer.notes}</p>
                                 </div>
                             )}

@@ -7,6 +7,13 @@ import { Badge } from "../../../components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../../components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../../../components/ui/dialog";
 import { Label } from "../../../components/ui/label";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "../../../components/ui/select";
 import { apiClient } from "../../../lib/api-client";
 import Link from "next/link";
 
@@ -136,7 +143,7 @@ export default function FulfillmentQueuePage() {
     if (!campgroundId) {
         return (
             <DashboardShell>
-                <div className="flex items-center justify-center h-64 text-slate-500">
+                <div className="flex items-center justify-center h-64 text-muted-foreground">
                     Please select a campground first.
                 </div>
             </DashboardShell>
@@ -151,8 +158,8 @@ export default function FulfillmentQueuePage() {
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-900">Fulfillment Queue</h1>
-                        <p className="text-sm text-slate-500 mt-1">
+                        <h1 className="text-2xl font-bold text-foreground">Fulfillment Queue</h1>
+                        <p className="text-sm text-muted-foreground mt-1">
                             Manage online orders awaiting fulfillment
                         </p>
                     </div>
@@ -170,27 +177,29 @@ export default function FulfillmentQueuePage() {
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                     <button
                         onClick={() => setStatusFilter("all")}
+                        aria-pressed={statusFilter === "all"}
                         className={`p-4 rounded-lg border transition-all ${
                             statusFilter === "all"
-                                ? "border-slate-900 bg-slate-50 ring-2 ring-slate-900"
-                                : "border-slate-200 hover:border-slate-300"
+                                ? "border-primary bg-primary/10 ring-2 ring-primary/30"
+                                : "border-border hover:border-muted-foreground/30"
                         }`}
                     >
-                        <div className="text-2xl font-bold text-slate-900">{totalActive}</div>
-                        <div className="text-sm text-slate-500">All Active</div>
+                        <div className="text-2xl font-bold text-foreground">{totalActive}</div>
+                        <div className="text-sm text-muted-foreground">All Active</div>
                     </button>
                     {(["unassigned", "assigned", "preparing", "ready"] as FulfillmentStatus[]).map((status) => (
                         <button
                             key={status}
                             onClick={() => setStatusFilter(status)}
+                            aria-pressed={statusFilter === status}
                             className={`p-4 rounded-lg border transition-all ${
                                 statusFilter === status
-                                    ? "border-slate-900 bg-slate-50 ring-2 ring-slate-900"
-                                    : "border-slate-200 hover:border-slate-300"
+                                    ? "border-primary bg-primary/10 ring-2 ring-primary/30"
+                                    : "border-border hover:border-muted-foreground/30"
                             }`}
                         >
-                            <div className="text-2xl font-bold text-slate-900">{counts[status] || 0}</div>
-                            <div className="text-sm text-slate-500">{STATUS_LABELS[status]}</div>
+                            <div className="text-2xl font-bold text-foreground">{counts[status] || 0}</div>
+                            <div className="text-sm text-muted-foreground">{STATUS_LABELS[status]}</div>
                         </button>
                     ))}
                 </div>
@@ -198,19 +207,25 @@ export default function FulfillmentQueuePage() {
                 {/* Filters */}
                 {locations.length > 1 && (
                     <div className="flex items-center gap-4">
-                        <Label className="text-sm font-medium text-slate-700">Filter by location:</Label>
-                        <select
+                        <Label htmlFor="fulfillment-location-filter" className="text-sm font-medium text-foreground">
+                            Filter by location:
+                        </Label>
+                        <Select
                             value={locationFilter}
-                            onChange={(e) => setLocationFilter(e.target.value)}
-                            className="rounded-md border border-slate-300 px-3 py-1.5 text-sm"
+                            onValueChange={(value) => setLocationFilter(value)}
                         >
-                            <option value="all">All Locations</option>
-                            {locations.map((loc) => (
-                                <option key={loc.id} value={loc.id}>
-                                    {loc.name}
-                                </option>
-                            ))}
-                        </select>
+                            <SelectTrigger id="fulfillment-location-filter" className="w-[200px] text-sm">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">All Locations</SelectItem>
+                                {locations.map((loc) => (
+                                    <SelectItem key={loc.id} value={loc.id}>
+                                        {loc.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
                 )}
 
@@ -222,14 +237,14 @@ export default function FulfillmentQueuePage() {
                                 <CardContent className="p-4 animate-pulse">
                                     <div className="flex items-start justify-between gap-4 mb-3">
                                         <div className="flex-1 space-y-2">
-                                            <div className="h-5 bg-slate-200 rounded w-32" />
-                                            <div className="h-4 bg-slate-200 rounded w-48" />
+                                            <div className="h-5 bg-muted rounded w-32" />
+                                            <div className="h-4 bg-muted rounded w-48" />
                                         </div>
-                                        <div className="h-6 w-20 bg-slate-200 rounded" />
+                                        <div className="h-6 w-20 bg-muted rounded" />
                                     </div>
                                     <div className="space-y-2">
-                                        <div className="h-3 bg-slate-200 rounded w-full" />
-                                        <div className="h-3 bg-slate-200 rounded w-3/4" />
+                                        <div className="h-3 bg-muted rounded w-full" />
+                                        <div className="h-3 bg-muted rounded w-3/4" />
                                     </div>
                                 </CardContent>
                             </Card>
@@ -238,13 +253,13 @@ export default function FulfillmentQueuePage() {
                 ) : orders.length === 0 ? (
                     <Card>
                         <CardContent className="py-12 text-center">
-                            <div className="text-slate-400 mb-2">
+                            <div className="text-muted-foreground mb-2">
                                 <svg className="mx-auto h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                                 </svg>
                             </div>
-                            <p className="text-slate-600 font-medium">No orders in queue</p>
-                            <p className="text-sm text-slate-500 mt-1">
+                            <p className="text-muted-foreground font-medium">No orders in queue</p>
+                            <p className="text-sm text-muted-foreground mt-1">
                                 {statusFilter !== "all"
                                     ? `No ${STATUS_LABELS[statusFilter].toLowerCase()} orders found.`
                                     : "Online orders will appear here when placed."}
@@ -261,7 +276,7 @@ export default function FulfillmentQueuePage() {
                                         <div className="flex items-start justify-between mb-3">
                                             <div>
                                                 <div className="flex items-center gap-2">
-                                                    <span className="font-semibold text-slate-900">
+                                                    <span className="font-semibold text-foreground">
                                                         Order #{order.id.slice(0, 8)}
                                                     </span>
                                                     <Badge className={STATUS_COLORS[order.fulfillmentStatus]}>
@@ -273,21 +288,21 @@ export default function FulfillmentQueuePage() {
                                                         </Badge>
                                                     )}
                                                 </div>
-                                                <div className="text-sm text-slate-500 mt-1">
+                                                <div className="text-sm text-muted-foreground mt-1">
                                                     {order.createdAt ? formatTimeAgo(order.createdAt) : "Just now"}
                                                     {order.promisedAt && (
-                                                        <span className="ml-2 text-amber-600 font-medium">
+                                                        <span className="ml-2 text-status-warning font-medium">
                                                             Promised: {formatTime(order.promisedAt)}
                                                         </span>
                                                     )}
                                                 </div>
                                             </div>
                                             <div className="text-right">
-                                                <div className="font-bold text-lg text-slate-900">
+                                                <div className="font-bold text-lg text-foreground">
                                                     ${(order.totalCents / 100).toFixed(2)}
                                                 </div>
                                                 {order.fulfillmentType && (
-                                                    <div className="text-xs text-slate-500 capitalize">
+                                                    <div className="text-xs text-muted-foreground capitalize">
                                                         {order.fulfillmentType.replace("_", " ")}
                                                     </div>
                                                 )}
@@ -296,7 +311,7 @@ export default function FulfillmentQueuePage() {
 
                                         {/* Customer Info */}
                                         {(order.guest || order.siteNumber) && (
-                                            <div className="text-sm text-slate-600 mb-3">
+                                            <div className="text-sm text-muted-foreground mb-3">
                                                 {order.guest && (
                                                     <span>
                                                         {order.guest.firstName} {order.guest.lastName}
@@ -304,7 +319,7 @@ export default function FulfillmentQueuePage() {
                                                     </span>
                                                 )}
                                                 {order.siteNumber && (
-                                                    <span className="ml-2 text-slate-500">Site {order.siteNumber}</span>
+                                                    <span className="ml-2 text-muted-foreground">Site {order.siteNumber}</span>
                                                 )}
                                             </div>
                                         )}
@@ -313,12 +328,12 @@ export default function FulfillmentQueuePage() {
                                         <div className="space-y-1">
                                             {order.items.slice(0, 4).map((item) => (
                                                 <div key={item.id} className="flex items-center text-sm">
-                                                    <span className="text-slate-600">{item.qty}x</span>
-                                                    <span className="ml-2 text-slate-900">{item.name}</span>
+                                                    <span className="text-muted-foreground">{item.qty}x</span>
+                                                    <span className="ml-2 text-foreground">{item.name}</span>
                                                 </div>
                                             ))}
                                             {order.items.length > 4 && (
-                                                <div className="text-xs text-slate-400">
+                                                <div className="text-xs text-muted-foreground">
                                                     +{order.items.length - 4} more items
                                                 </div>
                                             )}
@@ -326,14 +341,14 @@ export default function FulfillmentQueuePage() {
 
                                         {/* Delivery Instructions */}
                                         {order.deliveryInstructions && (
-                                            <div className="mt-3 p-2 bg-amber-50 rounded-md text-sm text-amber-800">
+                                            <div className="mt-3 p-2 bg-status-warning/10 rounded-md text-sm text-status-warning">
                                                 <span className="font-medium">Notes:</span> {order.deliveryInstructions}
                                             </div>
                                         )}
                                     </div>
 
                                     {/* Actions */}
-                                    <div className="flex flex-col justify-center gap-2 p-4 bg-slate-50 border-l border-slate-200 min-w-[140px]">
+                                    <div className="flex flex-col justify-center gap-2 p-4 bg-muted/60 border-l border-border min-w-[140px]">
                                         {order.fulfillmentStatus === "unassigned" ? (
                                             <Button
                                                 onClick={() => openAssignDialog(order)}
@@ -395,10 +410,10 @@ export default function FulfillmentQueuePage() {
                                 key={loc.id}
                                 onClick={() => handleAssign(loc.id)}
                                 disabled={assigning}
-                                className="p-4 rounded-lg border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 transition-all text-left"
+                                className="p-4 rounded-lg border border-border hover:border-primary hover:bg-primary/10 transition-all text-left"
                             >
-                                <div className="font-medium text-slate-900">{loc.name}</div>
-                                {loc.code && <div className="text-sm text-slate-500">{loc.code}</div>}
+                                <div className="font-medium text-foreground">{loc.name}</div>
+                                {loc.code && <div className="text-sm text-muted-foreground">{loc.code}</div>}
                             </button>
                         ))}
                     </div>

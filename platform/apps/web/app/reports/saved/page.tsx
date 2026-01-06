@@ -79,6 +79,7 @@ export default function SavedReportsPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-64"
+                aria-label="Search saved reports"
               />
               <Button variant="outline" onClick={() => setReports(listSavedReports(campgroundId))}>Refresh</Button>
             </div>
@@ -136,6 +137,7 @@ export default function SavedReportsPage() {
                           deleteReport(r.id);
                           setReports(listSavedReports(campgroundId));
                         }}
+                        aria-label={`Delete saved report ${r.name}`}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -207,4 +209,3 @@ export default function SavedReportsPage() {
     </DashboardShell>
   );
 }
-

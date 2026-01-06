@@ -4,6 +4,9 @@ import { useEffect, useState, useMemo } from "react";
 import { useWhoami } from "@/hooks/use-whoami";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { StaffNavigation } from "@/components/staff/StaffNavigation";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Palmtree,
@@ -249,6 +252,8 @@ export default function TimeOffPage({ params }: { params: { campgroundId: string
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setShowForm(!showForm)}
+            aria-expanded={showForm}
+            aria-controls="timeoff-form"
             className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-purple-600 text-white font-medium hover:bg-purple-700 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
           >
             <Plus className="w-4 h-4" />
@@ -261,6 +266,7 @@ export default function TimeOffPage({ params }: { params: { campgroundId: string
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
+            role="alert"
             className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 flex items-center gap-2"
           >
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
@@ -278,6 +284,7 @@ export default function TimeOffPage({ params }: { params: { campgroundId: string
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
+              id="timeoff-form"
               className="bg-card rounded-xl border border-border shadow-sm overflow-hidden"
             >
               <div className="bg-purple-50 border-b border-purple-100 px-6 py-4">
@@ -294,6 +301,7 @@ export default function TimeOffPage({ params }: { params: { campgroundId: string
                         key={type.value}
                         type="button"
                         onClick={() => setFormType(type.value)}
+                        aria-pressed={formType === type.value}
                         className={cn(
                           "flex items-center gap-2 px-3 py-2 rounded-lg border-2 text-sm font-medium transition-all",
                           formType === type.value
@@ -310,8 +318,11 @@ export default function TimeOffPage({ params }: { params: { campgroundId: string
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">Start Date</label>
-                    <input
+                    <Label htmlFor="timeoff-start-date" className="block text-sm font-medium text-foreground mb-2">
+                      Start Date
+                    </Label>
+                    <Input
+                      id="timeoff-start-date"
                       type="date"
                       value={formStartDate}
                       onChange={(e) => setFormStartDate(e.target.value)}
@@ -320,8 +331,11 @@ export default function TimeOffPage({ params }: { params: { campgroundId: string
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">End Date</label>
-                    <input
+                    <Label htmlFor="timeoff-end-date" className="block text-sm font-medium text-foreground mb-2">
+                      End Date
+                    </Label>
+                    <Input
+                      id="timeoff-end-date"
                       type="date"
                       value={formEndDate}
                       onChange={(e) => setFormEndDate(e.target.value)}
@@ -333,10 +347,11 @@ export default function TimeOffPage({ params }: { params: { campgroundId: string
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
+                  <Label htmlFor="timeoff-reason" className="block text-sm font-medium text-foreground mb-2">
                     Reason <span className="text-muted-foreground">(optional)</span>
-                  </label>
-                  <textarea
+                  </Label>
+                  <Textarea
+                    id="timeoff-reason"
                     value={formReason}
                     onChange={(e) => setFormReason(e.target.value)}
                     placeholder="Brief description..."
@@ -378,6 +393,7 @@ export default function TimeOffPage({ params }: { params: { campgroundId: string
         >
           <button
             onClick={() => setActiveTab("my")}
+            aria-pressed={activeTab === "my"}
             className={cn(
               "flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all",
               activeTab === "my"
@@ -393,6 +409,7 @@ export default function TimeOffPage({ params }: { params: { campgroundId: string
           </button>
           <button
             onClick={() => setActiveTab("pending")}
+            aria-pressed={activeTab === "pending"}
             className={cn(
               "flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-all",
               activeTab === "pending"

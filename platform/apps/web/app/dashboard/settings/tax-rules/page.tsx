@@ -381,27 +381,29 @@ export default function TaxRulesSettingsPage() {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <Label>Base Currency</Label>
-                                        <select
-                                            className="w-full rounded-md border border-border px-3 py-2 text-sm"
-                                            value={baseCurrency}
-                                            onChange={(e) => setBaseCurrency(e.target.value)}
-                                        >
-                                            {currencies.map((c) => (
-                                                <option key={c} value={c}>{c}</option>
-                                            ))}
-                                        </select>
+                                        <Select value={baseCurrency} onValueChange={setBaseCurrency}>
+                                            <SelectTrigger className="w-full text-sm">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {currencies.map((c) => (
+                                                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                     </div>
                                     <div className="space-y-2">
                                         <Label>Reporting Currency</Label>
-                                        <select
-                                            className="w-full rounded-md border border-border px-3 py-2 text-sm"
-                                            value={reportingCurrency}
-                                            onChange={(e) => setReportingCurrency(e.target.value)}
-                                        >
-                                            {currencies.map((c) => (
-                                                <option key={c} value={c}>{c}</option>
-                                            ))}
-                                        </select>
+                                        <Select value={reportingCurrency} onValueChange={setReportingCurrency}>
+                                            <SelectTrigger className="w-full text-sm">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {currencies.map((c) => (
+                                                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                     </div>
                                 </div>
                                 <Button
@@ -429,25 +431,33 @@ export default function TaxRulesSettingsPage() {
                                         onChange={(e) => setConversion((prev) => ({ ...prev, amount: Number(e.target.value) }))}
                                         className="w-28"
                                     />
-                                    <select
-                                        className="rounded-md border border-border px-2 py-2 text-sm"
+                                    <Select
                                         value={conversion.from}
-                                        onChange={(e) => setConversion((prev) => ({ ...prev, from: e.target.value }))}
+                                        onValueChange={(value) => setConversion((prev) => ({ ...prev, from: value }))}
                                     >
-                                        {currencies.map((c) => (
-                                            <option key={c} value={c}>{c}</option>
-                                        ))}
-                                    </select>
+                                        <SelectTrigger className="w-[110px] text-sm">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {currencies.map((c) => (
+                                                <SelectItem key={c} value={c}>{c}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                     <span className="text-muted-foreground">→</span>
-                                    <select
-                                        className="rounded-md border border-border px-2 py-2 text-sm"
+                                    <Select
                                         value={conversion.to}
-                                        onChange={(e) => setConversion((prev) => ({ ...prev, to: e.target.value }))}
+                                        onValueChange={(value) => setConversion((prev) => ({ ...prev, to: value }))}
                                     >
-                                        {currencies.map((c) => (
-                                            <option key={c} value={c}>{c}</option>
-                                        ))}
-                                    </select>
+                                        <SelectTrigger className="w-[110px] text-sm">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {currencies.map((c) => (
+                                                <SelectItem key={c} value={c}>{c}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                                 <Button
                                     onClick={() => convertMutation.mutate({ amount: conversion.amount, from: conversion.from, to: conversion.to })}

@@ -3,6 +3,10 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../../lib/api-client";
 import { DashboardShell } from "../../../components/ui/layout/DashboardShell";
+import { Checkbox } from "../../../components/ui/checkbox";
+import { Input } from "../../../components/ui/input";
+import { Label } from "../../../components/ui/label";
+import { Textarea } from "../../../components/ui/textarea";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -594,7 +598,7 @@ export default function FeedbackDashboard() {
                     <div className="flex flex-col sm:flex-row gap-3 mt-4">
                       <div className="flex-1">
                         <label htmlFor="survey-name" className="sr-only">Survey name</label>
-                        <input
+                        <Input
                           id="survey-name"
                           value={surveyName}
                           onChange={(e) => setSurveyName(e.target.value)}
@@ -646,7 +650,7 @@ export default function FeedbackDashboard() {
                   <div className="flex-1 relative">
                     <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                     <label htmlFor="invite-email" className="sr-only">Guest email address</label>
-                    <input
+                    <Input
                       id="invite-email"
                       type="email"
                       value={inviteEmail}
@@ -722,20 +726,19 @@ export default function FeedbackDashboard() {
                   <p className="text-sm text-muted-foreground">Approve reviews to display them publicly</p>
                 </div>
               </div>
-              <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 rounded border-border text-emerald-600 focus:ring-emerald-500 transition-colors"
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Checkbox
+                  id="show-removed"
                   checked={showRemoved}
-                  onChange={(e) => setShowRemoved(e.target.checked)}
+                  onCheckedChange={(checked) => setShowRemoved(Boolean(checked))}
                   aria-describedby="show-removed-help"
                 />
-                <span className="flex items-center gap-1">
+                <Label htmlFor="show-removed" className="flex items-center gap-1 cursor-pointer text-sm text-muted-foreground">
                   {showRemoved ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                   Show removed
-                </span>
+                </Label>
                 <span id="show-removed-help" className="sr-only">Toggle to show or hide removed reviews</span>
-              </label>
+              </div>
             </div>
           </div>
 
@@ -882,7 +885,7 @@ export default function FeedbackDashboard() {
                                 </div>
                                 <span className="text-sm font-semibold text-blue-700">Your Public Response</span>
                               </div>
-                              <textarea
+                              <Textarea
                                 value={replyText}
                                 onChange={(e) => setReplyText(e.target.value)}
                                 placeholder="Write a professional, helpful response that will be visible to all guests..."

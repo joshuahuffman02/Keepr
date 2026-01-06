@@ -213,8 +213,8 @@ export default function MaintenancePage() {
                 className="relative overflow-hidden"
               >
                 <div className="p-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
-                  <div className={`hidden sm:block w-2 h-full absolute left-0 top-0 ${ticket.priority === 'critical' ? 'bg-red-500' :
-                    ticket.priority === 'high' ? 'bg-orange-500' : 'bg-transparent'
+                  <div className={`hidden sm:block w-2 h-full absolute left-0 top-0 ${ticket.priority === 'critical' ? 'bg-status-error' :
+                    ticket.priority === 'high' ? 'bg-status-warning' : 'bg-transparent'
                     }`} />
 
                   <div className="flex-1">
@@ -247,7 +247,7 @@ export default function MaintenancePage() {
                         </span>
                       )}
                       {ticket.dueDate && (
-                        <span className="rounded-full border border-amber-200 bg-amber-50 px-2 py-1 text-amber-800">
+                        <span className="rounded-full border border-status-warning/20 bg-status-warning/10 px-2 py-1 text-status-warning">
                           Due: {format(new Date(ticket.dueDate), 'MMM d')}
                         </span>
                       )}
@@ -259,7 +259,7 @@ export default function MaintenancePage() {
                         <Button
                           size="sm"
                           variant="outline"
-                          className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                          className="text-status-info border-status-info/20 hover:bg-status-info/10"
                           disabled={updatingTicket === ticket.id}
                           onClick={(e) => {
                             e.stopPropagation();
@@ -274,7 +274,7 @@ export default function MaintenancePage() {
                         <Button
                           size="sm"
                           variant="outline"
-                          className="text-emerald-600 border-emerald-200 hover:bg-emerald-50"
+                          className="text-status-success border-status-success/20 hover:bg-status-success/10"
                           disabled={updatingTicket === ticket.id}
                           onClick={(e) => {
                             e.stopPropagation();
@@ -424,6 +424,7 @@ function SummaryCard({
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={Boolean(highlight)}
       className={cn(
         "group w-full text-left rounded-xl transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-status-warning focus-visible:ring-offset-2",
         onClick ? "cursor-pointer" : "cursor-default"

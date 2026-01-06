@@ -12,6 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../..
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
+import { Textarea } from "../../../components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../../../components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../components/ui/table";
 import { Badge } from "../../../components/ui/badge";
@@ -430,7 +431,11 @@ export default function GuestDetailPage() {
                                 )}
                             </CardHeader>
                             <CardContent className="space-y-2 text-sm">
-                                {formsQuery.isError && <div className="text-xs text-status-error">Failed to load forms.</div>}
+                                {formsQuery.isError && (
+                                    <div role="alert" className="text-xs text-status-error">
+                                        Failed to load forms.
+                                    </div>
+                                )}
                                 {!formsQuery.isLoading && (formsQuery.data || []).length === 0 && (
                                     <div className="text-xs text-muted-foreground">No forms for this guest.</div>
                                 )}
@@ -555,7 +560,11 @@ export default function GuestDetailPage() {
                                 <div className="text-xs text-muted-foreground">Choose which wallet to view or apply.</div>
                             </div>
                             <Select value={selectedWalletId ?? ""} onValueChange={setSelectedWalletId}>
-                                <SelectTrigger className="w-[220px]" disabled={!wallets.length}>
+                                <SelectTrigger
+                                    className="w-[220px]"
+                                    disabled={!wallets.length}
+                                    aria-label="Wallet scope"
+                                >
                                     <SelectValue placeholder={wallets.length ? "Select wallet" : "No wallets yet"} />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -651,10 +660,10 @@ export default function GuestDetailPage() {
                                                 />
                                             </div>
                                             <div className="grid grid-cols-4 items-center gap-4">
-                                                <Label className="text-right">Scope</Label>
+                                                <Label htmlFor="credit-scope" className="text-right">Scope</Label>
                                                 <div className="col-span-3">
                                                     <Select value={creditScopeType} onValueChange={(value) => setCreditScopeType(value as "campground" | "organization" | "global")}>
-                                                        <SelectTrigger>
+                                                        <SelectTrigger id="credit-scope" aria-label="Credit scope">
                                                             <SelectValue placeholder="Select scope" />
                                                         </SelectTrigger>
                                                         <SelectContent>
@@ -809,6 +818,7 @@ export default function GuestDetailPage() {
                                                         variant={adjustType === "add" ? "default" : "outline"}
                                                         onClick={() => setAdjustType("add")}
                                                         className="flex-1"
+                                                        aria-pressed={adjustType === "add"}
                                                     >
                                                         Add
                                                     </Button>
@@ -817,6 +827,7 @@ export default function GuestDetailPage() {
                                                         variant={adjustType === "deduct" ? "default" : "outline"}
                                                         onClick={() => setAdjustType("deduct")}
                                                         className={cn("flex-1", adjustType === "deduct" && "bg-destructive hover:bg-destructive/90")}
+                                                        aria-pressed={adjustType === "deduct"}
                                                     >
                                                         Deduct
                                                     </Button>
@@ -908,6 +919,7 @@ export default function GuestDetailPage() {
                                     <Button
                                         size="sm"
                                         variant={commTypeFilter === "email" && commDirectionFilter === "outbound" ? "secondary" : "outline"}
+                                        aria-pressed={commTypeFilter === "email" && commDirectionFilter === "outbound"}
                                         onClick={() => {
                                             setCommTypeFilter("email");
                                             setCommDirectionFilter("outbound");
@@ -921,6 +933,7 @@ export default function GuestDetailPage() {
                                     <Button
                                         size="sm"
                                         variant={commTypeFilter === "all" && commDirectionFilter === "all" ? "secondary" : "outline"}
+                                        aria-pressed={commTypeFilter === "all" && commDirectionFilter === "all"}
                                         onClick={() => {
                                             setCommTypeFilter("all");
                                             setCommDirectionFilter("all");
@@ -934,12 +947,10 @@ export default function GuestDetailPage() {
                                 {/* Filters */}
                                 <div className="flex flex-wrap gap-3 text-sm">
                                     <div className="space-y-1">
-                                        <Label className="text-xs">Type</Label>
-                                        <select
-                                            className="h-9 rounded border border-border bg-background px-2 text-sm"
+                                        <Label htmlFor="comm-type-filter" className="text-xs">Type</Label>
+                                        <Select
                                             value={commTypeFilter}
-                                            onChange={(e) => {
-                                                const value = e.target.value;
+                                            onValueChange={(value) => {
                                                 setCommTypeFilter(value);
                                                 queryClient.removeQueries({
                                                     queryKey: ["communications", "guest", guestId, commDirectionFilter]
@@ -947,35 +958,39 @@ export default function GuestDetailPage() {
                                                 commsQuery.refetch();
                                             }}
                                         >
-                                            <option value="all">All</option>
-                                            <option value="email">Email</option>
-                                            <option value="sms">SMS</option>
-                                            <option value="automation">Automation</option>
-                                        </select>
+                                            <SelectTrigger id="comm-type-filter" className="h-9 bg-background" aria-label="Communication type">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="all">All</SelectItem>
+                                                <SelectItem value="email">Email</SelectItem>
+                                                <SelectItem value="sms">SMS</SelectItem>
+                                                <SelectItem value="automation">Automation</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </div>
                                     <div className="space-y-1">
-                                        <Label className="text-xs">Status</Label>
-                                        <select
-                                            className="h-9 rounded border border-border bg-background px-2 text-sm"
-                                            value={commStatusFilter}
-                                            onChange={(e) => setCommStatusFilter(e.target.value)}
-                                        >
-                                            <option value="all">All</option>
-                                            <option value="sent">Sent</option>
-                                            <option value="delivered">Delivered</option>
-                                            <option value="pending">Pending</option>
-                                            <option value="failed">Failed</option>
-                                            <option value="bounce">Bounced</option>
-                                            <option value="complaint">Complaint</option>
-                                        </select>
+                                        <Label htmlFor="comm-status-filter" className="text-xs">Status</Label>
+                                        <Select value={commStatusFilter} onValueChange={setCommStatusFilter}>
+                                            <SelectTrigger id="comm-status-filter" className="h-9 bg-background" aria-label="Communication status">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="all">All</SelectItem>
+                                                <SelectItem value="sent">Sent</SelectItem>
+                                                <SelectItem value="delivered">Delivered</SelectItem>
+                                                <SelectItem value="pending">Pending</SelectItem>
+                                                <SelectItem value="failed">Failed</SelectItem>
+                                                <SelectItem value="bounce">Bounced</SelectItem>
+                                                <SelectItem value="complaint">Complaint</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </div>
                                     <div className="space-y-1">
-                                        <Label className="text-xs">Direction</Label>
-                                        <select
-                                            className="h-9 rounded border border-border bg-background px-2 text-sm"
+                                        <Label htmlFor="comm-direction-filter" className="text-xs">Direction</Label>
+                                        <Select
                                             value={commDirectionFilter}
-                                            onChange={(e) => {
-                                                const value = e.target.value;
+                                            onValueChange={(value) => {
                                                 setCommDirectionFilter(value);
                                                 queryClient.removeQueries({
                                                     queryKey: ["communications", "guest", guestId, commTypeFilter]
@@ -983,10 +998,15 @@ export default function GuestDetailPage() {
                                                 commsQuery.refetch();
                                             }}
                                         >
-                                            <option value="all">All</option>
-                                            <option value="outbound">Outbound</option>
-                                            <option value="inbound">Inbound</option>
-                                        </select>
+                                            <SelectTrigger id="comm-direction-filter" className="h-9 bg-background" aria-label="Communication direction">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="all">All</SelectItem>
+                                                <SelectItem value="outbound">Outbound</SelectItem>
+                                                <SelectItem value="inbound">Inbound</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </div>
                                 </div>
 
@@ -999,42 +1019,46 @@ export default function GuestDetailPage() {
                                     <div className="mt-3 p-3 bg-muted rounded-lg border border-border space-y-3">
                                         <div className="grid grid-cols-2 gap-3">
                                             <div className="space-y-1">
-                                                <Label className="text-xs">Type</Label>
-                                                <select
-                                                    className="w-full h-9 rounded border border-border bg-background px-2 text-sm"
-                                                    value={composeType}
-                                                    onChange={(e) => setComposeType(e.target.value as "email" | "sms" | "note" | "call")}
-                                                >
-                                                    <option value="email">Email</option>
-                                                    <option value="sms">SMS</option>
-                                                    <option value="note">Note</option>
-                                                    <option value="call">Call</option>
-                                                </select>
+                                                <Label htmlFor="compose-type" className="text-xs">Type</Label>
+                                                <Select value={composeType} onValueChange={(value) => setComposeType(value as "email" | "sms" | "note" | "call")}>
+                                                    <SelectTrigger id="compose-type" className="h-9 bg-background" aria-label="Compose type">
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="email">Email</SelectItem>
+                                                        <SelectItem value="sms">SMS</SelectItem>
+                                                        <SelectItem value="note">Note</SelectItem>
+                                                        <SelectItem value="call">Call</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
                                             </div>
                                             <div className="space-y-1">
-                                                <Label className="text-xs">Direction</Label>
-                                                <select
-                                                    className="w-full h-9 rounded border border-border bg-background px-2 text-sm"
-                                                    value={composeDirection}
-                                                    onChange={(e) => setComposeDirection(e.target.value as "inbound" | "outbound")}
-                                                >
-                                                    <option value="outbound">Outbound</option>
-                                                    <option value="inbound">Inbound</option>
-                                                </select>
+                                                <Label htmlFor="compose-direction" className="text-xs">Direction</Label>
+                                                <Select value={composeDirection} onValueChange={(value) => setComposeDirection(value as "inbound" | "outbound")}>
+                                                    <SelectTrigger id="compose-direction" className="h-9 bg-background" aria-label="Compose direction">
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="outbound">Outbound</SelectItem>
+                                                        <SelectItem value="inbound">Inbound</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
                                             </div>
                                         </div>
                                         <div className="space-y-1">
-                                            <Label className="text-xs">Subject (optional)</Label>
+                                            <Label htmlFor="compose-subject" className="text-xs">Subject (optional)</Label>
                                             <Input
+                                                id="compose-subject"
                                                 value={composeSubject}
                                                 onChange={(e) => setComposeSubject(e.target.value)}
                                                 placeholder="Subject"
                                             />
                                         </div>
                                         <div className="space-y-1">
-                                            <Label className="text-xs">Body</Label>
-                                            <textarea
-                                                className="w-full rounded border border-border bg-background px-3 py-2 text-sm min-h-[80px]"
+                                            <Label htmlFor="compose-body" className="text-xs">Body</Label>
+                                            <Textarea
+                                                id="compose-body"
+                                                className="min-h-[80px] bg-background"
                                                 value={composeBody}
                                                 onChange={(e) => setComposeBody(e.target.value)}
                                                 placeholder="Log the message content"
@@ -1042,12 +1066,22 @@ export default function GuestDetailPage() {
                                         </div>
                                         <div className="grid grid-cols-2 gap-3">
                                             <div className="space-y-1">
-                                                <Label className="text-xs">To</Label>
-                                                <Input value={composeTo} onChange={(e) => setComposeTo(e.target.value)} placeholder="email or phone" />
+                                                <Label htmlFor="compose-to" className="text-xs">To</Label>
+                                                <Input
+                                                    id="compose-to"
+                                                    value={composeTo}
+                                                    onChange={(e) => setComposeTo(e.target.value)}
+                                                    placeholder="email or phone"
+                                                />
                                             </div>
                                             <div className="space-y-1">
-                                                <Label className="text-xs">From</Label>
-                                                <Input value={composeFrom} onChange={(e) => setComposeFrom(e.target.value)} placeholder="email or phone" />
+                                                <Label htmlFor="compose-from" className="text-xs">From</Label>
+                                                <Input
+                                                    id="compose-from"
+                                                    value={composeFrom}
+                                                    onChange={(e) => setComposeFrom(e.target.value)}
+                                                    placeholder="email or phone"
+                                                />
                                             </div>
                                         </div>
                                         <Button
@@ -1289,26 +1323,28 @@ function GuestEquipmentTab({ guestId }: { guestId: string }) {
                         </DialogHeader>
                         <div className="grid gap-4 py-4">
                             <div className="grid grid-cols-4 items-center gap-4">
-                                <Label className="text-right">Type</Label>
-                                <select
-                                    className="col-span-3 flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                    value={newEquipment.type}
-                                    onChange={(e) => setNewEquipment({ ...newEquipment, type: e.target.value })}
-                                >
-                                    <option value="motorhome_a">Motorhome Class A</option>
-                                    <option value="motorhome_b">Motorhome Class B</option>
-                                    <option value="motorhome_c">Motorhome Class C</option>
-                                    <option value="trailer">Travel Trailer</option>
-                                    <option value="fifth_wheel">Fifth Wheel</option>
-                                    <option value="popup">Pop-up Camper</option>
-                                    <option value="truck_camper">Truck Camper</option>
-                                    <option value="van">Camper Van</option>
-                                    <option value="tow_vehicle">Tow Vehicle</option>
-                                </select>
+                                <Label htmlFor="equipment-type" className="text-right">Type</Label>
+                                <Select value={newEquipment.type} onValueChange={(value) => setNewEquipment({ ...newEquipment, type: value })}>
+                                    <SelectTrigger id="equipment-type" className="col-span-3 h-10 bg-background">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="motorhome_a">Motorhome Class A</SelectItem>
+                                        <SelectItem value="motorhome_b">Motorhome Class B</SelectItem>
+                                        <SelectItem value="motorhome_c">Motorhome Class C</SelectItem>
+                                        <SelectItem value="trailer">Travel Trailer</SelectItem>
+                                        <SelectItem value="fifth_wheel">Fifth Wheel</SelectItem>
+                                        <SelectItem value="popup">Pop-up Camper</SelectItem>
+                                        <SelectItem value="truck_camper">Truck Camper</SelectItem>
+                                        <SelectItem value="van">Camper Van</SelectItem>
+                                        <SelectItem value="tow_vehicle">Tow Vehicle</SelectItem>
+                                    </SelectContent>
+                                </Select>
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
-                                <Label className="text-right">Make</Label>
+                                <Label htmlFor="equipment-make" className="text-right">Make</Label>
                                 <Input
+                                    id="equipment-make"
                                     value={newEquipment.make}
                                     onChange={(e) => setNewEquipment({ ...newEquipment, make: e.target.value })}
                                     className="col-span-3"
@@ -1316,8 +1352,9 @@ function GuestEquipmentTab({ guestId }: { guestId: string }) {
                                 />
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
-                                <Label className="text-right">Model</Label>
+                                <Label htmlFor="equipment-model" className="text-right">Model</Label>
                                 <Input
+                                    id="equipment-model"
                                     value={newEquipment.model}
                                     onChange={(e) => setNewEquipment({ ...newEquipment, model: e.target.value })}
                                     className="col-span-3"
@@ -1325,8 +1362,9 @@ function GuestEquipmentTab({ guestId }: { guestId: string }) {
                                 />
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
-                                <Label className="text-right">Length (ft)</Label>
+                                <Label htmlFor="equipment-length" className="text-right">Length (ft)</Label>
                                 <Input
+                                    id="equipment-length"
                                     type="number"
                                     value={newEquipment.length}
                                     onChange={(e) => setNewEquipment({ ...newEquipment, length: e.target.value })}
@@ -1335,8 +1373,9 @@ function GuestEquipmentTab({ guestId }: { guestId: string }) {
                                 />
                             </div>
                             <div className="grid grid-cols-4 items-center gap-4">
-                                <Label className="text-right">Plate</Label>
+                                <Label htmlFor="equipment-plate" className="text-right">Plate</Label>
                                 <Input
+                                    id="equipment-plate"
                                     value={newEquipment.plateNumber}
                                     onChange={(e) => setNewEquipment({ ...newEquipment, plateNumber: e.target.value })}
                                     className="col-span-3"
@@ -1386,6 +1425,7 @@ function GuestEquipmentTab({ guestId }: { guestId: string }) {
                                         size="icon"
                                         onClick={() => setDeleteConfirmId(item.id)}
                                         className="text-status-error hover:text-status-error hover:bg-status-error/10"
+                                        aria-label="Remove equipment"
                                     >
                                         <Trash2 className="w-4 h-4" />
                                     </Button>

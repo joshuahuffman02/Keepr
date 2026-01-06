@@ -16,6 +16,8 @@ import { ConfirmDialog } from "../../../../components/ui/confirm-dialog";
 import { Card, CardContent } from "../../../../components/ui/card";
 import { Badge } from "../../../../components/ui/badge";
 import { Label } from "../../../../components/ui/label";
+import { Checkbox } from "../../../../components/ui/checkbox";
+import { Textarea } from "../../../../components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -600,7 +602,7 @@ export default function SitesPage() {
           </Card>
         </motion.div>
 
-        {error && <p className="text-red-500">Error loading sites</p>}
+        {error && <p role="alert" className="text-red-500">Error loading sites</p>}
 
         {/* Search and Filter Bar */}
         {data && data.length > 0 && (
@@ -617,18 +619,21 @@ export default function SitesPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-9 bg-background border-border"
+                aria-label="Search sites"
               />
               {searchQuery && (
                 <button
+                  type="button"
                   onClick={() => setSearchQuery("")}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label="Clear search"
                 >
                   <X className="h-4 w-4" />
                 </button>
               )}
             </div>
             <Select value={filterType} onValueChange={setFilterType}>
-              <SelectTrigger className="w-[140px] bg-background border-border">
+              <SelectTrigger className="w-[140px] bg-background border-border" aria-label="Filter by site type">
                 <SelectValue placeholder="All types" />
               </SelectTrigger>
               <SelectContent>
@@ -644,7 +649,7 @@ export default function SitesPage() {
               </SelectContent>
             </Select>
             <Select value={filterClass} onValueChange={setFilterClass}>
-              <SelectTrigger className="w-[160px] bg-background border-border">
+              <SelectTrigger className="w-[160px] bg-background border-border" aria-label="Filter by site class">
                 <SelectValue placeholder="All classes" />
               </SelectTrigger>
               <SelectContent>
@@ -655,7 +660,7 @@ export default function SitesPage() {
               </SelectContent>
             </Select>
             <Select value={filterActive} onValueChange={(v) => setFilterActive(v as "all" | "active" | "inactive")}>
-              <SelectTrigger className="w-[130px] bg-background border-border">
+              <SelectTrigger className="w-[130px] bg-background border-border" aria-label="Filter by status">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -668,7 +673,7 @@ export default function SitesPage() {
             {/* Sorting */}
             <div className="flex items-center gap-1 ml-2 pl-2 border-l border-border">
               <Select value={sortBy} onValueChange={(v) => setSortBy(v as typeof sortBy)}>
-                <SelectTrigger className="w-[130px] bg-background border-border">
+                <SelectTrigger className="w-[130px] bg-background border-border" aria-label="Sort by">
                   <ArrowUpDown className="h-3.5 w-3.5 mr-1.5 text-muted-foreground" />
                   <SelectValue />
                 </SelectTrigger>
@@ -686,6 +691,8 @@ export default function SitesPage() {
                 size="sm"
                 onClick={() => setSortDir(sortDir === "asc" ? "desc" : "asc")}
                 className="h-9 w-9 p-0"
+                aria-label="Toggle sort direction"
+                aria-pressed={sortDir === "desc"}
               >
                 {sortDir === "asc" ? (
                   <ArrowUp className="h-4 w-4" />
@@ -746,7 +753,7 @@ export default function SitesPage() {
                 }}
                 disabled={bulkUpdateSites.isPending}
               >
-                <SelectTrigger className="w-[150px] bg-background border-emerald-300">
+                <SelectTrigger className="w-[150px] bg-background border-emerald-300" aria-label="Change class for selected sites">
                   <SelectValue placeholder="Change class..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -816,6 +823,7 @@ export default function SitesPage() {
                   setShowCreateForm(false);
                   setFormState(defaultSiteForm);
                 }}
+                aria-label="Close add site form"
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -827,18 +835,20 @@ export default function SitesPage() {
                 value={formState.name}
                 onChange={(e) => setFormState((s) => ({ ...s, name: e.target.value }))}
                 className="bg-background border-border"
+                aria-label="Site name"
               />
               <Input
                 placeholder="Site number *"
                 value={formState.siteNumber}
                 onChange={(e) => setFormState((s) => ({ ...s, siteNumber: e.target.value }))}
                 className="bg-background border-border"
+                aria-label="Site number"
               />
               <Select
                 value={formState.siteType}
                 onValueChange={(value) => setFormState((s) => ({ ...s, siteType: value }))}
               >
-                <SelectTrigger className="bg-background border-border">
+                <SelectTrigger className="bg-background border-border" aria-label="Site type">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -879,7 +889,7 @@ export default function SitesPage() {
                   }
                 }}
               >
-                <SelectTrigger className="bg-background border-border">
+                <SelectTrigger className="bg-background border-border" aria-label="Site class">
                   <SelectValue placeholder="Select class (inherits settings)" />
                 </SelectTrigger>
                 <SelectContent>
@@ -899,6 +909,9 @@ export default function SitesPage() {
                 type="button"
                 onClick={() => setShowAdvanced(!showAdvanced)}
                 className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                aria-expanded={showAdvanced}
+                aria-controls="site-advanced-panel"
+                id="site-advanced-toggle"
               >
                 {showAdvanced ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                 {showAdvanced ? "Hide" : "Show"} advanced options
@@ -907,6 +920,9 @@ export default function SitesPage() {
               <AnimatePresence>
                 {showAdvanced && (
                   <motion.div
+                    id="site-advanced-panel"
+                    role="region"
+                    aria-labelledby="site-advanced-toggle"
                     initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, height: 0 }}
                     animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, height: "auto" }}
                     exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, height: 0 }}
@@ -920,6 +936,7 @@ export default function SitesPage() {
                       value={formState.maxOccupancy}
                       onChange={(e) => setFormState((s) => ({ ...s, maxOccupancy: Number(e.target.value) }))}
                       className="bg-background border-border"
+                      aria-label="Max occupancy"
                     />
                     <Input
                       type="number"
@@ -927,35 +944,33 @@ export default function SitesPage() {
                       value={formState.rigMaxLength}
                       onChange={(e) => setFormState((s) => ({ ...s, rigMaxLength: e.target.value === "" ? "" : Number(e.target.value) }))}
                       className="bg-background border-border"
+                      aria-label="Rig max length"
                     />
                     <div className="flex flex-wrap gap-3 md:col-span-2">
                       <span className="text-xs font-semibold text-muted-foreground">Hookups:</span>
                       <label className="flex items-center gap-2 text-sm text-foreground">
-                        <input
-                          type="checkbox"
+                        <Checkbox
                           checked={formState.hookupsPower}
-                          onChange={(e) => setFormState((s) => ({ ...s, hookupsPower: e.target.checked }))}
-                          className="rounded border-border"
+                          onCheckedChange={(checked) => setFormState((s) => ({ ...s, hookupsPower: Boolean(checked) }))}
+                          aria-label="Power hookups"
                         />
                         <Zap className="h-3.5 w-3.5 text-amber-500" />
                         Power
                       </label>
                       <label className="flex items-center gap-2 text-sm text-foreground">
-                        <input
-                          type="checkbox"
+                        <Checkbox
                           checked={formState.hookupsWater}
-                          onChange={(e) => setFormState((s) => ({ ...s, hookupsWater: e.target.checked }))}
-                          className="rounded border-border"
+                          onCheckedChange={(checked) => setFormState((s) => ({ ...s, hookupsWater: Boolean(checked) }))}
+                          aria-label="Water hookups"
                         />
                         <Droplet className="h-3.5 w-3.5 text-blue-500" />
                         Water
                       </label>
                       <label className="flex items-center gap-2 text-sm text-foreground">
-                        <input
-                          type="checkbox"
+                        <Checkbox
                           checked={formState.hookupsSewer}
-                          onChange={(e) => setFormState((s) => ({ ...s, hookupsSewer: e.target.checked }))}
-                          className="rounded border-border"
+                          onCheckedChange={(checked) => setFormState((s) => ({ ...s, hookupsSewer: Boolean(checked) }))}
+                          aria-label="Sewer hookups"
                         />
                         <Waves className="h-3.5 w-3.5 text-muted-foreground" />
                         Sewer
@@ -980,6 +995,7 @@ export default function SitesPage() {
                                   ? "border-amber-500 bg-status-warning/15 text-status-warning"
                                   : "border-border bg-background text-muted-foreground hover:border-amber-300"
                               )}
+                              aria-pressed={formState.powerAmps.includes(amp)}
                             >
                               {amp}A
                             </button>
@@ -990,21 +1006,19 @@ export default function SitesPage() {
                     <div className="flex flex-wrap gap-3 md:col-span-2">
                       <span className="text-xs font-semibold text-muted-foreground">Features:</span>
                       <label className="flex items-center gap-2 text-sm text-foreground">
-                        <input
-                          type="checkbox"
+                        <Checkbox
                           checked={formState.petFriendly}
-                          onChange={(e) => setFormState((s) => ({ ...s, petFriendly: e.target.checked }))}
-                          className="rounded border-border"
+                          onCheckedChange={(checked) => setFormState((s) => ({ ...s, petFriendly: Boolean(checked) }))}
+                          aria-label="Pet friendly"
                         />
                         <PawPrint className="h-3.5 w-3.5 text-amber-600" />
                         Pet friendly
                       </label>
                       <label className="flex items-center gap-2 text-sm text-foreground">
-                        <input
-                          type="checkbox"
+                        <Checkbox
                           checked={formState.accessible}
-                          onChange={(e) => setFormState((s) => ({ ...s, accessible: e.target.checked }))}
-                          className="rounded border-border"
+                          onCheckedChange={(checked) => setFormState((s) => ({ ...s, accessible: Boolean(checked) }))}
+                          aria-label="Accessible"
                         />
                         <Accessibility className="h-3.5 w-3.5 text-blue-600" />
                         Accessible
@@ -1017,6 +1031,7 @@ export default function SitesPage() {
                       value={formState.minNights}
                       onChange={(e) => setFormState((s) => ({ ...s, minNights: e.target.value === "" ? "" : Number(e.target.value) }))}
                       className="bg-background border-border"
+                      aria-label="Minimum nights"
                     />
                     <Input
                       type="number"
@@ -1025,6 +1040,7 @@ export default function SitesPage() {
                       value={formState.maxNights}
                       onChange={(e) => setFormState((s) => ({ ...s, maxNights: e.target.value === "" ? "" : Number(e.target.value) }))}
                       className="bg-background border-border"
+                      aria-label="Maximum nights"
                     />
                     <div className="md:col-span-2 space-y-1">
                       <Label className="text-xs font-semibold">Photos</Label>
@@ -1038,11 +1054,12 @@ export default function SitesPage() {
                           placeholder="Upload site photo"
                         />
                       </div>
-                      <textarea
-                        className="rounded-md border border-border bg-background px-3 py-2 w-full text-xs"
+                      <Textarea
+                        className="text-xs"
                         placeholder="Or enter URLs: https://img1.jpg, https://img2.jpg"
                         value={formState.photos}
                         onChange={(e) => setFormState((s) => ({ ...s, photos: e.target.value }))}
+                        aria-label="Photo URLs"
                       />
                     </div>
                     <Input
@@ -1050,12 +1067,13 @@ export default function SitesPage() {
                       value={formState.tags}
                       onChange={(e) => setFormState((s) => ({ ...s, tags: e.target.value }))}
                       className="bg-background border-border"
+                      aria-label="Tags"
                     />
-                    <textarea
-                      className="rounded-md border border-border bg-background px-3 py-2"
+                    <Textarea
                       placeholder="Description"
                       value={formState.description}
                       onChange={(e) => setFormState((s) => ({ ...s, description: e.target.value }))}
+                      aria-label="Site description"
                     />
                   </motion.div>
                 )}
@@ -1079,7 +1097,11 @@ export default function SitesPage() {
               >
                 Cancel
               </Button>
-              {createSite.isError && <span className="text-sm text-red-600">Failed to save site</span>}
+              {createSite.isError && (
+                <span role="alert" className="text-sm text-red-600">
+                  Failed to save site
+                </span>
+              )}
             </div>
             </CardContent>
           </Card>
@@ -1089,11 +1111,10 @@ export default function SitesPage() {
         {/* Select All checkbox when there are sites */}
         {paginatedSites.length > 0 && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <input
-              type="checkbox"
+            <Checkbox
               checked={paginatedSites.length > 0 && paginatedSites.every((s) => selectedSites.has(s.id))}
-              onChange={toggleSelectAll}
-              className="rounded border-border"
+              onCheckedChange={toggleSelectAll}
+              aria-label="Select all sites on page"
             />
             <span>
               Select page ({paginatedSites.length} of {filteredSites.length} sites)
@@ -1112,11 +1133,10 @@ export default function SitesPage() {
             <TableHeader>
               <TableRow className="bg-muted/50">
                 <TableHead className="w-10">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     checked={paginatedSites.length > 0 && paginatedSites.every((s) => selectedSites.has(s.id))}
-                    onChange={toggleSelectAll}
-                    className="rounded border-border"
+                    onCheckedChange={toggleSelectAll}
+                    aria-label="Select all sites on page"
                   />
                 </TableHead>
                 <TableHead>Site</TableHead>
@@ -1153,12 +1173,10 @@ export default function SitesPage() {
                       "hover:bg-muted/50"
                     )}>
                       <TableCell>
-                        <input
-                          type="checkbox"
+                        <Checkbox
                           checked={isSelected}
                           onClick={(e) => toggleSiteSelection(site.id, index, e)}
-                          onChange={() => {}}
-                          className="rounded border-border cursor-pointer"
+                          aria-label={`Select ${site.name}`}
                         />
                       </TableCell>
                       <TableCell>
@@ -1198,7 +1216,10 @@ export default function SitesPage() {
                           }}
                           disabled={quickUpdateSite.isPending}
                         >
-                          <SelectTrigger className="h-8 w-[110px] text-xs bg-background border-border">
+                          <SelectTrigger
+                            className="h-8 w-[110px] text-xs bg-background border-border"
+                            aria-label={`Select class for ${site.name}`}
+                          >
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -1281,6 +1302,7 @@ export default function SitesPage() {
                           )}
                           disabled={quickUpdateSite.isPending}
                           title={site.isActive !== false ? "Click to deactivate" : "Click to activate"}
+                          aria-pressed={site.isActive !== false}
                         >
                           <span className={cn(
                             "w-2 h-2 rounded-full transition-colors",
@@ -1324,6 +1346,7 @@ export default function SitesPage() {
                               }
                             }}
                             title="Edit"
+                            aria-label={`Edit ${site.name}`}
                           >
                             <Pencil className="h-4 w-4" />
                           </Button>
@@ -1335,6 +1358,7 @@ export default function SitesPage() {
                                 className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
                                 disabled={deleteSite.isPending}
                                 title="Delete"
+                                aria-label={`Delete ${site.name}`}
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
@@ -1365,18 +1389,20 @@ export default function SitesPage() {
                                 value={editForm.name}
                                 onChange={(e) => setEditForm((s) => (s ? { ...s, name: e.target.value } : s))}
                                 className="bg-background border-border"
+                                aria-label="Site name"
                               />
                               <Input
                                 placeholder="Site number"
                                 value={editForm.siteNumber}
                                 onChange={(e) => setEditForm((s) => (s ? { ...s, siteNumber: e.target.value } : s))}
                                 className="bg-background border-border"
+                                aria-label="Site number"
                               />
                               <Select
                                 value={editForm.siteType}
                                 onValueChange={(value) => setEditForm((s) => (s ? { ...s, siteType: value } : s))}
                               >
-                                <SelectTrigger className="bg-background border-border">
+                                <SelectTrigger className="bg-background border-border" aria-label="Site type">
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -1417,7 +1443,7 @@ export default function SitesPage() {
                                   }
                                 }}
                               >
-                                <SelectTrigger className="bg-background border-border">
+                                <SelectTrigger className="bg-background border-border" aria-label="Site class">
                                   <SelectValue placeholder="Select class (inherits settings)" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -1439,6 +1465,7 @@ export default function SitesPage() {
                                   setEditForm((s) => (s ? { ...s, maxOccupancy: e.target.value === "" ? 0 : Number(e.target.value) } : s))
                                 }
                                 className="bg-background border-border"
+                                aria-label="Max occupancy"
                               />
                               <Input
                                 type="number"
@@ -1446,6 +1473,7 @@ export default function SitesPage() {
                                 value={editForm.rigMaxLength}
                                 onChange={(e) => setEditForm((s) => (s ? { ...s, rigMaxLength: e.target.value === "" ? "" : Number(e.target.value) } : s))}
                                 className="bg-background border-border"
+                                aria-label="Rig max length"
                               />
                               <div className="flex items-center gap-1">
                                 <span className="text-xs text-muted-foreground mr-1">Power:</span>
@@ -1467,6 +1495,7 @@ export default function SitesPage() {
                                         ? "border-amber-500 bg-status-warning/15 text-status-warning"
                                         : "border-border bg-background text-muted-foreground hover:border-amber-300"
                                     )}
+                                    aria-pressed={editForm.powerAmps.includes(amp)}
                                   >
                                     {amp}A
                                   </button>
@@ -1478,57 +1507,53 @@ export default function SitesPage() {
                                 value={editForm.minNights}
                                 onChange={(e) => setEditForm((s) => (s ? { ...s, minNights: e.target.value === "" ? "" : Number(e.target.value) } : s))}
                                 className="bg-background border-border"
+                                aria-label="Minimum nights"
                               />
                             </div>
                             <div className="flex flex-wrap items-center gap-4">
                               <span className="text-xs font-semibold text-muted-foreground">Hookups:</span>
                               <label className="flex items-center gap-2 text-sm text-foreground">
-                                <input
-                                  type="checkbox"
+                                <Checkbox
                                   checked={editForm.hookupsPower}
-                                  onChange={(e) => setEditForm((s) => (s ? { ...s, hookupsPower: e.target.checked } : s))}
-                                  className="rounded border-border"
+                                  onCheckedChange={(checked) => setEditForm((s) => (s ? { ...s, hookupsPower: Boolean(checked) } : s))}
+                                  aria-label="Power hookups"
                                 />
                                 <Zap className="h-3.5 w-3.5 text-amber-500" />
                                 Power
                               </label>
                               <label className="flex items-center gap-2 text-sm text-foreground">
-                                <input
-                                  type="checkbox"
+                                <Checkbox
                                   checked={editForm.hookupsWater}
-                                  onChange={(e) => setEditForm((s) => (s ? { ...s, hookupsWater: e.target.checked } : s))}
-                                  className="rounded border-border"
+                                  onCheckedChange={(checked) => setEditForm((s) => (s ? { ...s, hookupsWater: Boolean(checked) } : s))}
+                                  aria-label="Water hookups"
                                 />
                                 <Droplet className="h-3.5 w-3.5 text-blue-500" />
                                 Water
                               </label>
                               <label className="flex items-center gap-2 text-sm text-foreground">
-                                <input
-                                  type="checkbox"
+                                <Checkbox
                                   checked={editForm.hookupsSewer}
-                                  onChange={(e) => setEditForm((s) => (s ? { ...s, hookupsSewer: e.target.checked } : s))}
-                                  className="rounded border-border"
+                                  onCheckedChange={(checked) => setEditForm((s) => (s ? { ...s, hookupsSewer: Boolean(checked) } : s))}
+                                  aria-label="Sewer hookups"
                                 />
                                 <Waves className="h-3.5 w-3.5 text-muted-foreground" />
                                 Sewer
                               </label>
                               <span className="text-xs font-semibold text-muted-foreground ml-4">Features:</span>
                               <label className="flex items-center gap-2 text-sm text-foreground">
-                                <input
-                                  type="checkbox"
+                                <Checkbox
                                   checked={editForm.petFriendly}
-                                  onChange={(e) => setEditForm((s) => (s ? { ...s, petFriendly: e.target.checked } : s))}
-                                  className="rounded border-border"
+                                  onCheckedChange={(checked) => setEditForm((s) => (s ? { ...s, petFriendly: Boolean(checked) } : s))}
+                                  aria-label="Pet friendly"
                                 />
                                 <PawPrint className="h-3.5 w-3.5 text-amber-600" />
                                 Pet friendly
                               </label>
                               <label className="flex items-center gap-2 text-sm text-foreground">
-                                <input
-                                  type="checkbox"
+                                <Checkbox
                                   checked={editForm.accessible}
-                                  onChange={(e) => setEditForm((s) => (s ? { ...s, accessible: e.target.checked } : s))}
-                                  className="rounded border-border"
+                                  onCheckedChange={(checked) => setEditForm((s) => (s ? { ...s, accessible: Boolean(checked) } : s))}
+                                  aria-label="Accessible"
                                 />
                                 <Accessibility className="h-3.5 w-3.5 text-blue-600" />
                                 Accessible
@@ -1558,7 +1583,11 @@ export default function SitesPage() {
                                 Cancel
                               </Button>
                               <span className="text-xs text-muted-foreground">Cmd+S to save, Escape to cancel</span>
-                              {updateSite.isError && <span className="text-sm text-red-600">Failed to update</span>}
+                              {updateSite.isError && (
+                                <span role="alert" className="text-sm text-red-600">
+                                  Failed to update
+                                </span>
+                              )}
                             </div>
                           </motion.div>
                         </TableCell>
@@ -1625,7 +1654,7 @@ export default function SitesPage() {
                   setCurrentPage(1);
                 }}
               >
-                <SelectTrigger className="w-[70px] h-8 bg-background border-border">
+                <SelectTrigger className="w-[70px] h-8 bg-background border-border" aria-label="Rows per page">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -1643,6 +1672,7 @@ export default function SitesPage() {
                 onClick={() => setCurrentPage(1)}
                 disabled={currentPage === 1}
                 className="h-8 w-8 p-0"
+                aria-label="First page"
               >
                 <ChevronLeft className="h-4 w-4" />
                 <ChevronLeft className="h-4 w-4 -ml-2" />
@@ -1653,6 +1683,7 @@ export default function SitesPage() {
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
                 className="h-8 w-8 p-0"
+                aria-label="Previous page"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -1665,6 +1696,7 @@ export default function SitesPage() {
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
                 className="h-8 w-8 p-0"
+                aria-label="Next page"
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -1674,6 +1706,7 @@ export default function SitesPage() {
                 onClick={() => setCurrentPage(totalPages)}
                 disabled={currentPage === totalPages}
                 className="h-8 w-8 p-0"
+                aria-label="Last page"
               >
                 <ChevronRight className="h-4 w-4" />
                 <ChevronRight className="h-4 w-4 -ml-2" />

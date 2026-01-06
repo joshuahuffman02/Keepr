@@ -9,10 +9,18 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../../../components/ui/card";
 import { Badge } from "../../../../components/ui/badge";
 import { Button } from "../../../../components/ui/button";
+import { Checkbox } from "../../../../components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../components/ui/tabs";
 import { Input } from "../../../../components/ui/input";
 import { Textarea } from "../../../../components/ui/textarea";
 import { Label } from "../../../../components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../../components/ui/select";
 import { Switch } from "../../../../components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "../../../../components/ui/dialog";
 import {
@@ -228,7 +236,7 @@ function StatusBadge({ status }: { status: SeasonalStatus }) {
   const config: Record<SeasonalStatus, { class: string; label: string }> = {
     active: { class: "bg-status-success/15 text-status-success border-status-success/20", label: "Active" },
     pending_renewal: { class: "bg-status-warning/15 text-status-warning border-status-warning/20", label: "Pending Renewal" },
-    not_renewing: { class: "bg-rose-100 text-rose-700 border-rose-200", label: "Not Renewing" },
+    not_renewing: { class: "bg-status-error/15 text-status-error border-status-error/20", label: "Not Renewing" },
     departed: { class: "bg-muted text-foreground border-border", label: "Departed" },
     waitlist: { class: "bg-status-info/15 text-status-info border-status-info/20", label: "Waitlist" },
   };
@@ -245,7 +253,7 @@ function RenewalIntentBadge({ intent }: { intent?: RenewalIntent }) {
     committed: { class: "bg-status-success/15 text-status-success border-status-success/20", label: "Committed", icon: CheckCircle },
     likely: { class: "bg-status-success/15 text-status-success border-status-success/20", label: "Likely", icon: TrendingUp },
     undecided: { class: "bg-status-warning/15 text-status-warning border-status-warning/20", label: "Undecided", icon: Clock },
-    not_renewing: { class: "bg-rose-100 text-rose-700 border-rose-200", label: "Not Returning", icon: X },
+    not_renewing: { class: "bg-status-error/15 text-status-error border-status-error/20", label: "Not Returning", icon: X },
   };
   const Icon = config[intent].icon;
   return (
@@ -262,7 +270,7 @@ function PaymentStatusBadge({ seasonal }: { seasonal: SeasonalGuest }) {
 
   if (hasPastDue) {
     return (
-      <Badge variant="outline" className="bg-rose-100 text-rose-700 border-rose-200">
+      <Badge variant="outline" className="bg-status-error/15 text-status-error border-status-error/20">
         <AlertCircle className="h-3 w-3 mr-1" />
         Past Due
       </Badge>
@@ -270,7 +278,7 @@ function PaymentStatusBadge({ seasonal }: { seasonal: SeasonalGuest }) {
   }
   if (!hasDue && seasonal.payments?.length > 0) {
     return (
-      <Badge variant="outline" className="bg-purple-100 text-purple-700 border-purple-200">
+      <Badge variant="outline" className="bg-status-info/15 text-status-info border-status-info/20">
         <Sparkles className="h-3 w-3 mr-1" />
         Paid Ahead
       </Badge>
@@ -364,7 +372,7 @@ function ContractStatusBadge({ status }: { status?: ContractStatus }) {
     signed: { class: "bg-status-success/15 text-status-success border-status-success/20", label: "Signed", icon: CheckCircle },
     sent: { class: "bg-status-info/15 text-status-info border-status-info/20", label: "Sent", icon: Send },
     not_sent: { class: "bg-muted text-muted-foreground border-border", label: "Not Sent", icon: FileText },
-    expired: { class: "bg-rose-100 text-rose-700 border-rose-200", label: "Expired", icon: AlertCircle },
+    expired: { class: "bg-status-error/15 text-status-error border-status-error/20", label: "Expired", icon: AlertCircle },
   };
   const Icon = config[status].icon;
   return (
@@ -399,15 +407,15 @@ function HeroStatCard({
   const colorClasses = {
     emerald: "text-status-success bg-status-success/15",
     amber: "text-status-warning bg-status-warning/15",
-    rose: "text-rose-600 bg-rose-50",
+    rose: "text-status-error bg-status-error/15",
     blue: "text-status-info bg-status-info/15",
-    purple: "text-purple-600 bg-purple-50",
+    purple: "text-accent bg-accent/15",
     slate: "text-muted-foreground bg-muted/60",
   };
 
   return (
     <Card
-      className={`relative overflow-hidden transition-all duration-200 ${onClick ? "cursor-pointer hover:shadow-md hover:scale-[1.02]" : ""} ${highlight ? "ring-2 ring-amber-400 shadow-amber-100" : ""}`}
+      className={`relative overflow-hidden transition-all duration-200 ${onClick ? "cursor-pointer hover:shadow-md hover:scale-[1.02]" : ""} ${highlight ? "ring-2 ring-status-error/40 shadow-status-error/20" : ""}`}
       onClick={onClick}
     >
       <CardContent className="p-4">
@@ -417,7 +425,7 @@ function HeroStatCard({
             <p className={`text-2xl font-bold mt-1 ${colorClasses[color].split(" ")[0]}`}>{value}</p>
             {subtitle && <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>}
             {trend && (
-              <p className={`text-xs flex items-center gap-1 mt-1 ${trend.value >= 0 ? "text-status-success" : "text-rose-600"}`}>
+              <p className={`text-xs flex items-center gap-1 mt-1 ${trend.value >= 0 ? "text-status-success" : "text-status-error"}`}>
                 <TrendingUp className={`h-3 w-3 ${trend.value < 0 ? "rotate-180" : ""}`} />
                 {trend.value > 0 ? "+" : ""}{trend.value}% {trend.label}
               </p>
@@ -465,11 +473,11 @@ function CriticalAlertsBanner({
   }
 
   const colorMap: Record<string, string> = {
-    rose: "bg-rose-100 text-rose-700 border-rose-200 hover:bg-rose-200",
+    rose: "bg-status-error/15 text-status-error border-status-error/20 hover:bg-status-error/25",
     amber: "bg-status-warning/15 text-status-warning border-status-warning/20 hover:bg-status-warning/25",
     orange: "bg-status-warning/15 text-status-warning border-status-warning/20 hover:bg-status-warning/25",
     blue: "bg-status-info/15 text-status-info border-status-info/20 hover:bg-status-info/25",
-    purple: "bg-purple-100 text-purple-700 border-purple-200 hover:bg-purple-200",
+    purple: "bg-status-error/15 text-status-error border-status-error/20 hover:bg-status-error/25",
   };
 
   return (
@@ -537,9 +545,9 @@ function MilestonesCelebration({ milestones }: { milestones: DashboardStats["mil
 
   const getShadow = (type: string) => {
     switch (type) {
-      case "20year": return "shadow-lg shadow-purple-300/50";
-      case "15year": return "shadow-md shadow-amber-300/50";
-      case "10year": return "shadow-sm shadow-amber-200/50";
+      case "20year": return "shadow-lg shadow-status-info/20";
+      case "15year": return "shadow-md shadow-status-warning/20";
+      case "10year": return "shadow-sm shadow-status-warning/10";
       default: return "shadow-sm";
     }
   };
@@ -548,10 +556,10 @@ function MilestonesCelebration({ milestones }: { milestones: DashboardStats["mil
     <Card className="bg-status-warning/10 border-status-warning/20 overflow-hidden relative">
       {/* Subtle celebration sparkles */}
       <div className="absolute top-2 right-2 opacity-50">
-        <Sparkles className="h-5 w-5 text-amber-400 animate-pulse" />
+        <Sparkles className="h-5 w-5 text-status-warning animate-pulse" />
       </div>
       <div className="absolute bottom-2 left-2 opacity-30">
-        <Star className="h-4 w-4 text-amber-400 animate-pulse" style={{ animationDelay: "0.5s" }} />
+        <Star className="h-4 w-4 text-status-warning animate-pulse" style={{ animationDelay: "0.5s" }} />
       </div>
 
       <CardHeader className="pb-2">
@@ -598,17 +606,17 @@ function RenewalProgressCard({ stats }: { stats: DashboardStats["renewalsByInten
   if (total === 0) return null;
 
   const segments = [
-    { key: "committed", value: stats.committed, color: "bg-emerald-500", label: "Committed" },
-    { key: "likely", value: stats.likely, color: "bg-green-400", label: "Likely" },
-    { key: "undecided", value: stats.undecided, color: "bg-amber-400", label: "Undecided" },
-    { key: "not_renewing", value: stats.not_renewing, color: "bg-rose-400", label: "Not Returning" },
+    { key: "committed", value: stats.committed, color: "bg-status-success", label: "Committed" },
+    { key: "likely", value: stats.likely, color: "bg-status-success/70", label: "Likely" },
+    { key: "undecided", value: stats.undecided, color: "bg-status-warning", label: "Undecided" },
+    { key: "not_renewing", value: stats.not_renewing, color: "bg-status-error", label: "Not Returning" },
   ];
 
   return (
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-sm flex items-center gap-2">
-          <Target className="h-4 w-4 text-blue-600" />
+          <Target className="h-4 w-4 text-primary" />
           Renewal Progress
         </CardTitle>
       </CardHeader>
@@ -683,7 +691,7 @@ function ChurnRiskCard({ guests }: { guests: DashboardStats["churnRiskGuests"] }
                   <span className="font-medium text-sm">{guest.guestName}</span>
                 </div>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Award className="h-3.5 w-3.5 text-amber-500" />
+                  <Award className="h-3.5 w-3.5 text-status-warning" />
                   {guest.tenure} years
                 </div>
               </div>
@@ -718,7 +726,7 @@ function CommunityStatsCard({ stats }: { stats: DashboardStats }) {
           </div>
           <div className="text-sm text-muted-foreground">combined years of loyalty</div>
         </div>
-        <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-purple-100">
+        <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-border">
           <div className="text-center">
             <div className="text-lg font-semibold text-foreground">{stats.activeSeasonals}</div>
             <div className="text-xs text-muted-foreground">Active</div>
@@ -744,17 +752,17 @@ function PaymentAgingCard({ aging }: { aging: DashboardStats["paymentAging"] }) 
   if (total === 0) return null;
 
   const segments = [
-    { key: "current", value: aging.current, color: "bg-emerald-500", label: "< 30 days", textColor: "text-status-success" },
-    { key: "days30", value: aging.days30, color: "bg-amber-500", label: "30-59 days", textColor: "text-status-warning" },
-    { key: "days60", value: aging.days60, color: "bg-orange-500", label: "60-89 days", textColor: "text-status-warning" },
-    { key: "days90Plus", value: aging.days90Plus, color: "bg-rose-600", label: "90+ days", textColor: "text-rose-700" },
+    { key: "current", value: aging.current, color: "bg-status-success", label: "< 30 days", textColor: "text-status-success" },
+    { key: "days30", value: aging.days30, color: "bg-status-warning/70", label: "30-59 days", textColor: "text-status-warning" },
+    { key: "days60", value: aging.days60, color: "bg-status-warning", label: "60-89 days", textColor: "text-status-warning" },
+    { key: "days90Plus", value: aging.days90Plus, color: "bg-status-error", label: "90+ days", textColor: "text-status-error" },
   ];
 
   return (
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-sm flex items-center gap-2">
-          <Hourglass className="h-4 w-4 text-amber-600" />
+          <Hourglass className="h-4 w-4 text-status-warning" />
           Past Due Aging
         </CardTitle>
       </CardHeader>
@@ -794,15 +802,15 @@ function RenewalDeadlineCountdown({ deadline }: { deadline?: Date }) {
   const isSoon = daysUntil <= 30;
 
   return (
-    <Card className={`${isUrgent ? 'border-rose-300 bg-rose-50' : isSoon ? 'border-status-warning/30 bg-status-warning/15' : 'border-status-info/30 bg-status-info/15'}`}>
+    <Card className={`${isUrgent ? 'border-status-error/30 bg-status-error/10' : isSoon ? 'border-status-warning/30 bg-status-warning/15' : 'border-status-info/30 bg-status-info/15'}`}>
       <CardContent className="p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-full ${isUrgent ? 'bg-rose-100' : isSoon ? 'bg-status-warning/15' : 'bg-status-info/15'}`}>
-              <Timer className={`h-5 w-5 ${isUrgent ? 'text-rose-600' : isSoon ? 'text-status-warning' : 'text-status-info'}`} />
+            <div className={`p-2 rounded-full ${isUrgent ? 'bg-status-error/15' : isSoon ? 'bg-status-warning/15' : 'bg-status-info/15'}`}>
+              <Timer className={`h-5 w-5 ${isUrgent ? 'text-status-error' : isSoon ? 'text-status-warning' : 'text-status-info'}`} />
             </div>
             <div>
-              <p className={`text-sm font-medium ${isUrgent ? 'text-rose-800' : isSoon ? 'text-status-warning' : 'text-status-info'}`}>
+              <p className={`text-sm font-medium ${isUrgent ? 'text-status-error' : isSoon ? 'text-status-warning' : 'text-status-info'}`}>
                 Renewal Deadline
               </p>
               <p className="text-xs text-muted-foreground">
@@ -811,7 +819,7 @@ function RenewalDeadlineCountdown({ deadline }: { deadline?: Date }) {
             </div>
           </div>
           <div className="text-right">
-            <div className={`text-2xl font-bold ${isUrgent ? 'text-rose-600' : isSoon ? 'text-status-warning' : 'text-status-info'}`}>
+            <div className={`text-2xl font-bold ${isUrgent ? 'text-status-error' : isSoon ? 'text-status-warning' : 'text-status-info'}`}>
               {daysUntil}
             </div>
             <div className="text-xs text-muted-foreground">days left</div>
@@ -881,7 +889,7 @@ function FloatingActionPanel({
                 Mark Undecided
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => onBulkUpdate("not_renewing")} className="text-rose-600">
+              <DropdownMenuItem onClick={() => onBulkUpdate("not_renewing")} className="text-status-error">
                 <X className="h-4 w-4 mr-2" />
                 Mark Not Returning
               </DropdownMenuItem>
@@ -907,7 +915,7 @@ function FloatingActionPanel({
           </Button>
 
           {/* Clear */}
-          <Button size="sm" variant="ghost" onClick={onClear}>
+          <Button size="sm" variant="ghost" onClick={onClear} aria-label="Clear selection">
             <X className="h-4 w-4" />
           </Button>
         </CardContent>
@@ -935,17 +943,17 @@ function SeasonalRow({
   const currentContract = seasonal.contracts?.find(c => c.seasonYear === new Date().getFullYear());
 
   return (
-    <div className={`border rounded-lg transition-all duration-200 ${isSelected ? "ring-2 ring-blue-500 bg-blue-50/30" : "hover:shadow-md bg-card"}`}>
+    <div className={`border rounded-lg transition-all duration-200 ${isSelected ? "ring-2 ring-primary/40 bg-primary/5" : "hover:shadow-md bg-card"}`}>
       {/* Mobile Card View */}
       <div className="md:hidden p-4 space-y-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <input
-              type="checkbox"
+            <Checkbox
               checked={isSelected}
-              onChange={onSelect}
-              className="rounded border-border mt-1"
+              onCheckedChange={() => onSelect()}
+              className="mt-1"
               onClick={(e) => e.stopPropagation()}
+              aria-label={`Select ${seasonal.guest.primaryFirstName} ${seasonal.guest.primaryLastName}`}
             />
             {/* Avatar with tenure indicator */}
             <div className="relative">
@@ -959,7 +967,7 @@ function SeasonalRow({
                 {seasonal.guest.primaryFirstName[0]}{seasonal.guest.primaryLastName[0]}
               </div>
               {seasonal.seniorityRank && seasonal.seniorityRank <= 3 && (
-                <div className="absolute -top-1 -right-1 w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow">
+                <div className="absolute -top-1 -right-1 w-5 h-5 bg-status-warning rounded-full flex items-center justify-center text-status-warning-foreground text-xs font-bold shadow">
                   {seasonal.seniorityRank}
                 </div>
               )}
@@ -979,7 +987,14 @@ function SeasonalRow({
               </div>
             </div>
           </div>
-          <Button size="sm" variant="ghost" onClick={() => setExpanded(!expanded)}>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => setExpanded(!expanded)}
+            aria-label={expanded ? "Collapse guest details" : "Expand guest details"}
+            aria-expanded={expanded}
+            aria-controls={`seasonal-details-mobile-${seasonal.id}`}
+          >
             <ChevronDown className={`h-5 w-5 transition-transform ${expanded ? "rotate-180" : ""}`} />
           </Button>
         </div>
@@ -994,7 +1009,7 @@ function SeasonalRow({
 
         {/* Mobile Expanded */}
         {expanded && (
-          <div className="space-y-3 pt-3 border-t">
+          <div id={`seasonal-details-mobile-${seasonal.id}`} className="space-y-3 pt-3 border-t">
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div>
                 <p className="text-xs text-muted-foreground uppercase">Email</p>
@@ -1047,12 +1062,11 @@ function SeasonalRow({
       {/* Desktop Row View */}
       <div className="hidden md:block">
         <div className="p-4 flex items-center gap-4">
-          <input
-            type="checkbox"
+          <Checkbox
             checked={isSelected}
-            onChange={onSelect}
-            className="rounded border-border"
+            onCheckedChange={() => onSelect()}
             onClick={(e) => e.stopPropagation()}
+            aria-label={`Select ${seasonal.guest.primaryFirstName} ${seasonal.guest.primaryLastName}`}
           />
 
           {/* Avatar with tenure indicator */}
@@ -1067,7 +1081,7 @@ function SeasonalRow({
               {seasonal.guest.primaryFirstName[0]}{seasonal.guest.primaryLastName[0]}
             </div>
             {seasonal.seniorityRank && seasonal.seniorityRank <= 3 && (
-              <div className="absolute -top-1 -right-1 w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center text-white text-xs font-bold shadow">
+              <div className="absolute -top-1 -right-1 w-5 h-5 bg-status-warning rounded-full flex items-center justify-center text-status-warning-foreground text-xs font-bold shadow">
                 {seasonal.seniorityRank}
               </div>
             )}
@@ -1105,10 +1119,17 @@ function SeasonalRow({
 
           {/* Actions */}
           <div className="flex items-center gap-1">
-            <Button size="sm" variant="ghost" onClick={() => setExpanded(!expanded)}>
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => setExpanded(!expanded)}
+              aria-label={expanded ? "Collapse guest details" : "Expand guest details"}
+              aria-expanded={expanded}
+              aria-controls={`seasonal-details-${seasonal.id}`}
+            >
               <ChevronDown className={`h-4 w-4 transition-transform ${expanded ? "rotate-180" : ""}`} />
             </Button>
-            <Button size="sm" variant="ghost" onClick={onViewDetails}>
+            <Button size="sm" variant="ghost" onClick={onViewDetails} aria-label="View guest details">
               <Eye className="h-4 w-4" />
             </Button>
           </div>
@@ -1116,7 +1137,7 @@ function SeasonalRow({
 
         {/* Desktop Expanded Details */}
         {expanded && (
-          <div className="px-4 pb-4 pt-0 border-t bg-muted/60/50">
+          <div id={`seasonal-details-${seasonal.id}`} className="px-4 pb-4 pt-0 border-t bg-muted/60/50">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 py-3">
               <div>
                 <p className="text-xs text-muted-foreground uppercase tracking-wide">Phone</p>
@@ -1209,14 +1230,20 @@ function WaitlistRow({
               Deposit Paid
             </Badge>
           )}
-          <Button size="sm" variant="outline" onClick={onContact}>
+          <Button size="sm" variant="outline" onClick={onContact} aria-label="Contact waitlist guest">
             <Mail className="h-4 w-4" />
           </Button>
           <Button size="sm" variant="outline" onClick={onConvert}>
             <UserPlus className="h-4 w-4 mr-1" />
             Convert
           </Button>
-          <Button size="sm" variant="ghost" className="text-muted-foreground" onClick={onRemove}>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="text-muted-foreground"
+            onClick={onRemove}
+            aria-label="Remove from waitlist"
+          >
             <X className="h-4 w-4" />
           </Button>
         </div>
@@ -1237,7 +1264,7 @@ function RateCardDisplay({
   onDuplicate: () => void;
 }) {
   return (
-    <Card className={rateCard.isDefault ? "ring-2 ring-blue-500" : ""}>
+    <Card className={rateCard.isDefault ? "ring-2 ring-primary/40" : ""}>
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -1247,10 +1274,10 @@ function RateCardDisplay({
             )}
           </div>
           <div className="flex gap-1">
-            <Button size="sm" variant="ghost" onClick={onEdit}>
+            <Button size="sm" variant="ghost" onClick={onEdit} aria-label="Edit rate card">
               <Edit className="h-4 w-4" />
             </Button>
-            <Button size="sm" variant="ghost" onClick={onDuplicate}>
+            <Button size="sm" variant="ghost" onClick={onDuplicate} aria-label="Duplicate rate card">
               <Copy className="h-4 w-4" />
             </Button>
           </div>
@@ -1298,7 +1325,7 @@ function RateCardDisplay({
               <div className="space-y-1">
                 {rateCard.incentives?.map((inc, i) => (
                   <div key={i} className="text-sm flex items-center gap-2">
-                    <Zap className="h-3 w-3 text-amber-500" />
+                    <Zap className="h-3 w-3 text-status-warning" />
                     <span>{inc.name}</span>
                     {inc.deadline && (
                       <span className="text-xs text-muted-foreground">by {format(new Date(inc.deadline), "MMM d")}</span>
@@ -1329,7 +1356,7 @@ function MessageTemplateCard({
     renewal: "bg-status-info/15 text-status-info",
     payment: "bg-status-success/15 text-status-success",
     general: "bg-muted text-foreground",
-    welcome: "bg-purple-100 text-purple-700",
+    welcome: "bg-accent/15 text-accent",
     contract: "bg-status-warning/15 text-status-warning",
   };
 
@@ -1355,7 +1382,7 @@ function MessageTemplateCard({
           <Button size="sm" onClick={onUse}>
             Use
           </Button>
-          <Button size="sm" variant="ghost" onClick={onEdit}>
+          <Button size="sm" variant="ghost" onClick={onEdit} aria-label="Edit message template">
             <Edit className="h-4 w-4" />
           </Button>
         </div>
@@ -1385,6 +1412,7 @@ export default function SeasonalsPage() {
   const [showMessageModal, setShowMessageModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showRateCardModal, setShowRateCardModal] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("check");
   const [messageChannel, setMessageChannel] = useState<"email" | "sms">("email");
   const [messageSubject, setMessageSubject] = useState("");
   const [messageBody, setMessageBody] = useState("");
@@ -1588,6 +1616,13 @@ export default function SeasonalsPage() {
   const waitlist = waitlistQuery.data || [];
   const rateCards = rateCardsQuery.data || [];
   const templates = templatesQuery.data || [];
+  const bulkSelectState = seasonals.length === 0
+    ? false
+    : selectedIds.length === seasonals.length
+      ? true
+      : selectedIds.length > 0
+        ? "indeterminate"
+        : false;
 
   // Selection handlers
   const toggleSelectAll = () => {
@@ -1653,15 +1688,22 @@ export default function SeasonalsPage() {
             <p className="text-xs text-muted-foreground mt-0.5">Long-term campers with seasonal agreements (not individual reservations)</p>
             <p className="text-sm text-muted-foreground flex items-center gap-2 mt-1">
               <Calendar className="h-4 w-4" />
-              <select
-                value={seasonYear}
-                onChange={(e) => setSeasonYear(parseInt(e.target.value))}
-                className="border-0 bg-transparent font-medium text-foreground cursor-pointer hover:text-foreground"
+              <Select
+                value={String(seasonYear)}
+                onValueChange={(value) => setSeasonYear(Number(value))}
               >
-                {[currentYear - 1, currentYear, currentYear + 1].map((y) => (
-                  <option key={y} value={y}>{y} Season</option>
-                ))}
-              </select>
+                <SelectTrigger
+                  className="h-auto border-0 bg-transparent p-0 text-sm font-medium text-foreground shadow-none focus:ring-0 focus:ring-offset-0 hover:text-foreground"
+                  aria-label="Season year"
+                >
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {[currentYear - 1, currentYear, currentYear + 1].map((y) => (
+                    <SelectItem key={y} value={String(y)}>{y} Season</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </p>
           </div>
           <div className="flex gap-2">
@@ -1680,7 +1722,7 @@ export default function SeasonalsPage() {
 
         {/* Stats API Error Banner */}
         {statsQuery.isError && (
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-center gap-2 text-amber-800">
+          <div className="bg-status-warning/10 border border-status-warning/20 rounded-lg p-3 flex items-center gap-2 text-status-warning">
             <AlertTriangle className="h-4 w-4 flex-shrink-0" />
             <span className="text-sm">
               Unable to load stats. Check browser console for details.
@@ -1776,14 +1818,14 @@ export default function SeasonalsPage() {
                 <RefreshCw className="h-4 w-4" />
                 Renewals
                 {(stats?.needsAttention?.pendingRenewals ?? 0) > 0 && (
-                  <Badge className="ml-1 bg-amber-500 text-white text-xs px-1.5">{stats?.needsAttention?.pendingRenewals}</Badge>
+                  <Badge className="ml-1 bg-status-warning text-status-warning-foreground text-xs px-1.5">{stats?.needsAttention?.pendingRenewals}</Badge>
                 )}
               </TabsTrigger>
               <TabsTrigger value="payments" className="flex items-center gap-1.5">
                 <DollarSign className="h-4 w-4" />
                 Payments
                 {(stats?.needsAttention?.pastDuePayments ?? 0) > 0 && (
-                  <Badge className="ml-1 bg-rose-500 text-white text-xs px-1.5">{stats?.needsAttention?.pastDuePayments}</Badge>
+                  <Badge className="ml-1 bg-status-error text-status-error-foreground text-xs px-1.5">{stats?.needsAttention?.pastDuePayments}</Badge>
                 )}
               </TabsTrigger>
               <TabsTrigger value="contracts" className="flex items-center gap-1.5">
@@ -1816,32 +1858,41 @@ export default function SeasonalsPage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-9 w-48"
+                  aria-label="Search seasonal guests"
                 />
               </div>
               {(activeTab === "all" || activeTab === "renewals" || activeTab === "payments") && (
                 <>
-                  <select
+                  <Select
                     value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value as SeasonalStatus | "all")}
-                    className="text-sm border border-border rounded-lg px-3 py-2"
+                    onValueChange={(value) => setStatusFilter(value as SeasonalStatus | "all")}
                   >
-                    <option value="all">All Status</option>
-                    <option value="active">Active</option>
-                    <option value="pending_renewal">Pending Renewal</option>
-                    <option value="not_renewing">Not Renewing</option>
-                    <option value="waitlist">Waitlist</option>
-                  </select>
-                  <select
+                    <SelectTrigger className="h-9 w-[160px] text-sm" aria-label="Filter by status">
+                      <SelectValue placeholder="All Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Status</SelectItem>
+                      <SelectItem value="active">Active</SelectItem>
+                      <SelectItem value="pending_renewal">Pending Renewal</SelectItem>
+                      <SelectItem value="not_renewing">Not Renewing</SelectItem>
+                      <SelectItem value="waitlist">Waitlist</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select
                     value={renewalFilter}
-                    onChange={(e) => setRenewalFilter(e.target.value as RenewalIntent | "all")}
-                    className="text-sm border border-border rounded-lg px-3 py-2"
+                    onValueChange={(value) => setRenewalFilter(value as RenewalIntent | "all")}
                   >
-                    <option value="all">All Renewal</option>
-                    <option value="committed">Committed</option>
-                    <option value="likely">Likely</option>
-                    <option value="undecided">Undecided</option>
-                    <option value="not_renewing">Not Returning</option>
-                  </select>
+                    <SelectTrigger className="h-9 w-[160px] text-sm" aria-label="Filter by renewal intent">
+                      <SelectValue placeholder="All Renewal" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Renewal</SelectItem>
+                      <SelectItem value="committed">Committed</SelectItem>
+                      <SelectItem value="likely">Likely</SelectItem>
+                      <SelectItem value="undecided">Undecided</SelectItem>
+                      <SelectItem value="not_renewing">Not Returning</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </>
               )}
             </div>
@@ -1851,11 +1902,10 @@ export default function SeasonalsPage() {
           <TabsContent value="all" className="space-y-4">
             {/* Bulk select */}
             <div className="flex items-center gap-3 text-sm">
-              <input
-                type="checkbox"
-                checked={selectedIds.length === seasonals.length && seasonals.length > 0}
-                onChange={toggleSelectAll}
-                className="rounded border-border"
+              <Checkbox
+                checked={bulkSelectState}
+                onCheckedChange={() => toggleSelectAll()}
+                aria-label="Select all seasonal guests"
               />
               <span className="text-muted-foreground">
                 {selectedIds.length > 0 ? `${selectedIds.length} selected` : `${seasonals.length} seasonal guests`}
@@ -1914,9 +1964,9 @@ export default function SeasonalsPage() {
                   <Clock className="h-4 w-4" /> Undecided
                 </div>
               </Card>
-              <Card className="p-4 bg-rose-50 border-rose-200 cursor-pointer hover:shadow-md transition-all" onClick={() => setRenewalFilter("not_renewing")}>
-                <div className="text-3xl font-bold text-rose-700">{stats?.renewalsByIntent.not_renewing || 0}</div>
-                <div className="text-sm text-rose-600 flex items-center gap-1">
+              <Card className="p-4 bg-status-error/10 border-status-error/20 cursor-pointer hover:shadow-md transition-all" onClick={() => setRenewalFilter("not_renewing")}>
+                <div className="text-3xl font-bold text-status-error">{stats?.renewalsByIntent.not_renewing || 0}</div>
+                <div className="text-sm text-status-error flex items-center gap-1">
                   <X className="h-4 w-4" /> Not Returning
                 </div>
               </Card>
@@ -1926,7 +1976,7 @@ export default function SeasonalsPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-amber-600" />
+                  <Clock className="h-5 w-5 text-status-warning" />
                   Need Follow-Up
                 </CardTitle>
                 <CardDescription>Guests who haven't committed to returning yet</CardDescription>
@@ -1975,7 +2025,7 @@ export default function SeasonalsPage() {
                         <Button
                           size="sm"
                           variant="outline"
-                          className="text-rose-600 hover:bg-rose-50"
+                          className="text-status-error hover:bg-status-error/10"
                           onClick={() => updateRenewalMutation.mutate({ id: seasonal.id, intent: "not_renewing" })}
                         >
                           <X className="h-4 w-4 mr-1" />
@@ -1986,7 +2036,7 @@ export default function SeasonalsPage() {
                   ))}
                 {seasonals.filter((s) => !s.renewalIntent || s.renewalIntent === "undecided").length === 0 && (
                   <div className="text-center py-8 text-muted-foreground">
-                    <CheckCircle className="h-8 w-8 text-emerald-500 mx-auto mb-2" />
+                    <CheckCircle className="h-8 w-8 text-status-success mx-auto mb-2" />
                     All guests have responded!
                   </div>
                 )}
@@ -2003,15 +2053,15 @@ export default function SeasonalsPage() {
                   <CheckCircle className="h-4 w-4" /> Current
                 </div>
               </Card>
-              <Card className="p-4 bg-rose-50 border-rose-200">
-                <div className="text-3xl font-bold text-rose-700">{stats?.paymentsPastDue || 0}</div>
-                <div className="text-sm text-rose-600 flex items-center gap-1">
+              <Card className="p-4 bg-status-error/10 border-status-error/20">
+                <div className="text-3xl font-bold text-status-error">{stats?.paymentsPastDue || 0}</div>
+                <div className="text-sm text-status-error flex items-center gap-1">
                   <AlertCircle className="h-4 w-4" /> Past Due
                 </div>
               </Card>
-              <Card className="p-4 bg-purple-50 border-purple-200">
-                <div className="text-3xl font-bold text-purple-700">{stats?.paymentsPaidAhead || 0}</div>
-                <div className="text-sm text-purple-600 flex items-center gap-1">
+              <Card className="p-4 bg-status-info/10 border-status-info/20">
+                <div className="text-3xl font-bold text-status-info">{stats?.paymentsPaidAhead || 0}</div>
+                <div className="text-sm text-status-info flex items-center gap-1">
                   <Sparkles className="h-4 w-4" /> Paid Ahead
                 </div>
               </Card>
@@ -2019,8 +2069,8 @@ export default function SeasonalsPage() {
 
             {/* Past due list */}
             <Card>
-              <CardHeader className="bg-rose-50 border-b border-rose-100">
-                <CardTitle className="text-lg flex items-center gap-2 text-rose-700">
+              <CardHeader className="bg-status-error/10 border-b border-status-error/20">
+                <CardTitle className="text-lg flex items-center gap-2 text-status-error">
                   <AlertCircle className="h-5 w-5" />
                   Past Due Payments
                 </CardTitle>
@@ -2034,17 +2084,17 @@ export default function SeasonalsPage() {
                     return (
                       <div
                         key={seasonal.id}
-                        className="flex items-center justify-between p-3 bg-rose-50/50 border border-rose-100 rounded-lg"
+                        className="flex items-center justify-between p-3 bg-status-error/5 border border-status-error/20 rounded-lg"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-full bg-rose-100 flex items-center justify-center text-rose-700 font-medium text-sm">
+                          <div className="w-9 h-9 rounded-full bg-status-error/15 flex items-center justify-center text-status-error font-medium text-sm">
                             {seasonal.guest.primaryFirstName[0]}{seasonal.guest.primaryLastName[0]}
                           </div>
                           <div>
                             <p className="font-medium">{seasonal.guest.primaryFirstName} {seasonal.guest.primaryLastName}</p>
                             <p className="text-sm text-muted-foreground">
                               ${pastDue?.amount.toLocaleString()} due {pastDue?.dueDate && format(new Date(pastDue.dueDate), "MMM d")}
-                              <span className="text-rose-600 ml-2">({daysOverdue} days overdue)</span>
+                              <span className="text-status-error ml-2">({daysOverdue} days overdue)</span>
                             </p>
                           </div>
                         </div>
@@ -2067,7 +2117,7 @@ export default function SeasonalsPage() {
                   })}
                 {!seasonals.some((s) => s.payments?.some((p) => p.status === "past_due")) && (
                   <div className="text-center py-8 text-muted-foreground">
-                    <CheckCircle className="h-8 w-8 text-emerald-500 mx-auto mb-2" />
+                    <CheckCircle className="h-8 w-8 text-status-success mx-auto mb-2" />
                     No past due payments!
                   </div>
                 )}
@@ -2087,7 +2137,7 @@ export default function SeasonalsPage() {
                     <div className="flex-1">
                       <div className="h-3 rounded-full bg-muted overflow-hidden">
                         <div
-                          className="h-full bg-emerald-500 transition-all"
+                          className="h-full bg-status-success transition-all"
                           style={{ width: `${stats ? (stats.contractsSigned / stats.contractsTotal) * 100 : 0}%` }}
                         />
                       </div>
@@ -2107,7 +2157,7 @@ export default function SeasonalsPage() {
                   <div className="flex items-center gap-4">
                     <div className="flex-1">
                       <div className="h-3 rounded-full bg-muted overflow-hidden">
-                        <div className="h-full bg-blue-500 transition-all" style={{ width: "25%" }} />
+                        <div className="h-full bg-status-info transition-all" style={{ width: "25%" }} />
                       </div>
                     </div>
                     <span className="text-lg font-bold">22/88</span>
@@ -2121,7 +2171,7 @@ export default function SeasonalsPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <FileSignature className="h-5 w-5 text-amber-600" />
+                  <FileSignature className="h-5 w-5 text-status-warning" />
                   Needs Signature
                 </CardTitle>
               </CardHeader>
@@ -2168,7 +2218,7 @@ export default function SeasonalsPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <Shield className="h-5 w-5 text-purple-600" />
+                  <Shield className="h-5 w-5 text-primary" />
                   Insurance (COI) Status
                 </CardTitle>
               </CardHeader>
@@ -2226,23 +2276,23 @@ export default function SeasonalsPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Calendar className="h-5 w-5 text-blue-600" />
+                  <Calendar className="h-5 w-5 text-primary" />
                   Season Settings
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid md:grid-cols-3 gap-4">
                   <div>
-                    <Label>Season Start</Label>
-                    <Input type="date" defaultValue="2025-04-15" className="mt-1" />
+                    <Label htmlFor="season-start">Season Start</Label>
+                    <Input id="season-start" type="date" defaultValue="2025-04-15" className="mt-1" />
                   </div>
                   <div>
-                    <Label>Season End</Label>
-                    <Input type="date" defaultValue="2025-10-15" className="mt-1" />
+                    <Label htmlFor="season-end">Season End</Label>
+                    <Input id="season-end" type="date" defaultValue="2025-10-15" className="mt-1" />
                   </div>
                   <div>
-                    <Label>Renewal Deadline</Label>
-                    <Input type="date" defaultValue="2025-03-01" className="mt-1" />
+                    <Label htmlFor="renewal-deadline">Renewal Deadline</Label>
+                    <Input id="renewal-deadline" type="date" defaultValue="2025-03-01" className="mt-1" />
                   </div>
                 </div>
               </CardContent>
@@ -2252,7 +2302,7 @@ export default function SeasonalsPage() {
             <div>
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-lg font-medium flex items-center gap-2">
-                  <Receipt className="h-5 w-5 text-purple-600" />
+                  <Receipt className="h-5 w-5 text-primary" />
                   Rate Cards
                 </h3>
                 <Button onClick={() => setShowRateCardModal(true)}>
@@ -2286,35 +2336,50 @@ export default function SeasonalsPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <CreditCard className="h-5 w-5 text-emerald-600" />
+                  <CreditCard className="h-5 w-5 text-status-success" />
                   Payment Settings
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid md:grid-cols-3 gap-4">
                   <div>
-                    <Label>Default Billing Frequency</Label>
-                    <select className="w-full mt-1 border border-border rounded-lg px-3 py-2">
-                      <option value="monthly">Monthly</option>
-                      <option value="quarterly">Quarterly</option>
-                      <option value="seasonal">Seasonal (Full)</option>
-                    </select>
+                    <Label htmlFor="billing-frequency">Default Billing Frequency</Label>
+                    <Select defaultValue="monthly">
+                      <SelectTrigger id="billing-frequency" className="w-full mt-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="monthly">Monthly</SelectItem>
+                        <SelectItem value="quarterly">Quarterly</SelectItem>
+                        <SelectItem value="seasonal">Seasonal (Full)</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div>
-                    <Label>Payment Due Day</Label>
-                    <select className="w-full mt-1 border border-border rounded-lg px-3 py-2">
-                      <option value="1">1st of month</option>
-                      <option value="15">15th of month</option>
-                    </select>
+                    <Label htmlFor="payment-due-day">Payment Due Day</Label>
+                    <Select defaultValue="1">
+                      <SelectTrigger id="payment-due-day" className="w-full mt-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">1st of month</SelectItem>
+                        <SelectItem value="15">15th of month</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div>
-                    <Label>Late Fee</Label>
+                    <Label htmlFor="late-fee-amount">Late Fee</Label>
                     <div className="flex gap-2 mt-1">
-                      <Input type="number" defaultValue="25" className="w-20" />
-                      <select className="flex-1 border border-border rounded-lg px-3 py-2">
-                        <option value="flat">Flat fee</option>
-                        <option value="percent">Percentage</option>
-                      </select>
+                      <Input id="late-fee-amount" type="number" defaultValue="25" className="w-20" />
+                      <Select defaultValue="flat">
+                        <SelectTrigger className="flex-1" aria-label="Late fee type">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="flat">Flat fee</SelectItem>
+                          <SelectItem value="percent">Percentage</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
                 </div>
@@ -2329,28 +2394,34 @@ export default function SeasonalsPage() {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Send className="h-5 w-5 text-blue-600" />
+                    <Send className="h-5 w-5 text-primary" />
                     Send Message
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <Label>Recipients</Label>
-                    <select className="w-full mt-1 border border-border rounded-lg px-3 py-2">
-                      <option value="all">All Seasonals ({stats?.totalSeasonals || 0})</option>
-                      <option value="committed">Committed ({stats?.renewalsByIntent.committed || 0})</option>
-                      <option value="undecided">Undecided ({stats?.renewalsByIntent.undecided || 0})</option>
-                      <option value="past_due">Past Due Payments ({stats?.paymentsPastDue || 0})</option>
-                      <option value="selected">Selected ({selectedIds.length})</option>
-                    </select>
+                    <Label htmlFor="comms-recipients">Recipients</Label>
+                    <Select defaultValue="all">
+                      <SelectTrigger id="comms-recipients" className="w-full mt-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Seasonals ({stats?.totalSeasonals || 0})</SelectItem>
+                        <SelectItem value="committed">Committed ({stats?.renewalsByIntent.committed || 0})</SelectItem>
+                        <SelectItem value="undecided">Undecided ({stats?.renewalsByIntent.undecided || 0})</SelectItem>
+                        <SelectItem value="past_due">Past Due Payments ({stats?.paymentsPastDue || 0})</SelectItem>
+                        <SelectItem value="selected">Selected ({selectedIds.length})</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div>
-                    <Label>Channel</Label>
-                    <div className="flex gap-2 mt-1">
+                    <Label id="comms-channel-label">Channel</Label>
+                    <div className="flex gap-2 mt-1" role="group" aria-labelledby="comms-channel-label">
                       <Button
                         variant={messageChannel === "email" ? "default" : "outline"}
                         size="sm"
                         onClick={() => setMessageChannel("email")}
+                        aria-pressed={messageChannel === "email"}
                       >
                         <Mail className="h-4 w-4 mr-1" />
                         Email
@@ -2359,6 +2430,7 @@ export default function SeasonalsPage() {
                         variant={messageChannel === "sms" ? "default" : "outline"}
                         size="sm"
                         onClick={() => setMessageChannel("sms")}
+                        aria-pressed={messageChannel === "sms"}
                       >
                         <MessageSquare className="h-4 w-4 mr-1" />
                         SMS
@@ -2367,8 +2439,9 @@ export default function SeasonalsPage() {
                   </div>
                   {messageChannel === "email" && (
                     <div>
-                      <Label>Subject</Label>
+                      <Label htmlFor="comms-subject">Subject</Label>
                       <Input
+                        id="comms-subject"
                         value={messageSubject}
                         onChange={(e) => setMessageSubject(e.target.value)}
                         placeholder="Message subject..."
@@ -2377,8 +2450,9 @@ export default function SeasonalsPage() {
                     </div>
                   )}
                   <div>
-                    <Label>Message</Label>
+                    <Label htmlFor="comms-message">Message</Label>
                     <Textarea
+                      id="comms-message"
                       value={messageBody}
                       onChange={(e) => setMessageBody(e.target.value)}
                       placeholder="Hi {{first_name}}, ..."
@@ -2512,45 +2586,49 @@ export default function SeasonalsPage() {
           <DialogHeader>
             <DialogTitle>Send Message to {selectedIds.length} Guest{selectedIds.length !== 1 ? "s" : ""}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <div className="flex gap-2">
-              <Button
-                variant={messageChannel === "email" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setMessageChannel("email")}
-              >
-                <Mail className="h-4 w-4 mr-1" />
-                Email
-              </Button>
-              <Button
-                variant={messageChannel === "sms" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setMessageChannel("sms")}
-              >
-                <MessageSquare className="h-4 w-4 mr-1" />
-                SMS
-              </Button>
-            </div>
-
-            {messageChannel === "email" && (
-              <div>
-                <Label>Subject</Label>
-                <Input
-                  value={messageSubject}
-                  onChange={(e) => setMessageSubject(e.target.value)}
-                  placeholder="Message subject..."
-                  className="mt-1"
-                />
+            <div className="space-y-4">
+              <div className="flex gap-2">
+                <Button
+                  variant={messageChannel === "email" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setMessageChannel("email")}
+                  aria-pressed={messageChannel === "email"}
+                >
+                  <Mail className="h-4 w-4 mr-1" />
+                  Email
+                </Button>
+                <Button
+                  variant={messageChannel === "sms" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setMessageChannel("sms")}
+                  aria-pressed={messageChannel === "sms"}
+                >
+                  <MessageSquare className="h-4 w-4 mr-1" />
+                  SMS
+                </Button>
               </div>
-            )}
 
-            <div>
-              <Label>Message</Label>
-              <Textarea
-                value={messageBody}
-                onChange={(e) => setMessageBody(e.target.value)}
-                placeholder="Hi {{first_name}}, ..."
-                rows={5}
+              {messageChannel === "email" && (
+                <div>
+                  <Label htmlFor="bulk-message-subject">Subject</Label>
+                  <Input
+                    id="bulk-message-subject"
+                    value={messageSubject}
+                    onChange={(e) => setMessageSubject(e.target.value)}
+                    placeholder="Message subject..."
+                    className="mt-1"
+                  />
+                </div>
+              )}
+
+              <div>
+                <Label htmlFor="bulk-message-body">Message</Label>
+                <Textarea
+                  id="bulk-message-body"
+                  value={messageBody}
+                  onChange={(e) => setMessageBody(e.target.value)}
+                  placeholder="Hi {{first_name}}, ..."
+                  rows={5}
                 className="mt-1"
               />
               <p className="text-xs text-muted-foreground mt-1">
@@ -2636,18 +2714,19 @@ export default function SeasonalsPage() {
             </div>
             <div>
               <Label htmlFor="method">Payment Method</Label>
-              <select
-                id="method"
-                name="method"
-                required
-                className="mt-1 w-full rounded-md border border-border px-3 py-2 text-sm"
-              >
-                <option value="check">Check</option>
-                <option value="cash">Cash</option>
-                <option value="card">Credit/Debit Card</option>
-                <option value="ach">ACH/Bank Transfer</option>
-                <option value="other">Other</option>
-              </select>
+              <Select value={paymentMethod} onValueChange={setPaymentMethod}>
+                <SelectTrigger id="method" className="mt-1 w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="check">Check</SelectItem>
+                  <SelectItem value="cash">Cash</SelectItem>
+                  <SelectItem value="card">Credit/Debit Card</SelectItem>
+                  <SelectItem value="ach">ACH/Bank Transfer</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+              <input type="hidden" name="method" value={paymentMethod} />
             </div>
             <div>
               <Label htmlFor="note">Note (optional)</Label>

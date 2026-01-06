@@ -191,6 +191,7 @@ export default function ApprovalsQueue({ params }: { params: { campgroundId: str
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 flex items-center gap-2"
+            role="alert"
           >
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
             {error}

@@ -9,6 +9,7 @@ import { Breadcrumbs } from "@/components/breadcrumbs";
 import { apiClient } from "../../../../lib/api-client";
 import { useState, useRef, useEffect, useMemo } from "react";
 import { Button } from "../../../../components/ui/button";
+import { Checkbox } from "../../../../components/ui/checkbox";
 import { Input } from "../../../../components/ui/input";
 import { Label } from "../../../../components/ui/label";
 import { Textarea } from "../../../../components/ui/textarea";
@@ -80,8 +81,8 @@ const siteTypeConfig: Record<string, { icon: React.ReactNode; label: string; col
   rv: { icon: <Home className="h-4 w-4" />, label: "RV", color: "bg-status-info/15 text-status-info" },
   tent: { icon: <Tent className="h-4 w-4" />, label: "Tent", color: "bg-status-success/15 text-status-success" },
   cabin: { icon: <Home className="h-4 w-4" />, label: "Cabin", color: "bg-status-warning/15 text-status-warning" },
-  group: { icon: <Users className="h-4 w-4" />, label: "Group", color: "bg-purple-100 text-purple-700" },
-  glamping: { icon: <Sparkles className="h-4 w-4" />, label: "Glamping", color: "bg-pink-100 text-pink-700" },
+  group: { icon: <Users className="h-4 w-4" />, label: "Group", color: "bg-status-info/15 text-status-info" },
+  glamping: { icon: <Sparkles className="h-4 w-4" />, label: "Glamping", color: "bg-status-warning/15 text-status-warning" },
 };
 
 type Site = {
@@ -328,7 +329,7 @@ export default function SiteClassesPage() {
             animate={{ opacity: 1, scale: 1 }}
             className="text-center"
           >
-            <Loader2 className="h-12 w-12 animate-spin text-emerald-500 mx-auto mb-4" />
+            <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
             <p className="text-muted-foreground">Loading site classes...</p>
           </motion.div>
         </div>
@@ -449,7 +450,12 @@ export default function SiteClassesPage() {
                       </CardTitle>
                       <CardDescription>Create a new pricing tier for your sites</CardDescription>
                     </div>
-                    <Button variant="ghost" size="sm" onClick={() => setShowCreateForm(false)}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowCreateForm(false)}
+                      aria-label="Close add site class form"
+                    >
                       <X className="h-4 w-4" />
                     </Button>
                   </div>
@@ -522,8 +528,8 @@ export default function SiteClassesPage() {
                   <div className="flex flex-wrap items-center gap-4 p-3 rounded-lg bg-muted/50">
                     <span className="text-sm font-medium text-foreground">Hookups:</span>
                     {[
-                      { key: "hookupsPower", label: "Power", icon: <Zap className="h-4 w-4" />, color: "text-amber-500" },
-                      { key: "hookupsWater", label: "Water", icon: <Droplet className="h-4 w-4" />, color: "text-blue-500" },
+                      { key: "hookupsPower", label: "Power", icon: <Zap className="h-4 w-4" />, color: "text-status-warning" },
+                      { key: "hookupsWater", label: "Water", icon: <Droplet className="h-4 w-4" />, color: "text-status-info" },
                       { key: "hookupsSewer", label: "Sewer", icon: <Waves className="h-4 w-4" />, color: "text-muted-foreground" },
                     ].map((hookup) => (
                       <motion.button
@@ -533,16 +539,17 @@ export default function SiteClassesPage() {
                         className={cn(
                           "flex items-center gap-2 px-3 py-2 rounded-lg border-2 transition-all",
                           form[hookup.key as keyof SiteClassFormState]
-                            ? "border-emerald-500 bg-emerald-50"
+                            ? "border-primary bg-primary/10"
                             : "border-border hover:border-muted-foreground/30"
                         )}
                         whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
                         whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
+                        aria-pressed={Boolean(form[hookup.key as keyof SiteClassFormState])}
                       >
                         <span className={hookup.color}>{hookup.icon}</span>
                         <span className="text-sm text-foreground">{hookup.label}</span>
                         {form[hookup.key as keyof SiteClassFormState] && (
-                          <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                          <CheckCircle2 className="h-4 w-4 text-primary" />
                         )}
                       </motion.button>
                     ))}
@@ -557,15 +564,16 @@ export default function SiteClassesPage() {
                       className={cn(
                         "flex items-center gap-2 px-3 py-2 rounded-lg border-2 transition-all",
                         form.petFriendly
-                          ? "border-emerald-500 bg-emerald-50"
+                          ? "border-primary bg-primary/10"
                           : "border-border hover:border-muted-foreground/30"
                       )}
                       whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
                       whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
+                      aria-pressed={form.petFriendly}
                     >
-                      <PawPrint className="h-4 w-4 text-orange-500" />
+                      <PawPrint className="h-4 w-4 text-status-warning" />
                       <span className="text-sm text-foreground">Pet Friendly</span>
-                      {form.petFriendly && <CheckCircle2 className="h-4 w-4 text-emerald-500" />}
+                      {form.petFriendly && <CheckCircle2 className="h-4 w-4 text-primary" />}
                     </motion.button>
                     <motion.button
                       type="button"
@@ -573,15 +581,16 @@ export default function SiteClassesPage() {
                       className={cn(
                         "flex items-center gap-2 px-3 py-2 rounded-lg border-2 transition-all",
                         form.accessible
-                          ? "border-emerald-500 bg-emerald-50"
+                          ? "border-primary bg-primary/10"
                           : "border-border hover:border-muted-foreground/30"
                       )}
                       whileHover={prefersReducedMotion ? {} : { scale: 1.02 }}
                       whileTap={prefersReducedMotion ? {} : { scale: 0.98 }}
+                      aria-pressed={form.accessible}
                     >
-                      <Accessibility className="h-4 w-4 text-blue-500" />
+                      <Accessibility className="h-4 w-4 text-status-info" />
                       <span className="text-sm text-foreground">Accessible</span>
-                      {form.accessible && <CheckCircle2 className="h-4 w-4 text-emerald-500" />}
+                      {form.accessible && <CheckCircle2 className="h-4 w-4 text-primary" />}
                     </motion.button>
                   </div>
 
@@ -590,6 +599,9 @@ export default function SiteClassesPage() {
                     type="button"
                     onClick={() => setShowAdvanced(!showAdvanced)}
                     className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    aria-expanded={showAdvanced}
+                    aria-controls="site-class-advanced"
+                    id="site-class-advanced-toggle"
                   >
                     {showAdvanced ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                     {showAdvanced ? "Hide" : "Show"} advanced options
@@ -602,6 +614,9 @@ export default function SiteClassesPage() {
                         animate={{ opacity: 1, height: "auto" }}
                         exit={{ opacity: 0, height: 0 }}
                         className="space-y-4 pt-4 border-t border-border"
+                        id="site-class-advanced"
+                        role="region"
+                        aria-labelledby="site-class-advanced-toggle"
                       >
                         <div className="space-y-2">
                           <Label htmlFor="description" className="text-foreground">Description</Label>
@@ -615,8 +630,9 @@ export default function SiteClassesPage() {
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                           <div className="space-y-2">
-                            <Label className="text-foreground">Min Nights</Label>
+                            <Label htmlFor="min-nights" className="text-foreground">Min Nights</Label>
                             <Input
+                              id="min-nights"
                               type="number"
                               min="1"
                               value={form.minNights}
@@ -625,8 +641,9 @@ export default function SiteClassesPage() {
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label className="text-foreground">Max Nights</Label>
+                            <Label htmlFor="max-nights" className="text-foreground">Max Nights</Label>
                             <Input
+                              id="max-nights"
                               type="number"
                               min="1"
                               value={form.maxNights}
@@ -635,8 +652,9 @@ export default function SiteClassesPage() {
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label className="text-foreground">Max Rig Length (ft)</Label>
+                            <Label htmlFor="max-rig-length" className="text-foreground">Max Rig Length (ft)</Label>
                             <Input
+                              id="max-rig-length"
                               type="number"
                               min="0"
                               value={form.rigMaxLength}
@@ -646,11 +664,10 @@ export default function SiteClassesPage() {
                           </div>
                           <div className="flex items-end">
                             <label className="flex items-center gap-2 text-sm text-foreground h-10">
-                              <input
-                                type="checkbox"
+                              <Checkbox
                                 checked={form.isActive}
-                                onChange={(e) => setForm((s) => ({ ...s, isActive: e.target.checked }))}
-                                className="rounded border-border"
+                                onCheckedChange={(checked) => setForm((s) => ({ ...s, isActive: Boolean(checked) }))}
+                                aria-label="Class is active"
                               />
                               Active
                             </label>
@@ -699,7 +716,11 @@ export default function SiteClassesPage() {
                     <Button variant="ghost" onClick={() => setShowCreateForm(false)}>
                       Cancel
                     </Button>
-                    {createClass.isError && <span className="text-sm text-red-500">Failed to save class</span>}
+                    {createClass.isError && (
+                      <span role="alert" className="text-sm text-status-error">
+                        Failed to save class
+                      </span>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -720,13 +741,13 @@ export default function SiteClassesPage() {
                 <Card className="border-border bg-card/80 backdrop-blur-sm">
                   <CardContent className="py-16">
                     <div className="flex flex-col items-center justify-center text-center">
-                      <motion.div
-                        animate={{ y: [0, -8, 0] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                        className="h-16 w-16 rounded-full bg-purple-100 flex items-center justify-center mb-4"
-                      >
-                        <Layers className="h-8 w-8 text-purple-600" />
-                      </motion.div>
+                        <motion.div
+                          animate={{ y: [0, -8, 0] }}
+                          transition={{ duration: 2, repeat: Infinity }}
+                          className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4"
+                        >
+                          <Layers className="h-8 w-8 text-primary" />
+                        </motion.div>
                       <p className="text-lg font-medium text-foreground">No site classes yet</p>
                       <p className="text-sm text-muted-foreground mt-1 max-w-sm">
                         Create your first site class to define pricing tiers and amenity packages
@@ -803,7 +824,7 @@ export default function SiteClassesPage() {
                                 {typeConfig.label}
                               </Badge>
                               {rentalType !== "transient" && (
-                                <Badge variant="outline" className="text-xs bg-purple-100 text-purple-700">
+                                <Badge variant="outline" className="text-xs bg-muted text-muted-foreground">
                                   {rentalTypeLabels[rentalType] || rentalType}
                                 </Badge>
                               )}
@@ -819,6 +840,7 @@ export default function SiteClassesPage() {
                                 size="sm"
                                 onClick={() => router.push(`/campgrounds/${campgroundId}/classes/${cls.id}`)}
                                 className="h-8 w-8 p-0"
+                                aria-label={`Edit ${cls.name}`}
                               >
                                 <Pencil className="h-4 w-4" />
                               </Button>
@@ -826,7 +848,8 @@ export default function SiteClassesPage() {
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => handleDeleteClass(cls.id, cls.name)}
-                                className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-50"
+                                className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                aria-label={`Delete ${cls.name}`}
                               >
                                 <Trash2 className="h-4 w-4" />
                               </Button>
@@ -838,13 +861,13 @@ export default function SiteClassesPage() {
                             <h3 className="font-semibold text-foreground text-lg">{cls.name}</h3>
                             {inlineEditingRate === cls.id ? (
                               <div className="flex items-center gap-1 mt-1">
-                                <span className="text-2xl font-bold text-emerald-600">$</span>
-                                <input
+                                <span className="text-2xl font-bold text-primary">$</span>
+                                <Input
                                   ref={inlineRateInputRef}
                                   type="number"
                                   step="0.01"
                                   min="0"
-                                  className="w-20 text-2xl font-bold text-emerald-600 bg-transparent border-b-2 border-emerald-500 focus:outline-none"
+                                  className="w-20 text-2xl font-bold text-primary bg-transparent border-0 border-b-2 border-primary focus-visible:ring-0 focus-visible:ring-offset-0 px-0"
                                   value={inlineRateValue}
                                   onChange={(e) => setInlineRateValue(e.target.value)}
                                   onBlur={() => handleInlineRateSave(cls.id)}
@@ -852,6 +875,7 @@ export default function SiteClassesPage() {
                                     if (e.key === "Enter") handleInlineRateSave(cls.id);
                                     if (e.key === "Escape") setInlineEditingRate(null);
                                   }}
+                                  aria-label={`Default rate for ${cls.name}`}
                                 />
                                 <span className="text-sm text-muted-foreground">/night</span>
                               </div>
@@ -863,7 +887,7 @@ export default function SiteClassesPage() {
                                 }}
                                 className="flex items-center gap-1 group mt-1"
                               >
-                                <span className="text-2xl font-bold text-emerald-600">
+                                <span className="text-2xl font-bold text-primary">
                                   ${(cls.defaultRate / 100).toFixed(0)}
                                 </span>
                                 <span className="text-sm text-muted-foreground">/night</span>
@@ -916,19 +940,19 @@ export default function SiteClassesPage() {
                             </div>
                             {hasHookups && (
                               <div className="flex items-center gap-1">
-                                {cls.hookupsPower && <Zap className="h-3.5 w-3.5 text-amber-500" />}
-                                {cls.hookupsWater && <Droplet className="h-3.5 w-3.5 text-blue-500" />}
+                                {cls.hookupsPower && <Zap className="h-3.5 w-3.5 text-status-warning" />}
+                                {cls.hookupsWater && <Droplet className="h-3.5 w-3.5 text-status-info" />}
                                 {cls.hookupsSewer && <Waves className="h-3.5 w-3.5 text-muted-foreground" />}
                               </div>
                             )}
                             {meteredEnabled && (
-                              <div className="flex items-center gap-1 text-xs text-orange-600">
+                              <div className="flex items-center gap-1 text-xs text-status-warning">
                                 <Gauge className="h-3.5 w-3.5" />
                                 {meteredType === "electric" ? "Metered" : meteredType === "propane" ? "Propane" : "Metered"}
                               </div>
                             )}
-                            {cls.petFriendly && <PawPrint className="h-3.5 w-3.5 text-orange-500" />}
-                            {cls.accessible && <Accessibility className="h-3.5 w-3.5 text-blue-500" />}
+                            {cls.petFriendly && <PawPrint className="h-3.5 w-3.5 text-status-warning" />}
+                            {cls.accessible && <Accessibility className="h-3.5 w-3.5 text-status-info" />}
                           </div>
 
                           {/* Amenity Tags */}
@@ -985,7 +1009,7 @@ export default function SiteClassesPage() {
             <AlertDialogDescription>
               Are you sure you want to delete "{deleteConfirm?.name}"?
               {deleteConfirm?.siteCount && deleteConfirm.siteCount > 0 && (
-                <span className="block mt-2 text-amber-600">
+                <span className="block mt-2 text-status-warning">
                   {deleteConfirm.siteCount} site{deleteConfirm.siteCount === 1 ? '' : 's'} will lose {deleteConfirm.siteCount === 1 ? 'its' : 'their'} class assignment.
                 </span>
               )}
@@ -996,7 +1020,7 @@ export default function SiteClassesPage() {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmDeleteClass}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-destructive hover:bg-destructive/90"
             >
               Delete
             </AlertDialogAction>

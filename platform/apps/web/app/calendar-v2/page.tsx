@@ -452,6 +452,7 @@ export default function CalendarPage() {
                       state.dayCount === range ? "bg-status-success/10 text-status-success" : "text-muted-foreground"
                     )}
                     onClick={() => actions.setDayCount(range)}
+                    aria-pressed={state.dayCount === range}
                   >
                     {range}d
                   </Button>
@@ -459,7 +460,13 @@ export default function CalendarPage() {
               </div>
 
               <div className="flex items-center bg-card rounded-xl border border-border p-1">
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" onClick={handlePrev}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-muted-foreground"
+                  onClick={handlePrev}
+                  aria-label="Previous date range"
+                >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
                 <Button
@@ -470,7 +477,13 @@ export default function CalendarPage() {
                 >
                   Today
                 </Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" onClick={handleNext}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-muted-foreground"
+                  onClick={handleNext}
+                  aria-label="Next date range"
+                >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>
@@ -496,6 +509,7 @@ export default function CalendarPage() {
                       )}
                       onClick={() => setDensity(mode)}
                       title={`${config.label} view`}
+                      aria-pressed={density === mode}
                     >
                       <Icon className="h-4 w-4" />
                       <span className="text-[11px] font-semibold hidden sm:inline">
@@ -642,10 +656,10 @@ export default function CalendarPage() {
         {state.selectedCampground && (
           <div className="space-y-4">
             {bookingDraft ? (
-              <Card className="p-4 border-emerald-200 shadow-sm">
+              <Card className="p-4 border-primary/20 shadow-sm">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="space-y-1">
-                    <div className="text-xs font-medium text-emerald-700">Draft booking</div>
+                    <div className="text-xs font-medium text-primary">Draft booking</div>
                     <div className="text-sm font-semibold text-foreground">{bookingDraft.siteName}</div>
                     <div className="text-xs text-muted-foreground">
                       {bookingDraft.arrival} → {bookingDraft.departure} · {bookingDraft.nights} nights
@@ -790,15 +804,15 @@ export default function CalendarPage() {
                       <div className="flex items-center justify-between">
                         <span className="font-medium text-foreground">${(total / 100).toFixed(2)}</span>
                         {balance > 0 ? (
-                          <span className="text-xs font-medium text-amber-600">${(balance / 100).toFixed(2)} due</span>
+                          <span className="text-xs font-medium text-status-warning">${(balance / 100).toFixed(2)} due</span>
                         ) : paid > 0 ? (
-                          <span className="text-xs font-medium text-emerald-600">Paid in full</span>
+                          <span className="text-xs font-medium text-status-success">Paid in full</span>
                         ) : null}
                       </div>
                       {paid > 0 && paid < total && (
                         <div className="mt-2 h-1.5 bg-muted rounded-full overflow-hidden">
                           <div
-                            className="h-full bg-emerald-500 rounded-full"
+                            className="h-full bg-status-success rounded-full"
                             style={{ width: `${Math.min(100, (paid / total) * 100)}%` }}
                           />
                         </div>
@@ -836,7 +850,7 @@ export default function CalendarPage() {
                   {res.status === "confirmed" && (
                     <Button
                       size="sm"
-                      className="flex-1 bg-emerald-600 hover:bg-emerald-700"
+                      className="flex-1 bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover"
                       onClick={() => {
                         router.push(`/check-in-out?reservationId=${res.id}`);
                         actions.setSelectedReservationId(null);
@@ -964,7 +978,7 @@ function StatusFilterChips({ activeFilter, onFilterChange, reservationCounts = {
             onClick={() => onFilterChange(status)}
             className={cn(
               "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200",
-              "border shadow-sm hover:shadow focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-blue-500/50",
+              "border shadow-sm hover:shadow focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-ring",
               isActive
                 ? config
                   ? cn("text-white border-transparent", config.bgColor)
@@ -1166,7 +1180,7 @@ function CalendarGrid({
               key={idx}
               className={cn(
                 "px-2 py-3 text-center border-r border-border/60 last:border-r-0",
-                d.isToday && "bg-emerald-50 text-emerald-700"
+                d.isToday && "bg-primary/10 text-primary"
               )}
             >
               <div>{d.label}</div>
@@ -1269,8 +1283,8 @@ function CalendarRow({
                 "border-r border-border/60 cursor-crosshair transition-colors select-none touch-none",
                 zebra,
                 d.weekend && "bg-muted/50",
-                d.isToday && "bg-emerald-50/50",
-                "hover:bg-emerald-50/40"
+                d.isToday && "bg-primary/10",
+                "hover:bg-primary/10"
               )}
               style={{ height: `${densityConfig.rowHeight}px` }}
               onPointerDown={(e) => onCellPointerDown(site.id, i, e)}
@@ -1284,10 +1298,10 @@ function CalendarRow({
         >
           {active && activeStart !== null && activeEnd !== null && (
             <div
-              className={cn("my-1 mx-1 rounded-xl bg-emerald-500/25 border border-emerald-500/70 shadow-[0_0_20px_rgba(16,185,129,0.25)] flex items-center justify-center z-20", selectionHeightClass)}
+              className={cn("my-1 mx-1 rounded-xl bg-primary/20 border border-primary/60 shadow-lg flex items-center justify-center z-20", selectionHeightClass)}
               style={{ gridColumn: `${activeStart + 1} / span ${activeSpan}` }}
             >
-              <div className={cn("px-3 py-1 rounded-full bg-emerald-600 text-white font-black uppercase tracking-widest flex items-center gap-2", densityConfig.fontSize)}>
+              <div className={cn("px-3 py-1 rounded-full bg-action-primary text-action-primary-foreground font-black uppercase tracking-widest flex items-center gap-2", densityConfig.fontSize)}>
                 {densityConfig.showDetails && <span className="opacity-80">{site.name}</span>}
                 <span>{activeSpan} {activeLabel}</span>
               </div>
@@ -1305,10 +1319,10 @@ function CalendarRow({
             return (
               <div
                 key="draft-selection"
-                className={cn("mx-1 rounded-lg bg-purple-500/10 border-2 border-purple-500 border-dashed flex items-center justify-center z-10", selectionHeightClass)}
+                className={cn("mx-1 rounded-lg bg-status-info/10 border-2 border-status-info/40 border-dashed flex items-center justify-center z-10", selectionHeightClass)}
                 style={{ gridColumn: `${startIdx + 1} / span ${span}` }}
               >
-                <span className={cn("font-bold text-purple-700 bg-card/90 px-2 py-0.5 rounded", densityConfig.fontSize)}>
+                <span className={cn("font-bold text-status-info bg-card/90 px-2 py-0.5 rounded", densityConfig.fontSize)}>
                   Draft
                 </span>
               </div>

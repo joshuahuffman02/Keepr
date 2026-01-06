@@ -9,6 +9,16 @@ import { apiClient } from "../../../../lib/api-client";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/ui/card";
 import { Badge } from "../../../../components/ui/badge";
 import { Button } from "../../../../components/ui/button";
+import { Input } from "../../../../components/ui/input";
+import { Label } from "../../../../components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../../components/ui/select";
+import { Textarea } from "../../../../components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../components/ui/tabs";
 import { format } from "date-fns";
 import {
@@ -33,6 +43,7 @@ import {
 type TaskState = "pending" | "in_progress" | "blocked" | "done" | "failed" | "expired";
 type SlaStatus = "on_track" | "at_risk" | "breached";
 type TaskType = "turnover" | "inspection" | "deep_clean" | "touch_up" | "vip_prep" | "linen_change" | "other";
+const EMPTY_SELECT_VALUE = "__empty";
 
 type ListTasksParams = {
   state?: TaskState;
@@ -108,9 +119,9 @@ function HousekeepingStatusBadge({ status }: { status: string }) {
     vacant_clean: "bg-status-success/15 text-status-success",
     vacant_inspected: "bg-status-success/15 text-status-success",
     occupied: "bg-muted text-foreground border-border",
-    occupied_service: "bg-purple-100 text-purple-700 border-purple-200",
+    occupied_service: "bg-status-info/15 text-status-info border-status-info/30",
     occupied_dnd: "bg-status-warning/15 text-status-warning",
-    out_of_order: "bg-gray-100 text-gray-700 border-gray-200",
+    out_of_order: "bg-muted text-muted-foreground border-border",
   };
   const labels: Record<string, string> = {
     vacant_dirty: "Dirty",
@@ -142,30 +153,34 @@ function TaskStateDropdown({
 }) {
   const states: TaskState[] = ["pending", "in_progress", "blocked", "done", "failed"];
   return (
-    <select
+    <Select
       value={current}
-      onChange={(e) => onChange(e.target.value as TaskState)}
+      onValueChange={(value) => onChange(value as TaskState)}
       disabled={disabled}
-      className="text-xs border border-border rounded px-2 py-1 bg-card"
     >
-      {states.map((s) => (
-        <option key={s} value={s}>
-          {s.replace("_", " ")}
-        </option>
-      ))}
-    </select>
+      <SelectTrigger className="h-7 w-[140px] text-xs" aria-label="Task state">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {states.map((s) => (
+          <SelectItem key={s} value={s}>
+            {s.replace("_", " ")}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }
 
 function TaskTypeBadge({ type }: { type: string }) {
   const styles: Record<string, string> = {
-    turnover: "bg-blue-500",
-    deep_clean: "bg-purple-500",
-    touch_up: "bg-green-500",
-    inspection: "bg-yellow-500",
-    vip_prep: "bg-red-500",
-    linen_change: "bg-cyan-500",
-    pet_treatment: "bg-orange-500",
+    turnover: "bg-status-info",
+    deep_clean: "bg-status-warning",
+    touch_up: "bg-status-success",
+    inspection: "bg-status-warning",
+    vip_prep: "bg-status-error",
+    linen_change: "bg-status-info",
+    pet_treatment: "bg-status-warning",
     other: "bg-muted0",
   };
   const labels: Record<string, string> = {
@@ -341,23 +356,23 @@ export default function HousekeepingPage() {
                 <div className="text-xs text-muted-foreground">Total Tasks</div>
               </Card>
               <Card className="p-4">
-                <div className="text-2xl font-bold text-emerald-600">{slaStats.onTrack}</div>
+                <div className="text-2xl font-bold text-status-success">{slaStats.onTrack}</div>
                 <div className="text-xs text-muted-foreground">On Track</div>
               </Card>
               <Card className="p-4">
-                <div className="text-2xl font-bold text-amber-600">{slaStats.atRisk}</div>
+                <div className="text-2xl font-bold text-status-warning">{slaStats.atRisk}</div>
                 <div className="text-xs text-muted-foreground">At Risk</div>
               </Card>
               <Card className="p-4">
-                <div className="text-2xl font-bold text-rose-600">{slaStats.breached}</div>
+                <div className="text-2xl font-bold text-status-error">{slaStats.breached}</div>
                 <div className="text-xs text-muted-foreground">Breached</div>
               </Card>
               <Card className="p-4">
-                <div className="text-2xl font-bold text-blue-600">{inspectionStats?.passRate ?? 0}%</div>
+                <div className="text-2xl font-bold text-status-info">{inspectionStats?.passRate ?? 0}%</div>
                 <div className="text-xs text-muted-foreground">Inspection Pass Rate</div>
               </Card>
               <Card className="p-4">
-                <div className="text-2xl font-bold text-purple-600">{inspectionStats?.averageScore ?? 0}</div>
+                <div className="text-2xl font-bold text-primary">{inspectionStats?.averageScore ?? 0}</div>
                 <div className="text-xs text-muted-foreground">Avg Inspection Score</div>
               </Card>
             </div>
@@ -365,43 +380,46 @@ export default function HousekeepingPage() {
             {/* Filters */}
             <div className="flex flex-wrap gap-2 items-center">
               <Filter className="h-4 w-4 text-muted-foreground" />
-              <select
-                value={stateFilter}
-                onChange={(e) => setStateFilter(e.target.value as TaskState | "all")}
-                className="text-sm border border-border rounded px-2 py-1"
-              >
-                <option value="all">All States</option>
-                <option value="pending">Pending</option>
-                <option value="in_progress">In Progress</option>
-                <option value="blocked">Blocked</option>
-                <option value="done">Done</option>
-                <option value="failed">Failed</option>
-                <option value="expired">Expired</option>
-              </select>
-              <select
-                value={slaFilter}
-                onChange={(e) => setSlaFilter(e.target.value as SlaStatus | "all")}
-                className="text-sm border border-border rounded px-2 py-1"
-              >
-                <option value="all">All SLA</option>
-                <option value="on_track">On Track</option>
-                <option value="at_risk">At Risk</option>
-                <option value="breached">Breached</option>
-              </select>
-              <select
-                value={typeFilter}
-                onChange={(e) => setTypeFilter(e.target.value)}
-                className="text-sm border border-border rounded px-2 py-1"
-              >
-                <option value="all">All Types</option>
-                <option value="turnover">Turnover</option>
-                <option value="deep_clean">Deep Clean</option>
-                <option value="touch_up">Touch Up</option>
-                <option value="inspection">Inspection</option>
-                <option value="vip_prep">VIP Prep</option>
-                <option value="linen_change">Linen Change</option>
-                <option value="other">Other</option>
-              </select>
+              <Select value={stateFilter} onValueChange={(value) => setStateFilter(value as TaskState | "all")}>
+                <SelectTrigger className="h-8 w-[150px] text-sm" aria-label="State filter">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All States</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="in_progress">In Progress</SelectItem>
+                  <SelectItem value="blocked">Blocked</SelectItem>
+                  <SelectItem value="done">Done</SelectItem>
+                  <SelectItem value="failed">Failed</SelectItem>
+                  <SelectItem value="expired">Expired</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={slaFilter} onValueChange={(value) => setSlaFilter(value as SlaStatus | "all")}>
+                <SelectTrigger className="h-8 w-[140px] text-sm" aria-label="SLA filter">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All SLA</SelectItem>
+                  <SelectItem value="on_track">On Track</SelectItem>
+                  <SelectItem value="at_risk">At Risk</SelectItem>
+                  <SelectItem value="breached">Breached</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={typeFilter} onValueChange={setTypeFilter}>
+                <SelectTrigger className="h-8 w-[150px] text-sm" aria-label="Task type filter">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="turnover">Turnover</SelectItem>
+                  <SelectItem value="deep_clean">Deep Clean</SelectItem>
+                  <SelectItem value="touch_up">Touch Up</SelectItem>
+                  <SelectItem value="inspection">Inspection</SelectItem>
+                  <SelectItem value="vip_prep">VIP Prep</SelectItem>
+                  <SelectItem value="linen_change">Linen Change</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Task Board */}
@@ -477,11 +495,12 @@ export default function HousekeepingPage() {
 
           <TabsContent value="schedule" className="space-y-4">
             <div className="flex items-center gap-4">
-              <input
+              <Input
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="border border-border rounded px-3 py-2"
+                className="w-[160px]"
+                aria-label="Schedule date"
               />
               {dailySchedule && (
                 <div className="text-sm text-muted-foreground">
@@ -500,7 +519,7 @@ export default function HousekeepingPage() {
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
-                      <ArrowRightLeft className="h-4 w-4 text-rose-500" />
+                      <ArrowRightLeft className="h-4 w-4 text-status-error" />
                       Checkouts ({dailySchedule.expectedCheckouts?.length ?? 0})
                     </CardTitle>
                   </CardHeader>
@@ -521,7 +540,7 @@ export default function HousekeepingPage() {
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
-                      <ArrowRightLeft className="h-4 w-4 text-emerald-500" />
+                      <ArrowRightLeft className="h-4 w-4 text-status-success" />
                       Check-ins ({dailySchedule.expectedCheckins?.length ?? 0})
                     </CardTitle>
                   </CardHeader>
@@ -546,15 +565,15 @@ export default function HousekeepingPage() {
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm flex items-center gap-2">
-                      <Sparkles className="h-4 w-4 text-amber-500" />
+                      <Sparkles className="h-4 w-4 text-status-warning" />
                       Priority ({dailySchedule.summary?.priorityCount ?? 0})
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2">
                     {dailySchedule.priorityUnits?.slice(0, 10).map((siteId: string) => (
-                      <div key={siteId} className="p-2 border border-amber-200 bg-amber-50 rounded text-sm">
+                      <div key={siteId} className="p-2 border border-status-warning/20 bg-status-warning/10 rounded text-sm">
                         <div className="font-medium">{siteId.slice(-8)}</div>
-                        <div className="text-xs text-amber-600">VIP / Early Arrival</div>
+                        <div className="text-xs text-status-warning">VIP / Early Arrival</div>
                       </div>
                     ))}
                     {(dailySchedule.priorityUnits?.length ?? 0) === 0 && (
@@ -620,11 +639,12 @@ export default function HousekeepingPage() {
 
           <TabsContent value="workload" className="space-y-4">
             <div className="flex items-center gap-4">
-              <input
+              <Input
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="border border-border rounded px-3 py-2"
+                className="w-[160px]"
+                aria-label="Workload date"
               />
             </div>
 
@@ -649,11 +669,11 @@ export default function HousekeepingPage() {
                           <div className="text-xs text-muted-foreground">Total</div>
                         </div>
                         <div>
-                          <div className="text-xl font-bold text-emerald-600">{data.completed}</div>
+                          <div className="text-xl font-bold text-status-success">{data.completed}</div>
                           <div className="text-xs text-muted-foreground">Done</div>
                         </div>
                         <div>
-                          <div className="text-xl font-bold text-blue-600">{data.inProgress}</div>
+                          <div className="text-xl font-bold text-status-info">{data.inProgress}</div>
                           <div className="text-xs text-muted-foreground">Active</div>
                         </div>
                         <div>
@@ -665,7 +685,7 @@ export default function HousekeepingPage() {
                         <div className="mt-3">
                           <div className="h-2 bg-muted rounded-full overflow-hidden">
                             <div
-                              className="h-full bg-emerald-500"
+                              className="h-full bg-status-success"
                               style={{ width: `${(data.completed / data.total) * 100}%` }}
                             />
                           </div>
@@ -692,71 +712,85 @@ export default function HousekeepingPage() {
                   variant="ghost"
                   size="icon"
                   onClick={() => setShowCreateModal(false)}
+                  aria-label="Close create task dialog"
                 >
                   <X className="h-4 w-4" />
                 </Button>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-foreground">Type</label>
-                  <select
+                  <Label htmlFor="task-type" className="text-sm font-medium text-foreground">Type</Label>
+                  <Select
                     value={newTask.type}
-                    onChange={(e) =>
-                      setNewTask({ ...newTask, type: e.target.value as TaskType })
+                    onValueChange={(value) =>
+                      setNewTask({ ...newTask, type: value as TaskType })
                     }
-                    className="w-full mt-1 border border-border rounded px-3 py-2"
                   >
-                    <option value="turnover">Turnover</option>
-                    <option value="deep_clean">Deep Clean</option>
-                    <option value="touch_up">Touch Up</option>
-                    <option value="inspection">Inspection</option>
-                    <option value="vip_prep">VIP Prep</option>
-                    <option value="linen_change">Linen Change</option>
-                    <option value="other">Other</option>
-                  </select>
+                    <SelectTrigger id="task-type" className="w-full mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="turnover">Turnover</SelectItem>
+                      <SelectItem value="deep_clean">Deep Clean</SelectItem>
+                      <SelectItem value="touch_up">Touch Up</SelectItem>
+                      <SelectItem value="inspection">Inspection</SelectItem>
+                      <SelectItem value="vip_prep">VIP Prep</SelectItem>
+                      <SelectItem value="linen_change">Linen Change</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-foreground">Site</label>
-                  <select
-                    value={newTask.siteId}
-                    onChange={(e) =>
-                      setNewTask({ ...newTask, siteId: e.target.value })
+                  <Label htmlFor="task-site" className="text-sm font-medium text-foreground">Site</Label>
+                  <Select
+                    value={newTask.siteId || EMPTY_SELECT_VALUE}
+                    onValueChange={(value) =>
+                      setNewTask({ ...newTask, siteId: value === EMPTY_SELECT_VALUE ? "" : value })
                     }
-                    className="w-full mt-1 border border-border rounded px-3 py-2"
                   >
-                    <option value="">Select a site...</option>
-                    {sites.map((site: any) => (
-                      <option key={site.id} value={site.id}>
-                        {site.name} {site.zone ? `(${site.zone})` : ""}
-                      </option>
-                    ))}
-                  </select>
+                    <SelectTrigger id="task-site" className="w-full mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={EMPTY_SELECT_VALUE}>Select a site...</SelectItem>
+                      {sites.map((site: any) => (
+                        <SelectItem key={site.id} value={site.id}>
+                          {site.name} {site.zone ? `(${site.zone})` : ""}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-foreground">Priority</label>
-                  <select
+                  <Label htmlFor="task-priority" className="text-sm font-medium text-foreground">Priority</Label>
+                  <Select
                     value={newTask.priority}
-                    onChange={(e) =>
-                      setNewTask({ ...newTask, priority: e.target.value })
+                    onValueChange={(value) =>
+                      setNewTask({ ...newTask, priority: value })
                     }
-                    className="w-full mt-1 border border-border rounded px-3 py-2"
                   >
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High (VIP/Rush)</option>
-                  </select>
+                    <SelectTrigger id="task-priority" className="w-full mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="low">Low</SelectItem>
+                      <SelectItem value="medium">Medium</SelectItem>
+                      <SelectItem value="high">High (VIP/Rush)</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-foreground">Notes</label>
-                  <textarea
+                  <Label htmlFor="task-notes" className="text-sm font-medium text-foreground">Notes</Label>
+                  <Textarea
+                    id="task-notes"
                     value={newTask.notes}
                     onChange={(e) =>
                       setNewTask({ ...newTask, notes: e.target.value })
                     }
-                    className="w-full mt-1 border border-border rounded px-3 py-2"
+                    className="mt-1"
                     rows={3}
                     placeholder="Optional notes..."
                   />

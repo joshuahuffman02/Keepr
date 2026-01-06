@@ -3,6 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { apiClient } from "@/lib/api-client";
 import { ReportChart } from "@/components/reports/ReportChart";
+import { Input } from "@/components/ui/input";
+import { DashboardShell } from "@/components/ui/layout/DashboardShell";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 
 type CatalogEntry = {
   id: string;
@@ -92,7 +95,14 @@ export default function ReportsPage({ params }: { params: { campgroundId: string
   }, [catalog, search]);
 
   return (
-    <div className="p-6 space-y-4">
+    <DashboardShell>
+      <div className="p-6 space-y-4">
+        <Breadcrumbs
+          items={[
+            { label: "Campgrounds", href: "/campgrounds?all=true" },
+            { label: "Reports" }
+          ]}
+        />
       <div>
         <h1 className="text-2xl font-semibold">Reports</h1>
         <p className="text-muted-foreground text-sm">Browse the metadata catalog and run chart-ready reports.</p>
@@ -102,21 +112,23 @@ export default function ReportsPage({ params }: { params: { campgroundId: string
         {categories.map((cat) => (
           <button
             key={cat}
-            className={`rounded border px-3 py-1 text-sm ${category === cat ? "border-indigo-600 text-indigo-700 bg-indigo-50" : "border-border text-foreground"}`}
+            className={`rounded border px-3 py-1 text-sm ${category === cat ? "border-primary/30 text-primary bg-primary/10" : "border-border text-foreground"}`}
             onClick={() => setCategory(cat)}
+            aria-pressed={category === cat}
           >
             {cat}
           </button>
         ))}
-        <input
-          className="ml-auto rounded border px-3 py-2 text-sm w-64"
+        <Input
+          className="ml-auto w-64"
           placeholder="Search reports"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          aria-label="Search reports"
         />
       </div>
 
-      {error && <div className="rounded border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800">{error}</div>}
+      {error && <div className="rounded border border-status-warning/30 bg-status-warning/10 px-3 py-2 text-sm text-status-warning">{error}</div>}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {loadingCatalog
@@ -126,7 +138,7 @@ export default function ReportsPage({ params }: { params: { campgroundId: string
           : filtered.map((entry) => (
               <button
                 key={entry.id}
-                className={`rounded border p-3 text-left hover:border-indigo-400 ${selected?.id === entry.id ? "border-indigo-600 bg-indigo-50" : "border-border"}`}
+                className={`rounded border p-3 text-left hover:border-primary/30 ${selected?.id === entry.id ? "border-primary/30 bg-primary/10" : "border-border"}`}
                 onClick={() => setSelected(entry)}
               >
                 <div className="text-sm font-semibold">{entry.name}</div>
@@ -147,7 +159,7 @@ export default function ReportsPage({ params }: { params: { campgroundId: string
               <div className="text-sm text-muted-foreground">{selected.id}</div>
             </div>
             <button
-              className="ml-auto rounded bg-indigo-600 px-3 py-2 text-white text-sm disabled:opacity-50"
+              className="ml-auto rounded bg-primary px-3 py-2 text-white text-sm disabled:opacity-50"
               onClick={() => runSelected(selected)}
               disabled={running}
             >
@@ -204,6 +216,7 @@ export default function ReportsPage({ params }: { params: { campgroundId: string
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </DashboardShell>
   );
 }

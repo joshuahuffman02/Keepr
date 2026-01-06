@@ -67,8 +67,8 @@ const siteTypeConfig: Record<string, { icon: React.ReactNode; label: string; col
   rv: { icon: <Truck className="h-4 w-4" />, label: "RV", color: "bg-status-info/15 text-status-info" },
   tent: { icon: <Tent className="h-4 w-4" />, label: "Tent", color: "bg-status-success/15 text-status-success" },
   cabin: { icon: <Home className="h-4 w-4" />, label: "Cabin", color: "bg-status-warning/15 text-status-warning" },
-  group: { icon: <Users className="h-4 w-4" />, label: "Group", color: "bg-purple-100 text-purple-700" },
-  glamping: { icon: <Sparkles className="h-4 w-4" />, label: "Glamping", color: "bg-pink-100 text-pink-700" },
+  group: { icon: <Users className="h-4 w-4" />, label: "Group", color: "bg-status-info/15 text-status-info" },
+  glamping: { icon: <Sparkles className="h-4 w-4" />, label: "Glamping", color: "bg-status-warning/15 text-status-warning" },
 };
 
 // Rental type options
@@ -391,7 +391,7 @@ export default function SiteClassDetailPage() {
             animate={{ opacity: 1, scale: 1 }}
             className="text-center"
           >
-            <Loader2 className="h-12 w-12 animate-spin text-emerald-500 mx-auto mb-4" />
+            <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
             <p className="text-muted-foreground">Loading class...</p>
           </motion.div>
         </div>
@@ -458,7 +458,12 @@ export default function SiteClassDetailPage() {
           className="flex items-center justify-between"
         >
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={() => router.back()}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => router.back()}
+              aria-label="Back to site classes"
+            >
               <ArrowLeft className="h-4 w-4" />
             </Button>
             <div className="flex items-center gap-3">
@@ -519,30 +524,31 @@ export default function SiteClassDetailPage() {
               className="space-y-4"
             >
               {/* Basic Info */}
-              <Card className="border-emerald-200 bg-emerald-50/50">
+              <Card className="border-primary/20 bg-primary/5">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Pencil className="h-5 w-5 text-emerald-600" />
+                    <Pencil className="h-5 w-5 text-primary" />
                     Basic Information
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="space-y-2">
-                      <Label>Name</Label>
+                      <Label htmlFor="class-name">Name</Label>
                       <Input
+                        id="class-name"
                         value={editForm.name}
                         onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
                         className="bg-background"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Site Type</Label>
+                      <Label htmlFor="class-site-type">Site Type</Label>
                       <Select
                         value={editForm.siteType}
                         onValueChange={(value) => setEditForm({ ...editForm, siteType: value })}
                       >
-                        <SelectTrigger className="bg-background">
+                        <SelectTrigger id="class-site-type" className="bg-background">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -558,12 +564,12 @@ export default function SiteClassDetailPage() {
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label>Rental Type</Label>
+                      <Label htmlFor="class-rental-type">Rental Type</Label>
                       <Select
                         value={editForm.rentalType}
                         onValueChange={(value) => setEditForm({ ...editForm, rentalType: value })}
                       >
-                        <SelectTrigger className="bg-background">
+                        <SelectTrigger id="class-rental-type" className="bg-background">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -574,8 +580,9 @@ export default function SiteClassDetailPage() {
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label>Default Rate ($)</Label>
+                      <Label htmlFor="class-default-rate">Default Rate ($)</Label>
                       <Input
+                        id="class-default-rate"
                         type="number"
                         step="0.01"
                         value={editForm.defaultRate}
@@ -587,8 +594,9 @@ export default function SiteClassDetailPage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div className="space-y-2">
-                      <Label>Max Occupancy</Label>
+                      <Label htmlFor="class-max-occupancy">Max Occupancy</Label>
                       <Input
+                        id="class-max-occupancy"
                         type="number"
                         value={editForm.maxOccupancy}
                         onChange={(e) => setEditForm({ ...editForm, maxOccupancy: parseInt(e.target.value) || 1 })}
@@ -596,8 +604,9 @@ export default function SiteClassDetailPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Rig Max Length (ft)</Label>
+                      <Label htmlFor="class-rig-length">Rig Max Length (ft)</Label>
                       <Input
+                        id="class-rig-length"
                         type="number"
                         value={editForm.rigMaxLength}
                         onChange={(e) => setEditForm({ ...editForm, rigMaxLength: e.target.value === "" ? "" : parseInt(e.target.value) })}
@@ -606,8 +615,9 @@ export default function SiteClassDetailPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Min Nights</Label>
+                      <Label htmlFor="class-min-nights">Min Nights</Label>
                       <Input
+                        id="class-min-nights"
                         type="number"
                         value={editForm.minNights}
                         onChange={(e) => setEditForm({ ...editForm, minNights: e.target.value === "" ? "" : parseInt(e.target.value) })}
@@ -616,8 +626,9 @@ export default function SiteClassDetailPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Max Nights</Label>
+                      <Label htmlFor="class-max-nights">Max Nights</Label>
                       <Input
+                        id="class-max-nights"
                         type="number"
                         value={editForm.maxNights}
                         onChange={(e) => setEditForm({ ...editForm, maxNights: e.target.value === "" ? "" : parseInt(e.target.value) })}
@@ -629,9 +640,10 @@ export default function SiteClassDetailPage() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label>Same-Day Booking Cutoff</Label>
+                      <Label htmlFor="class-same-day-cutoff">Same-Day Booking Cutoff</Label>
                       <div className="flex items-center gap-2">
                         <Input
+                          id="class-same-day-cutoff"
                           type="number"
                           min="0"
                           value={editForm.sameDayBookingCutoffMinutes ?? ""}
@@ -653,22 +665,22 @@ export default function SiteClassDetailPage() {
 
               {/* RV Configuration - Only show for RV sites */}
               {editForm.siteType === "rv" && (
-                <Card className="border-blue-200 bg-blue-50/50">
+                <Card className="border-status-info/20 bg-status-info/10">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <Truck className="h-5 w-5 text-blue-600" />
+                      <Truck className="h-5 w-5 text-status-info" />
                       RV Configuration
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label>Orientation</Label>
+                        <Label htmlFor="class-rv-orientation">Orientation</Label>
                         <Select
                           value={editForm.rvOrientation}
                           onValueChange={(value) => setEditForm({ ...editForm, rvOrientation: value })}
                         >
-                          <SelectTrigger className="bg-background">
+                          <SelectTrigger id="class-rv-orientation" className="bg-background">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -679,12 +691,12 @@ export default function SiteClassDetailPage() {
                         </Select>
                       </div>
                       <div className="space-y-2">
-                        <Label>Slide-outs</Label>
+                        <Label htmlFor="class-slide-outs">Slide-outs</Label>
                         <Select
                           value={editForm.slideOutsAccepted}
                           onValueChange={(value) => setEditForm({ ...editForm, slideOutsAccepted: value })}
                         >
-                          <SelectTrigger className="bg-background">
+                          <SelectTrigger id="class-slide-outs" className="bg-background">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
@@ -707,9 +719,10 @@ export default function SiteClassDetailPage() {
                             className={cn(
                               "px-4 py-2 rounded-lg border transition-all flex items-center gap-2",
                               editForm.electricAmps?.includes(amp)
-                                ? "border-amber-500 bg-status-warning/15 text-status-warning"
-                                : "border-border bg-background hover:border-amber-300"
+                                ? "border-status-warning/40 bg-status-warning/15 text-status-warning"
+                                : "border-border bg-background hover:border-status-warning/50"
                             )}
+                            aria-pressed={editForm.electricAmps?.includes(amp)}
                           >
                             <Zap className="h-4 w-4" />
                             {amp}A
@@ -729,9 +742,10 @@ export default function SiteClassDetailPage() {
                             className={cn(
                               "px-3 py-2 rounded-lg border text-sm transition-all text-left",
                               editForm.equipmentTypes?.includes(opt.value)
-                                ? "border-blue-500 bg-status-info/15 text-status-info"
-                                : "border-border bg-background hover:border-blue-300"
+                                ? "border-status-info/40 bg-status-info/15 text-status-info"
+                                : "border-border bg-background hover:border-status-info/50"
                             )}
+                            aria-pressed={editForm.equipmentTypes?.includes(opt.value)}
                           >
                             {opt.label}
                           </button>
@@ -747,7 +761,7 @@ export default function SiteClassDetailPage() {
               <Card className="border-border bg-card/80">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Zap className="h-5 w-5 text-amber-500" />
+                    <Zap className="h-5 w-5 text-status-warning" />
                     Hookups & Features
                   </CardTitle>
                 </CardHeader>
@@ -755,22 +769,24 @@ export default function SiteClassDetailPage() {
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                     <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-background">
                       <div className="flex items-center gap-2">
-                        <Zap className="h-4 w-4 text-amber-500" />
+                        <Zap className="h-4 w-4 text-status-warning" />
                         <span className="text-sm">Power</span>
                       </div>
                       <Switch
                         checked={editForm.hookupsPower}
                         onCheckedChange={(checked) => setEditForm({ ...editForm, hookupsPower: checked })}
+                        aria-label="Power hookups"
                       />
                     </div>
                     <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-background">
                       <div className="flex items-center gap-2">
-                        <Droplet className="h-4 w-4 text-blue-500" />
+                        <Droplet className="h-4 w-4 text-status-info" />
                         <span className="text-sm">Water</span>
                       </div>
                       <Switch
                         checked={editForm.hookupsWater}
                         onCheckedChange={(checked) => setEditForm({ ...editForm, hookupsWater: checked })}
+                        aria-label="Water hookups"
                       />
                     </div>
                     <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-background">
@@ -781,26 +797,29 @@ export default function SiteClassDetailPage() {
                       <Switch
                         checked={editForm.hookupsSewer}
                         onCheckedChange={(checked) => setEditForm({ ...editForm, hookupsSewer: checked })}
+                        aria-label="Sewer hookups"
                       />
                     </div>
                     <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-background">
                       <div className="flex items-center gap-2">
-                        <PawPrint className="h-4 w-4 text-amber-600" />
+                        <PawPrint className="h-4 w-4 text-status-warning" />
                         <span className="text-sm">Pets</span>
                       </div>
                       <Switch
                         checked={editForm.petFriendly}
                         onCheckedChange={(checked) => setEditForm({ ...editForm, petFriendly: checked })}
+                        aria-label="Pet friendly"
                       />
                     </div>
                     <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-background">
                       <div className="flex items-center gap-2">
-                        <Accessibility className="h-4 w-4 text-blue-600" />
+                        <Accessibility className="h-4 w-4 text-status-info" />
                         <span className="text-sm">ADA</span>
                       </div>
                       <Switch
                         checked={editForm.accessible}
                         onCheckedChange={(checked) => setEditForm({ ...editForm, accessible: checked })}
+                        aria-label="Accessible"
                       />
                     </div>
                     <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-background">
@@ -808,6 +827,7 @@ export default function SiteClassDetailPage() {
                       <Switch
                         checked={editForm.isActive}
                         onCheckedChange={(checked) => setEditForm({ ...editForm, isActive: checked })}
+                        aria-label="Active"
                       />
                     </div>
                   </div>
@@ -819,6 +839,9 @@ export default function SiteClassDetailPage() {
                 type="button"
                 onClick={() => setShowAdvanced(!showAdvanced)}
                 className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                aria-expanded={showAdvanced}
+                aria-controls="class-advanced-panel"
+                id="class-advanced-toggle"
               >
                 {showAdvanced ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
                 {showAdvanced ? "Hide" : "Show"} advanced options (Guest Pricing, Metered Utilities, Amenities)
@@ -832,20 +855,24 @@ export default function SiteClassDetailPage() {
                     exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, height: 0 }}
                     transition={SPRING_CONFIG}
                     className="space-y-4"
+                    id="class-advanced-panel"
+                    role="region"
+                    aria-labelledby="class-advanced-toggle"
                   >
                     {/* Guest Pricing */}
                     <Card className="border-border bg-card/80">
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2">
-                          <Users className="h-5 w-5 text-purple-500" />
+                          <Users className="h-5 w-5 text-primary" />
                           Guest Pricing
                         </CardTitle>
                       </CardHeader>
                       <CardContent className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                           <div className="space-y-2">
-                            <Label>Guests Included in Base Rate</Label>
+                            <Label htmlFor="class-occupants-included">Guests Included in Base Rate</Label>
                             <Input
+                              id="class-occupants-included"
                               type="number"
                               min="1"
                               value={editForm.occupantsIncluded}
@@ -854,8 +881,9 @@ export default function SiteClassDetailPage() {
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label>Extra Adult Fee ($)</Label>
+                            <Label htmlFor="class-extra-adult-fee">Extra Adult Fee ($)</Label>
                             <Input
+                              id="class-extra-adult-fee"
                               type="number"
                               step="0.01"
                               value={editForm.extraAdultFee}
@@ -865,8 +893,9 @@ export default function SiteClassDetailPage() {
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label>Extra Child Fee ($)</Label>
+                            <Label htmlFor="class-extra-child-fee">Extra Child Fee ($)</Label>
                             <Input
+                              id="class-extra-child-fee"
                               type="number"
                               step="0.01"
                               value={editForm.extraChildFee}
@@ -883,7 +912,7 @@ export default function SiteClassDetailPage() {
                     <Card className="border-border bg-card/80">
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2">
-                          <Gauge className="h-5 w-5 text-orange-500" />
+                          <Gauge className="h-5 w-5 text-status-warning" />
                           Metered Utilities
                         </CardTitle>
                       </CardHeader>
@@ -896,18 +925,19 @@ export default function SiteClassDetailPage() {
                           <Switch
                             checked={editForm.meteredEnabled}
                             onCheckedChange={(checked) => setEditForm({ ...editForm, meteredEnabled: checked })}
+                            aria-label="Enable metered billing"
                           />
                         </div>
 
                         {editForm.meteredEnabled && (
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                              <Label>Utility Type</Label>
+                              <Label htmlFor="class-metered-type">Utility Type</Label>
                               <Select
                                 value={editForm.meteredType}
                                 onValueChange={(value) => setEditForm({ ...editForm, meteredType: value })}
                               >
-                                <SelectTrigger className="bg-background">
+                                <SelectTrigger id="class-metered-type" className="bg-background">
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -918,12 +948,12 @@ export default function SiteClassDetailPage() {
                               </Select>
                             </div>
                             <div className="space-y-2">
-                              <Label>Billing Mode</Label>
+                              <Label htmlFor="class-metered-billing">Billing Mode</Label>
                               <Select
                                 value={editForm.meteredBillingMode}
                                 onValueChange={(value) => setEditForm({ ...editForm, meteredBillingMode: value })}
                               >
-                                <SelectTrigger className="bg-background">
+                                <SelectTrigger id="class-metered-billing" className="bg-background">
                                   <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -942,7 +972,7 @@ export default function SiteClassDetailPage() {
                     <Card className="border-border bg-card/80">
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2">
-                          <Flame className="h-5 w-5 text-orange-500" />
+                          <Flame className="h-5 w-5 text-status-warning" />
                           Site Amenities
                         </CardTitle>
                       </CardHeader>
@@ -956,9 +986,10 @@ export default function SiteClassDetailPage() {
                               className={cn(
                                 "flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-all",
                                 editForm.amenityTags?.includes(amenity.id)
-                                  ? "border-emerald-500 bg-status-success/15 text-status-success"
-                                  : "border-border bg-background hover:border-emerald-300"
+                                  ? "border-status-success/40 bg-status-success/15 text-status-success"
+                                  : "border-border bg-background hover:border-status-success/50"
                               )}
+                              aria-pressed={editForm.amenityTags?.includes(amenity.id)}
                             >
                               {amenityIconMap[amenity.id] || <amenity.icon className="h-4 w-4" />}
                               <span className="truncate">{amenity.label}</span>
@@ -973,7 +1004,7 @@ export default function SiteClassDetailPage() {
                       <Card className="border-border bg-card/80">
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
-                            <Home className="h-5 w-5 text-amber-500" />
+                            <Home className="h-5 w-5 text-status-warning" />
                             {editForm.siteType === "cabin" ? "Cabin" : "Glamping"} Amenities
                           </CardTitle>
                         </CardHeader>
@@ -998,9 +1029,10 @@ export default function SiteClassDetailPage() {
                                     className={cn(
                                       "flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-all",
                                       editForm.amenityTags?.includes(amenity.id)
-                                        ? "border-amber-500 bg-status-warning/15 text-status-warning"
-                                        : "border-border bg-background hover:border-amber-300"
+                                        ? "border-status-warning/40 bg-status-warning/15 text-status-warning"
+                                        : "border-border bg-background hover:border-status-warning/50"
                                     )}
+                                    aria-pressed={editForm.amenityTags?.includes(amenity.id)}
                                   >
                                     <amenity.icon className="h-4 w-4 flex-shrink-0" />
                                     <span className="truncate">{amenity.label}</span>
@@ -1024,6 +1056,7 @@ export default function SiteClassDetailPage() {
                           onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
                           placeholder="Optional description for this site class..."
                           className="bg-background min-h-[100px]"
+                          aria-label="Site class description"
                         />
                       </CardContent>
                     </Card>
@@ -1042,14 +1075,14 @@ export default function SiteClassDetailPage() {
                 <Card className="border-border bg-card/80 backdrop-blur-sm">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <DollarSign className="h-5 w-5 text-emerald-500" />
+                      <DollarSign className="h-5 w-5 text-primary" />
                       Pricing & Capacity
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <div className="text-xs text-muted-foreground">Default rate</div>
-                      <div className="font-medium text-lg text-emerald-600">${((siteClass.defaultRate ?? 0) / 100).toFixed(2)}</div>
+                      <div className="font-medium text-lg text-primary">${((siteClass.defaultRate ?? 0) / 100).toFixed(2)}</div>
                     </div>
                     <div>
                       <div className="text-xs text-muted-foreground">Rental type</div>
@@ -1103,7 +1136,7 @@ export default function SiteClassDetailPage() {
                   <Card className="border-border bg-card/80 backdrop-blur-sm">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
-                        <Truck className="h-5 w-5 text-blue-500" />
+                        <Truck className="h-5 w-5 text-status-info" />
                         RV Configuration
                       </CardTitle>
                     </CardHeader>
@@ -1120,7 +1153,7 @@ export default function SiteClassDetailPage() {
                             return amps.length > 0 ? (
                               amps.map((amp: number) => (
                                 <Badge key={amp} variant="secondary" className="gap-1">
-                                  <Zap className="h-3 w-3 text-amber-500" />
+                                  <Zap className="h-3 w-3 text-status-warning" />
                                   {amp}A
                                 </Badge>
                               ))
@@ -1167,12 +1200,12 @@ export default function SiteClassDetailPage() {
                     <div className="flex flex-wrap gap-2">
                       {siteClass.hookupsPower && (
                         <Badge variant="secondary" className="gap-1">
-                          <Zap className="h-3 w-3 text-amber-500" /> Power
+                          <Zap className="h-3 w-3 text-status-warning" /> Power
                         </Badge>
                       )}
                       {siteClass.hookupsWater && (
                         <Badge variant="secondary" className="gap-1">
-                          <Droplet className="h-3 w-3 text-blue-500" /> Water
+                          <Droplet className="h-3 w-3 text-status-info" /> Water
                         </Badge>
                       )}
                       {siteClass.hookupsSewer && (
@@ -1182,17 +1215,17 @@ export default function SiteClassDetailPage() {
                       )}
                       {siteClass.petFriendly && (
                         <Badge variant="secondary" className="gap-1">
-                          <PawPrint className="h-3 w-3 text-amber-600" /> Pet Friendly
+                          <PawPrint className="h-3 w-3 text-status-warning" /> Pet Friendly
                         </Badge>
                       )}
                       {siteClass.accessible && (
                         <Badge variant="secondary" className="gap-1">
-                          <Accessibility className="h-3 w-3 text-blue-600" /> Accessible
+                          <Accessibility className="h-3 w-3 text-status-info" /> Accessible
                         </Badge>
                       )}
                       {siteClass.meteredEnabled && (
                         <Badge variant="secondary" className="gap-1">
-                          <Gauge className="h-3 w-3 text-orange-500" /> Metered {siteClass.meteredType}
+                          <Gauge className="h-3 w-3 text-status-warning" /> Metered {siteClass.meteredType}
                         </Badge>
                       )}
                       {!siteClass.hookupsPower && !siteClass.hookupsWater && !siteClass.hookupsSewer && !siteClass.petFriendly && !siteClass.accessible && !siteClass.meteredEnabled && (
@@ -1216,7 +1249,7 @@ export default function SiteClassDetailPage() {
                                   variant="outline"
                                   className={cn(
                                     "gap-1",
-                                    isCabinAmenity && "border-amber-300 bg-amber-50"
+                                    isCabinAmenity && "border-status-warning/30 bg-status-warning/10"
                                   )}
                                 >
                                   {amenityIconMap[tag]}
@@ -1255,7 +1288,7 @@ export default function SiteClassDetailPage() {
                                 variant={status.status === "available" ? "outline" : "default"}
                                 className={cn(
                                   "capitalize text-xs",
-                                  status.status === "available" && "border-emerald-500 text-emerald-600"
+                                  status.status === "available" && "border-status-success/40 text-status-success"
                                 )}
                               >
                                 {status.status}

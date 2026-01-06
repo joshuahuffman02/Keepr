@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useWhoami } from "@/hooks/use-whoami";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { StaffNavigation } from "@/components/staff/StaffNavigation";
+import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   BarChart3,
@@ -276,6 +277,8 @@ export default function TimesheetReportsPage({ params }: { params: { campgroundI
               <button
                 onClick={() => setShowPresets(!showPresets)}
                 className="px-4 py-2 bg-muted rounded-lg text-sm font-medium text-foreground hover:bg-muted flex items-center gap-2"
+                aria-expanded={showPresets}
+                aria-controls="timesheet-presets"
               >
                 <Calendar className="w-4 h-4" />
                 Quick Select
@@ -289,6 +292,7 @@ export default function TimesheetReportsPage({ params }: { params: { campgroundI
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
                     className="absolute z-10 mt-2 w-48 bg-card rounded-lg shadow-lg border border-border py-1"
+                    id="timesheet-presets"
                   >
                     {DATE_PRESETS.map((preset) => (
                       <button
@@ -305,18 +309,20 @@ export default function TimesheetReportsPage({ params }: { params: { campgroundI
             </div>
 
             <div className="flex items-center gap-2">
-              <input
+              <Input
                 type="date"
                 value={periodStart}
                 onChange={(e) => setPeriodStart(e.target.value)}
-                className="px-3 py-2 border border-border rounded-lg text-sm"
+                className="w-[150px]"
+                aria-label="Start date"
               />
               <span className="text-muted-foreground">to</span>
-              <input
+              <Input
                 type="date"
                 value={periodEnd}
                 onChange={(e) => setPeriodEnd(e.target.value)}
-                className="px-3 py-2 border border-border rounded-lg text-sm"
+                className="w-[150px]"
+                aria-label="End date"
               />
             </div>
 
@@ -329,6 +335,7 @@ export default function TimesheetReportsPage({ params }: { params: { campgroundI
                     ? "bg-card text-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
                 )}
+                aria-pressed={viewMode === "summary"}
               >
                 Summary
               </button>
@@ -340,6 +347,7 @@ export default function TimesheetReportsPage({ params }: { params: { campgroundI
                     ? "bg-card text-foreground shadow-sm"
                     : "text-muted-foreground hover:text-foreground"
                 )}
+                aria-pressed={viewMode === "detailed"}
               >
                 Detailed
               </button>
@@ -353,6 +361,7 @@ export default function TimesheetReportsPage({ params }: { params: { campgroundI
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 flex items-center gap-2"
+            role="alert"
           >
             <AlertCircle className="w-5 h-5" />
             {error}

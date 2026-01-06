@@ -346,16 +346,18 @@ export default function NewSeasonalGuestPage() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label>First Name *</Label>
+                      <Label htmlFor="new-guest-first-name">First Name *</Label>
                       <Input
+                        id="new-guest-first-name"
                         placeholder="John"
                         value={newGuestFirstName}
                         onChange={(e) => setNewGuestFirstName(e.target.value)}
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Last Name *</Label>
+                      <Label htmlFor="new-guest-last-name">Last Name *</Label>
                       <Input
+                        id="new-guest-last-name"
                         placeholder="Smith"
                         value={newGuestLastName}
                         onChange={(e) => setNewGuestLastName(e.target.value)}
@@ -363,8 +365,9 @@ export default function NewSeasonalGuestPage() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label>Email</Label>
+                    <Label htmlFor="new-guest-email">Email</Label>
                     <Input
+                      id="new-guest-email"
                       type="email"
                       placeholder="hello@keeprstay.com"
                       value={newGuestEmail}
@@ -372,8 +375,9 @@ export default function NewSeasonalGuestPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label>Phone</Label>
+                    <Label htmlFor="new-guest-phone">Phone</Label>
                     <Input
+                      id="new-guest-phone"
                       type="tel"
                       placeholder="(555) 123-4567"
                       value={newGuestPhone}
@@ -410,6 +414,7 @@ export default function NewSeasonalGuestPage() {
                     placeholder="Search guests by name or email..."
                     value={guestSearch}
                     onChange={(e) => setGuestSearch(e.target.value)}
+                    aria-label="Search guests"
                   />
                   {loadingGuests ? (
                     <div className="flex justify-center py-4">
@@ -495,24 +500,27 @@ export default function NewSeasonalGuestPage() {
                   </p>
                 </div>
               ) : (
-              <Select value={selectedSiteId || "__none__"} onValueChange={(v) => setSelectedSiteId(v === "__none__" ? "" : v)}>
-                <SelectTrigger>
+              <>
+                <Label htmlFor="seasonal-site" className="sr-only">Seasonal site</Label>
+                <Select value={selectedSiteId || "__none__"} onValueChange={(v) => setSelectedSiteId(v === "__none__" ? "" : v)}>
+                  <SelectTrigger id="seasonal-site">
                   <SelectValue placeholder="Select a site..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="__none__">No site assigned yet</SelectItem>
-                  {sites.map((site) => (
-                    <SelectItem key={site.id} value={site.id}>
-                      {site.name}
-                      {site.siteClass && (
-                        <span className="text-muted-foreground ml-2">
-                          ({site.siteClass.name})
-                        </span>
-                      )}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none__">No site assigned yet</SelectItem>
+                    {sites.map((site) => (
+                      <SelectItem key={site.id} value={site.id}>
+                        {site.name}
+                        {site.siteClass && (
+                          <span className="text-muted-foreground ml-2">
+                            ({site.siteClass.name})
+                          </span>
+                        )}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </>
               )}
             </CardContent>
           </Card>
@@ -578,9 +586,9 @@ export default function NewSeasonalGuestPage() {
 
               {/* Billing Frequency Override */}
               <div className="space-y-2">
-                <Label>Billing Frequency</Label>
+                <Label htmlFor="billing-frequency">Billing Frequency</Label>
                 <Select value={billingFrequency} onValueChange={setBillingFrequency}>
-                  <SelectTrigger>
+                  <SelectTrigger id="billing-frequency">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -598,12 +606,12 @@ export default function NewSeasonalGuestPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Payment Day of Month</Label>
+                  <Label htmlFor="payment-day">Payment Day of Month</Label>
                   <Select
                     value={String(paymentDay)}
                     onValueChange={(v) => setPaymentDay(Number(v))}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger id="payment-day">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -617,9 +625,9 @@ export default function NewSeasonalGuestPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Preferred Payment Method</Label>
+                  <Label htmlFor="preferred-payment-method">Preferred Payment Method</Label>
                   <Select value={preferredPaymentMethod || "__any__"} onValueChange={(v) => setPreferredPaymentMethod(v === "__any__" ? "" : v)}>
-                    <SelectTrigger>
+                    <SelectTrigger id="preferred-payment-method">
                       <SelectValue placeholder="Any method" />
                     </SelectTrigger>
                     <SelectContent>
@@ -635,12 +643,12 @@ export default function NewSeasonalGuestPage() {
 
               <div className="flex items-center gap-6">
                 <div className="flex items-center gap-2">
-                  <Switch checked={paysInFull} onCheckedChange={setPaysInFull} />
-                  <Label>Pays in Full</Label>
+                  <Switch id="pays-in-full" checked={paysInFull} onCheckedChange={setPaysInFull} />
+                  <Label htmlFor="pays-in-full">Pays in Full</Label>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Switch checked={autoPayEnabled} onCheckedChange={setAutoPayEnabled} />
-                  <Label>Auto-Pay Enabled</Label>
+                  <Switch id="auto-pay-enabled" checked={autoPayEnabled} onCheckedChange={setAutoPayEnabled} />
+                  <Label htmlFor="auto-pay-enabled">Auto-Pay Enabled</Label>
                 </div>
               </div>
             </CardContent>
@@ -657,19 +665,19 @@ export default function NewSeasonalGuestPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-2">
-                <Switch checked={isMetered} onCheckedChange={setIsMetered} />
-                <Label>Guest is on metered utilities</Label>
+                <Switch id="is-metered" checked={isMetered} onCheckedChange={setIsMetered} />
+                <Label htmlFor="is-metered">Guest is on metered utilities</Label>
               </div>
 
               {isMetered && (
                 <div className="pl-6 space-y-3 border-l-2">
                   <div className="flex items-center gap-2">
-                    <Switch checked={meteredElectric} onCheckedChange={setMeteredElectric} />
-                    <Label>Metered Electric</Label>
+                    <Switch id="metered-electric" checked={meteredElectric} onCheckedChange={setMeteredElectric} />
+                    <Label htmlFor="metered-electric">Metered Electric</Label>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Switch checked={meteredWater} onCheckedChange={setMeteredWater} />
-                    <Label>Metered Water</Label>
+                    <Switch id="metered-water" checked={meteredWater} onCheckedChange={setMeteredWater} />
+                    <Label htmlFor="metered-water">Metered Water</Label>
                   </div>
                 </div>
               )}
@@ -687,19 +695,21 @@ export default function NewSeasonalGuestPage() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="flex items-center gap-2">
+                  <Label htmlFor="emergency-contact" className="flex items-center gap-2">
                     <Phone className="h-4 w-4" />
                     Emergency Contact
                   </Label>
                   <Input
+                    id="emergency-contact"
                     placeholder="Contact name"
                     value={emergencyContact}
                     onChange={(e) => setEmergencyContact(e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Emergency Phone</Label>
+                  <Label htmlFor="emergency-phone">Emergency Phone</Label>
                   <Input
+                    id="emergency-phone"
                     placeholder="Phone number"
                     value={emergencyPhone}
                     onChange={(e) => setEmergencyPhone(e.target.value)}
@@ -708,11 +718,12 @@ export default function NewSeasonalGuestPage() {
               </div>
 
               <div className="space-y-2">
-                <Label className="flex items-center gap-2">
+                <Label htmlFor="vehicle-plates" className="flex items-center gap-2">
                   <Car className="h-4 w-4" />
                   Vehicle Plates
                 </Label>
                 <Input
+                  id="vehicle-plates"
                   placeholder="ABC123, XYZ789 (comma separated)"
                   value={vehiclePlates}
                   onChange={(e) => setVehiclePlates(e.target.value)}
@@ -721,12 +732,12 @@ export default function NewSeasonalGuestPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="flex items-center gap-2">
+                  <Label htmlFor="pet-count" className="flex items-center gap-2">
                     <Dog className="h-4 w-4" />
                     Number of Pets
                   </Label>
                   <Select value={String(petCount)} onValueChange={(v) => setPetCount(Number(v))}>
-                    <SelectTrigger>
+                    <SelectTrigger id="pet-count">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -740,8 +751,9 @@ export default function NewSeasonalGuestPage() {
                 </div>
                 {petCount > 0 && (
                   <div className="space-y-2">
-                    <Label>Pet Notes</Label>
+                    <Label htmlFor="pet-notes">Pet Notes</Label>
                     <Input
+                      id="pet-notes"
                       placeholder="Breeds, names..."
                       value={petNotes}
                       onChange={(e) => setPetNotes(e.target.value)}
@@ -751,8 +763,9 @@ export default function NewSeasonalGuestPage() {
               </div>
 
               <div className="space-y-2">
-                <Label>Certificate of Insurance Expiry</Label>
+                <Label htmlFor="coi-expiry">Certificate of Insurance Expiry</Label>
                 <Input
+                  id="coi-expiry"
                   type="date"
                   value={coiExpiresAt}
                   onChange={(e) => setCoiExpiresAt(e.target.value)}
@@ -768,6 +781,7 @@ export default function NewSeasonalGuestPage() {
             </CardHeader>
             <CardContent>
               <Textarea
+                id="seasonal-notes"
                 placeholder="Any additional notes about this seasonal guest..."
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}

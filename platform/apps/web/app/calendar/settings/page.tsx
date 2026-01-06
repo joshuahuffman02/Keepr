@@ -6,6 +6,15 @@ import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { apiClient } from "@/lib/api-client";
 import Link from "next/link";
 import { ArrowLeft, BarChart3, CalendarDays, Printer, Check } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface CalendarSettings {
   defaultDayCount: number;
@@ -125,42 +134,50 @@ export default function CalendarSettingsPage() {
           <section className="bg-card rounded-xl border border-border p-6">
             <h2 className="text-lg font-semibold text-foreground mb-4">Display Settings</h2>
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                  <Label htmlFor="default-day-range" className="block text-sm font-medium text-foreground mb-1">
                     Default Day Range
-                  </label>
-                  <select
-                    value={settings.defaultDayCount}
-                    onChange={(e) =>
-                      setSettings({ ...settings, defaultDayCount: parseInt(e.target.value) })
+                  </Label>
+                  <Select
+                    value={String(settings.defaultDayCount)}
+                    onValueChange={(value) =>
+                      setSettings({ ...settings, defaultDayCount: parseInt(value) })
                     }
-                    className="w-full px-3 py-2 border border-border rounded-lg"
                   >
-                    {DAY_COUNTS.map((n) => (
-                      <option key={n} value={n}>
-                        {n} days
-                      </option>
-                    ))}
-                  </select>
+                    <SelectTrigger id="default-day-range" className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {DAY_COUNTS.map((n) => (
+                        <SelectItem key={n} value={String(n)}>
+                          {n} days
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">
+                  <Label htmlFor="week-starts-on" className="block text-sm font-medium text-foreground mb-1">
                     Week Starts On
-                  </label>
-                  <select
+                  </Label>
+                  <Select
                     value={settings.startOfWeek}
-                    onChange={(e) =>
+                    onValueChange={(value) =>
                       setSettings({
                         ...settings,
-                        startOfWeek: e.target.value as "sunday" | "monday",
+                        startOfWeek: value as "sunday" | "monday",
                       })
                     }
-                    className="w-full px-3 py-2 border border-border rounded-lg"
                   >
-                    <option value="sunday">Sunday</option>
-                    <option value="monday">Monday</option>
-                  </select>
+                    <SelectTrigger id="week-starts-on" className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="sunday">Sunday</SelectItem>
+                      <SelectItem value="monday">Monday</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
@@ -218,6 +235,7 @@ export default function CalendarSettingsPage() {
                     ? "border-status-success bg-status-success/15 ring-2 ring-status-success/30"
                     : "border-border hover:border-border"
                     }`}
+                  aria-pressed={settings.colorScheme === scheme.value}
                 >
                   <div className="font-medium text-foreground">{scheme.label}</div>
                   <div className="text-sm text-muted-foreground">{scheme.desc}</div>
@@ -231,27 +249,27 @@ export default function CalendarSettingsPage() {
               <div className="flex flex-wrap gap-3">
                 {settings.colorScheme === "status" && (
                   <>
-                    <ColorChip color="bg-emerald-500" label="Confirmed" />
-                    <ColorChip color="bg-blue-500" label="Checked In" />
-                    <ColorChip color="bg-amber-500" label="Pending" />
+                    <ColorChip color="bg-status-success" label="Confirmed" />
+                    <ColorChip color="bg-status-info" label="Checked In" />
+                    <ColorChip color="bg-status-warning" label="Pending" />
                     <ColorChip color="bg-muted" label="Cancelled" />
-                    <ColorChip color="bg-purple-500" label="Checked Out" />
+                    <ColorChip color="bg-muted-foreground" label="Checked Out" />
                   </>
                 )}
                 {settings.colorScheme === "source" && (
                   <>
-                    <ColorChip color="bg-blue-500" label="Online" />
-                    <ColorChip color="bg-emerald-500" label="Phone" />
-                    <ColorChip color="bg-orange-500" label="OTA" />
-                    <ColorChip color="bg-muted0" label="Walk-in" />
+                    <ColorChip color="bg-status-info" label="Online" />
+                    <ColorChip color="bg-status-success" label="Phone" />
+                    <ColorChip color="bg-status-warning" label="OTA" />
+                    <ColorChip color="bg-muted" label="Walk-in" />
                   </>
                 )}
                 {settings.colorScheme === "siteType" && (
                   <>
-                    <ColorChip color="bg-amber-500" label="RV" />
-                    <ColorChip color="bg-emerald-500" label="Tent" />
-                    <ColorChip color="bg-blue-500" label="Cabin" />
-                    <ColorChip color="bg-purple-500" label="Glamping" />
+                    <ColorChip color="bg-status-info" label="RV" />
+                    <ColorChip color="bg-status-success" label="Tent" />
+                    <ColorChip color="bg-status-warning" label="Cabin" />
+                    <ColorChip color="bg-primary" label="Glamping" />
                   </>
                 )}
               </div>
@@ -262,22 +280,26 @@ export default function CalendarSettingsPage() {
           <section className="bg-card rounded-xl border border-border p-6">
             <h2 className="text-lg font-semibold text-foreground mb-4">Auto-Refresh</h2>
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1">
+              <Label htmlFor="refresh-interval" className="block text-sm font-medium text-foreground mb-1">
                 Refresh Interval
-              </label>
-              <select
-                value={settings.autoRefreshInterval}
-                onChange={(e) =>
-                  setSettings({ ...settings, autoRefreshInterval: parseInt(e.target.value) })
+              </Label>
+              <Select
+                value={String(settings.autoRefreshInterval)}
+                onValueChange={(value) =>
+                  setSettings({ ...settings, autoRefreshInterval: parseInt(value) })
                 }
-                className="w-full px-3 py-2 border border-border rounded-lg"
               >
-                {REFRESH_INTERVALS.map((opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger id="refresh-interval" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {REFRESH_INTERVALS.map((opt) => (
+                    <SelectItem key={opt.value} value={String(opt.value)}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <p className="text-sm text-muted-foreground mt-2">
                 Calendar will automatically refresh to show new reservations and changes.
               </p>
@@ -347,16 +369,19 @@ function ToggleOption({
   checked: boolean;
   onChange: (v: boolean) => void;
 }) {
+  const id = `toggle-${label.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
   return (
-    <label className="flex items-center gap-2 cursor-pointer select-none">
-      <input
-        type="checkbox"
+    <div className="flex items-center gap-2 select-none">
+      <Checkbox
+        id={id}
         checked={checked}
-        onChange={(e) => onChange(e.target.checked)}
-        className="rounded border-border text-emerald-600"
+        onCheckedChange={(value) => onChange(Boolean(value))}
+        aria-label={label}
       />
-      <span className="text-sm text-foreground">{label}</span>
-    </label>
+      <Label htmlFor={id} className="text-sm text-foreground cursor-pointer">
+        {label}
+      </Label>
+    </div>
   );
 }
 
@@ -386,4 +411,3 @@ function ShortcutRow({ keys, desc }: { keys: string[]; desc: string }) {
     </div>
   );
 }
-

@@ -4,6 +4,16 @@ import { useEffect, useMemo, useState } from "react";
 import { DashboardShell } from "../../../../components/ui/layout/DashboardShell";
 import { StaffNavigation } from "@/components/staff/StaffNavigation";
 import { useWhoami } from "@/hooks/use-whoami";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search,
@@ -47,6 +57,7 @@ type StaffRole = { id: string; code: string; name: string };
 type StaffMember = { id: string; firstName?: string; lastName?: string; email?: string };
 
 const STATUS_OPTIONS = ["all", "scheduled", "in_progress", "submitted", "approved", "rejected"];
+const EMPTY_SELECT_VALUE = "__empty";
 
 const STATUS_COLORS: Record<string, { bg: string; text: string; dot: string }> = {
   scheduled: { bg: "bg-muted", text: "text-foreground", dot: "bg-muted" },
@@ -519,6 +530,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                     <button
                       onClick={closeSwapModal}
                       className="p-2 text-muted-foreground hover:text-muted-foreground rounded-lg hover:bg-muted"
+                      aria-label="Close swap request"
                     >
                       <X className="w-5 h-5" />
                     </button>
@@ -540,34 +552,39 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
 
                   {/* Recipient selector */}
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
+                    <Label htmlFor="swap-recipient" className="block text-sm font-medium text-foreground mb-2">
                       Ask someone to take it
-                    </label>
-                    <select
-                      value={swapRecipientId}
-                      onChange={(e) => setSwapRecipientId(e.target.value)}
-                      className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
+                    </Label>
+                    <Select
+                      value={swapRecipientId || EMPTY_SELECT_VALUE}
+                      onValueChange={(value) => setSwapRecipientId(value === EMPTY_SELECT_VALUE ? "" : value)}
                     >
-                      <option value="">Select a team member...</option>
-                      {swapRecipients.map((s) => (
-                        <option key={s.id} value={s.id}>
-                          {s.firstName} {s.lastName}
-                        </option>
-                      ))}
-                    </select>
+                      <SelectTrigger id="swap-recipient" className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={EMPTY_SELECT_VALUE}>Select a team member...</SelectItem>
+                        {swapRecipients.map((s) => (
+                          <SelectItem key={s.id} value={s.id}>
+                            {s.firstName} {s.lastName}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   {/* Note */}
                   <div>
-                    <label className="block text-sm font-medium text-foreground mb-2">
+                    <Label htmlFor="swap-note" className="block text-sm font-medium text-foreground mb-2">
                       Note (optional)
-                    </label>
-                    <textarea
+                    </Label>
+                    <Textarea
+                      id="swap-note"
                       value={swapNote}
                       onChange={(e) => setSwapNote(e.target.value)}
                       placeholder="e.g., I have a doctor's appointment..."
                       rows={2}
-                      className="w-full px-4 py-3 border border-border rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
+                      className="w-full"
                     />
                   </div>
 
@@ -699,12 +716,13 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
             <div className="p-6 space-y-4">
               {/* Staff Member Selector */}
               <div className="relative">
-                <label className="block text-sm font-medium text-foreground mb-2">
+                <Label htmlFor="staff-member-search" className="block text-sm font-medium text-foreground mb-2">
                   Staff Member
-                </label>
+                </Label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <input
+                  <Input
+                    id="staff-member-search"
                     className="w-full pl-10 pr-10 rounded-lg border border-border px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:outline-none transition-shadow"
                     placeholder="Search staff..."
                     value={form.userId ? `${selectedStaff?.firstName || ""} ${selectedStaff?.lastName || ""}`.trim() || form.userId : staffSearch}
@@ -720,6 +738,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                       type="button"
                       onClick={() => { setForm({ ...form, userId: "" }); setStaffSearch(""); }}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground"
+                      aria-label="Clear selected staff member"
                     >×</button>
                   )}
                 </div>
@@ -762,8 +781,9 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
 
               {/* Date */}
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Date</label>
-                <input
+                <Label htmlFor="shift-date" className="block text-sm font-medium text-foreground mb-2">Date</Label>
+                <Input
+                  id="shift-date"
                   className="w-full rounded-lg border border-border px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:outline-none transition-shadow"
                   type="date"
                   value={form.date}
@@ -773,44 +793,54 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
 
               {/* Time Range */}
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Time</label>
+                <Label className="block text-sm font-medium text-foreground mb-2">Time</Label>
                 <div className="flex gap-2 items-center">
-                  <input
+                  <Input
                     className="w-full rounded-lg border border-border px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:outline-none transition-shadow"
                     type="time"
                     value={form.start}
                     onChange={(e) => setForm({ ...form, start: e.target.value })}
+                    aria-label="Shift start time"
                   />
                   <span className="text-muted-foreground">to</span>
-                  <input
+                  <Input
                     className="w-full rounded-lg border border-border px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:outline-none transition-shadow"
                     type="time"
                     value={form.end}
                     onChange={(e) => setForm({ ...form, end: e.target.value })}
+                    aria-label="Shift end time"
                   />
                 </div>
               </div>
 
               {/* Role */}
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">Role</label>
-                <select
-                  className="w-full rounded-lg border border-border px-4 py-3 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:outline-none transition-shadow"
-                  value={form.role}
-                  onChange={(e) => setForm({ ...form, role: e.target.value })}
+                <Label htmlFor="shift-role" className="block text-sm font-medium text-foreground mb-2">Role</Label>
+                <Select
+                  value={form.role || EMPTY_SELECT_VALUE}
+                  onValueChange={(value) =>
+                    setForm({ ...form, role: value === EMPTY_SELECT_VALUE ? "" : value })
+                  }
                 >
-                  {roles.map((r) => (
-                    <option key={r.id} value={r.name}>
-                      {r.name} ({r.code})
-                    </option>
-                  ))}
-                  {!roles.length && <option value="">Role (optional)</option>}
-                </select>
+                  <SelectTrigger id="shift-role" className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {!roles.length && (
+                      <SelectItem value={EMPTY_SELECT_VALUE}>Role (optional)</SelectItem>
+                    )}
+                    {roles.map((r) => (
+                      <SelectItem key={r.id} value={r.name}>
+                        {r.name} ({r.code})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Error */}
               {error && (
-                <div className="rounded-lg border bg-status-error/15 px-4 py-3 text-sm text-status-error flex items-center gap-2">
+                <div className="rounded-lg border bg-status-error/15 px-4 py-3 text-sm text-status-error flex items-center gap-2" role="alert">
                   <AlertCircle className="w-4 h-4 flex-shrink-0" />
                   {error}
                 </div>
@@ -864,6 +894,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                         "px-3 py-2 flex items-center gap-1.5 text-sm",
                         viewMode === "calendar" ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted/60"
                       )}
+                      aria-pressed={viewMode === "calendar"}
                     >
                       <LayoutGrid className="w-4 h-4" />
                       <span className="hidden sm:inline">Calendar</span>
@@ -874,6 +905,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                         "px-3 py-2 flex items-center gap-1.5 text-sm border-l border-border",
                         viewMode === "list" ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted/60"
                       )}
+                      aria-pressed={viewMode === "list"}
                     >
                       <List className="w-4 h-4" />
                       <span className="hidden sm:inline">List</span>
@@ -883,17 +915,18 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                   {/* Status Filter */}
                   <div className="flex items-center gap-2">
                     <Filter className="w-4 h-4 text-muted-foreground" />
-                    <select
-                      className="rounded-lg border border-border px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500 focus:border-teal-500 focus:outline-none"
-                      value={statusFilter}
-                      onChange={(e) => setStatusFilter(e.target.value)}
-                    >
-                      {STATUS_OPTIONS.map((s) => (
-                        <option key={s} value={s}>
-                          {s === "all" ? "All statuses" : s.replace("_", " ")}
-                        </option>
-                      ))}
-                    </select>
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                      <SelectTrigger className="w-[170px] text-sm" aria-label="Filter by status">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {STATUS_OPTIONS.map((s) => (
+                          <SelectItem key={s} value={s}>
+                            {s === "all" ? "All statuses" : s.replace("_", " ")}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   {/* Refresh */}
@@ -903,6 +936,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                     onClick={load}
                     disabled={loading}
                     className="p-2 rounded-lg border border-border text-muted-foreground hover:bg-muted/60 disabled:opacity-50"
+                    aria-label="Refresh schedule"
                   >
                     <RefreshCw className={cn("w-4 h-4", loading && "animate-spin")} />
                   </motion.button>
@@ -912,6 +946,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                     <button
                       onClick={() => setStartDay(new Date(windowStart.getTime() - 7 * 24 * 60 * 60 * 1000))}
                       className="p-2 rounded-lg border border-border text-muted-foreground hover:bg-muted/60"
+                      aria-label="Previous week"
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
@@ -924,6 +959,7 @@ export default function StaffSchedulingPage({ params }: { params: { campgroundId
                     <button
                       onClick={() => setStartDay(new Date(windowStart.getTime() + 7 * 24 * 60 * 60 * 1000))}
                       className="p-2 rounded-lg border border-border text-muted-foreground hover:bg-muted/60"
+                      aria-label="Next week"
                     >
                       <ChevronRight className="w-4 h-4" />
                     </button>

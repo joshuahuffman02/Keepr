@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useCallback, useRef } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import Link from "next/link";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient, useQueries } from "@tanstack/react-query";
@@ -11,9 +11,11 @@ import { Button } from "../../../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/ui/card";
 import { DashboardShell } from "../../../../components/ui/layout/DashboardShell";
 import { PageHeader } from "../../../../components/ui/layout/PageHeader";
+import { Checkbox } from "../../../../components/ui/checkbox";
 import { Input } from "../../../../components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../../components/ui/tabs";
+import { Textarea } from "../../../../components/ui/textarea";
 import { TableEmpty } from "../../../../components/ui/table";
 import { ReservationSchema, computeDepositDue, CreateCommunicationSchema, DepositConfig } from "@keepr/shared";
 import type { z } from "zod";
@@ -794,6 +796,7 @@ export default function ReservationsPage() {
   );
   const allInViewSelected = currentRowIds.length > 0 && currentRowIds.every((id) => selectedIds.includes(id));
   const someInViewSelected = currentRowIds.some((id) => selectedIds.includes(id)) && !allInViewSelected;
+  const selectAllState = allInViewSelected ? true : someInViewSelected ? "indeterminate" : false;
   useEffect(() => {
     setSelectedIds([]);
   }, [listTab, search, statusFilter, startFilter, endFilter]);
@@ -814,12 +817,6 @@ export default function ReservationsPage() {
     return { nights, totalCents, paidCents, balanceCents, adr, revpar };
   }, [tabFilteredReservations, siteCount]);
 
-  const selectAllRef = useRef<HTMLInputElement>(null);
-  useEffect(() => {
-    if (selectAllRef.current) {
-      selectAllRef.current.indeterminate = someInViewSelected;
-    }
-  }, [someInViewSelected, allInViewSelected]);
   useEffect(() => {
     setBulkFeedback(null);
   }, [selectedIds.length, statusFilter, search, startFilter, endFilter, listTab]);
@@ -1071,6 +1068,7 @@ export default function ReservationsPage() {
         />
         {flash && (
           <div
+            role={flash.type === "error" ? "alert" : "status"}
             className={`rounded-md border px-3 py-2 text-sm ${flash.type === "success"
               ? "border-status-success/30 bg-status-success/15 text-status-success"
               : flash.type === "error"
@@ -1200,12 +1198,10 @@ export default function ReservationsPage() {
               <thead className="bg-muted text-muted-foreground">
                 <tr>
                   <th className="px-3 py-2">
-                    <input
-                      ref={selectAllRef}
-                      type="checkbox"
-                      className="h-4 w-4 rounded border-border"
-                      checked={allInViewSelected}
-                      onChange={toggleAll}
+                    <Checkbox
+                      checked={selectAllState}
+                      onCheckedChange={toggleAll}
+                      aria-label="Select all reservations"
                     />
                   </th>
                   <th className="px-3 py-2 text-left font-semibold cursor-pointer select-none" onClick={() => {
@@ -1257,11 +1253,10 @@ export default function ReservationsPage() {
                   return (
                     <tr key={res.id} className="hover:bg-muted">
                       <td className="px-3 py-2">
-                        <input
-                          type="checkbox"
-                          className="h-4 w-4 rounded border-border"
+                        <Checkbox
                           checked={selectedIds.includes(res.id)}
-                          onChange={() => toggleRow(res.id)}
+                          onCheckedChange={() => toggleRow(res.id)}
+                          aria-label={`Select reservation ${guestName || res.id.slice(0, 8)}`}
                         />
                       </td>
                       <td className="px-3 py-2 text-foreground">
@@ -1338,12 +1333,10 @@ export default function ReservationsPage() {
               <thead className="bg-muted text-muted-foreground">
                 <tr>
                   <th className="px-3 py-2">
-                    <input
-                      ref={selectAllRef}
-                      type="checkbox"
-                      className="h-4 w-4 rounded border-border"
-                      checked={allInViewSelected}
-                      onChange={toggleAll}
+                    <Checkbox
+                      checked={selectAllState}
+                      onCheckedChange={toggleAll}
+                      aria-label="Select all in-house reservations"
                     />
                   </th>
                   <th className="px-3 py-2 text-left font-semibold cursor-pointer select-none" onClick={() => {
@@ -1395,11 +1388,10 @@ export default function ReservationsPage() {
                   return (
                     <tr key={res.id} className="hover:bg-muted">
                       <td className="px-3 py-2">
-                        <input
-                          type="checkbox"
-                          className="h-4 w-4 rounded border-border"
+                        <Checkbox
                           checked={selectedIds.includes(res.id)}
-                          onChange={() => toggleRow(res.id)}
+                          onCheckedChange={() => toggleRow(res.id)}
+                          aria-label={`Select reservation ${guestName || res.id.slice(0, 8)}`}
                         />
                       </td>
                       <td className="px-3 py-2 text-foreground">
@@ -1542,6 +1534,7 @@ export default function ReservationsPage() {
                   <div className="space-y-1">
                     <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Search</div>
                     <Input
+                      aria-label="Search reservations"
                       placeholder="Search guest, site, status..."
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
@@ -1551,6 +1544,7 @@ export default function ReservationsPage() {
                     <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Start date</div>
                     <Input
                       type="date"
+                      aria-label="Start date filter"
                       value={startFilter}
                       onChange={(e) => setStartFilter(e.target.value)}
                     />
@@ -1559,6 +1553,7 @@ export default function ReservationsPage() {
                     <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">End date</div>
                     <Input
                       type="date"
+                      aria-label="End date filter"
                       value={endFilter}
                       onChange={(e) => setEndFilter(e.target.value)}
                     />
@@ -1566,7 +1561,7 @@ export default function ReservationsPage() {
                   <div className="space-y-1">
                     <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Status</div>
                     <Select value={statusFilter} onValueChange={setStatusFilter}>
-                      <SelectTrigger>
+                      <SelectTrigger aria-label="Status filter">
                         <SelectValue placeholder="All statuses" />
                       </SelectTrigger>
                       <SelectContent>
@@ -1624,6 +1619,7 @@ export default function ReservationsPage() {
                   size="sm"
                   variant={filterDepositsDue ? "secondary" : "outline"}
                   onClick={() => setFilterDepositsDue((v) => !v)}
+                  aria-pressed={filterDepositsDue}
                 >
                   Deposits due
                 </Button>
@@ -2284,12 +2280,13 @@ export default function ReservationsPage() {
                               <div className="rounded-lg border border-border bg-muted px-3 py-2 flex flex-col gap-1 text-xs">
                                 <div className="text-muted-foreground text-xs">Quick payments</div>
                                 <div className="flex flex-wrap gap-2">
-                                  <input
+                                  <Input
                                     type="number"
                                     min={0}
                                     step="0.01"
-                                    className="rounded-md border border-border px-2 py-1 w-24"
+                                    className="h-8 w-24 px-2 py-1 text-xs"
                                     placeholder="Add payment"
+                                    aria-label="Payment amount"
                                     value={
                                       paymentInputs[res.id] !== undefined
                                         ? paymentInputs[res.id]
@@ -2299,21 +2296,25 @@ export default function ReservationsPage() {
                                       setPaymentInputs((prev) => ({ ...prev, [res.id]: Number(e.target.value || 0) }))
                                     }
                                   />
-                                  <select
-                                    className="rounded-md border border-border px-2 py-1 text-xs"
+                                  <Select
                                     value={paymentTenders[res.id] ?? "card"}
-                                    onChange={(e) =>
+                                    onValueChange={(value) =>
                                       setPaymentTenders((prev) => ({
                                         ...prev,
-                                        [res.id]: (e.target.value as "card" | "cash" | "check" | "folio") || "card"
+                                        [res.id]: (value as "card" | "cash" | "check" | "folio") || "card"
                                       }))
                                     }
                                   >
-                                    <option value="card">Card</option>
-                                    <option value="cash">Cash</option>
-                                    <option value="check">Check</option>
-                                    <option value="folio">Folio</option>
-                                  </select>
+                                    <SelectTrigger className="h-8 w-[90px] px-2 text-xs" aria-label="Payment method">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="card">Card</SelectItem>
+                                      <SelectItem value="cash">Cash</SelectItem>
+                                      <SelectItem value="check">Check</SelectItem>
+                                      <SelectItem value="folio">Folio</SelectItem>
+                                    </SelectContent>
+                                  </Select>
                                   <Button
                                     variant="secondary"
                                     size="sm"
@@ -2347,12 +2348,13 @@ export default function ReservationsPage() {
                                   </div>
                                 )}
                                 <div className="flex flex-wrap gap-2 mt-1">
-                                  <input
+                                  <Input
                                     type="number"
                                     min={0}
                                     step="0.01"
-                                    className="rounded-md border border-status-error/30 px-2 py-1 w-24"
+                                    className="h-8 w-24 px-2 py-1 text-xs border-status-error/30"
                                     placeholder="Refund"
+                                    aria-label="Refund amount"
                                     value={refundInputs[res.id] ?? ""}
                                     onChange={(e) =>
                                       setRefundInputs((prev) => ({ ...prev, [res.id]: Number(e.target.value || 0) }))
@@ -2378,9 +2380,9 @@ export default function ReservationsPage() {
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm text-foreground">
                               <label className="flex items-center gap-2">
                                 Adults
-                                <input
+                                <Input
                                   type="number"
-                                  className="rounded-md border border-border px-2 py-1 w-20"
+                                  className="h-8 w-20 px-2 py-1 text-xs"
                                   value={editing[res.id]?.adults ?? res.adults}
                                   onChange={(e) =>
                                     setEditing((prev) => ({
@@ -2395,9 +2397,9 @@ export default function ReservationsPage() {
                               </label>
                               <label className="flex items-center gap-2">
                                 Children
-                                <input
+                                <Input
                                   type="number"
-                                  className="rounded-md border border-border px-2 py-1 w-20"
+                                  className="h-8 w-20 px-2 py-1 text-xs"
                                   value={editing[res.id]?.children ?? res.children}
                                   onChange={(e) =>
                                     setEditing((prev) => ({
@@ -2412,9 +2414,9 @@ export default function ReservationsPage() {
                               </label>
                               <label className="flex items-center gap-2">
                                 Total $
-                                <input
+                                <Input
                                   type="number"
-                                  className="rounded-md border border-border px-2 py-1 w-28"
+                                  className="h-8 w-28 px-2 py-1 text-xs"
                                   value={((editing[res.id]?.totalAmount ?? res.totalAmount) / 100).toFixed(2)}
                                   onChange={(e) =>
                                     setEditing((prev) => ({
@@ -2429,9 +2431,9 @@ export default function ReservationsPage() {
                               </label>
                               <label className="flex items-center gap-2">
                                 Paid $
-                                <input
+                                <Input
                                   type="number"
-                                  className="rounded-md border border-border px-2 py-1 w-28"
+                                  className="h-8 w-28 px-2 py-1 text-xs"
                                   value={((editing[res.id]?.paidAmount ?? res.paidAmount ?? 0) / 100).toFixed(2)}
                                   onChange={(e) =>
                                     setEditing((prev) => ({
@@ -2446,23 +2448,27 @@ export default function ReservationsPage() {
                               </label>
                               <label className="flex items-center gap-2">
                                 Payment
-                                <select
-                                  className="rounded-md border border-border px-2 py-1 text-xs"
+                                <Select
                                   value={editing[res.id]?.paymentStatus || res.paymentStatus || "unpaid"}
-                                  onChange={(e) =>
+                                  onValueChange={(value) =>
                                     setEditing((prev) => ({
                                       ...prev,
                                       [res.id]: {
                                         ...prev[res.id],
-                                        paymentStatus: e.target.value
+                                        paymentStatus: value
                                       }
                                     }))
                                   }
                                 >
-                                  <option value="unpaid">unpaid</option>
-                                  <option value="partial">partial</option>
-                                  <option value="paid">paid</option>
-                                </select>
+                                  <SelectTrigger className="h-8 w-[110px] px-2 text-xs" aria-label="Payment status">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="unpaid">unpaid</SelectItem>
+                                    <SelectItem value="partial">partial</SelectItem>
+                                    <SelectItem value="paid">paid</SelectItem>
+                                  </SelectContent>
+                                </Select>
                               </label>
                             </div>
                           </div>
@@ -2480,41 +2486,51 @@ export default function ReservationsPage() {
                                 <div className="flex flex-wrap items-center gap-2 text-xs text-foreground">
                                   <label className="flex items-center gap-2">
                                     Site
-                                    <select
-                                      className="rounded-md border border-border px-2 py-1 text-xs"
-                                      value={editing[res.id]?.siteId || res.siteId}
-                                      onChange={(e) =>
+                                    <Select
+                                      value={editing[res.id]?.siteId ?? res.siteId ?? ""}
+                                      onValueChange={(value) =>
                                         setEditing((prev) => ({
                                           ...prev,
-                                          [res.id]: { ...(prev[res.id] || {}), siteId: e.target.value }
+                                          [res.id]: { ...(prev[res.id] || {}), siteId: value }
                                         }))
                                       }
                                     >
-                                      {sitesQuery.data?.map((s) => (
-                                        <option key={s.id} value={s.id}>
-                                          {s.name} ({s.siteType})
-                                        </option>
-                                      ))}
-                                    </select>
+                                      <SelectTrigger className="h-8 w-[180px] px-2 text-xs" aria-label="Assign site">
+                                        <SelectValue placeholder="Select site" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="">Unassigned</SelectItem>
+                                        {sitesQuery.data?.map((s) => (
+                                          <SelectItem key={s.id} value={s.id}>
+                                            {s.name} ({s.siteType})
+                                          </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
                                   </label>
                                   <label className="flex items-center gap-2">
                                     Guest
-                                    <select
-                                      className="rounded-md border border-border px-2 py-1 text-xs"
-                                      value={editing[res.id]?.guestId || res.guestId}
-                                      onChange={(e) =>
+                                    <Select
+                                      value={editing[res.id]?.guestId ?? res.guestId ?? ""}
+                                      onValueChange={(value) =>
                                         setEditing((prev) => ({
                                           ...prev,
-                                          [res.id]: { ...(prev[res.id] || {}), guestId: e.target.value }
+                                          [res.id]: { ...(prev[res.id] || {}), guestId: value }
                                         }))
                                       }
                                     >
-                                      {guestsQuery.data?.map((g) => (
-                                        <option key={g.id} value={g.id}>
-                                          {g.primaryLastName}, {g.primaryFirstName} ({g.phone})
-                                        </option>
-                                      ))}
-                                    </select>
+                                      <SelectTrigger className="h-8 w-[200px] px-2 text-xs" aria-label="Assign guest">
+                                        <SelectValue placeholder="Select guest" />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        <SelectItem value="">Unassigned</SelectItem>
+                                        {guestsQuery.data?.map((g) => (
+                                          <SelectItem key={g.id} value={g.id}>
+                                            {g.primaryLastName}, {g.primaryFirstName} ({g.phone})
+                                          </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
                                   </label>
                                 </div>
                               </div>
@@ -2528,9 +2544,10 @@ export default function ReservationsPage() {
                                     Guest profile ID: {res.guest.id} {res.guest.email ? `• ${res.guest.email}` : ""}
                                   </div>
                                   <div className="flex flex-wrap gap-2">
-                                    <input
-                                      className="rounded-md border border-border px-2 py-1"
+                                    <Input
+                                      className="h-8 w-[180px] px-2 py-1 text-xs"
                                       placeholder="Email"
+                                      aria-label="Guest email"
                                       value={guestEdits[res.guest.id]?.email ?? res.guest.email ?? ""}
                                       onChange={(e) =>
                                         setGuestEdits((prev) => ({
@@ -2539,9 +2556,10 @@ export default function ReservationsPage() {
                                         }))
                                       }
                                     />
-                                    <input
-                                      className="rounded-md border border-border px-2 py-1"
+                                    <Input
+                                      className="h-8 w-[140px] px-2 py-1 text-xs"
                                       placeholder="Phone"
+                                      aria-label="Guest phone"
                                       value={guestEdits[res.guest.id]?.phone ?? res.guest.phone ?? ""}
                                       onChange={(e) =>
                                         setGuestEdits((prev) => ({
@@ -2574,7 +2592,11 @@ export default function ReservationsPage() {
                                 <div className="flex items-center justify-between">
                                   <div className="text-sm font-semibold text-foreground">Recommended sites</div>
                                   {matchScoresQuery.isLoading && <span className="text-[11px] text-muted-foreground">Checking matches…</span>}
-                                  {matchScoresQuery.isError && <span className="text-[11px] text-status-error">Match scoring failed</span>}
+                                  {matchScoresQuery.isError && (
+                                    <span role="alert" className="text-[11px] text-status-error">
+                                      Match scoring failed
+                                    </span>
+                                  )}
                                 </div>
                                 {topMatches.length === 0 && !matchScoresQuery.isLoading && (
                                   <div className="text-muted-foreground">No ranked matches available for this guest.</div>
@@ -2646,9 +2668,9 @@ export default function ReservationsPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-foreground">
                               <label className="flex items-center gap-2">
                                 Check-in
-                                <input
+                                <Input
                                   type="datetime-local"
-                                  className="rounded-md border border-border px-2 py-1"
+                                  className="h-8 px-2 py-1 text-xs"
                                   value={(editing[res.id]?.checkInAt || res.checkInAt || "").toString().slice(0, 16)}
                                   onChange={(e) =>
                                     setEditing((prev) => ({
@@ -2663,9 +2685,9 @@ export default function ReservationsPage() {
                               </label>
                               <label className="flex items-center gap-2">
                                 Check-out
-                                <input
+                                <Input
                                   type="datetime-local"
-                                  className="rounded-md border border-border px-2 py-1"
+                                  className="h-8 px-2 py-1 text-xs"
                                   value={(editing[res.id]?.checkOutAt || res.checkOutAt || "").toString().slice(0, 16)}
                                   onChange={(e) =>
                                     setEditing((prev) => ({
@@ -2680,9 +2702,10 @@ export default function ReservationsPage() {
                               </label>
                             </div>
                             <div>
-                              <textarea
-                                className="rounded-md border border-border px-2 py-1 w-full text-sm"
+                              <Textarea
+                                className="min-h-[80px] text-sm"
                                 placeholder="Notes"
+                                aria-label="Reservation notes"
                                 value={editing[res.id]?.notes ?? res.notes ?? ""}
                                 onChange={(e) =>
                                   setEditing((prev) => ({
@@ -2714,6 +2737,7 @@ export default function ReservationsPage() {
                                         key={f}
                                         className={`rounded-full border px-2 py-1 text-[11px] ${commsFilter === f ? "border-status-success/30 bg-status-success/15 text-status-success" : "border-border text-muted-foreground"}`}
                                         onClick={() => setCommsFilter(f)}
+                                        aria-pressed={commsFilter === f}
                                       >
                                         {f === "failed" ? "Failed" : f === "messages" ? "Messages" : f[0].toUpperCase() + f.slice(1)}
                                       </button>
@@ -2752,7 +2776,11 @@ export default function ReservationsPage() {
                                   </Button>
                                 </div>
                               </div>
-                              {commsErrors[res.id] && <div className="text-xs text-status-warning">{commsErrors[res.id]}</div>}
+                              {commsErrors[res.id] && (
+                                <div role="alert" className="text-xs text-status-warning">
+                                  {commsErrors[res.id]}
+                                </div>
+                              )}
                               {!commsLoading[res.id] && (commsByRes[res.id] || []).length === 0 && (
                                 <div className="overflow-hidden rounded border border-border bg-card">
                                   <table className="w-full text-sm">
@@ -2820,24 +2848,29 @@ export default function ReservationsPage() {
                                 return (
                                   <div className="rounded border border-border bg-muted px-2 py-2 space-y-2">
                                     <div className="flex gap-2 items-center">
-                                      <label className="text-xs text-muted-foreground">Type</label>
-                                      <select
-                                        className="rounded-md border border-border px-2 py-1 text-xs"
+                                      <span className="text-xs text-muted-foreground">Type</span>
+                                      <Select
                                         value={commDraft.type || "note"}
-                                        onChange={(e) =>
+                                        onValueChange={(value) =>
                                           setNewComm((prev) => ({
                                             ...prev,
-                                            [res.id]: { ...(prev[res.id] || { body: "" }), type: e.target.value as "note" | "email" }
+                                            [res.id]: { ...(prev[res.id] || { body: "" }), type: value as "note" | "email" }
                                           }))
                                         }
                                       >
-                                        <option value="note">Note</option>
-                                        <option value="email">Email</option>
-                                      </select>
+                                        <SelectTrigger className="h-8 w-[96px] px-2 text-xs" aria-label="Communication type">
+                                          <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          <SelectItem value="note">Note</SelectItem>
+                                          <SelectItem value="email">Email</SelectItem>
+                                        </SelectContent>
+                                      </Select>
                                       {commDraft.type === "email" && (
-                                        <input
-                                          className="flex-1 rounded-md border border-border px-2 py-1 text-xs"
+                                        <Input
+                                          className="h-8 flex-1 px-2 py-1 text-xs"
                                           placeholder="To email"
+                                          aria-label="Recipient email"
                                           value={commDraft.toAddress ?? (res as ReservationWithGuest)?.guest?.email ?? ""}
                                           onChange={(e) =>
                                             setNewComm((prev) => ({
@@ -2848,15 +2881,17 @@ export default function ReservationsPage() {
                                         />
                                       )}
                                     </div>
-                                    <input
-                                      className="w-full rounded-md border border-border px-2 py-1 text-xs"
+                                    <Input
+                                      className="h-8 w-full px-2 py-1 text-xs"
                                       placeholder="Subject (optional)"
+                                      aria-label="Communication subject"
                                       value={commDraft.subject ?? ""}
                                       onChange={(e) => setNewComm((prev) => ({ ...prev, [res.id]: { ...(prev[res.id] || { body: "" }), subject: e.target.value } }))}
                                     />
-                                    <textarea
-                                      className="w-full rounded-md border border-border px-2 py-1 text-xs"
+                                    <Textarea
+                                      className="min-h-[70px] text-xs"
                                       placeholder="Add a note or email body"
+                                      aria-label="Communication body"
                                       value={commDraft.body ?? ""}
                                       onChange={(e) => setNewComm((prev) => ({ ...prev, [res.id]: { ...(prev[res.id] || { subject: "" }), body: e.target.value } }))}
                                     />
@@ -2950,7 +2985,11 @@ export default function ReservationsPage() {
                                 </div>
                               )}
                               {resQuoteLoading[res.id] && <div className="text-xs text-muted-foreground">Loading pricing breakdown…</div>}
-                              {resQuoteErrors[res.id] && <div className="text-xs text-status-warning">{resQuoteErrors[res.id]}</div>}
+                              {resQuoteErrors[res.id] && (
+                                <div role="alert" className="text-xs text-status-warning">
+                                  {resQuoteErrors[res.id]}
+                                </div>
+                              )}
                               {resQuotes[res.id] && (
                                 <div className="text-xs text-muted-foreground">
                                   Base ${(resQuotes[res.id].baseSubtotalCents / 100).toFixed(2)} • Rules{" "}
@@ -2965,7 +3004,11 @@ export default function ReservationsPage() {
                                 </div>
                               )}
                               {ledgerLoading[res.id] && <div className="text-xs text-muted-foreground">Loading ledger…</div>}
-                              {ledgerErrors[res.id] && <div className="text-xs text-status-warning">{ledgerErrors[res.id]}</div>}
+                              {ledgerErrors[res.id] && (
+                                <div role="alert" className="text-xs text-status-warning">
+                                  {ledgerErrors[res.id]}
+                                </div>
+                              )}
                               {!ledgerLoading[res.id] && ledgerByRes[res.id] && ledgerByRes[res.id].length === 0 && (
                                 <div className="overflow-hidden rounded border border-border bg-card">
                                   <table className="w-full text-sm">
@@ -2995,9 +3038,10 @@ export default function ReservationsPage() {
                             <div className="text-sm font-semibold">Manual pricing override</div>
                             <div className="text-[11px]">Provide reason and approval to save discount/total changes.</div>
                             <div className="grid md:grid-cols-2 gap-2">
-                              <input
-                                className="rounded-md border border-status-warning/30 px-2 py-1 text-xs"
+                              <Input
+                                className="h-8 px-2 py-1 text-xs border-status-warning/30"
                                 placeholder="Override reason"
+                                aria-label="Override reason"
                                 value={editing[res.id]?.overrideReason ?? ""}
                                 onChange={(e) =>
                                   setEditing((prev) => ({
@@ -3006,9 +3050,10 @@ export default function ReservationsPage() {
                                   }))
                                 }
                               />
-                              <input
-                                className="rounded-md border border-status-warning/30 px-2 py-1 text-xs"
+                              <Input
+                                className="h-8 px-2 py-1 text-xs border-status-warning/30"
                                 placeholder="Approved by"
+                                aria-label="Approved by"
                                 value={editing[res.id]?.overrideApprovedBy ?? ""}
                                 onChange={(e) =>
                                   setEditing((prev) => ({

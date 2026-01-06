@@ -568,7 +568,7 @@ export default function GiftCardsPage() {
                     value={issueForm.issuedFor}
                     onValueChange={(value: RedemptionChannel) => setIssueForm((prev) => ({ ...prev, issuedFor: value }))}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger id="issuedFor">
                       <SelectValue placeholder="Choose channel" />
                     </SelectTrigger>
                     <SelectContent>
@@ -586,7 +586,7 @@ export default function GiftCardsPage() {
                       setIssueForm((prev) => ({ ...prev, scopeType: value }))
                     }
                   >
-                    <SelectTrigger>
+                    <SelectTrigger id="scope">
                       <SelectValue placeholder="Choose scope" />
                     </SelectTrigger>
                     <SelectContent>
@@ -636,7 +636,7 @@ export default function GiftCardsPage() {
                   value={redeemForm.code}
                   onValueChange={(value) => setRedeemForm((prev) => ({ ...prev, code: value }))}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger id="redeemCode">
                     <SelectValue placeholder="Select gift card" />
                   </SelectTrigger>
                   <SelectContent>
@@ -673,7 +673,7 @@ export default function GiftCardsPage() {
                     value={redeemForm.channel}
                     onValueChange={(value: RedemptionChannel) => setRedeemForm((prev) => ({ ...prev, channel: value }))}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger id="channel">
                       <SelectValue placeholder="Choose channel" />
                     </SelectTrigger>
                     <SelectContent>

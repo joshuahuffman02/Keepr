@@ -4,6 +4,16 @@ import { useEffect, useState } from "react";
 import { useWhoami } from "@/hooks/use-whoami";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { StaffNavigation } from "@/components/staff/StaffNavigation";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Copy,
@@ -75,6 +85,7 @@ type StaffRole = {
 
 const DAYS_OF_WEEK = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const SHORT_DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const EMPTY_SELECT_VALUE = "__empty";
 
 const SPRING_CONFIG = {
   type: "spring" as const,
@@ -385,6 +396,7 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
+            role="alert"
             className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700"
           >
             {error}
@@ -415,10 +427,11 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
 
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-1">
+                      <Label htmlFor="template-name" className="block text-sm font-medium text-foreground mb-1">
                         Template Name
-                      </label>
-                      <input
+                      </Label>
+                      <Input
+                        id="template-name"
                         type="text"
                         value={formName}
                         onChange={(e) => setFormName(e.target.value)}
@@ -429,10 +442,11 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-1">
+                      <Label htmlFor="template-description" className="block text-sm font-medium text-foreground mb-1">
                         Description (optional)
-                      </label>
-                      <textarea
+                      </Label>
+                      <Textarea
+                        id="template-description"
                         value={formDescription}
                         onChange={(e) => setFormDescription(e.target.value)}
                         placeholder="Notes about this template..."
@@ -467,69 +481,93 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
                               key={idx}
                               className="p-3 bg-muted/60 rounded-lg flex flex-wrap gap-3 items-center"
                             >
-                              <select
-                                value={shift.dayOfWeek}
-                                onChange={(e) =>
-                                  updateFormShift(idx, { dayOfWeek: parseInt(e.target.value) })
+                              <Select
+                                value={String(shift.dayOfWeek)}
+                                onValueChange={(value) =>
+                                  updateFormShift(idx, { dayOfWeek: parseInt(value) })
                                 }
-                                className="px-3 py-1.5 border border-border rounded-lg text-sm"
                               >
-                                {DAYS_OF_WEEK.map((day, i) => (
-                                  <option key={i} value={i}>
-                                    {day}
-                                  </option>
-                                ))}
-                              </select>
+                                <SelectTrigger
+                                  className="h-8 w-[140px] text-sm"
+                                  aria-label={`Day of week for shift ${idx + 1}`}
+                                >
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {DAYS_OF_WEEK.map((day, i) => (
+                                    <SelectItem key={i} value={String(i)}>
+                                      {day}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
 
-                              <input
+                              <Input
                                 type="time"
                                 value={shift.startTime}
                                 onChange={(e) => updateFormShift(idx, { startTime: e.target.value })}
-                                className="px-3 py-1.5 border border-border rounded-lg text-sm"
+                                aria-label={`Start time for shift ${idx + 1}`}
+                                className="h-8 w-[120px] text-sm"
                               />
                               <span className="text-muted-foreground">to</span>
-                              <input
+                              <Input
                                 type="time"
                                 value={shift.endTime}
                                 onChange={(e) => updateFormShift(idx, { endTime: e.target.value })}
-                                className="px-3 py-1.5 border border-border rounded-lg text-sm"
+                                aria-label={`End time for shift ${idx + 1}`}
+                                className="h-8 w-[120px] text-sm"
                               />
 
                               {roles.length > 0 && (
-                                <select
-                                  value={shift.roleCode || ""}
-                                  onChange={(e) =>
-                                    updateFormShift(idx, { roleCode: e.target.value || undefined })
+                                <Select
+                                  value={shift.roleCode || EMPTY_SELECT_VALUE}
+                                  onValueChange={(value) =>
+                                    updateFormShift(idx, { roleCode: value === EMPTY_SELECT_VALUE ? undefined : value })
                                   }
-                                  className="px-3 py-1.5 border border-border rounded-lg text-sm"
                                 >
-                                  <option value="">No role</option>
-                                  {roles.map((role) => (
-                                    <option key={role.code} value={role.code}>
-                                      {role.name}
-                                    </option>
-                                  ))}
-                                </select>
+                                  <SelectTrigger
+                                    className="h-8 w-[140px] text-sm"
+                                    aria-label={`Role for shift ${idx + 1}`}
+                                  >
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value={EMPTY_SELECT_VALUE}>No role</SelectItem>
+                                    {roles.map((role) => (
+                                      <SelectItem key={role.code} value={role.code}>
+                                        {role.name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
                               )}
 
-                              <select
-                                value={shift.userId || ""}
-                                onChange={(e) =>
-                                  updateFormShift(idx, { userId: e.target.value || undefined })
+                              <Select
+                                value={shift.userId || EMPTY_SELECT_VALUE}
+                                onValueChange={(value) =>
+                                  updateFormShift(idx, { userId: value === EMPTY_SELECT_VALUE ? undefined : value })
                                 }
-                                className="px-3 py-1.5 border border-border rounded-lg text-sm flex-1 min-w-[150px]"
                               >
-                                <option value="">Unassigned</option>
-                                {staffMembers.map((member) => (
-                                  <option key={member.id} value={member.id}>
-                                    {member.firstName} {member.lastName}
-                                  </option>
-                                ))}
-                              </select>
+                                <SelectTrigger
+                                  className="h-8 flex-1 min-w-[150px] text-sm"
+                                  aria-label={`Staff member for shift ${idx + 1}`}
+                                >
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value={EMPTY_SELECT_VALUE}>Unassigned</SelectItem>
+                                  {staffMembers.map((member) => (
+                                    <SelectItem key={member.id} value={member.id}>
+                                      {member.firstName} {member.lastName}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
 
                               <button
                                 type="button"
                                 onClick={() => removeFormShift(idx)}
+                                aria-label={`Remove shift ${idx + 1}`}
                                 className="p-1.5 text-red-500 hover:bg-red-50 rounded"
                               >
                                 <Trash2 className="w-4 h-4" />
@@ -605,39 +643,47 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
 
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-1">
+                      <Label htmlFor="recurring-day" className="block text-sm font-medium text-foreground mb-1">
                         Run on
-                      </label>
-                      <select
-                        value={recurringDay}
-                        onChange={(e) => setRecurringDay(parseInt(e.target.value))}
-                        className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-violet-500"
+                      </Label>
+                      <Select
+                        value={String(recurringDay)}
+                        onValueChange={(value) => setRecurringDay(parseInt(value))}
                       >
-                        {DAYS_OF_WEEK.map((day, i) => (
-                          <option key={i} value={i}>
-                            Every {day}
-                          </option>
-                        ))}
-                      </select>
+                        <SelectTrigger id="recurring-day" className="w-full">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {DAYS_OF_WEEK.map((day, i) => (
+                            <SelectItem key={i} value={String(i)}>
+                              Every {day}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <p className="text-xs text-muted-foreground mt-1">
                         The template will be applied automatically on this day
                       </p>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-1">
+                      <Label htmlFor="recurring-weeks" className="block text-sm font-medium text-foreground mb-1">
                         Schedule for
-                      </label>
-                      <select
-                        value={recurringWeeksAhead}
-                        onChange={(e) => setRecurringWeeksAhead(parseInt(e.target.value))}
-                        className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-violet-500"
+                      </Label>
+                      <Select
+                        value={String(recurringWeeksAhead)}
+                        onValueChange={(value) => setRecurringWeeksAhead(parseInt(value))}
                       >
-                        <option value={1}>Next week</option>
-                        <option value={2}>2 weeks ahead</option>
-                        <option value={3}>3 weeks ahead</option>
-                        <option value={4}>4 weeks ahead</option>
-                      </select>
+                        <SelectTrigger id="recurring-weeks" className="w-full">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="1">Next week</SelectItem>
+                          <SelectItem value="2">2 weeks ahead</SelectItem>
+                          <SelectItem value="3">3 weeks ahead</SelectItem>
+                          <SelectItem value="4">4 weeks ahead</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <p className="text-xs text-muted-foreground mt-1">
                         How far ahead to generate the schedule
                       </p>
@@ -760,6 +806,9 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
                               setApplyingTemplate(isApplying ? null : template.id);
                               if (!applyWeekStart) setApplyWeekStart(getNextSunday());
                             }}
+                            aria-expanded={isApplying}
+                            aria-controls={`apply-template-${template.id}`}
+                            aria-pressed={isApplying}
                             className="px-3 py-1.5 bg-status-success/15 text-status-success rounded-lg text-sm font-medium hover:bg-status-success/25 flex items-center gap-1"
                           >
                             <Play className="w-4 h-4" />
@@ -770,6 +819,8 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
                               e.stopPropagation();
                               handleToggleRecurring(template.id, !template.isRecurring);
                             }}
+                            aria-pressed={template.isRecurring}
+                            aria-label={`${template.isRecurring ? "Disable" : "Enable"} auto-schedule for ${template.name}`}
                             className={cn(
                               "px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-1",
                               template.isRecurring
@@ -786,6 +837,7 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
                               e.stopPropagation();
                               handleEdit(template);
                             }}
+                            aria-label={`Edit template ${template.name}`}
                             className="p-2 text-muted-foreground hover:bg-muted rounded-lg"
                           >
                             <Edit3 className="w-4 h-4" />
@@ -795,6 +847,7 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
                               e.stopPropagation();
                               setDeleteConfirmId(template.id);
                             }}
+                            aria-label={`Delete template ${template.name}`}
                             className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -819,14 +872,16 @@ export default function ScheduleTemplatesPage({ params }: { params: { campground
                           initial={{ height: 0, opacity: 0 }}
                           animate={{ height: "auto", opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
+                          id={`apply-template-${template.id}`}
                           className="border-t border-border bg-status-success/10 overflow-hidden"
                         >
                           <div className="p-4 flex items-center gap-4">
                             <div className="flex-1">
-                              <label className="block text-sm font-medium text-foreground mb-1">
+                              <Label htmlFor={`apply-week-${template.id}`} className="block text-sm font-medium text-foreground mb-1">
                                 Apply to week starting:
-                              </label>
-                              <input
+                              </Label>
+                              <Input
+                                id={`apply-week-${template.id}`}
                                 type="date"
                                 value={applyWeekStart}
                                 onChange={(e) => setApplyWeekStart(e.target.value)}

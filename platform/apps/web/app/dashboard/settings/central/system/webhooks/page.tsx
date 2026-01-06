@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
@@ -367,11 +368,10 @@ export default function WebhooksPage() {
                     key={event.value}
                     className="flex items-center gap-2 p-2 rounded hover:bg-muted cursor-pointer"
                   >
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       checked={selectedEvents.includes(event.value)}
-                      onChange={() => toggleEventType(event.value)}
-                      className="rounded border-border"
+                      onCheckedChange={() => toggleEventType(event.value)}
+                      aria-label={event.label}
                     />
                     <span className="text-sm">{event.label}</span>
                   </label>

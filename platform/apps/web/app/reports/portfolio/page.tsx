@@ -170,21 +170,25 @@ export default function PortfolioFxReportPage() {
             <div className="flex flex-wrap gap-3">
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-muted-foreground">Portfolio</span>
-                <select
-                  className="w-60 rounded-md border border-border px-3 py-2 text-sm"
+                <Select
                   value={portfolioId ?? ""}
-                  onChange={(e) => {
-                    setPortfolioId(e.target.value);
-                    if (typeof window !== "undefined") localStorage.setItem("campreserv:selectedPortfolio", e.target.value);
+                  onValueChange={(value) => {
+                    setPortfolioId(value);
+                    if (typeof window !== "undefined") localStorage.setItem("campreserv:selectedPortfolio", value);
                     qc.invalidateQueries({ queryKey: ["portfolio-report"] });
                   }}
                 >
-                  {(portfoliosQuery.data?.portfolios ?? []).map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className="w-60 text-sm" aria-label="Portfolio">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(portfoliosQuery.data?.portfolios ?? []).map((p) => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="flex flex-col gap-1">
@@ -196,7 +200,7 @@ export default function PortfolioFxReportPage() {
                     if (typeof window !== "undefined") localStorage.setItem("campreserv:reportingCurrency", val);
                   }}
                 >
-                  <SelectTrigger className="w-48">
+                  <SelectTrigger className="w-48" aria-label="Reporting currency">
                     <SelectValue placeholder="Currency" />
                   </SelectTrigger>
                   <SelectContent>
@@ -210,7 +214,7 @@ export default function PortfolioFxReportPage() {
               </div>
 
               <div className="flex items-center gap-2 rounded-md border border-border px-3 py-2">
-                <Switch checked={fxEnabled} onCheckedChange={setFxEnabled} />
+                <Switch checked={fxEnabled} onCheckedChange={setFxEnabled} aria-label="Toggle FX conversion" />
                 <div className="flex flex-col">
                   <span className="text-xs font-semibold text-foreground">FX toggle</span>
                   <span className="text-[11px] text-muted-foreground">Convert to {resolvedReportingCurrency}</span>
@@ -375,5 +379,3 @@ export default function PortfolioFxReportPage() {
     </DashboardShell>
   );
 }
-
-

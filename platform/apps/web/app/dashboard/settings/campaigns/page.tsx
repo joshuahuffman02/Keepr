@@ -10,8 +10,16 @@ if (typeof window !== "undefined") {
   DOMPurify = require("dompurify");
 }
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -19,6 +27,8 @@ import { useToast } from "@/components/ui/use-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+
+const EMPTY_SELECT_VALUE = "__empty";
 
 export default function CampaignsPage() {
   const { toast } = useToast();
@@ -285,20 +295,24 @@ export default function CampaignsPage() {
               <div className="space-y-1">
                 <Label>Template</Label>
                 <div className="flex gap-2">
-                  <select
-                    className="border rounded-md px-3 py-2 text-sm"
-                    value={templateId}
-                    onChange={(e) => applyTemplate(e.target.value)}
+                  <Select
+                    value={templateId || EMPTY_SELECT_VALUE}
+                    onValueChange={(value) => applyTemplate(value === EMPTY_SELECT_VALUE ? "" : value)}
                   >
-                    <option value="">Select a template</option>
-                    {templatesQuery.data
-                      ?.sort((a, b) => (a.category || "").localeCompare(b.category || ""))
-                      .map((t) => (
-                        <option key={t.id} value={t.id}>
-                          {t.name} ({t.channel}) [{t.category || "general"}]
-                        </option>
-                      ))}
-                  </select>
+                    <SelectTrigger className="w-full text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={EMPTY_SELECT_VALUE}>Select a template</SelectItem>
+                      {templatesQuery.data
+                        ?.sort((a, b) => (a.category || "").localeCompare(b.category || ""))
+                        .map((t) => (
+                          <SelectItem key={t.id} value={t.id}>
+                            {t.name} ({t.channel}) [{t.category || "general"}]
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
                   <Button
                     type="button"
                     variant="outline"
@@ -338,18 +352,22 @@ export default function CampaignsPage() {
                 <div className="grid gap-3 md:grid-cols-2">
                   <div className="space-y-1">
                     <Label>Site type</Label>
-                    <select
-                      className="border rounded-md px-3 py-2 text-sm"
-                      value={filters.siteType}
-                      onChange={(e) => setFilters((f) => ({ ...f, siteType: e.target.value }))}
+                    <Select
+                      value={filters.siteType || EMPTY_SELECT_VALUE}
+                      onValueChange={(value) => setFilters((f) => ({ ...f, siteType: value === EMPTY_SELECT_VALUE ? "" : value }))}
                     >
-                      <option value="">Any</option>
-                      <option value="rv">RV</option>
-                      <option value="tent">Tent</option>
-                      <option value="cabin">Cabin</option>
-                      <option value="group">Group</option>
-                      <option value="glamping">Glamping</option>
-                    </select>
+                      <SelectTrigger className="w-full text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={EMPTY_SELECT_VALUE}>Any</SelectItem>
+                        <SelectItem value="rv">RV</SelectItem>
+                        <SelectItem value="tent">Tent</SelectItem>
+                        <SelectItem value="cabin">Cabin</SelectItem>
+                        <SelectItem value="group">Group</SelectItem>
+                        <SelectItem value="glamping">Glamping</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-1">
                     <Label>State/Province</Label>
@@ -368,29 +386,26 @@ export default function CampaignsPage() {
                     />
                   </div>
                   <div className="flex items-center gap-2 mt-6">
-                    <input
+                    <Checkbox
                       id="notStayed"
-                      type="checkbox"
                       checked={filters.notStayedThisYear}
-                      onChange={(e) => setFilters((f) => ({ ...f, notStayedThisYear: e.target.checked }))}
+                      onCheckedChange={(checked) => setFilters((f) => ({ ...f, notStayedThisYear: Boolean(checked) }))}
                     />
                     <Label htmlFor="notStayed">Exclude guests who already stayed this year</Label>
                   </div>
                   <div className="flex items-center gap-2">
-                    <input
+                    <Checkbox
                       id="promoUsed"
-                      type="checkbox"
                       checked={filters.promoUsed}
-                      onChange={(e) => setFilters((f) => ({ ...f, promoUsed: e.target.checked }))}
+                      onCheckedChange={(checked) => setFilters((f) => ({ ...f, promoUsed: Boolean(checked) }))}
                     />
                     <Label htmlFor="promoUsed">Used a promo</Label>
                   </div>
                   <div className="flex items-center gap-2">
-                    <input
+                    <Checkbox
                       id="vip"
-                      type="checkbox"
                       checked={filters.vip}
-                      onChange={(e) => setFilters((f) => ({ ...f, vip: e.target.checked }))}
+                      onCheckedChange={(checked) => setFilters((f) => ({ ...f, vip: Boolean(checked) }))}
                     />
                     <Label htmlFor="vip">VIP / loyalty</Label>
                   </div>
@@ -630,4 +645,3 @@ export default function CampaignsPage() {
     </div>
   );
 }
-

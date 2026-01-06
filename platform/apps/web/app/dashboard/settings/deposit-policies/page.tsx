@@ -3,6 +3,16 @@
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "../../../../components/ui/button";
+import { Checkbox } from "../../../../components/ui/checkbox";
+import { Input } from "../../../../components/ui/input";
+import { Label } from "../../../../components/ui/label";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "../../../../components/ui/select";
 import { apiClient } from "../../../../lib/api-client";
 import { Plus, Pencil, Trash2, Banknote, Clock, Percent, DollarSign } from "lucide-react";
 import { HelpTooltip } from "../../../../components/ui/help-tooltip";
@@ -34,6 +44,7 @@ type DepositPolicy = {
 };
 
 type SiteClass = { id: string; name: string };
+const EMPTY_SELECT_VALUE = "__empty";
 
 type FormData = {
   name: string;
@@ -341,8 +352,8 @@ export default function DepositPoliciesPage() {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Name *</label>
-                <input
+                <Label className="block text-sm font-medium text-foreground mb-1">Name *</Label>
+                <Input
                   type="text"
                   className="w-full rounded-lg border border-border px-3 py-2 text-sm"
                   placeholder="e.g., Standard Deposit"
@@ -377,10 +388,10 @@ export default function DepositPoliciesPage() {
 
               {formData.strategy !== "first_night" && (
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">
+                  <Label className="block text-sm font-medium text-foreground mb-1">
                     {formData.strategy === "percent" ? "Percentage (%)" : "Amount ($)"}
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     type="number"
                     step={formData.strategy === "percent" ? "1" : "0.01"}
                     min="0"
@@ -394,38 +405,50 @@ export default function DepositPoliciesPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">Apply To</label>
-                  <select
-                    className="w-full rounded-lg border border-border px-3 py-2 text-sm"
+                  <Label className="block text-sm font-medium text-foreground mb-1">Apply To</Label>
+                  <Select
                     value={formData.applyTo}
-                    onChange={(e) => setFormData({ ...formData, applyTo: e.target.value as FormData["applyTo"] })}
+                    onValueChange={(value) => setFormData({ ...formData, applyTo: value as FormData["applyTo"] })}
                   >
-                    {Object.entries(applyToLabels).map(([key, label]) => (
-                      <option key={key} value={key}>{label}</option>
-                    ))}
-                  </select>
+                    <SelectTrigger className="w-full text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(applyToLabels).map(([key, label]) => (
+                        <SelectItem key={key} value={key}>
+                          {label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <div className="flex items-center gap-1.5 mb-1">
-                    <label className="block text-sm font-medium text-foreground">Due Timing</label>
+                    <Label className="block text-sm font-medium text-foreground">Due Timing</Label>
                     <HelpTooltip content="When the deposit should be collected from the guest" />
                   </div>
-                  <select
-                    className="w-full rounded-lg border border-border px-3 py-2 text-sm"
+                  <Select
                     value={formData.dueTiming}
-                    onChange={(e) => setFormData({ ...formData, dueTiming: e.target.value as FormData["dueTiming"] })}
+                    onValueChange={(value) => setFormData({ ...formData, dueTiming: value as FormData["dueTiming"] })}
                   >
-                    {Object.entries(dueTimingLabels).map(([key, label]) => (
-                      <option key={key} value={key}>{label}</option>
-                    ))}
-                  </select>
+                    <SelectTrigger className="w-full text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(dueTimingLabels).map(([key, label]) => (
+                        <SelectItem key={key} value={key}>
+                          {label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
               {formData.dueTiming === "before_arrival" && (
                 <div>
-                  <label className="block text-sm font-medium text-foreground mb-1">Hours Before Arrival</label>
-                  <input
+                  <Label className="block text-sm font-medium text-foreground mb-1">Hours Before Arrival</Label>
+                  <Input
                     type="number"
                     min="1"
                     className="w-full rounded-lg border border-border px-3 py-2 text-sm"
@@ -436,26 +459,32 @@ export default function DepositPoliciesPage() {
               )}
 
               <div>
-                <label className="block text-sm font-medium text-foreground mb-1">Site Class</label>
-                <select
-                  className="w-full rounded-lg border border-border px-3 py-2 text-sm"
-                  value={formData.siteClassId}
-                  onChange={(e) => setFormData({ ...formData, siteClassId: e.target.value })}
+                <Label className="block text-sm font-medium text-foreground mb-1">Site Class</Label>
+                <Select
+                  value={formData.siteClassId || EMPTY_SELECT_VALUE}
+                  onValueChange={(value) => setFormData({ ...formData, siteClassId: value === EMPTY_SELECT_VALUE ? "" : value })}
                 >
-                  <option value="">All Site Classes (campground default)</option>
-                  {siteClassesQuery.data?.map((sc: SiteClass) => (
-                    <option key={sc.id} value={sc.id}>{sc.name}</option>
-                  ))}
-                </select>
+                  <SelectTrigger className="w-full text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={EMPTY_SELECT_VALUE}>All Site Classes (campground default)</SelectItem>
+                    {siteClassesQuery.data?.map((sc: SiteClass) => (
+                      <SelectItem key={sc.id} value={sc.id}>
+                        {sc.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <div className="flex items-center gap-1.5 mb-1">
-                    <label className="block text-sm font-medium text-foreground">Min Cap ($)</label>
+                    <Label className="block text-sm font-medium text-foreground">Min Cap ($)</Label>
                     <HelpTooltip content="Minimum deposit amount regardless of calculation (e.g., always collect at least $25)" />
                   </div>
-                  <input
+                  <Input
                     type="number"
                     step="0.01"
                     min="0"
@@ -467,10 +496,10 @@ export default function DepositPoliciesPage() {
                 </div>
                 <div>
                   <div className="flex items-center gap-1.5 mb-1">
-                    <label className="block text-sm font-medium text-foreground">Max Cap ($)</label>
+                    <Label className="block text-sm font-medium text-foreground">Max Cap ($)</Label>
                     <HelpTooltip content="Maximum deposit amount regardless of calculation (e.g., never collect more than $500)" />
                   </div>
-                  <input
+                  <Input
                     type="number"
                     step="0.01"
                     min="0"
@@ -483,14 +512,12 @@ export default function DepositPoliciesPage() {
               </div>
 
               <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
+                <Checkbox
                   id="active"
                   checked={formData.active}
-                  onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
-                  className="rounded border-border"
+                  onCheckedChange={(checked) => setFormData({ ...formData, active: Boolean(checked) })}
                 />
-                <label htmlFor="active" className="text-sm text-foreground">Active</label>
+                <Label htmlFor="active" className="text-sm text-foreground">Active</Label>
               </div>
             </div>
 

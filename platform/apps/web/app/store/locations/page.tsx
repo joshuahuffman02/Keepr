@@ -142,8 +142,8 @@ export default function StoreLocationsPage() {
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight text-slate-900">Store Locations</h1>
-                        <p className="text-slate-500">
+                        <h1 className="text-2xl font-bold tracking-tight text-foreground">Store Locations</h1>
+                        <p className="text-muted-foreground">
                             Manage physical and virtual store locations for inventory and POS.
                         </p>
                     </div>
@@ -157,7 +157,7 @@ export default function StoreLocationsPage() {
                     <CardHeader className="pb-3">
                         <div className="flex items-center justify-between">
                             <CardTitle className="text-base">All Locations</CardTitle>
-                            <label className="flex items-center gap-2 text-sm text-slate-600">
+                            <label className="flex items-center gap-2 text-sm text-muted-foreground">
                                 <Switch
                                     checked={showInactive}
                                     onCheckedChange={setShowInactive}
@@ -168,11 +168,11 @@ export default function StoreLocationsPage() {
                     </CardHeader>
                     <CardContent>
                         {isLoading ? (
-                            <div className="text-center py-8 text-slate-500">Loading locations...</div>
+                            <div className="text-center py-8 text-muted-foreground">Loading locations...</div>
                         ) : locations.length === 0 ? (
                             <div className="text-center py-8">
-                                <Store className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                                <p className="text-slate-500 mb-4">
+                                <Store className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                                <p className="text-muted-foreground mb-4">
                                     No store locations yet. Create your first location to get started.
                                 </p>
                                 <Button variant="outline" onClick={() => setIsCreateDialogOpen(true)}>
@@ -185,20 +185,20 @@ export default function StoreLocationsPage() {
                                 {locations.map((location) => (
                                     <div
                                         key={location.id}
-                                        className={cn(
-                                            "flex items-center justify-between p-4 rounded-lg border",
-                                            !location.isActive && "bg-slate-50 opacity-60"
-                                        )}
-                                    >
+                                            className={cn(
+                                                "flex items-center justify-between p-4 rounded-lg border",
+                                                !location.isActive && "bg-muted/60 opacity-60"
+                                            )}
+                                        >
                                         <div className="flex items-center gap-4">
                                             <div className={cn(
                                                 "w-10 h-10 rounded-lg flex items-center justify-center",
-                                                location.type === "physical" ? "bg-blue-100" : "bg-purple-100"
+                                                location.type === "physical" ? "bg-status-info/15" : "bg-primary/10"
                                             )}>
                                                 {location.type === "physical" ? (
-                                                    <MapPin className="w-5 h-5 text-blue-600" />
+                                                    <MapPin className="w-5 h-5 text-status-info" />
                                                 ) : (
-                                                    <Globe className="w-5 h-5 text-purple-600" />
+                                                    <Globe className="w-5 h-5 text-primary" />
                                                 )}
                                             </div>
                                             <div>
@@ -219,7 +219,7 @@ export default function StoreLocationsPage() {
                                                         <Badge variant="secondary">Inactive</Badge>
                                                     )}
                                                 </div>
-                                                <div className="flex items-center gap-4 mt-1 text-sm text-slate-500">
+                                                <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
                                                     {location.acceptsOnline && (
                                                         <span className="flex items-center gap-1">
                                                             <Globe className="w-3.5 h-3.5" />
@@ -245,7 +245,7 @@ export default function StoreLocationsPage() {
                                         </div>
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="icon">
+                                                <Button variant="ghost" size="icon" aria-label={`Open actions for ${location.name}`}>
                                                     <MoreVertical className="w-4 h-4" />
                                                 </Button>
                                             </DropdownMenuTrigger>
@@ -275,7 +275,7 @@ export default function StoreLocationsPage() {
                                                 </DropdownMenuItem>
                                                 {!location.isDefault && (
                                                     <DropdownMenuItem
-                                                        className="text-red-600"
+                                                        className="text-destructive"
                                                         onClick={() => setDeleteConfirm(location)}
                                                     >
                                                         <Trash2 className="w-4 h-4 mr-2" />
@@ -333,7 +333,7 @@ export default function StoreLocationsPage() {
                                 onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
                                 maxLength={4}
                             />
-                            <p className="text-xs text-slate-500">
+                            <p className="text-xs text-muted-foreground">
                                 A short code for receipts and reports
                             </p>
                         </div>
@@ -344,6 +344,7 @@ export default function StoreLocationsPage() {
                                     type="button"
                                     variant={formData.type === "physical" ? "default" : "outline"}
                                     onClick={() => setFormData({ ...formData, type: "physical" })}
+                                    aria-pressed={formData.type === "physical"}
                                     className="flex-1"
                                 >
                                     <MapPin className="w-4 h-4 mr-2" />
@@ -353,6 +354,7 @@ export default function StoreLocationsPage() {
                                     type="button"
                                     variant={formData.type === "virtual" ? "default" : "outline"}
                                     onClick={() => setFormData({ ...formData, type: "virtual" })}
+                                    aria-pressed={formData.type === "virtual"}
                                     className="flex-1"
                                 >
                                     <Globe className="w-4 h-4 mr-2" />
@@ -363,9 +365,9 @@ export default function StoreLocationsPage() {
                         <div className="flex items-center justify-between">
                             <div>
                                 <Label htmlFor="acceptsOnline">Accepts Online Orders</Label>
-                                <p className="text-xs text-slate-500">
-                                    This location can fulfill orders placed online
-                                </p>
+                                    <p className="text-xs text-muted-foreground">
+                                        This location can fulfill orders placed online
+                                    </p>
                             </div>
                             <Switch
                                 id="acceptsOnline"
@@ -379,7 +381,7 @@ export default function StoreLocationsPage() {
                             <div className="flex items-center justify-between">
                                 <div>
                                     <Label htmlFor="isDefault">Set as Default</Label>
-                                    <p className="text-xs text-slate-500">
+                                    <p className="text-xs text-muted-foreground">
                                         Make this the default location for new terminals
                                     </p>
                                 </div>

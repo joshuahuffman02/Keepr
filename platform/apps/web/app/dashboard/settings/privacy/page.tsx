@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { apiClient } from "@/lib/api-client";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -304,22 +305,22 @@ export default function PrivacySettingsPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <label className="flex items-center justify-between gap-3 rounded border border-border px-3 py-2">
-              <span className="text-sm text-foreground">Redact PII in audit/logs</span>
-              <input
-                type="checkbox"
+            <div className="flex items-center justify-between gap-3 rounded border border-border px-3 py-2">
+              <Label htmlFor="redact-pii" className="text-sm text-foreground">Redact PII in audit/logs</Label>
+              <Checkbox
+                id="redact-pii"
                 checked={!!settings?.redactPII}
-                onChange={(e) => updateField("redactPII", e.target.checked)}
+                onCheckedChange={(checked) => updateField("redactPII", Boolean(checked))}
               />
-            </label>
-            <label className="flex items-center justify-between gap-3 rounded border border-border px-3 py-2">
-              <span className="text-sm text-foreground">Consent required for communications</span>
-              <input
-                type="checkbox"
+            </div>
+            <div className="flex items-center justify-between gap-3 rounded border border-border px-3 py-2">
+              <Label htmlFor="consent-required" className="text-sm text-foreground">Consent required for communications</Label>
+              <Checkbox
+                id="consent-required"
                 checked={!!settings?.consentRequired}
-                onChange={(e) => updateField("consentRequired", e.target.checked)}
+                onCheckedChange={(checked) => updateField("consentRequired", Boolean(checked))}
               />
-            </label>
+            </div>
             <div className="flex flex-col gap-1">
               <Label className="text-sm">Backup retention (days)</Label>
               <Input

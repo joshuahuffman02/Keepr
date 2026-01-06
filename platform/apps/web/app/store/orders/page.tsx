@@ -11,6 +11,7 @@ import { TableSkeleton } from "@/components/ui/skeletons";
 import { EmptyState } from "@/components/ui/empty-state";
 import { useToast } from "@/components/ui/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 
 type StoreOrder = Awaited<ReturnType<typeof apiClient.getStoreOrders>>[0];
 
@@ -139,31 +140,54 @@ export default function StoreOrdersPage() {
 
   if (!campgroundId) {
     return (
-      <div className="p-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Store Orders</CardTitle>
-          </CardHeader>
-          <CardContent>Select a campground to view orders.</CardContent>
-        </Card>
-      </div>
+      <DashboardShell>
+        <div className="p-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Store Orders</CardTitle>
+            </CardHeader>
+            <CardContent>Select a campground to view orders.</CardContent>
+          </Card>
+        </div>
+      </DashboardShell>
     );
   }
 
   return (
-    <div className="p-6 space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold">Store Orders</h1>
-          {badge}
+    <DashboardShell>
+      <div className="p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold">Store Orders</h1>
+            {badge}
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant={statusFilter === "pending" ? "default" : "outline"}
+              onClick={() => setStatusFilter("pending")}
+              aria-pressed={statusFilter === "pending"}
+            >
+              Pending
+            </Button>
+            <Button
+              variant={statusFilter === "completed" ? "default" : "outline"}
+              onClick={() => setStatusFilter("completed")}
+              aria-pressed={statusFilter === "completed"}
+            >
+              Completed
+            </Button>
+            <Button
+              variant={statusFilter === "all" ? "default" : "outline"}
+              onClick={() => setStatusFilter("all")}
+              aria-pressed={statusFilter === "all"}
+            >
+              All
+            </Button>
+            <Button variant="ghost" size="icon" onClick={load} aria-label="Refresh orders">
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant={statusFilter === "pending" ? "default" : "outline"} onClick={() => setStatusFilter("pending")}>Pending</Button>
-          <Button variant={statusFilter === "completed" ? "default" : "outline"} onClick={() => setStatusFilter("completed")}>Completed</Button>
-          <Button variant={statusFilter === "all" ? "default" : "outline"} onClick={() => setStatusFilter("all")}>All</Button>
-          <Button variant="ghost" size="icon" onClick={load}><RefreshCw className="h-4 w-4" /></Button>
-        </div>
-      </div>
 
       <Card>
         <CardHeader>
@@ -270,48 +294,49 @@ export default function StoreOrdersPage() {
         </CardContent>
       </Card>
 
-      <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
-        <DialogContent className="max-w-xl">
-          <DialogHeader>
-            <DialogTitle>Order Details</DialogTitle>
-          </DialogHeader>
-          {detailOrder ? (
-            <div className="space-y-3">
-              <div className="text-sm text-muted-foreground">
-                Order ID: <span className="font-mono">{detailOrder.id}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge variant={detailOrder.status === "completed" ? "outline" : "default"}>
-                  {detailOrder.status}
-                </Badge>
-                {detailOrder.siteNumber && <Badge variant="secondary">Site {detailOrder.siteNumber}</Badge>}
-              </div>
-              <div className="text-sm">
-                Total: <span className="font-semibold">${(detailOrder.totalCents / 100).toFixed(2)}</span>
-              </div>
-              <div className="space-y-1">
-                <div className="text-sm font-medium">Items</div>
-                <ul className="space-y-1 text-sm">
-                  {detailOrder.items.map((item) => (
-                    <li key={`${item.name}-${item.qty}`} className="flex justify-between">
-                      <span>{item.qty} × {item.name}</span>
-                      <span>${((item.totalCents ?? 0) / 100).toFixed(2)}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              {detailOrder.notes && (
-                <div className="text-sm">
-                  <div className="font-medium">Notes</div>
-                  <div className="text-muted-foreground whitespace-pre-line">{detailOrder.notes}</div>
+        <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
+          <DialogContent className="max-w-xl">
+            <DialogHeader>
+              <DialogTitle>Order Details</DialogTitle>
+            </DialogHeader>
+            {detailOrder ? (
+              <div className="space-y-3">
+                <div className="text-sm text-muted-foreground">
+                  Order ID: <span className="font-mono">{detailOrder.id}</span>
                 </div>
-              )}
-            </div>
-          ) : (
-            <div className="text-sm text-muted-foreground">No order selected.</div>
-          )}
-        </DialogContent>
-      </Dialog>
-    </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant={detailOrder.status === "completed" ? "outline" : "default"}>
+                    {detailOrder.status}
+                  </Badge>
+                  {detailOrder.siteNumber && <Badge variant="secondary">Site {detailOrder.siteNumber}</Badge>}
+                </div>
+                <div className="text-sm">
+                  Total: <span className="font-semibold">${(detailOrder.totalCents / 100).toFixed(2)}</span>
+                </div>
+                <div className="space-y-1">
+                  <div className="text-sm font-medium">Items</div>
+                  <ul className="space-y-1 text-sm">
+                    {detailOrder.items.map((item) => (
+                      <li key={`${item.name}-${item.qty}`} className="flex justify-between">
+                        <span>{item.qty} × {item.name}</span>
+                        <span>${((item.totalCents ?? 0) / 100).toFixed(2)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                {detailOrder.notes && (
+                  <div className="text-sm">
+                    <div className="font-medium">Notes</div>
+                    <div className="text-muted-foreground whitespace-pre-line">{detailOrder.notes}</div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-sm text-muted-foreground">No order selected.</div>
+            )}
+          </DialogContent>
+        </Dialog>
+      </div>
+    </DashboardShell>
   );
 }

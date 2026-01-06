@@ -7,6 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   ArrowRight,
   Package,
   ShoppingCart,
@@ -273,32 +280,34 @@ export default function ProductsPage() {
             {/* Category filter dropdown */}
             <div className="flex items-center gap-2">
               <label className="text-xs text-muted-foreground">Category:</label>
-              <select
-                className="text-sm border border-border rounded-md px-2 py-1 bg-card"
-                value={categoryFilter}
-                onChange={(e) => setCategoryFilter(e.target.value)}
-              >
-                <option value="all">All Categories</option>
-                <option value="uncategorized">Uncategorized</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
+              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                <SelectTrigger className="h-8 text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  <SelectItem value="uncategorized">Uncategorized</SelectItem>
+                  {categories.map((cat) => (
+                    <SelectItem key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             {/* Status filter dropdown */}
             <div className="flex items-center gap-2">
               <label className="text-xs text-muted-foreground">Status:</label>
-              <select
-                className="text-sm border border-border rounded-md px-2 py-1 bg-card"
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-              >
-                <option value="all">All Status</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="h-8 text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
           {/* Active filter pills */}

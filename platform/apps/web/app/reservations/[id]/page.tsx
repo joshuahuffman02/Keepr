@@ -20,6 +20,9 @@ import { GitBranch, Loader2, Mail, MessageSquare, Phone, PlusCircle, RotateCcw, 
 import { PageSkeleton } from "@/components/ui/skeletons";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -324,7 +327,7 @@ export default function ReservationDetailPage() {
                                         Loading groups...
                                     </div>
                                 ) : groupsQuery.isError ? (
-                                    <div className="text-sm text-status-error">Unable to load groups.</div>
+                                    <div className="text-sm text-status-error" role="alert">Unable to load groups.</div>
                                 ) : groupsQuery.data?.length === 0 ? (
                                     <div className="space-y-3">
                                         <div className="flex items-center justify-between rounded border border-dashed border-border bg-muted px-3 py-2">
@@ -352,46 +355,51 @@ export default function ReservationDetailPage() {
                                 ) : (
                                     <>
                                         <div className="space-y-1">
-                                            <Label className="text-xs">Group</Label>
-                                            <select
-                                                className="h-10 rounded border border-border bg-background px-3 text-sm"
+                                            <Label className="text-xs" htmlFor="group-select">Group</Label>
+                                            <Select
                                                 value={selectedGroupId}
-                                                onChange={(e) => setSelectedGroupId(e.target.value)}
+                                                onValueChange={(value) => setSelectedGroupId(value)}
                                                 disabled={updateGroupMutation.isPending}
                                             >
-                                                <option value="">Not assigned</option>
-                                                {groupsQuery.data?.map((g: any) => (
-                                                    <option key={g.id} value={g.id}>
-                                                        {`Group #${g.id.slice(0, 8)} • ${g.reservationCount} reservation${g.reservationCount === 1 ? "" : "s"}`}
-                                                    </option>
-                                                ))}
-                                            </select>
+                                                <SelectTrigger id="group-select" className="h-10 bg-background">
+                                                    <SelectValue placeholder="Not assigned" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="">Not assigned</SelectItem>
+                                                    {groupsQuery.data?.map((g: any) => (
+                                                        <SelectItem key={g.id} value={g.id}>
+                                                            {`Group #${g.id.slice(0, 8)} • ${g.reservationCount} reservation${g.reservationCount === 1 ? "" : "s"}`}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
                                         </div>
 
                                         <div className="space-y-1">
-                                            <Label className="text-xs">Role</Label>
-                                            <div className="flex items-center gap-4 text-sm text-foreground">
-                                                <label className="flex items-center gap-2">
-                                                    <input
-                                                        type="radio"
+                                            <Label className="text-xs" htmlFor="group-role-primary">Role</Label>
+                                            <RadioGroup
+                                                value={groupRole}
+                                                onValueChange={(value) => setGroupRole(value as "primary" | "member")}
+                                                className="flex items-center gap-4 text-sm text-foreground"
+                                                aria-label="Group role"
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    <RadioGroupItem
+                                                        id="group-role-primary"
                                                         value="primary"
-                                                        checked={groupRole === "primary"}
-                                                        onChange={() => setGroupRole("primary")}
                                                         disabled={!selectedGroupId || updateGroupMutation.isPending}
                                                     />
-                                                    <span>Primary</span>
-                                                </label>
-                                                <label className="flex items-center gap-2">
-                                                    <input
-                                                        type="radio"
+                                                    <Label htmlFor="group-role-primary">Primary</Label>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <RadioGroupItem
+                                                        id="group-role-member"
                                                         value="member"
-                                                        checked={groupRole === "member"}
-                                                        onChange={() => setGroupRole("member")}
                                                         disabled={!selectedGroupId || updateGroupMutation.isPending}
                                                     />
-                                                    <span>Member</span>
-                                                </label>
-                                            </div>
+                                                    <Label htmlFor="group-role-member">Member</Label>
+                                                </div>
+                                            </RadioGroup>
                                             <p className="text-xs text-muted-foreground">Primary is treated as the main contact for shared communications.</p>
                                         </div>
 
@@ -440,45 +448,48 @@ export default function ReservationDetailPage() {
                                 </div>
                                 <div className="flex flex-wrap gap-3 text-sm">
                                     <div className="space-y-1">
-                                        <Label className="text-xs">Type</Label>
-                                        <select
-                                            className="h-9 rounded border border-border bg-background px-2 text-sm"
-                                            value={commTypeFilter}
-                                            onChange={(e) => setCommTypeFilter(e.target.value)}
-                                        >
-                                            <option value="all">All</option>
-                                            <option value="email">Email</option>
-                                            <option value="sms">SMS</option>
-                                            <option value="automation">Automation</option>
-                                        </select>
+                                        <Label className="text-xs" htmlFor="comm-type-filter">Type</Label>
+                                        <Select value={commTypeFilter} onValueChange={setCommTypeFilter}>
+                                            <SelectTrigger id="comm-type-filter" className="h-9 bg-background" aria-label="Communication type">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="all">All</SelectItem>
+                                                <SelectItem value="email">Email</SelectItem>
+                                                <SelectItem value="sms">SMS</SelectItem>
+                                                <SelectItem value="automation">Automation</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </div>
                                     <div className="space-y-1">
-                                        <Label className="text-xs">Status (stub)</Label>
-                                        <select
-                                            className="h-9 rounded border border-border bg-background px-2 text-sm"
-                                            value={commStatusFilter}
-                                            onChange={(e) => setCommStatusFilter(e.target.value)}
-                                        >
-                                            <option value="all">All</option>
-                                            <option value="sent">Sent</option>
-                                            <option value="delivered">Delivered</option>
-                                            <option value="pending">Pending</option>
-                                            <option value="failed">Failed</option>
-                                            <option value="bounce">Bounced</option>
-                                            <option value="complaint">Complaint</option>
-                                        </select>
+                                        <Label className="text-xs" htmlFor="comm-status-filter">Status (stub)</Label>
+                                        <Select value={commStatusFilter} onValueChange={setCommStatusFilter}>
+                                            <SelectTrigger id="comm-status-filter" className="h-9 bg-background" aria-label="Communication status">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="all">All</SelectItem>
+                                                <SelectItem value="sent">Sent</SelectItem>
+                                                <SelectItem value="delivered">Delivered</SelectItem>
+                                                <SelectItem value="pending">Pending</SelectItem>
+                                                <SelectItem value="failed">Failed</SelectItem>
+                                                <SelectItem value="bounce">Bounced</SelectItem>
+                                                <SelectItem value="complaint">Complaint</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </div>
                                     <div className="space-y-1">
-                                        <Label className="text-xs">Direction</Label>
-                                        <select
-                                            className="h-9 rounded border border-border bg-background px-2 text-sm"
-                                            value={commDirectionFilter}
-                                            onChange={(e) => setCommDirectionFilter(e.target.value)}
-                                        >
-                                            <option value="all">All</option>
-                                            <option value="outbound">Outbound</option>
-                                            <option value="inbound">Inbound</option>
-                                        </select>
+                                        <Label className="text-xs" htmlFor="comm-direction-filter">Direction</Label>
+                                        <Select value={commDirectionFilter} onValueChange={setCommDirectionFilter}>
+                                            <SelectTrigger id="comm-direction-filter" className="h-9 bg-background" aria-label="Communication direction">
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="all">All</SelectItem>
+                                                <SelectItem value="outbound">Outbound</SelectItem>
+                                                <SelectItem value="inbound">Inbound</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </div>
                                 </div>
 
@@ -491,42 +502,46 @@ export default function ReservationDetailPage() {
                                     <div className="mt-3 p-3 bg-muted rounded-lg border border-border space-y-3">
                                         <div className="grid grid-cols-2 gap-3">
                                             <div className="space-y-1">
-                                                <Label className="text-xs">Type</Label>
-                                                <select
-                                                    className="w-full h-9 rounded border border-border bg-background px-2 text-sm"
-                                                    value={composeType}
-                                                    onChange={(e) => setComposeType(e.target.value as "email" | "sms" | "note" | "call")}
-                                                >
-                                                    <option value="email">Email</option>
-                                                    <option value="sms">SMS</option>
-                                                    <option value="note">Note</option>
-                                                    <option value="call">Call</option>
-                                                </select>
+                                                <Label className="text-xs" htmlFor="compose-type">Type</Label>
+                                                <Select value={composeType} onValueChange={(value) => setComposeType(value as "email" | "sms" | "note" | "call")}>
+                                                    <SelectTrigger id="compose-type" className="h-9 bg-background" aria-label="Compose type">
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="email">Email</SelectItem>
+                                                        <SelectItem value="sms">SMS</SelectItem>
+                                                        <SelectItem value="note">Note</SelectItem>
+                                                        <SelectItem value="call">Call</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
                                             </div>
                                             <div className="space-y-1">
-                                                <Label className="text-xs">Direction</Label>
-                                                <select
-                                                    className="w-full h-9 rounded border border-border bg-background px-2 text-sm"
-                                                    value={composeDirection}
-                                                    onChange={(e) => setComposeDirection(e.target.value as "inbound" | "outbound")}
-                                                >
-                                                    <option value="outbound">Outbound</option>
-                                                    <option value="inbound">Inbound</option>
-                                                </select>
+                                                <Label className="text-xs" htmlFor="compose-direction">Direction</Label>
+                                                <Select value={composeDirection} onValueChange={(value) => setComposeDirection(value as "inbound" | "outbound")}>
+                                                    <SelectTrigger id="compose-direction" className="h-9 bg-background" aria-label="Compose direction">
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="outbound">Outbound</SelectItem>
+                                                        <SelectItem value="inbound">Inbound</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
                                             </div>
                                         </div>
                                         <div className="space-y-1">
-                                            <Label className="text-xs">Subject (optional)</Label>
+                                            <Label className="text-xs" htmlFor="compose-subject">Subject (optional)</Label>
                                             <Input
+                                                id="compose-subject"
                                                 value={composeSubject}
                                                 onChange={(e) => setComposeSubject(e.target.value)}
                                                 placeholder="Subject"
                                             />
                                         </div>
                                         <div className="space-y-1">
-                                            <Label className="text-xs">Body</Label>
-                                            <textarea
-                                                className="w-full rounded border border-border bg-background px-3 py-2 text-sm min-h-[80px]"
+                                            <Label className="text-xs" htmlFor="compose-body">Body</Label>
+                                            <Textarea
+                                                id="compose-body"
+                                                className="min-h-[80px] bg-background"
                                                 value={composeBody}
                                                 onChange={(e) => setComposeBody(e.target.value)}
                                                 placeholder="Log the message content"
@@ -534,12 +549,12 @@ export default function ReservationDetailPage() {
                                         </div>
                                         <div className="grid grid-cols-2 gap-3">
                                             <div className="space-y-1">
-                                                <Label className="text-xs">To</Label>
-                                                <Input value={composeTo} onChange={(e) => setComposeTo(e.target.value)} placeholder="email or phone" />
+                                                <Label className="text-xs" htmlFor="compose-to">To</Label>
+                                                <Input id="compose-to" value={composeTo} onChange={(e) => setComposeTo(e.target.value)} placeholder="email or phone" />
                                             </div>
                                             <div className="space-y-1">
-                                                <Label className="text-xs">From</Label>
-                                                <Input value={composeFrom} onChange={(e) => setComposeFrom(e.target.value)} placeholder="email or phone" />
+                                                <Label className="text-xs" htmlFor="compose-from">From</Label>
+                                                <Input id="compose-from" value={composeFrom} onChange={(e) => setComposeFrom(e.target.value)} placeholder="email or phone" />
                                             </div>
                                         </div>
                                         <Button

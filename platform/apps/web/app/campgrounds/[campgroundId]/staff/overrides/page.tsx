@@ -257,8 +257,8 @@ export default function OverridesPage({ params }: { params: { campgroundId: stri
             <CardContent className="space-y-5">
               {/* Request Type Selection */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">What do you need?</label>
-                <div className="grid gap-2 sm:grid-cols-3">
+                <label id="override-request-type-label" className="text-sm font-medium text-foreground">What do you need?</label>
+                <div className="grid gap-2 sm:grid-cols-3" role="group" aria-labelledby="override-request-type-label">
                   {requestTypes.map((type) => {
                     const Icon = type.icon;
                     const isSelected = form.type === type.value;
@@ -276,6 +276,7 @@ export default function OverridesPage({ params }: { params: { campgroundId: stri
                             ? "border-emerald-500 bg-emerald-50 ring-1 ring-emerald-500"
                             : "border-border bg-background hover:border-muted-foreground/30 hover:bg-muted/50"
                         )}
+                        aria-pressed={isSelected}
                       >
                         <Icon className={cn("h-5 w-5", type.color)} />
                         <div>
@@ -292,7 +293,7 @@ export default function OverridesPage({ params }: { params: { campgroundId: stri
                   })}
                 </div>
                 {errors.type && (
-                  <p className="text-sm text-red-600 flex items-center gap-1">
+                  <p className="text-sm text-red-600 flex items-center gap-1" role="alert">
                     <AlertCircle className="h-3.5 w-3.5" />
                     {errors.type}
                   </p>
@@ -309,13 +310,14 @@ export default function OverridesPage({ params }: { params: { campgroundId: stri
                     transition={{ duration: 0.2 }}
                     className="space-y-2 overflow-hidden"
                   >
-                    <label className="text-sm font-medium text-foreground">
+                    <label htmlFor="override-amount" className="text-sm font-medium text-foreground">
                       {form.type === "comp" ? "Amount to comp" : "Discount amount"}
                       <span className="text-muted-foreground font-normal ml-1">(optional)</span>
                     </label>
                     <div className="relative max-w-xs">
                       <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
+                        id="override-amount"
                         type="number"
                         step="0.01"
                         min="0"
@@ -332,7 +334,7 @@ export default function OverridesPage({ params }: { params: { campgroundId: stri
                       />
                     </div>
                     {errors.deltaAmount && (
-                      <p className="text-sm text-red-600 flex items-center gap-1">
+                      <p className="text-sm text-red-600 flex items-center gap-1" role="alert">
                         <AlertCircle className="h-3.5 w-3.5" />
                         {errors.deltaAmount}
                       </p>
@@ -344,7 +346,7 @@ export default function OverridesPage({ params }: { params: { campgroundId: stri
               {/* Target Entity & ID */}
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">What does this apply to?</label>
+                  <label htmlFor="override-target-entity" className="text-sm font-medium text-foreground">What does this apply to?</label>
                   <Select
                     value={form.targetEntity}
                     onValueChange={(v) => {
@@ -355,7 +357,7 @@ export default function OverridesPage({ params }: { params: { campgroundId: stri
                     <SelectTrigger className={cn(
                       "bg-background border-border text-foreground",
                       errors.targetEntity && "border-red-500"
-                    )}>
+                    )} id="override-target-entity">
                       <SelectValue placeholder="Select type..." />
                     </SelectTrigger>
                     <SelectContent>
@@ -376,7 +378,7 @@ export default function OverridesPage({ params }: { params: { campgroundId: stri
                     <p className="text-xs text-muted-foreground">{selectedEntity.description}</p>
                   )}
                   {errors.targetEntity && (
-                    <p className="text-sm text-red-600 flex items-center gap-1">
+                    <p className="text-sm text-red-600 flex items-center gap-1" role="alert">
                       <AlertCircle className="h-3.5 w-3.5" />
                       {errors.targetEntity}
                     </p>
@@ -384,10 +386,11 @@ export default function OverridesPage({ params }: { params: { campgroundId: stri
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-foreground">
+                  <label htmlFor="override-target-id" className="text-sm font-medium text-foreground">
                     {selectedEntity?.label || "Item"} ID or reference
                   </label>
                   <Input
+                    id="override-target-id"
                     value={form.targetId}
                     onChange={(e) => {
                       setForm({ ...form, targetId: e.target.value });
@@ -406,7 +409,7 @@ export default function OverridesPage({ params }: { params: { campgroundId: stri
                     )}
                   />
                   {errors.targetId && (
-                    <p className="text-sm text-red-600 flex items-center gap-1">
+                    <p className="text-sm text-red-600 flex items-center gap-1" role="alert">
                       <AlertCircle className="h-3.5 w-3.5" />
                       {errors.targetId}
                     </p>
@@ -416,8 +419,9 @@ export default function OverridesPage({ params }: { params: { campgroundId: stri
 
               {/* Reason */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Why is this needed?</label>
+                <label htmlFor="override-reason" className="text-sm font-medium text-foreground">Why is this needed?</label>
                 <Input
+                  id="override-reason"
                   value={form.reason}
                   onChange={(e) => {
                     setForm({ ...form, reason: e.target.value });
@@ -433,7 +437,7 @@ export default function OverridesPage({ params }: { params: { campgroundId: stri
                   Include relevant details like guest name, incident reference, or receipt number.
                 </p>
                 {errors.reason && (
-                  <p className="text-sm text-red-600 flex items-center gap-1">
+                  <p className="text-sm text-red-600 flex items-center gap-1" role="alert">
                     <AlertCircle className="h-3.5 w-3.5" />
                     {errors.reason}
                   </p>
@@ -484,6 +488,7 @@ export default function OverridesPage({ params }: { params: { campgroundId: stri
                         ? "bg-status-success/15 text-status-success border border-status-success/30"
                         : "bg-status-error/15 text-status-error border border-status-error/30"
                     )}
+                    role={submitStatus === "success" ? "status" : "alert"}
                   >
                     {submitStatus === "success" ? (
                       <Sparkles className="h-5 w-5 text-status-success" />

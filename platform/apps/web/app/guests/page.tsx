@@ -65,15 +65,21 @@ function GuestRewardsSection({ guestId, expanded, onToggle }: { guestId: string;
   return (
     <div className="mt-3 border-t border-border pt-3">
       <button
+        type="button"
         onClick={onToggle}
         className="flex items-center gap-2 text-sm font-medium text-action-primary hover:text-action-primary-hover"
+        aria-expanded={expanded}
+        aria-controls={`guest-rewards-${guestId}`}
       >
         <Trophy className="h-4 w-4" />
         {expanded ? "Hide Rewards" : "View Rewards"}
       </button>
 
       {expanded && (
-        <div className="mt-3 p-4 bg-status-success/10 rounded-lg border border-status-success/20">
+        <div
+          id={`guest-rewards-${guestId}`}
+          className="mt-3 p-4 bg-status-success/10 rounded-lg border border-status-success/20"
+        >
           {isLoading ? (
             <div className="text-center text-muted-foreground py-4">Loading rewards...</div>
           ) : loyalty ? (
@@ -210,15 +216,21 @@ function GuestEquipmentSection({ guestId, expanded, onToggle }: { guestId: strin
   return (
     <div className="mt-3 border-t border-border pt-3">
       <button
+        type="button"
         onClick={onToggle}
         className="flex items-center gap-2 text-sm font-medium text-action-primary hover:text-action-primary-hover"
+        aria-expanded={expanded}
+        aria-controls={`guest-equipment-${guestId}`}
       >
         <Car className="h-4 w-4" />
         {expanded ? "Hide Equipment" : "View Equipment"}
       </button>
 
       {expanded && (
-        <div className="mt-3 p-4 bg-muted rounded-lg border border-border">
+        <div
+          id={`guest-equipment-${guestId}`}
+          className="mt-3 p-4 bg-muted rounded-lg border border-border"
+        >
           {isLoading ? (
             <div className="text-center text-muted-foreground py-2">Loading equipment...</div>
           ) : (
@@ -238,6 +250,7 @@ function GuestEquipmentSection({ guestId, expanded, onToggle }: { guestId: strin
                     size="sm"
                     onClick={() => deleteMutation.mutate(eq.id)}
                     disabled={deleteMutation.isPending}
+                    aria-label="Delete equipment"
                   >
                     <Trash2 className="h-4 w-4 text-status-error" />
                   </Button>
@@ -257,46 +270,52 @@ function GuestEquipmentSection({ guestId, expanded, onToggle }: { guestId: strin
               {isAdding ? (
                 <div className="bg-card p-3 rounded border border-border space-y-3">
                   <div className="grid grid-cols-2 gap-2">
-                    <select
-                      className="rounded border border-border px-2 py-1 text-sm"
-                      value={newEq.type}
-                      onChange={(e) => setNewEq({ ...newEq, type: e.target.value })}
-                    >
-                      <option value="rv">RV</option>
-                      <option value="trailer">Trailer</option>
-                      <option value="tent">Tent</option>
-                      <option value="car">Car</option>
-                    </select>
-                    <input
-                      className="rounded border border-border px-2 py-1 text-sm"
+                    <Select value={newEq.type} onValueChange={(value) => setNewEq({ ...newEq, type: value })}>
+                      <SelectTrigger className="h-9" aria-label="Equipment type">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="rv">RV</SelectItem>
+                        <SelectItem value="trailer">Trailer</SelectItem>
+                        <SelectItem value="tent">Tent</SelectItem>
+                        <SelectItem value="car">Car</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      className="h-9"
                       placeholder="Length (ft)"
                       type="number"
                       value={newEq.length}
                       onChange={(e) => setNewEq({ ...newEq, length: e.target.value })}
+                      aria-label="Equipment length"
                     />
-                    <input
-                      className="rounded border border-border px-2 py-1 text-sm"
+                    <Input
+                      className="h-9"
                       placeholder="Make"
                       value={newEq.make}
                       onChange={(e) => setNewEq({ ...newEq, make: e.target.value })}
+                      aria-label="Equipment make"
                     />
-                    <input
-                      className="rounded border border-border px-2 py-1 text-sm"
+                    <Input
+                      className="h-9"
                       placeholder="Model"
                       value={newEq.model}
                       onChange={(e) => setNewEq({ ...newEq, model: e.target.value })}
+                      aria-label="Equipment model"
                     />
-                    <input
-                      className="rounded border border-border px-2 py-1 text-sm"
+                    <Input
+                      className="h-9"
                       placeholder="Plate #"
                       value={newEq.plateNumber}
                       onChange={(e) => setNewEq({ ...newEq, plateNumber: e.target.value })}
+                      aria-label="Equipment plate number"
                     />
-                    <input
-                      className="rounded border border-border px-2 py-1 text-sm"
+                    <Input
+                      className="h-9"
                       placeholder="State"
                       value={newEq.plateState}
                       onChange={(e) => setNewEq({ ...newEq, plateState: e.target.value })}
+                      aria-label="Equipment plate state"
                     />
                   </div>
                   <div className="flex gap-2">
@@ -652,7 +671,11 @@ export default function GuestsPage() {
                 <Download className="h-4 w-4 mr-2" />
                 Export CSV
               </Button>
-              <Button onClick={() => setShowAddForm(!showAddForm)}>
+              <Button
+                onClick={() => setShowAddForm(!showAddForm)}
+                aria-expanded={showAddForm}
+                aria-controls="guest-add-form"
+              >
                 <UserPlus className="h-4 w-4 mr-2" />
                 {showAddForm ? "Hide form" : "Add guest"}
               </Button>
@@ -662,6 +685,7 @@ export default function GuestsPage() {
 
         {flash && (
           <div
+            role={flash.type === "error" ? "alert" : "status"}
             className={`rounded-md border px-3 py-2 text-sm ${
               flash.type === "success"
                 ? "border-status-success/30 bg-status-success/10 text-status-success-text"
@@ -764,9 +788,10 @@ export default function GuestsPage() {
                 placeholder="Search name, email, phone…"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
+                aria-label="Search guests"
               />
               <Select value={vipFilter} onValueChange={(value) => setVipFilter(value as "all" | "vip" | "regular")}>
-                <SelectTrigger className="h-9 w-full sm:w-40">
+                <SelectTrigger className="h-9 w-full sm:w-40" aria-label="VIP filter">
                   <SelectValue placeholder="All guests" />
                 </SelectTrigger>
                 <SelectContent>
@@ -779,6 +804,7 @@ export default function GuestsPage() {
                 size="sm"
                 variant="outline"
                 onClick={() => setVipFilter("vip")}
+                aria-pressed={vipFilter === "vip"}
               >
                 <Crown className="h-3 w-3 mr-1" />
                 VIP guests
@@ -851,144 +877,164 @@ export default function GuestsPage() {
 
         {/* Collapsible Add Guest Form */}
         {showAddForm && (
-          <div className="rounded-lg border border-border bg-card p-4">
+          <div id="guest-add-form" className="rounded-lg border border-border bg-card p-4">
             <h3 className="text-lg font-semibold text-foreground mb-3">Add new guest</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <input
+            <Input
               className="rounded-md border border-border px-3 py-2"
               placeholder="First name"
               value={form.primaryFirstName}
               onChange={(e) => setForm((s) => ({ ...s, primaryFirstName: e.target.value }))}
+              aria-label="First name"
             />
-            <input
+            <Input
               className="rounded-md border border-border px-3 py-2"
               placeholder="Last name"
               value={form.primaryLastName}
               onChange={(e) => setForm((s) => ({ ...s, primaryLastName: e.target.value }))}
+              aria-label="Last name"
             />
-            <input
+            <Input
               className="rounded-md border border-border px-3 py-2"
               placeholder="Email"
               value={form.email}
               onChange={(e) => setForm((s) => ({ ...s, email: e.target.value }))}
+              aria-label="Email"
             />
-            <input
+            <Input
               className="rounded-md border border-border px-3 py-2"
               placeholder="Phone"
               value={form.phone}
               onChange={(e) => setForm((s) => ({ ...s, phone: e.target.value }))}
+              aria-label="Phone"
             />
-            <input
+            <Input
               className="rounded-md border border-border px-3 py-2"
               placeholder="Preferred contact (email/phone/sms)"
               value={form.preferredContact}
               onChange={(e) => setForm((s) => ({ ...s, preferredContact: e.target.value }))}
+              aria-label="Preferred contact method"
             />
-            <input
+            <Input
               className="rounded-md border border-border px-3 py-2"
               placeholder="Preferred language"
               value={form.preferredLanguage}
               onChange={(e) => setForm((s) => ({ ...s, preferredLanguage: e.target.value }))}
+              aria-label="Preferred language"
             />
-            <input
+            <Input
               className="rounded-md border border-border px-3 py-2"
               placeholder="Address 1"
               value={form.address1}
               onChange={(e) => setForm((s) => ({ ...s, address1: e.target.value }))}
+              aria-label="Address line 1"
             />
-            <input
+            <Input
               className="rounded-md border border-border px-3 py-2"
               placeholder="Address 2"
               value={form.address2}
               onChange={(e) => setForm((s) => ({ ...s, address2: e.target.value }))}
+              aria-label="Address line 2"
             />
-            <input
+            <Input
               className="rounded-md border border-border px-3 py-2"
               placeholder="City"
               value={form.city}
               onChange={(e) => setForm((s) => ({ ...s, city: e.target.value }))}
+              aria-label="City"
             />
-            <input
+            <Input
               className="rounded-md border border-border px-3 py-2"
               placeholder="State/Province"
               value={form.state}
               onChange={(e) => setForm((s) => ({ ...s, state: e.target.value }))}
+              aria-label="State or province"
             />
-            <input
+            <Input
               className="rounded-md border border-border px-3 py-2"
               placeholder="Postal code"
               value={form.postalCode}
               onChange={(e) => setForm((s) => ({ ...s, postalCode: e.target.value }))}
+              aria-label="Postal code"
             />
-            <input
+            <Input
               className="rounded-md border border-border px-3 py-2"
               placeholder="Country"
               value={form.country}
               onChange={(e) => setForm((s) => ({ ...s, country: e.target.value }))}
+              aria-label="Country"
             />
-            <input
+            <Input
               className="rounded-md border border-border px-3 py-2"
               placeholder="Rig type"
               value={form.rigType}
               onChange={(e) => setForm((s) => ({ ...s, rigType: e.target.value }))}
+              aria-label="Rig type"
             />
-            <input
+            <Input
               type="number"
               className="rounded-md border border-border px-3 py-2"
               placeholder="Rig length (ft)"
               value={form.rigLength}
               onChange={(e) => setForm((s) => ({ ...s, rigLength: e.target.value }))}
+              aria-label="Rig length in feet"
             />
-            <input
+            <Input
               className="rounded-md border border-border px-3 py-2"
               placeholder="Vehicle plate"
               value={form.vehiclePlate}
               onChange={(e) => setForm((s) => ({ ...s, vehiclePlate: e.target.value }))}
+              aria-label="Vehicle plate"
             />
-            <input
+            <Input
               className="rounded-md border border-border px-3 py-2"
               placeholder="Vehicle state"
               value={form.vehicleState}
               onChange={(e) => setForm((s) => ({ ...s, vehicleState: e.target.value }))}
+              aria-label="Vehicle state"
             />
-            <input
+            <Input
               className="rounded-md border border-border px-3 py-2 md:col-span-2"
               placeholder="Notes (optional)"
               value={form.notes}
               onChange={(e) => setForm((s) => ({ ...s, notes: e.target.value }))}
+              aria-label="Notes"
             />
-            <input
+            <Input
               className="rounded-md border border-border px-3 py-2"
               placeholder="Lead source"
               value={form.leadSource}
               onChange={(e) => setForm((s) => ({ ...s, leadSource: e.target.value }))}
+              aria-label="Lead source"
             />
-            <input
+            <Input
               className="rounded-md border border-border px-3 py-2"
               placeholder="Tags (comma separated)"
               value={form.tags}
               onChange={(e) => setForm((s) => ({ ...s, tags: e.target.value }))}
+              aria-label="Tags"
             />
-            <input
+            <Input
               type="number"
               className="rounded-md border border-border px-3 py-2"
               placeholder="Repeat stays"
               value={form.repeatStays}
               onChange={(e) => setForm((s) => ({ ...s, repeatStays: e.target.value }))}
+              aria-label="Repeat stays"
             />
             <label className="flex items-center gap-2 text-sm text-foreground">
-              <input
-                type="checkbox"
+              <Checkbox
                 checked={form.vip}
-                onChange={(e) => setForm((s) => ({ ...s, vip: e.target.checked }))}
+                onCheckedChange={(checked) => setForm((s) => ({ ...s, vip: Boolean(checked) }))}
+                aria-label="VIP"
               />
               VIP
             </label>
             <label className="flex items-center gap-2 text-sm text-foreground">
-              <input
-                type="checkbox"
+              <Checkbox
                 checked={form.marketingOptIn}
-                onChange={(e) => setForm((s) => ({ ...s, marketingOptIn: e.target.checked }))}
+                onCheckedChange={(checked) => setForm((s) => ({ ...s, marketingOptIn: Boolean(checked) }))}
+                aria-label="Marketing opt-in"
               />
               Marketing opt-in
             </label>
@@ -1013,7 +1059,11 @@ export default function GuestsPage() {
             <Button variant="ghost" onClick={() => setShowAddForm(false)}>
               Cancel
             </Button>
-            {createGuest.isError && <span className="ml-3 text-sm text-status-error">Failed to save guest</span>}
+            {createGuest.isError && (
+              <span role="alert" className="ml-3 text-sm text-status-error">
+                Failed to save guest
+              </span>
+            )}
           </div>
           </div>
         )}
@@ -1106,6 +1156,8 @@ export default function GuestsPage() {
                         size="sm"
                         variant="outline"
                         onClick={() => setExpandedGuestId(expandedGuestId === g.id ? null : g.id)}
+                        aria-expanded={expandedGuestId === g.id}
+                        aria-controls={`guest-details-${g.id}`}
                       >
                         {expandedGuestId === g.id ? "Hide" : "Expand"}
                       </Button>
@@ -1116,6 +1168,7 @@ export default function GuestsPage() {
                             variant="ghost"
                             className="text-status-error hover:text-status-error hover:bg-status-error/10"
                             disabled={deleteGuest.isPending}
+                            aria-label={`Delete ${g.primaryFirstName} ${g.primaryLastName}`}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -1132,7 +1185,7 @@ export default function GuestsPage() {
                 </StaggeredTableRow>
                 {/* Expanded row for additional details */}
                 {expandedGuestId === g.id && (
-                  <tr className="bg-muted">
+                  <tr id={`guest-details-${g.id}`} className="bg-muted">
                     <td colSpan={7} className="px-3 py-4">
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
@@ -1227,7 +1280,7 @@ export default function GuestsPage() {
                       <div className="h-20 w-20 rounded-full bg-muted flex items-center justify-center">
                         <Users className="h-10 w-10 text-muted-foreground" />
                       </div>
-                      <div className="space-y-2">
+                      <div className="space-y-2" role={guestsQuery.isError ? "alert" : "status"}>
                         <p className="text-lg font-semibold text-foreground">
                           {!campgroundChecked
                             ? "Loading..."

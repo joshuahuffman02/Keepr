@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useWhoami } from "@/hooks/use-whoami";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { StaffNavigation } from "@/components/staff/StaffNavigation";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Clock,
@@ -254,7 +256,7 @@ export default function TimeclockPage({ params }: { params: { campgroundId: stri
                 status.type === "error" && "bg-red-600 text-white",
                 status.type === "info" && "bg-blue-600 text-white"
               )}
-              role="status"
+              role={status.type === "error" ? "alert" : "status"}
               aria-live="polite"
             >
               {status.type === "success" && <CheckCircle2 className="w-5 h-5" />}
@@ -338,6 +340,7 @@ export default function TimeclockPage({ params }: { params: { campgroundId: stri
                       whileHover={{ scale: 1.01 }}
                       whileTap={{ scale: 0.99 }}
                       onClick={() => setShiftId(shift.id)}
+                      aria-pressed={shiftId === shift.id}
                       className={cn(
                         "w-full text-left rounded-lg border-2 p-4 transition-all",
                         shiftId === shift.id
@@ -371,10 +374,11 @@ export default function TimeclockPage({ params }: { params: { campgroundId: stri
 
               {/* Manual Entry */}
               <div className="pt-4 border-t border-border">
-                <label className="block text-sm font-medium text-foreground mb-2">
+                <Label htmlFor="timeclock-shift-id" className="block text-sm font-medium text-foreground mb-2">
                   Or enter shift ID manually
-                </label>
-                <input
+                </Label>
+                <Input
+                  id="timeclock-shift-id"
                   type="text"
                   value={shiftId}
                   onChange={(e) => setShiftId(e.target.value)}
@@ -422,10 +426,11 @@ export default function TimeclockPage({ params }: { params: { campgroundId: stri
 
               {/* Note Field */}
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
+                <Label htmlFor="timeclock-note" className="block text-sm font-medium text-foreground mb-2">
                   Add a note <span className="text-muted-foreground">(optional)</span>
-                </label>
-                <input
+                </Label>
+                <Input
+                  id="timeclock-note"
                   type="text"
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
@@ -513,6 +518,8 @@ export default function TimeclockPage({ params }: { params: { campgroundId: stri
                         whileTap={{ scale: 0.98 }}
                         onClick={() => setShowBreakMenu(!showBreakMenu)}
                         disabled={breakLoading}
+                        aria-expanded={showBreakMenu}
+                        aria-controls="timeclock-break-menu"
                         className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 border-amber-200 bg-amber-50 text-amber-700 font-medium disabled:opacity-50 hover:bg-amber-100 transition-all"
                       >
                         {breakLoading ? (
@@ -529,6 +536,7 @@ export default function TimeclockPage({ params }: { params: { campgroundId: stri
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
+                            id="timeclock-break-menu"
                             className="absolute top-full mt-2 left-0 right-0 bg-card rounded-lg shadow-lg border border-border overflow-hidden z-10"
                           >
                             <button

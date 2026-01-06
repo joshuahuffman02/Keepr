@@ -8,6 +8,13 @@ import { apiClient } from "../../lib/api-client";
 import { Button } from "../../components/ui/button";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { DashboardShell } from "../../components/ui/layout/DashboardShell";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../components/ui/select";
 import { CampgroundSchema } from "@keepr/shared";
 import type { z } from "zod";
 
@@ -88,18 +95,27 @@ function CampgroundsPageContent() {
               </div>
               <div className="mt-3 flex flex-wrap items-center gap-3 text-sm text-foreground">
                 <div className="text-xs uppercase tracking-wide text-muted-foreground">Deposit rule</div>
-                <select
-                  className="rounded-md border border-border px-3 py-2 text-sm"
+                <Select
                   value={cg.depositRule || "none"}
-                  onChange={(e) => depositMutation.mutate({ id: cg.id, rule: e.target.value as z.infer<typeof CampgroundSchema>["depositRule"] })}
-                  disabled={depositMutation.isPending}
+                  onValueChange={(value) =>
+                    depositMutation.mutate({ id: cg.id, rule: value as z.infer<typeof CampgroundSchema>["depositRule"] })
+                  }
                 >
-                  <option value="none">None</option>
-                  <option value="full">Full (100%)</option>
-                  <option value="half">Half (50%)</option>
-                  <option value="first_night">First night</option>
-                  <option value="first_night_fees">First night + fees</option>
-                </select>
+                  <SelectTrigger
+                    className="w-[180px] text-sm"
+                    disabled={depositMutation.isPending}
+                    aria-label="Deposit rule"
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None</SelectItem>
+                    <SelectItem value="full">Full (100%)</SelectItem>
+                    <SelectItem value="half">Half (50%)</SelectItem>
+                    <SelectItem value="first_night">First night</SelectItem>
+                    <SelectItem value="first_night_fees">First night + fees</SelectItem>
+                  </SelectContent>
+                </Select>
                 {depositMutation.isPending && <span className="text-xs text-muted-foreground">Saving…</span>}
                 {depositMutation.isError && <span className="text-xs text-rose-600">Failed to save</span>}
               </div>

@@ -88,6 +88,7 @@ export default function DisputesPage() {
                 size="sm"
                 variant={status === (s === "all" ? undefined : s) ? "default" : "outline"}
                 onClick={() => setStatus(s === "all" ? undefined : s)}
+                aria-pressed={status === (s === "all" ? undefined : s)}
               >
                 {s === "all" ? "All" : `${s.replace("_", " ")}${counts[s] ? ` (${counts[s]})` : ""}`}
               </Button>
@@ -116,7 +117,7 @@ export default function DisputesPage() {
         {dueSoonCount > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-sm text-amber-800">Disputes due soon: {dueSoonCount} (within {DUE_SOON_HOURS}h)</CardTitle>
+              <CardTitle className="text-sm text-status-warning">Disputes due soon: {dueSoonCount} (within {DUE_SOON_HOURS}h)</CardTitle>
             </CardHeader>
           </Card>
         )}
@@ -155,18 +156,18 @@ export default function DisputesPage() {
               <TableBody>
                 {!data && isLoading && (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground">Loading...</TableCell>
+                    <TableCell colSpan={8} className="text-center text-muted-foreground">Loading...</TableCell>
                   </TableRow>
                 )}
                 {data?.length === 0 && !isLoading && (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground">No disputes.</TableCell>
+                    <TableCell colSpan={8} className="text-center text-muted-foreground">No disputes.</TableCell>
                   </TableRow>
                 )}
                 {data?.map((d) => (
                   <TableRow key={d.id}>
                     <TableCell className="font-mono text-xs">
-                      <Link className="text-indigo-600 hover:underline" href={`/finance/disputes/${d.id}`}>
+                      <Link className="text-primary hover:underline" href={`/finance/disputes/${d.id}`}>
                         {d.stripeDisputeId}
                       </Link>
                     </TableCell>
@@ -179,7 +180,7 @@ export default function DisputesPage() {
                     <TableCell className="text-xs text-foreground">{d.reason ?? "—"}</TableCell>
                     <TableCell className="text-xs text-foreground">
                       {d.reservationId ? (
-                        <Link className="text-indigo-600 hover:underline" href={`/campgrounds/${campgroundId}/reservations/${d.reservationId}`}>
+                        <Link className="text-primary hover:underline" href={`/campgrounds/${campgroundId}/reservations/${d.reservationId}`}>
                           {d.reservationId}
                         </Link>
                       ) : "—"}
@@ -199,4 +200,3 @@ export default function DisputesPage() {
     </DashboardShell>
   );
 }
-

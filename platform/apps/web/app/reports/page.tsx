@@ -6,6 +6,16 @@ import { DashboardShell } from "../../components/ui/layout/DashboardShell";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Button } from "../../components/ui/button";
 import { Card } from "../../components/ui/card";
+import { Checkbox } from "../../components/ui/checkbox";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../components/ui/select";
 import { useToast } from "../../components/ui/use-toast";
 import { HelpAnchor } from "../../components/help/HelpAnchor";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "../../components/ui/dialog";
@@ -107,6 +117,7 @@ function ReportsPageInner() {
       end: end.toISOString().slice(0, 10)
     };
   });
+  const [activePreset, setActivePreset] = useState<string | null>(null);
   const [showActivePromos, setShowActivePromos] = useState(false);
 
   // Export confirmation dialog state
@@ -474,25 +485,25 @@ function ReportsPageInner() {
               <div className="text-sm text-muted-foreground">Daily summary for {drText}</div>
               {pickupStats && (
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 shadow-inner">
-                    <div className="text-xs text-emerald-700 mb-1">Bookings (last 7d)</div>
-                    <div className="text-2xl font-bold text-emerald-900">{pickupStats.w7.current.count}</div>
-                    <div className="text-sm text-emerald-800">Rev: {formatCurrency(pickupStats.w7.current.revenue, 0)}</div>
-                    <div className="text-xs text-emerald-700">Occ: {((pickupStats.w7.current.count / pickupStats.activeSitesCount) * 100).toFixed(1)}%</div>
+                  <div className="rounded-lg border border-status-success/20 bg-status-success/10 p-3 shadow-inner">
+                    <div className="text-xs text-status-success mb-1">Bookings (last 7d)</div>
+                    <div className="text-2xl font-bold text-status-success">{pickupStats.w7.current.count}</div>
+                    <div className="text-sm text-status-success">Rev: {formatCurrency(pickupStats.w7.current.revenue, 0)}</div>
+                    <div className="text-xs text-status-success">Occ: {((pickupStats.w7.current.count / pickupStats.activeSitesCount) * 100).toFixed(1)}%</div>
                   </div>
                   <div className="rounded-lg border border-border bg-card p-3 shadow-sm">
                     <div className="text-xs text-muted-foreground mb-1">vs prior 7d</div>
-                    <div className={`text-xl font-bold ${pickupStats.w7.countDelta >= 0 ? 'text-emerald-800' : 'text-rose-800'}`}>
+                    <div className={`text-xl font-bold ${pickupStats.w7.countDelta >= 0 ? 'text-status-success' : 'text-status-error'}`}>
                       {pickupStats.w7.countDelta >= 0 ? '+' : ''}{pickupStats.w7.countDelta} bookings
                     </div>
-                    <div className={`text-sm ${pickupStats.w7.revenueDelta >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+                    <div className={`text-sm ${pickupStats.w7.revenueDelta >= 0 ? 'text-status-success' : 'text-status-error'}`}>
                       {pickupStats.w7.revenueDelta >= 0 ? '+' : ''}{formatCurrency(pickupStats.w7.revenueDelta, 0)} revenue
                     </div>
                   </div>
-                  <div className="rounded-lg border border-indigo-200 bg-indigo-50 p-3 shadow-inner">
-                    <div className="text-xs text-indigo-700 mb-1">Future bookings (count)</div>
-                    <div className="text-2xl font-bold text-indigo-900">{futureRevenue?.count ?? 0}</div>
-                    <div className="text-sm text-indigo-800">Outstanding: {formatCurrency(futureRevenue?.outstanding ?? 0, 0)}</div>
+                  <div className="rounded-lg border border-primary/20 bg-primary/10 p-3 shadow-inner">
+                    <div className="text-xs text-primary mb-1">Future bookings (count)</div>
+                    <div className="text-2xl font-bold text-primary">{futureRevenue?.count ?? 0}</div>
+                    <div className="text-sm text-primary">Outstanding: {formatCurrency(futureRevenue?.outstanding ?? 0, 0)}</div>
                   </div>
                 </div>
               )}
@@ -518,10 +529,10 @@ function ReportsPageInner() {
                           <td className="px-3 py-2 font-medium text-foreground">{row.label}</td>
                           <td className="px-3 py-2 text-foreground">{row.data.current.count}</td>
                           <td className="px-3 py-2 text-foreground">{formatCurrency(row.data.current.revenue, 0)}</td>
-                          <td className={`px-3 py-2 ${row.data.countDelta >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+                          <td className={`px-3 py-2 ${row.data.countDelta >= 0 ? 'text-status-success' : 'text-status-error'}`}>
                             {row.data.countDelta >= 0 ? '+' : ''}{row.data.countDelta}
                           </td>
-                          <td className={`px-3 py-2 ${row.data.revenueDelta >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+                          <td className={`px-3 py-2 ${row.data.revenueDelta >= 0 ? 'text-status-success' : 'text-status-error'}`}>
                             {row.data.revenueDelta >= 0 ? '+' : ''}{formatCurrency(row.data.revenueDelta, 0)}
                           </td>
                         </tr>
@@ -531,21 +542,21 @@ function ReportsPageInner() {
                 </div>
               )}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3">
-                  <div className="text-xs text-emerald-700 mb-1">Total</div>
-                  <div className="text-2xl font-bold text-emerald-900">{reservationStats.total}</div>
+                <div className="rounded-lg border border-status-success/20 bg-status-success/10 p-3">
+                  <div className="text-xs text-status-success mb-1">Total</div>
+                  <div className="text-2xl font-bold text-status-success">{reservationStats.total}</div>
                 </div>
                 <div className="rounded-lg border border-border bg-muted p-3">
                   <div className="text-xs text-muted-foreground mb-1">Revenue</div>
                   <div className="text-2xl font-bold text-foreground">{formatCurrency(reservationStats.totalRevenue, 0)}</div>
                 </div>
-                <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
-                  <div className="text-xs text-blue-700 mb-1">Avg Lead Time</div>
-                  <div className="text-2xl font-bold text-blue-900">{reservationStats.avgLeadTime}d</div>
+                <div className="rounded-lg border border-primary/20 bg-primary/10 p-3">
+                  <div className="text-xs text-primary mb-1">Avg Lead Time</div>
+                  <div className="text-2xl font-bold text-primary">{reservationStats.avgLeadTime}d</div>
                 </div>
-                <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
-                  <div className="text-xs text-amber-700 mb-1">Cancelled</div>
-                  <div className="text-2xl font-bold text-amber-900">{reservationStats.byStatus['cancelled'] || 0}</div>
+                <div className="rounded-lg border border-status-warning/20 bg-status-warning/10 p-3">
+                  <div className="text-xs text-status-warning mb-1">Cancelled</div>
+                  <div className="text-2xl font-bold text-status-warning">{reservationStats.byStatus['cancelled'] || 0}</div>
                 </div>
               </div>
             </div>
@@ -575,24 +586,24 @@ function ReportsPageInner() {
               <div className="text-sm text-muted-foreground">Revenue overview for {drText}</div>
               {pickupStats && (
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 shadow-inner">
-                    <div className="text-xs text-emerald-700 mb-1">Bookings (last 7d)</div>
-                    <div className="text-2xl font-bold text-emerald-900">{pickupStats.w7.current.count}</div>
-                    <div className="text-sm text-emerald-800">Rev: {formatCurrency(pickupStats.w7.current.revenue, 0)}</div>
+                  <div className="rounded-lg border border-status-success/20 bg-status-success/10 p-3 shadow-inner">
+                    <div className="text-xs text-status-success mb-1">Bookings (last 7d)</div>
+                    <div className="text-2xl font-bold text-status-success">{pickupStats.w7.current.count}</div>
+                    <div className="text-sm text-status-success">Rev: {formatCurrency(pickupStats.w7.current.revenue, 0)}</div>
                   </div>
                   <div className="rounded-lg border border-border bg-card p-3 shadow-sm">
                     <div className="text-xs text-muted-foreground mb-1">vs prior 7d</div>
-                    <div className={`text-xl font-bold ${pickupStats.w7.countDelta >= 0 ? 'text-emerald-800' : 'text-rose-800'}`}>
+                    <div className={`text-xl font-bold ${pickupStats.w7.countDelta >= 0 ? 'text-status-success' : 'text-status-error'}`}>
                       {pickupStats.w7.countDelta >= 0 ? '+' : ''}{pickupStats.w7.countDelta} bookings
                     </div>
-                    <div className={`text-sm ${pickupStats.w7.revenueDelta >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+                    <div className={`text-sm ${pickupStats.w7.revenueDelta >= 0 ? 'text-status-success' : 'text-status-error'}`}>
                       {pickupStats.w7.revenueDelta >= 0 ? '+' : ''}{formatCurrency(pickupStats.w7.revenueDelta, 0)} revenue
                     </div>
                   </div>
-                  <div className="rounded-lg border border-indigo-200 bg-indigo-50 p-3 shadow-inner">
-                    <div className="text-xs text-indigo-700 mb-1">Future bookings (count)</div>
-                    <div className="text-2xl font-bold text-indigo-900">{futureRevenue?.count ?? 0}</div>
-                    <div className="text-sm text-indigo-800">Outstanding: {formatCurrency(futureRevenue?.outstanding ?? 0, 0)}</div>
+                  <div className="rounded-lg border border-primary/20 bg-primary/10 p-3 shadow-inner">
+                    <div className="text-xs text-primary mb-1">Future bookings (count)</div>
+                    <div className="text-2xl font-bold text-primary">{futureRevenue?.count ?? 0}</div>
+                    <div className="text-sm text-primary">Outstanding: {formatCurrency(futureRevenue?.outstanding ?? 0, 0)}</div>
                   </div>
                 </div>
               )}
@@ -618,10 +629,10 @@ function ReportsPageInner() {
                           <td className="px-3 py-2 font-medium text-foreground">{row.label}</td>
                           <td className="px-3 py-2 text-foreground">{row.data.current.count}</td>
                           <td className="px-3 py-2 text-foreground">{formatCurrency(row.data.current.revenue, 0)}</td>
-                          <td className={`px-3 py-2 ${row.data.countDelta >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+                          <td className={`px-3 py-2 ${row.data.countDelta >= 0 ? 'text-status-success' : 'text-status-error'}`}>
                             {row.data.countDelta >= 0 ? '+' : ''}{row.data.countDelta}
                           </td>
-                          <td className={`px-3 py-2 ${row.data.revenueDelta >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+                          <td className={`px-3 py-2 ${row.data.revenueDelta >= 0 ? 'text-status-success' : 'text-status-error'}`}>
                             {row.data.revenueDelta >= 0 ? '+' : ''}{formatCurrency(row.data.revenueDelta, 0)}
                           </td>
                         </tr>
@@ -631,13 +642,13 @@ function ReportsPageInner() {
                 </div>
               )}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3">
-                  <div className="text-xs text-emerald-700 mb-1">Revenue (30d)</div>
-                  <div className="text-2xl font-bold text-emerald-900">{formatCurrency(summaryQuery.data.revenue)}</div>
+                <div className="rounded-lg border border-status-success/20 bg-status-success/10 p-3">
+                  <div className="text-xs text-status-success mb-1">Revenue (30d)</div>
+                  <div className="text-2xl font-bold text-status-success">{formatCurrency(summaryQuery.data.revenue)}</div>
                 </div>
-                <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
-                  <div className="text-xs text-blue-700 mb-1">ADR</div>
-                  <div className="text-2xl font-bold text-blue-900">{formatCurrency(summaryQuery.data.adr)}</div>
+                <div className="rounded-lg border border-primary/20 bg-primary/10 p-3">
+                  <div className="text-xs text-primary mb-1">ADR</div>
+                  <div className="text-2xl font-bold text-primary">{formatCurrency(summaryQuery.data.adr)}</div>
                 </div>
                 <div className="rounded-lg border border-border bg-muted p-3">
                   <div className="text-xs text-muted-foreground mb-1">RevPAR</div>
@@ -699,6 +710,7 @@ function ReportsPageInner() {
           }), { bookings: 0, nights: 0, revenue: 0 });
 
           const setPresetRange = (preset: string) => {
+            setActivePreset(preset);
             const end = new Date();
             const start = new Date();
             switch (preset) {
@@ -726,39 +738,49 @@ function ReportsPageInner() {
                     <button
                       key={preset.value}
                       onClick={() => setPresetRange(preset.value)}
+                      type="button"
                       className="px-2 py-1 text-xs rounded-md border border-border bg-card hover:bg-muted text-foreground"
+                      aria-pressed={activePreset === preset.value}
                     >
                       {preset.label}
                     </button>
                   ))}
                 </div>
-                <input
+                <Input
                   type="date"
                   value={dateRange.start}
-                  onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
+                  onChange={(e) => {
+                    setActivePreset(null);
+                    setDateRange(prev => ({ ...prev, start: e.target.value }));
+                  }}
                   className="px-2 py-1 text-xs rounded-md border border-border"
+                  aria-label="Start date"
                 />
                 <span className="text-muted-foreground">→</span>
-                <input
+                <Input
                   type="date"
                   value={dateRange.end}
-                  onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
+                  onChange={(e) => {
+                    setActivePreset(null);
+                    setDateRange(prev => ({ ...prev, end: e.target.value }));
+                  }}
                   className="px-2 py-1 text-xs rounded-md border border-border"
+                  aria-label="End date"
                 />
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3">
-                  <div className="text-xs text-emerald-700 mb-1">Total Revenue</div>
-                  <div className="text-2xl font-bold text-emerald-900">{formatCurrency(totals.revenue)}</div>
+                <div className="rounded-lg border border-status-success/20 bg-status-success/10 p-3">
+                  <div className="text-xs text-status-success mb-1">Total Revenue</div>
+                  <div className="text-2xl font-bold text-status-success">{formatCurrency(totals.revenue)}</div>
                 </div>
-                <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
-                  <div className="text-xs text-blue-700 mb-1">Bookings</div>
-                  <div className="text-2xl font-bold text-blue-900">{totals.bookings}</div>
+                <div className="rounded-lg border border-primary/20 bg-primary/10 p-3">
+                  <div className="text-xs text-primary mb-1">Bookings</div>
+                  <div className="text-2xl font-bold text-primary">{totals.bookings}</div>
                 </div>
-                <div className="rounded-lg border border-indigo-200 bg-indigo-50 p-3">
-                  <div className="text-xs text-indigo-700 mb-1">Nights Booked</div>
-                  <div className="text-2xl font-bold text-indigo-900">{totals.nights}</div>
+                <div className="rounded-lg border border-primary/20 bg-primary/10 p-3">
+                  <div className="text-xs text-primary mb-1">Nights Booked</div>
+                  <div className="text-2xl font-bold text-primary">{totals.nights}</div>
                 </div>
                 <div className="rounded-lg border border-border bg-muted p-3">
                   <div className="text-xs text-muted-foreground mb-1">Avg Occupancy</div>
@@ -792,7 +814,7 @@ function ReportsPageInner() {
                         <td className="px-3 py-2 text-right text-foreground">{site.nights}</td>
                         <td className="px-3 py-2 text-right text-muted-foreground">{site.available}</td>
                         <td className="px-3 py-2 text-right">
-                          <span className={`font-medium ${Number(site.occupancy) >= 70 ? 'text-emerald-700' : Number(site.occupancy) >= 40 ? 'text-amber-700' : 'text-rose-700'}`}>
+                          <span className={`font-medium ${Number(site.occupancy) >= 70 ? 'text-status-success' : Number(site.occupancy) >= 40 ? 'text-status-warning' : 'text-status-error'}`}>
                             {site.occupancy}%
                           </span>
                         </td>
@@ -829,17 +851,17 @@ function ReportsPageInner() {
             <div className="space-y-3">
               <div className="text-sm text-muted-foreground">Guest behavior</div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3">
-                  <div className="text-xs text-emerald-700 mb-1">Total</div>
-                  <div className="text-2xl font-bold text-emerald-900">{reservationStats?.total ?? 0}</div>
+                <div className="rounded-lg border border-status-success/20 bg-status-success/10 p-3">
+                  <div className="text-xs text-status-success mb-1">Total</div>
+                  <div className="text-2xl font-bold text-status-success">{reservationStats?.total ?? 0}</div>
                 </div>
-                <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
-                  <div className="text-xs text-amber-700 mb-1">Cancelled</div>
-                  <div className="text-2xl font-bold text-amber-900">{cancellationStats.total}</div>
+                <div className="rounded-lg border border-status-warning/20 bg-status-warning/10 p-3">
+                  <div className="text-xs text-status-warning mb-1">Cancelled</div>
+                  <div className="text-2xl font-bold text-status-warning">{cancellationStats.total}</div>
                 </div>
-                <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
-                  <div className="text-xs text-blue-700 mb-1">Avg Lead Time</div>
-                  <div className="text-2xl font-bold text-blue-900">{reservationStats?.avgLeadTime ?? 0}d</div>
+                <div className="rounded-lg border border-primary/20 bg-primary/10 p-3">
+                  <div className="text-xs text-primary mb-1">Avg Lead Time</div>
+                  <div className="text-2xl font-bold text-primary">{reservationStats?.avgLeadTime ?? 0}d</div>
                 </div>
                 <div className="rounded-lg border border-border bg-muted p-3">
                   <div className="text-xs text-muted-foreground mb-1">Cancel Rate</div>
@@ -884,14 +906,12 @@ function ReportsPageInner() {
                 Live promo codes with usage and validity. Redemptions respect the page date range ({dateRange.start} → {dateRange.end}).
               </div>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <input
+                <Checkbox
                   id="show-active-promos"
-                  type="checkbox"
-                  className="h-3 w-3 rounded border-border"
                   checked={showActivePromos}
-                  onChange={(e) => setShowActivePromos(e.target.checked)}
+                  onCheckedChange={(checked) => setShowActivePromos(Boolean(checked))}
                 />
-                <label htmlFor="show-active-promos">Show active only</label>
+                <Label htmlFor="show-active-promos">Show active only</Label>
               </div>
 
               {promotionsQuery.isLoading ? (
@@ -1007,17 +1027,17 @@ function ReportsPageInner() {
               </div>
               {pickupStats && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 shadow-inner">
-                    <div className="text-xs text-emerald-700 mb-1">Bookings (last 7d)</div>
-                    <div className="text-2xl font-bold text-emerald-900">{pickupStats.w7.current.count}</div>
-                    <div className="text-sm text-emerald-800">Rev: {formatCurrency(pickupStats.w7.current.revenue, 0)}</div>
+                  <div className="rounded-lg border border-status-success/20 bg-status-success/10 p-3 shadow-inner">
+                    <div className="text-xs text-status-success mb-1">Bookings (last 7d)</div>
+                    <div className="text-2xl font-bold text-status-success">{pickupStats.w7.current.count}</div>
+                    <div className="text-sm text-status-success">Rev: {formatCurrency(pickupStats.w7.current.revenue, 0)}</div>
                   </div>
                   <div className="rounded-lg border border-border bg-card p-3 shadow-sm">
                     <div className="text-xs text-muted-foreground mb-1">vs prior 7d</div>
-                    <div className={`text-xl font-bold ${pickupStats.w7.countDelta >= 0 ? 'text-emerald-800' : 'text-rose-800'}`}>
+                    <div className={`text-xl font-bold ${pickupStats.w7.countDelta >= 0 ? 'text-status-success' : 'text-status-error'}`}>
                       {pickupStats.w7.countDelta >= 0 ? '+' : ''}{pickupStats.w7.countDelta} bookings
                     </div>
-                    <div className={`text-sm ${pickupStats.w7.revenueDelta >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+                    <div className={`text-sm ${pickupStats.w7.revenueDelta >= 0 ? 'text-status-success' : 'text-status-error'}`}>
                       {pickupStats.w7.revenueDelta >= 0 ? '+' : ''}{formatCurrency(pickupStats.w7.revenueDelta, 0)} revenue
                     </div>
                   </div>
@@ -1045,10 +1065,10 @@ function ReportsPageInner() {
                           <td className="px-3 py-2 font-medium text-foreground">{row.label}</td>
                           <td className="px-3 py-2 text-foreground">{row.data.current.count}</td>
                           <td className="px-3 py-2 text-foreground">{formatCurrency(row.data.current.revenue, 0)}</td>
-                          <td className={`px-3 py-2 ${row.data.countDelta >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+                          <td className={`px-3 py-2 ${row.data.countDelta >= 0 ? 'text-status-success' : 'text-status-error'}`}>
                             {row.data.countDelta >= 0 ? '+' : ''}{row.data.countDelta}
                           </td>
-                          <td className={`px-3 py-2 ${row.data.revenueDelta >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+                          <td className={`px-3 py-2 ${row.data.revenueDelta >= 0 ? 'text-status-success' : 'text-status-error'}`}>
                             {row.data.revenueDelta >= 0 ? '+' : ''}{formatCurrency(row.data.revenueDelta, 0)}
                           </td>
                         </tr>
@@ -1074,8 +1094,9 @@ function ReportsPageInner() {
               <div className="rounded-xl border border-border bg-card shadow-sm p-4 space-y-3">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                   <div className="space-y-1">
-                    <label className="text-xs font-medium text-muted-foreground">Comparison Date A</label>
-                    <input
+                    <Label htmlFor="pickup-comparison-a" className="text-xs font-medium text-muted-foreground">Comparison Date A</Label>
+                    <Input
+                      id="pickup-comparison-a"
                       type="date"
                       value={pickupFilters.comparisonA}
                       onChange={(e) => setPickupFilters((prev) => ({ ...prev, comparisonA: e.target.value }))}
@@ -1083,8 +1104,9 @@ function ReportsPageInner() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-medium text-muted-foreground">Comparison Date B</label>
-                    <input
+                    <Label htmlFor="pickup-comparison-b" className="text-xs font-medium text-muted-foreground">Comparison Date B</Label>
+                    <Input
+                      id="pickup-comparison-b"
                       type="date"
                       value={pickupFilters.comparisonB}
                       onChange={(e) => setPickupFilters((prev) => ({ ...prev, comparisonB: e.target.value }))}
@@ -1092,8 +1114,9 @@ function ReportsPageInner() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-medium text-muted-foreground">Show occupancy starting on</label>
-                    <input
+                    <Label htmlFor="pickup-occupancy-start" className="text-xs font-medium text-muted-foreground">Show occupancy starting on</Label>
+                    <Input
+                      id="pickup-occupancy-start"
                       type="date"
                       value={pickupFilters.occupancyStart}
                       onChange={(e) => setPickupFilters((prev) => ({ ...prev, occupancyStart: e.target.value }))}
@@ -1101,56 +1124,66 @@ function ReportsPageInner() {
                     />
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-medium text-muted-foreground">Interval</label>
-                    <select
+                    <Label htmlFor="pickup-interval" className="text-xs font-medium text-muted-foreground">Interval</Label>
+                    <Select
                       value={pickupFilters.interval}
-                      onChange={(e) => setPickupFilters((prev) => ({ ...prev, interval: e.target.value as 'weekly' | 'daily' }))}
-                      className="w-full rounded-md border border-border px-2 py-1 text-sm bg-card"
+                      onValueChange={(value) => setPickupFilters((prev) => ({ ...prev, interval: value as 'weekly' | 'daily' }))}
                     >
-                      <option value="daily">Daily</option>
-                      <option value="weekly">Weekly</option>
-                    </select>
+                      <SelectTrigger id="pickup-interval" className="w-full h-8 text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="daily">Daily</SelectItem>
+                        <SelectItem value="weekly">Weekly</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-medium text-muted-foreground">Include reservations</label>
-                    <select
+                    <Label htmlFor="pickup-include" className="text-xs font-medium text-muted-foreground">Include reservations</Label>
+                    <Select
                       value={pickupFilters.include}
-                      onChange={(e) => setPickupFilters((prev) => ({ ...prev, include: e.target.value as 'all' | 'confirmed' | 'paid' }))}
-                      className="w-full rounded-md border border-border px-2 py-1 text-sm bg-card"
+                      onValueChange={(value) => setPickupFilters((prev) => ({ ...prev, include: value as 'all' | 'confirmed' | 'paid' }))}
                     >
-                      <option value="all">All future occupancy</option>
-                      <option value="confirmed">Confirmed / pending only</option>
-                      <option value="paid">Paid only</option>
-                    </select>
+                      <SelectTrigger id="pickup-include" className="w-full h-8 text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All future occupancy</SelectItem>
+                        <SelectItem value="confirmed">Confirmed / pending only</SelectItem>
+                        <SelectItem value="paid">Paid only</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-1">
-                    <label className="text-xs font-medium text-muted-foreground">Site class</label>
-                    <select
+                    <Label htmlFor="pickup-site-class" className="text-xs font-medium text-muted-foreground">Site class</Label>
+                    <Select
                       value={pickupFilters.siteClassId}
-                      onChange={(e) => setPickupFilters((prev) => ({ ...prev, siteClassId: e.target.value }))}
-                      className="w-full rounded-md border border-border px-2 py-1 text-sm bg-card"
+                      onValueChange={(value) => setPickupFilters((prev) => ({ ...prev, siteClassId: value }))}
                     >
-                      <option value="all">All sites</option>
-                      {sitesQuery.data?.map((s) => (s as SiteWithClass)?.siteClass?.id ? (s as SiteWithClass).siteClass : null)
-                        ?.filter(Boolean)
-                        ?.reduce((acc: any[], sc: any) => {
-                          if (!acc.find((x) => x.id === sc.id)) acc.push(sc);
-                          return acc;
-                        }, [])
-                        ?.map((sc: any) => (
-                          <option key={sc.id} value={sc.id}>{sc.name}</option>
-                        ))}
-                    </select>
+                      <SelectTrigger id="pickup-site-class" className="w-full h-8 text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All sites</SelectItem>
+                        {sitesQuery.data?.map((s) => (s as SiteWithClass)?.siteClass?.id ? (s as SiteWithClass).siteClass : null)
+                          ?.filter(Boolean)
+                          ?.reduce((acc: any[], sc: any) => {
+                            if (!acc.find((x) => x.id === sc.id)) acc.push(sc);
+                            return acc;
+                          }, [])
+                          ?.map((sc: any) => (
+                            <SelectItem key={sc.id} value={sc.id}>{sc.name}</SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="flex items-center gap-2">
-                    <input
+                    <Checkbox
                       id="activity-only"
-                      type="checkbox"
                       checked={pickupFilters.activityOnly}
-                      onChange={(e) => setPickupFilters((prev) => ({ ...prev, activityOnly: e.target.checked }))}
-                      className="h-4 w-4"
+                      onCheckedChange={(checked) => setPickupFilters((prev) => ({ ...prev, activityOnly: Boolean(checked) }))}
                     />
-                    <label htmlFor="activity-only" className="text-sm text-foreground">Only show dates with activity</label>
+                    <Label htmlFor="activity-only" className="text-sm text-foreground">Only show dates with activity</Label>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
@@ -1197,10 +1230,10 @@ function ReportsPageInner() {
                         <div className="text-2xl font-bold text-foreground">{row.data.current.count} bookings</div>
                         <div className="text-sm text-foreground">Rev: {formatCurrency(row.data.current.revenue, 0)}</div>
                         <div className="text-sm text-muted-foreground">Occ: {((row.data.current.count / pickupStats.activeSitesCount) * 100).toFixed(1)}%</div>
-                        <div className={`text-sm mt-1 ${row.data.countDelta >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+                        <div className={`text-sm mt-1 ${row.data.countDelta >= 0 ? 'text-status-success' : 'text-status-error'}`}>
                           Δ bookings: {row.data.countDelta >= 0 ? '+' : ''}{row.data.countDelta}
                         </div>
-                        <div className={`text-sm ${row.data.revenueDelta >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+                        <div className={`text-sm ${row.data.revenueDelta >= 0 ? 'text-status-success' : 'text-status-error'}`}>
                           Δ revenue: {row.data.revenueDelta >= 0 ? '+' : ''}{formatCurrency(row.data.revenueDelta, 0)}
                         </div>
                       </div>
@@ -1236,10 +1269,10 @@ function ReportsPageInner() {
                               <td className="px-3 py-2 text-foreground">{row.data.current.count}</td>
                               <td className="px-3 py-2 text-foreground">{formatCurrency(row.data.current.revenue, 0)}</td>
                               <td className="px-3 py-2 text-foreground">{((row.data.current.count / pickupStats.activeSitesCount) * 100).toFixed(1)}%</td>
-                              <td className={`px-3 py-2 ${row.data.countDelta >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+                              <td className={`px-3 py-2 ${row.data.countDelta >= 0 ? 'text-status-success' : 'text-status-error'}`}>
                                 {row.data.countDelta >= 0 ? '+' : ''}{row.data.countDelta}
                               </td>
-                              <td className={`px-3 py-2 ${row.data.revenueDelta >= 0 ? 'text-emerald-700' : 'text-rose-700'}`}>
+                              <td className={`px-3 py-2 ${row.data.revenueDelta >= 0 ? 'text-status-success' : 'text-status-error'}`}>
                                 {row.data.revenueDelta >= 0 ? '+' : ''}{formatCurrency(row.data.revenueDelta, 0)}
                               </td>
                             </tr>
@@ -4009,15 +4042,17 @@ function ReportsPageInner() {
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <div className="flex items-center gap-2 bg-muted border border-border rounded-lg px-3 py-2">
-                <label className="text-xs font-medium text-muted-foreground">From</label>
-                <input
+                <Label htmlFor="report-date-start" className="text-xs font-medium text-muted-foreground">From</Label>
+                <Input
+                  id="report-date-start"
                   type="date"
                   value={dateRange.start}
                   onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
                   className="rounded-md border border-border px-2 py-1 text-sm"
                 />
-                <label className="text-xs font-medium text-muted-foreground">To</label>
-                <input
+                <Label htmlFor="report-date-end" className="text-xs font-medium text-muted-foreground">To</Label>
+                <Input
+                  id="report-date-end"
                   type="date"
                   value={dateRange.end}
                   onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
@@ -4062,9 +4097,11 @@ function ReportsPageInner() {
             <button
               onClick={() => setShowCatalog(!showCatalog)}
               className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-muted/50 transition-colors rounded-xl"
+              aria-expanded={showCatalog}
+              aria-controls="report-catalog-panel"
             >
               <div className="flex items-center gap-3">
-                <LayoutList className="h-5 w-5 text-indigo-600" />
+                <LayoutList className="h-5 w-5 text-primary" />
                 <div>
                   <span className="font-medium text-foreground">Browse All Reports</span>
                   <span className="text-muted-foreground text-sm ml-2">({reportCatalog.reduce((acc, cat) => acc + cat.subReports.length, 0)} available)</span>
@@ -4078,7 +4115,7 @@ function ReportsPageInner() {
             </button>
 
             {showCatalog && (
-              <div className="px-4 pb-4 pt-2 border-t border-border">
+              <div id="report-catalog-panel" className="px-4 pb-4 pt-2 border-t border-border">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                   {reportCatalog.map((category) => {
                     const IconComponent = category.icon;
@@ -4087,7 +4124,7 @@ function ReportsPageInner() {
                       <div
                         key={category.id}
                         className={`rounded-lg border p-3 transition-all cursor-pointer hover:shadow-sm ${isActive
-                          ? 'border-indigo-200 bg-indigo-50 ring-1 ring-indigo-100'
+                          ? 'border-primary/20 bg-primary/10 ring-1 ring-primary/15'
                           : 'border-border bg-card hover:border-border'
                           }`}
                         onClick={() => {
@@ -4102,8 +4139,8 @@ function ReportsPageInner() {
                         }}
                       >
                         <div className="flex items-start gap-3">
-                          <div className={`p-2 rounded-lg ${isActive ? 'bg-indigo-100' : 'bg-muted'}`}>
-                            <IconComponent className={`h-4 w-4 ${isActive ? 'text-indigo-600' : 'text-muted-foreground'}`} />
+                          <div className={`p-2 rounded-lg ${isActive ? 'bg-primary/10' : 'bg-muted'}`}>
+                            <IconComponent className={`h-4 w-4 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="font-medium text-foreground text-sm">{category.label}</div>
@@ -4143,6 +4180,7 @@ function ReportsPageInner() {
                     ? 'border-status-success/30 bg-status-success/15 text-status-success'
                     : 'border-border bg-card text-muted-foreground hover:bg-muted'
                     }`}
+                  aria-pressed={activeSubTab === sub.id || (!activeSubTab && idx === 0)}
                 >
                   {sub.label}
                 </button>
@@ -4169,6 +4207,8 @@ function ReportsPageInner() {
             <button
               onClick={() => setShowFilters(!showFilters)}
               className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-muted transition-colors rounded-xl"
+              aria-expanded={showFilters}
+              aria-controls="report-filter-panel"
             >
               <div className="flex items-center gap-3">
                 <SlidersHorizontal className="h-5 w-5 text-muted-foreground" />
@@ -4185,7 +4225,7 @@ function ReportsPageInner() {
             </button>
 
             {showFilters && (
-              <div className="px-4 pb-4 pt-2 border-t border-border space-y-4">
+              <div id="report-filter-panel" className="px-4 pb-4 pt-2 border-t border-border space-y-4">
                 {/* Date Range Presets */}
                 <div>
                   <label className="block text-xs font-medium text-muted-foreground mb-2">Quick Date Range</label>
@@ -4207,8 +4247,11 @@ function ReportsPageInner() {
                             start: start.toISOString().slice(0, 10),
                             end: end.toISOString().slice(0, 10)
                           });
+                          setActivePreset(preset.label);
                         }}
+                        type="button"
                         className="px-3 py-1.5 text-xs rounded-lg border border-border bg-card hover:bg-muted text-foreground transition-colors"
+                        aria-pressed={activePreset === preset.label}
                       >
                         {preset.label}
                       </button>
@@ -4220,60 +4263,72 @@ function ReportsPageInner() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {/* Status Filter */}
                   <div>
-                    <label className="block text-xs font-medium text-muted-foreground mb-1">Status</label>
-                    <select
+                    <Label htmlFor="report-filter-status" className="block text-xs font-medium text-muted-foreground mb-1">Status</Label>
+                    <Select
                       value={reportFilters.status}
-                      onChange={(e) => setReportFilters({ ...reportFilters, status: e.target.value as 'all' | 'confirmed' | 'checked_in' | 'pending' | 'cancelled' })}
-                      className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-card"
+                      onValueChange={(value) => setReportFilters({ ...reportFilters, status: value as 'all' | 'confirmed' | 'checked_in' | 'pending' | 'cancelled' })}
                     >
-                      <option value="all">All statuses</option>
-                      <option value="confirmed">Confirmed</option>
-                      <option value="checked_in">Checked In</option>
-                      <option value="pending">Pending</option>
-                      <option value="cancelled">Cancelled</option>
-                    </select>
+                      <SelectTrigger id="report-filter-status" className="w-full h-8 text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All statuses</SelectItem>
+                        <SelectItem value="confirmed">Confirmed</SelectItem>
+                        <SelectItem value="checked_in">Checked In</SelectItem>
+                        <SelectItem value="pending">Pending</SelectItem>
+                        <SelectItem value="cancelled">Cancelled</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   {/* Site Type Filter */}
                   <div>
-                    <label className="block text-xs font-medium text-muted-foreground mb-1">Site Type</label>
-                    <select
+                    <Label htmlFor="report-filter-site-type" className="block text-xs font-medium text-muted-foreground mb-1">Site Type</Label>
+                    <Select
                       value={reportFilters.siteType}
-                      onChange={(e) => setReportFilters({ ...reportFilters, siteType: e.target.value })}
-                      className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-card"
+                      onValueChange={(value) => setReportFilters({ ...reportFilters, siteType: value })}
                     >
-                      <option value="all">All site types</option>
-                      <option value="RV">RV Sites</option>
-                      <option value="Tent">Tent Sites</option>
-                      <option value="Cabin">Cabins</option>
-                      <option value="Glamping">Glamping</option>
-                    </select>
+                      <SelectTrigger id="report-filter-site-type" className="w-full h-8 text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All site types</SelectItem>
+                        <SelectItem value="RV">RV Sites</SelectItem>
+                        <SelectItem value="Tent">Tent Sites</SelectItem>
+                        <SelectItem value="Cabin">Cabins</SelectItem>
+                        <SelectItem value="Glamping">Glamping</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   {/* Group By */}
                   <div>
-                    <label className="block text-xs font-medium text-muted-foreground mb-1">Group By</label>
-                    <select
+                    <Label htmlFor="report-filter-group-by" className="block text-xs font-medium text-muted-foreground mb-1">Group By</Label>
+                    <Select
                       value={reportFilters.groupBy}
-                      onChange={(e) => setReportFilters({ ...reportFilters, groupBy: e.target.value as 'none' | 'site' | 'status' | 'date' | 'siteType' })}
-                      className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-card"
+                      onValueChange={(value) => setReportFilters({ ...reportFilters, groupBy: value as 'none' | 'site' | 'status' | 'date' | 'siteType' })}
                     >
-                      <option value="none">No grouping</option>
-                      <option value="site">By Site</option>
-                      <option value="status">By Status</option>
-                      <option value="date">By Date</option>
-                      <option value="siteType">By Site Type</option>
-                    </select>
+                      <SelectTrigger id="report-filter-group-by" className="w-full h-8 text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">No grouping</SelectItem>
+                        <SelectItem value="site">By Site</SelectItem>
+                        <SelectItem value="status">By Status</SelectItem>
+                        <SelectItem value="date">By Date</SelectItem>
+                        <SelectItem value="siteType">By Site Type</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
 
                 {/* Active Filters Summary */}
                 {(reportFilters.status !== 'all' || reportFilters.siteType !== 'all' || reportFilters.groupBy !== 'none') && (
                   <div className="flex items-center gap-2 pt-2 border-t border-border">
-                    <Filter className="h-4 w-4 text-indigo-500" />
+                    <Filter className="h-4 w-4 text-primary" />
                     <span className="text-xs text-muted-foreground">Active filters:</span>
                     {reportFilters.status !== 'all' && (
-                      <span className="text-xs px-2 py-0.5 rounded bg-indigo-100 text-indigo-700">{reportFilters.status}</span>
+                      <span className="text-xs px-2 py-0.5 rounded bg-primary/10 text-primary">{reportFilters.status}</span>
                     )}
                     {reportFilters.siteType !== 'all' && (
                       <span className="text-xs px-2 py-0.5 rounded bg-status-success-bg text-status-success-text">{reportFilters.siteType}</span>
@@ -4388,15 +4443,17 @@ function ReportsPageInner() {
             {campgroundId ? (
               <div className="flex flex-wrap items-center gap-2">
                 <div className="flex items-center gap-2 bg-muted border border-border rounded-lg px-3 py-2">
-                  <label className="text-xs font-medium text-muted-foreground">From</label>
-                  <input
+                  <Label htmlFor="report-date-start" className="text-xs font-medium text-muted-foreground">From</Label>
+                  <Input
+                    id="report-date-start"
                     type="date"
                     value={dateRange.start}
                     onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
                     className="rounded-md border border-border px-2 py-1 text-sm"
                   />
-                  <label className="text-xs font-medium text-muted-foreground">To</label>
-                  <input
+                  <Label htmlFor="report-date-end" className="text-xs font-medium text-muted-foreground">To</Label>
+                  <Input
+                    id="report-date-end"
                     type="date"
                     value={dateRange.end}
                     onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
@@ -4449,9 +4506,11 @@ function ReportsPageInner() {
               <button
                 onClick={() => setShowCatalog(!showCatalog)}
                 className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-muted/50 transition-colors rounded-xl"
+                aria-expanded={showCatalog}
+                aria-controls="report-catalog-panel-main"
               >
                 <div className="flex items-center gap-3">
-                  <LayoutList className="h-5 w-5 text-indigo-600" />
+                  <LayoutList className="h-5 w-5 text-primary" />
                   <div>
                     <span className="font-medium text-foreground">Browse All Reports</span>
                     <span className="text-muted-foreground text-sm ml-2">({reportCatalog.reduce((acc, cat) => acc + cat.subReports.length, 0)} available)</span>
@@ -4465,7 +4524,7 @@ function ReportsPageInner() {
               </button>
 
               {showCatalog && (
-                <div className="px-4 pb-4 pt-2 border-t border-border">
+                <div id="report-catalog-panel-main" className="px-4 pb-4 pt-2 border-t border-border">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     {reportCatalog.map((category) => {
                       const IconComponent = category.icon;
@@ -4474,7 +4533,7 @@ function ReportsPageInner() {
                         <div
                           key={category.id}
                           className={`rounded-lg border p-3 transition-all cursor-pointer hover:shadow-sm ${isActive
-                            ? 'border-indigo-200 bg-indigo-50 ring-1 ring-indigo-100'
+                            ? 'border-primary/20 bg-primary/10 ring-1 ring-primary/15'
                             : 'border-border bg-card hover:border-border'
                             }`}
                           onClick={() => {
@@ -4489,8 +4548,8 @@ function ReportsPageInner() {
                           }}
                         >
                           <div className="flex items-start gap-3">
-                            <div className={`p-2 rounded-lg ${isActive ? 'bg-indigo-100' : 'bg-muted'}`}>
-                              <IconComponent className={`h-4 w-4 ${isActive ? 'text-indigo-600' : 'text-muted-foreground'}`} />
+                            <div className={`p-2 rounded-lg ${isActive ? 'bg-primary/10' : 'bg-muted'}`}>
+                              <IconComponent className={`h-4 w-4 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="font-medium text-foreground text-sm">{category.label}</div>
@@ -4629,15 +4688,15 @@ function ReportsPageInner() {
                                   <td className="py-2 text-xs text-muted-foreground">{r.departureDate}</td>
                                   <td className="py-2 text-right">{formatCurrency(r.total)}</td>
                                   <td className="py-2 text-right">
-                                    <span className="text-emerald-700 font-medium">${r.paid.toFixed(2)}</span>
+                                    <span className="text-status-success font-medium">${r.paid.toFixed(2)}</span>
                                   </td>
                                   <td className="py-2 text-right">
-                                    <span className={r.balance > 0 ? 'text-amber-700 font-medium' : 'text-muted-foreground'}>
+                                    <span className={r.balance > 0 ? 'text-status-warning font-medium' : 'text-muted-foreground'}>
                                       {formatCurrency(r.balance)}
                                     </span>
                                   </td>
                                   <td className="py-2 text-center">
-                                    <Link href={`/reservations/${r.id}`} className="text-indigo-600 hover:text-indigo-800 inline-flex items-center gap-1 text-xs">
+                                    <Link href={`/reservations/${r.id}`} className="text-primary hover:text-primary inline-flex items-center gap-1 text-xs">
                                       View <ExternalLink className="h-3 w-3" />
                                     </Link>
                                   </td>
@@ -4664,20 +4723,20 @@ function ReportsPageInner() {
                           <div
                             key={m.month}
                             className={`rounded-lg border p-3 ${m.isCurrent
-                              ? 'border-emerald-200 bg-emerald-50'
+                              ? 'border-status-success/20 bg-status-success/10'
                               : 'border-border bg-muted'
                               }`}
                           >
-                            <div className={`text-xs mb-1 ${m.isCurrent ? 'text-emerald-700 font-medium' : 'text-muted-foreground'}`}>
+                            <div className={`text-xs mb-1 ${m.isCurrent ? 'text-status-success font-medium' : 'text-muted-foreground'}`}>
                               {m.month}
                             </div>
-                            <div className={`text-lg font-bold ${m.isCurrent ? 'text-emerald-900' : 'text-foreground'}`}>
+                            <div className={`text-lg font-bold ${m.isCurrent ? 'text-status-success' : 'text-foreground'}`}>
                               {formatCurrency(m.revenue, 0)}
                             </div>
-                            <div className={`text-xs mt-1 ${m.isCurrent ? 'text-emerald-700' : 'text-muted-foreground'}`}>
+                            <div className={`text-xs mt-1 ${m.isCurrent ? 'text-status-success' : 'text-muted-foreground'}`}>
                               {m.bookings} bookings
                             </div>
-                            <div className={`text-xs ${m.isCurrent ? 'text-emerald-600' : 'text-muted-foreground'}`}>
+                            <div className={`text-xs ${m.isCurrent ? 'text-status-success' : 'text-muted-foreground'}`}>
                               Paid: {formatCurrency(m.paid, 0)}
                             </div>
                           </div>
@@ -4700,24 +4759,24 @@ function ReportsPageInner() {
                           <div
                             key={y.year}
                             className={`rounded-lg border p-4 ${y.isCurrent
-                              ? 'border-emerald-300 bg-emerald-50'
+                              ? 'border-status-success/30 bg-status-success/10'
                               : 'border-border bg-muted'
                               }`}
                           >
-                            <div className={`text-sm mb-2 ${y.isCurrent ? 'text-emerald-700 font-semibold' : 'text-muted-foreground font-medium'}`}>
+                            <div className={`text-sm mb-2 ${y.isCurrent ? 'text-status-success font-semibold' : 'text-muted-foreground font-medium'}`}>
                               {y.year} {y.isCurrent && '(Current)'}
                             </div>
-                            <div className={`text-2xl font-bold mb-2 ${y.isCurrent ? 'text-emerald-900' : 'text-foreground'}`}>
+                            <div className={`text-2xl font-bold mb-2 ${y.isCurrent ? 'text-status-success' : 'text-foreground'}`}>
                               {formatCurrency(y.revenue, 0)}
                             </div>
                             <div className="space-y-1">
-                              <div className={`text-xs ${y.isCurrent ? 'text-emerald-700' : 'text-muted-foreground'}`}>
+                              <div className={`text-xs ${y.isCurrent ? 'text-status-success' : 'text-muted-foreground'}`}>
                                 {y.bookings} total bookings
                               </div>
-                              <div className={`text-xs ${y.isCurrent ? 'text-emerald-700' : 'text-muted-foreground'}`}>
+                              <div className={`text-xs ${y.isCurrent ? 'text-status-success' : 'text-muted-foreground'}`}>
                                 Paid: {formatCurrency(y.paid, 0)}
                               </div>
-                              <div className={`text-xs ${y.isCurrent ? 'text-emerald-600' : 'text-muted-foreground'}`}>
+                              <div className={`text-xs ${y.isCurrent ? 'text-status-success' : 'text-muted-foreground'}`}>
                                 Avg: {formatCurrency(y.avgPerBooking)}/booking
                               </div>
                             </div>
@@ -4762,7 +4821,7 @@ function ReportsPageInner() {
                                   </span>
                                 </td>
                                 <td className="py-2 text-right">
-                                  <span className={d.paid > 0 ? 'text-emerald-700 font-medium' : 'text-muted-foreground'}>
+                                  <span className={d.paid > 0 ? 'text-status-success font-medium' : 'text-muted-foreground'}>
                                     {formatCurrency(d.paid)}
                                   </span>
                                 </td>
@@ -4784,17 +4843,17 @@ function ReportsPageInner() {
                         <div className="text-xs text-muted-foreground">Last 30 days cancelled reservations</div>
                       </div>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
-                        <div className="rounded-lg border border-red-200 bg-red-50 p-3">
-                          <div className="text-xs text-red-700 mb-1">Total Cancelled</div>
-                          <div className="text-2xl font-bold text-red-900">{cancellationReport.summary.count}</div>
+                        <div className="rounded-lg border border-status-error/20 bg-status-error/10 p-3">
+                          <div className="text-xs text-status-error mb-1">Total Cancelled</div>
+                          <div className="text-2xl font-bold text-status-error">{cancellationReport.summary.count}</div>
                         </div>
-                        <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
-                          <div className="text-xs text-amber-700 mb-1">Lost Revenue</div>
-                          <div className="text-2xl font-bold text-amber-900">{formatCurrency(cancellationReport.summary.totalLost, 0)}</div>
+                        <div className="rounded-lg border border-status-warning/20 bg-status-warning/10 p-3">
+                          <div className="text-xs text-status-warning mb-1">Lost Revenue</div>
+                          <div className="text-2xl font-bold text-status-warning">{formatCurrency(cancellationReport.summary.totalLost, 0)}</div>
                         </div>
-                        <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
-                          <div className="text-xs text-blue-700 mb-1">Refunded</div>
-                          <div className="text-2xl font-bold text-blue-900">{formatCurrency(cancellationReport.summary.totalRefunded, 0)}</div>
+                        <div className="rounded-lg border border-primary/20 bg-primary/10 p-3">
+                          <div className="text-xs text-primary mb-1">Refunded</div>
+                          <div className="text-2xl font-bold text-primary">{formatCurrency(cancellationReport.summary.totalRefunded, 0)}</div>
                         </div>
                         <div className="rounded-lg border border-border bg-muted p-3">
                           <div className="text-xs text-muted-foreground mb-1">Net Loss</div>
@@ -4818,16 +4877,16 @@ function ReportsPageInner() {
                             </thead>
                             <tbody>
                               {cancellationReport.cancellations.map((r, idx) => (
-                                <tr key={r.id} className={idx % 2 === 0 ? 'bg-red-50' : 'bg-card'}>
+                                <tr key={r.id} className={idx % 2 === 0 ? 'bg-status-error/10' : 'bg-card'}>
                                   <td className="py-2 font-medium">{new Date(r.cancelDate).toISOString().split('T')[0]}</td>
                                   <td className="py-2">{r.siteName}</td>
                                   <td className="py-2">{r.guestName}</td>
                                   <td className="py-2 text-xs text-muted-foreground">{r.arrivalDate}</td>
                                   <td className="py-2 text-right">
-                                    <span className="text-red-700 font-medium">{formatCurrency(r.lostRevenue)}</span>
+                                    <span className="text-status-error font-medium">{formatCurrency(r.lostRevenue)}</span>
                                   </td>
                                   <td className="py-2 text-right">
-                                    <span className="text-blue-700">{formatCurrency(r.refunded)}</span>
+                                    <span className="text-primary">{formatCurrency(r.refunded)}</span>
                                   </td>
                                 </tr>
                               ))}
@@ -4848,21 +4907,21 @@ function ReportsPageInner() {
                         <div className="text-xs text-muted-foreground">Guests who didn't arrive for confirmed reservations</div>
                       </div>
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-3">
-                        <div className="rounded-lg border border-orange-200 bg-orange-50 p-3">
-                          <div className="text-xs text-orange-700 mb-1">Total No-Shows</div>
-                          <div className="text-2xl font-bold text-orange-900">{noShowReport.summary.count}</div>
+                        <div className="rounded-lg border border-status-warning/20 bg-status-warning/10 p-3">
+                          <div className="text-xs text-status-warning mb-1">Total No-Shows</div>
+                          <div className="text-2xl font-bold text-status-warning">{noShowReport.summary.count}</div>
                         </div>
-                        <div className="rounded-lg border border-red-200 bg-red-50 p-3">
-                          <div className="text-xs text-red-700 mb-1">Lost Revenue</div>
-                          <div className="text-2xl font-bold text-red-900">{formatCurrency(noShowReport.summary.totalLost, 0)}</div>
+                        <div className="rounded-lg border border-status-error/20 bg-status-error/10 p-3">
+                          <div className="text-xs text-status-error mb-1">Lost Revenue</div>
+                          <div className="text-2xl font-bold text-status-error">{formatCurrency(noShowReport.summary.totalLost, 0)}</div>
                         </div>
-                        <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3">
-                          <div className="text-xs text-emerald-700 mb-1">Paid (Non-Refundable)</div>
-                          <div className="text-2xl font-bold text-emerald-900">{formatCurrency(noShowReport.summary.totalPaid, 0)}</div>
+                        <div className="rounded-lg border border-status-success/20 bg-status-success/10 p-3">
+                          <div className="text-xs text-status-success mb-1">Paid (Non-Refundable)</div>
+                          <div className="text-2xl font-bold text-status-success">{formatCurrency(noShowReport.summary.totalPaid, 0)}</div>
                         </div>
                       </div>
                       {noShowReport.noShows.length === 0 ? (
-                        <div className="text-sm text-emerald-600">No no-shows detected - excellent!</div>
+                        <div className="text-sm text-status-success">No no-shows detected - excellent!</div>
                       ) : (
                         <div className="overflow-x-auto">
                           <table className="w-full text-sm">
@@ -4878,7 +4937,7 @@ function ReportsPageInner() {
                             </thead>
                             <tbody>
                               {noShowReport.noShows.map((r, idx) => (
-                                <tr key={r.id} className={idx % 2 === 0 ? 'bg-orange-50' : 'bg-card'}>
+                                <tr key={r.id} className={idx % 2 === 0 ? 'bg-status-warning/10' : 'bg-card'}>
                                   <td className="py-2">
                                     <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${r.daysLate > 7 ? 'bg-status-error-bg text-status-error-text' :
                                       r.daysLate > 3 ? 'bg-status-warning/15 text-status-warning' :
@@ -4892,7 +4951,7 @@ function ReportsPageInner() {
                                   <td className="py-2 text-xs text-muted-foreground">{r.arrivalDate}</td>
                                   <td className="py-2 text-xs text-muted-foreground">{r.departureDate}</td>
                                   <td className="py-2 text-right">
-                                    <span className="text-emerald-700 font-medium">${r.paid.toFixed(2)}</span>
+                                    <span className="text-status-success font-medium">${r.paid.toFixed(2)}</span>
                                   </td>
                                 </tr>
                               ))}
@@ -4917,17 +4976,17 @@ function ReportsPageInner() {
                           <div className="text-xs text-muted-foreground mb-1">Total Bookings</div>
                           <div className="text-2xl font-bold text-foreground">{reservationStats.total}</div>
                         </div>
-                        <div className="rounded-lg border border-border bg-emerald-50 p-3">
-                          <div className="text-xs text-emerald-700 mb-1">Revenue</div>
-                          <div className="text-2xl font-bold text-emerald-900">{formatCurrency(reservationStats.totalRevenue, 0)}</div>
+                        <div className="rounded-lg border border-border bg-status-success/10 p-3">
+                          <div className="text-xs text-status-success mb-1">Revenue</div>
+                          <div className="text-2xl font-bold text-status-success">{formatCurrency(reservationStats.totalRevenue, 0)}</div>
                         </div>
-                        <div className="rounded-lg border border-border bg-blue-50 p-3">
-                          <div className="text-xs text-blue-700 mb-1">Avg Lead Time</div>
-                          <div className="text-2xl font-bold text-blue-900">{reservationStats.avgLeadTime}d</div>
+                        <div className="rounded-lg border border-border bg-primary/10 p-3">
+                          <div className="text-xs text-primary mb-1">Avg Lead Time</div>
+                          <div className="text-2xl font-bold text-primary">{reservationStats.avgLeadTime}d</div>
                         </div>
-                        <div className="rounded-lg border border-border bg-purple-50 p-3">
-                          <div className="text-xs text-purple-700 mb-1">Avg per Booking</div>
-                          <div className="text-2xl font-bold text-purple-900">
+                        <div className="rounded-lg border border-border bg-primary/10 p-3">
+                          <div className="text-xs text-primary mb-1">Avg per Booking</div>
+                          <div className="text-2xl font-bold text-primary">
                             {reservationStats.total > 0 ? formatCurrency(reservationStats.totalRevenue / reservationStats.total, 0) : '0'}
                           </div>
                         </div>
@@ -4964,7 +5023,7 @@ function ReportsPageInner() {
                                 <div className="text-sm font-medium text-foreground">{site.name}</div>
                                 <div className="text-xs text-muted-foreground">{site.bookings} bookings</div>
                               </div>
-                              <div className="text-sm font-bold text-emerald-600">{formatCurrency(site.revenue, 0)}</div>
+                              <div className="text-sm font-bold text-status-success">{formatCurrency(site.revenue, 0)}</div>
                             </div>
                           </div>
                         ))}
@@ -5014,21 +5073,21 @@ function ReportsPageInner() {
                         <div className="text-xs text-muted-foreground">Booking patterns by arrival day</div>
                       </div>
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 space-y-3">
-                          <div className="text-sm font-bold text-blue-900">Weekend (Fri-Sat Arrivals)</div>
+                        <div className="rounded-lg border border-primary/20 bg-primary/10 p-4 space-y-3">
+                          <div className="text-sm font-bold text-primary">Weekend (Fri-Sat Arrivals)</div>
                           <div className="grid grid-cols-2 gap-3">
                             <div>
-                              <div className="text-xs text-blue-700 mb-1">Bookings</div>
-                              <div className="text-2xl font-bold text-blue-900">{weekendVsWeekdayStats.weekend.bookings}</div>
+                              <div className="text-xs text-primary mb-1">Bookings</div>
+                              <div className="text-2xl font-bold text-primary">{weekendVsWeekdayStats.weekend.bookings}</div>
                             </div>
                             <div>
-                              <div className="text-xs text-blue-700 mb-1">Revenue</div>
-                              <div className="text-2xl font-bold text-blue-900">{formatCurrency(weekendVsWeekdayStats.weekend.revenue, 0)}</div>
+                              <div className="text-xs text-primary mb-1">Revenue</div>
+                              <div className="text-2xl font-bold text-primary">{formatCurrency(weekendVsWeekdayStats.weekend.revenue, 0)}</div>
                             </div>
                           </div>
                           <div>
-                            <div className="text-xs text-blue-700 mb-1">Avg per Booking</div>
-                            <div className="text-lg font-bold text-blue-900">{formatCurrency(weekendVsWeekdayStats.weekend.avgRevenue, 0)}</div>
+                            <div className="text-xs text-primary mb-1">Avg per Booking</div>
+                            <div className="text-lg font-bold text-primary">{formatCurrency(weekendVsWeekdayStats.weekend.avgRevenue, 0)}</div>
                           </div>
                         </div>
                         <div className="rounded-lg border border-border bg-muted p-4 space-y-3">
@@ -5066,7 +5125,7 @@ function ReportsPageInner() {
                           <div key={cls.className} className="rounded-md border border-border bg-card p-3">
                             <div className="flex items-center justify-between mb-2">
                               <div className="text-sm font-medium text-foreground">{cls.className}</div>
-                              <div className="text-lg font-bold text-emerald-600">${cls.adr}/night</div>
+                              <div className="text-lg font-bold text-status-success">${cls.adr}/night</div>
                             </div>
                             <div className="grid grid-cols-2 gap-3 text-xs">
                               <div>
@@ -5102,7 +5161,7 @@ function ReportsPageInner() {
                               <div className="w-20 text-xs text-muted-foreground flex-shrink-0">{month}</div>
                               <div className="flex-1 h-8 bg-muted rounded relative overflow-hidden">
                                 <div
-                                  className="h-full bg-purple-500 transition-all duration-500"
+                                  className="h-full bg-primary transition-all duration-500"
                                   style={{ width: `${width}%` }}
                                 />
                                 <div className="absolute inset-0 flex items-center px-2">
@@ -5132,7 +5191,7 @@ function ReportsPageInner() {
                               <div className="text-sm font-medium text-foreground">{cls.className}</div>
                               <div className="text-xs text-muted-foreground">{cls.bookings} bookings</div>
                             </div>
-                            <div className="text-sm font-bold text-emerald-600">{formatCurrency(cls.revenue, 0)}</div>
+                            <div className="text-sm font-bold text-status-success">{formatCurrency(cls.revenue, 0)}</div>
                           </div>
                         ))}
                       </div>
@@ -5153,9 +5212,9 @@ function ReportsPageInner() {
                           const maxOccupancy = Math.max(...occupancyTrends.map(t => parseFloat(t.occupancy)), 1);
                           const width = (parseFloat(occupancy) / maxOccupancy) * 100;
                           const occupancyNum = parseFloat(occupancy);
-                          const colorClass = occupancyNum >= 80 ? 'bg-emerald-500' :
-                            occupancyNum >= 60 ? 'bg-blue-500' :
-                              occupancyNum >= 40 ? 'bg-amber-500' :
+                          const colorClass = occupancyNum >= 80 ? 'bg-status-success' :
+                            occupancyNum >= 60 ? 'bg-primary' :
+                              occupancyNum >= 40 ? 'bg-status-warning' :
                                 'bg-muted';
                           return (
                             <div key={month} className="flex items-center gap-2">
@@ -5190,13 +5249,13 @@ function ReportsPageInner() {
                           <div className="text-xs text-muted-foreground mb-1">Total Sites</div>
                           <div className="text-2xl font-bold text-foreground">{revenuePerSiteStats.totalSites}</div>
                         </div>
-                        <div className="rounded-lg border border-border bg-emerald-50 p-3">
-                          <div className="text-xs text-emerald-700 mb-1">All-Time Avg</div>
-                          <div className="text-2xl font-bold text-emerald-900">{formatCurrency(revenuePerSiteStats.allTime, 0)}</div>
+                        <div className="rounded-lg border border-border bg-status-success/10 p-3">
+                          <div className="text-xs text-status-success mb-1">All-Time Avg</div>
+                          <div className="text-2xl font-bold text-status-success">{formatCurrency(revenuePerSiteStats.allTime, 0)}</div>
                         </div>
-                        <div className="rounded-lg border border-border bg-blue-50 p-3">
-                          <div className="text-xs text-blue-700 mb-1">Last 30d Avg</div>
-                          <div className="text-2xl font-bold text-blue-900">{formatCurrency(revenuePerSiteStats.last30Days, 0)}</div>
+                        <div className="rounded-lg border border-border bg-primary/10 p-3">
+                          <div className="text-xs text-primary mb-1">Last 30d Avg</div>
+                          <div className="text-2xl font-bold text-primary">{formatCurrency(revenuePerSiteStats.last30Days, 0)}</div>
                         </div>
                       </div>
                     </Card>
@@ -5216,22 +5275,22 @@ function ReportsPageInner() {
                           <div className="text-xs text-muted-foreground mb-1">Total Sites</div>
                           <div className="text-2xl font-bold text-foreground">{siteUtilizationStats.sites.length}</div>
                         </div>
-                        <div className="rounded-lg border border-border bg-blue-50 p-3">
-                          <div className="text-xs text-blue-700 mb-1">Avg Bookings</div>
-                          <div className="text-2xl font-bold text-blue-900">{siteUtilizationStats.avgBookings}</div>
+                        <div className="rounded-lg border border-border bg-primary/10 p-3">
+                          <div className="text-xs text-primary mb-1">Avg Bookings</div>
+                          <div className="text-2xl font-bold text-primary">{siteUtilizationStats.avgBookings}</div>
                         </div>
-                        <div className="rounded-lg border border-border bg-amber-50 p-3">
-                          <div className="text-xs text-amber-700 mb-1">Underutilized</div>
-                          <div className="text-2xl font-bold text-amber-900">{siteUtilizationStats.underutilized}</div>
+                        <div className="rounded-lg border border-border bg-status-warning/10 p-3">
+                          <div className="text-xs text-status-warning mb-1">Underutilized</div>
+                          <div className="text-2xl font-bold text-status-warning">{siteUtilizationStats.underutilized}</div>
                         </div>
                       </div>
                       <div className="max-h-64 overflow-y-auto space-y-1">
                         {siteUtilizationStats.sites.slice(0, 15).map((site, idx) => {
                           const utilizationPercent = (site.bookings / siteUtilizationStats.avgBookings) * 100;
-                          const colorClass = utilizationPercent >= 100 ? 'bg-emerald-500' :
-                            utilizationPercent >= 70 ? 'bg-blue-500' :
-                              utilizationPercent >= 40 ? 'bg-amber-500' :
-                                'bg-rose-500';
+                          const colorClass = utilizationPercent >= 100 ? 'bg-status-success' :
+                            utilizationPercent >= 70 ? 'bg-primary' :
+                              utilizationPercent >= 40 ? 'bg-status-warning' :
+                                'bg-status-error';
                           return (
                             <div key={site.name} className="flex items-center gap-2">
                               <div className="w-32 text-xs text-muted-foreground flex-shrink-0 truncate">{site.name}</div>
@@ -5263,9 +5322,9 @@ function ReportsPageInner() {
                       <div className="space-y-2">
                         {occupancyBySiteClass.map((cls) => {
                           const occupancyNum = parseFloat(cls.occupancy);
-                          const colorClass = occupancyNum >= 80 ? 'bg-emerald-500' :
-                            occupancyNum >= 60 ? 'bg-blue-500' :
-                              occupancyNum >= 40 ? 'bg-amber-500' :
+                          const colorClass = occupancyNum >= 80 ? 'bg-status-success' :
+                            occupancyNum >= 60 ? 'bg-primary' :
+                              occupancyNum >= 40 ? 'bg-status-warning' :
                                 'bg-muted';
                           return (
                             <div key={cls.className} className="space-y-1">
@@ -5365,7 +5424,7 @@ function ReportsPageInner() {
                                 <td className="py-2 font-medium">{site.siteName}</td>
                                 <td className="py-2 text-muted-foreground">{site.siteClass}</td>
                                 <td className="py-2 text-right">
-                                  <span className="font-semibold text-emerald-700">{formatCurrency(site.totalRevenue, 0)}</span>
+                                  <span className="font-semibold text-status-success">{formatCurrency(site.totalRevenue, 0)}</span>
                                 </td>
                                 <td className="py-2 text-center text-foreground">{site.bookings}</td>
                                 <td className="py-2 text-center text-foreground">{site.nights}</td>
@@ -5440,7 +5499,7 @@ function ReportsPageInner() {
                                     <div className="flex items-center gap-2">
                                       <div className="flex-1 h-6 bg-muted rounded relative overflow-hidden">
                                         <div
-                                          className="h-full bg-blue-500 transition-all duration-500"
+                                          className="h-full bg-primary transition-all duration-500"
                                           style={{ width: `${percentage}%` }}
                                         />
                                         <div className="absolute inset-0 flex items-center px-2">
@@ -5468,31 +5527,31 @@ function ReportsPageInner() {
                         <div className="text-xs text-muted-foreground">How far in advance guests book | Avg: {bookingLeadTimeReport.avgLeadTime.toFixed(1)} days | Median: {bookingLeadTimeReport.medianLeadTime} days</div>
                       </div>
                       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
-                        <div className="rounded-lg border border-red-200 bg-red-50 p-3">
-                          <div className="text-xs text-red-700 mb-1">Same Day</div>
-                          <div className="text-xl font-bold text-red-900">{bookingLeadTimeReport.buckets.sameDay}</div>
-                          <div className="text-xs text-red-600 mt-1">
+                        <div className="rounded-lg border border-status-error/20 bg-status-error/10 p-3">
+                          <div className="text-xs text-status-error mb-1">Same Day</div>
+                          <div className="text-xl font-bold text-status-error">{bookingLeadTimeReport.buckets.sameDay}</div>
+                          <div className="text-xs text-status-error mt-1">
                             {((bookingLeadTimeReport.buckets.sameDay / bookingLeadTimeReport.total) * 100).toFixed(1)}%
                           </div>
                         </div>
-                        <div className="rounded-lg border border-orange-200 bg-orange-50 p-3">
-                          <div className="text-xs text-orange-700 mb-1">1-7 Days</div>
-                          <div className="text-xl font-bold text-orange-900">{bookingLeadTimeReport.buckets.within7Days}</div>
-                          <div className="text-xs text-orange-600 mt-1">
+                        <div className="rounded-lg border border-status-warning/20 bg-status-warning/10 p-3">
+                          <div className="text-xs text-status-warning mb-1">1-7 Days</div>
+                          <div className="text-xl font-bold text-status-warning">{bookingLeadTimeReport.buckets.within7Days}</div>
+                          <div className="text-xs text-status-warning mt-1">
                             {((bookingLeadTimeReport.buckets.within7Days / bookingLeadTimeReport.total) * 100).toFixed(1)}%
                           </div>
                         </div>
-                        <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
-                          <div className="text-xs text-amber-700 mb-1">8-14 Days</div>
-                          <div className="text-xl font-bold text-amber-900">{bookingLeadTimeReport.buckets.within14Days}</div>
-                          <div className="text-xs text-amber-600 mt-1">
+                        <div className="rounded-lg border border-status-warning/20 bg-status-warning/10 p-3">
+                          <div className="text-xs text-status-warning mb-1">8-14 Days</div>
+                          <div className="text-xl font-bold text-status-warning">{bookingLeadTimeReport.buckets.within14Days}</div>
+                          <div className="text-xs text-status-warning mt-1">
                             {((bookingLeadTimeReport.buckets.within14Days / bookingLeadTimeReport.total) * 100).toFixed(1)}%
                           </div>
                         </div>
-                        <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-3">
-                          <div className="text-xs text-yellow-700 mb-1">15-30 Days</div>
-                          <div className="text-xl font-bold text-yellow-900">{bookingLeadTimeReport.buckets.within30Days}</div>
-                          <div className="text-xs text-yellow-600 mt-1">
+                        <div className="rounded-lg border border-status-warning/20 bg-status-warning/10 p-3">
+                          <div className="text-xs text-status-warning mb-1">15-30 Days</div>
+                          <div className="text-xl font-bold text-status-warning">{bookingLeadTimeReport.buckets.within30Days}</div>
+                          <div className="text-xs text-status-warning mt-1">
                             {((bookingLeadTimeReport.buckets.within30Days / bookingLeadTimeReport.total) * 100).toFixed(1)}%
                           </div>
                         </div>
@@ -5503,17 +5562,17 @@ function ReportsPageInner() {
                             {((bookingLeadTimeReport.buckets.within60Days / bookingLeadTimeReport.total) * 100).toFixed(1)}%
                           </div>
                         </div>
-                        <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3">
-                          <div className="text-xs text-emerald-700 mb-1">61-90 Days</div>
-                          <div className="text-xl font-bold text-emerald-900">{bookingLeadTimeReport.buckets.within90Days}</div>
-                          <div className="text-xs text-emerald-600 mt-1">
+                        <div className="rounded-lg border border-status-success/20 bg-status-success/10 p-3">
+                          <div className="text-xs text-status-success mb-1">61-90 Days</div>
+                          <div className="text-xl font-bold text-status-success">{bookingLeadTimeReport.buckets.within90Days}</div>
+                          <div className="text-xs text-status-success mt-1">
                             {((bookingLeadTimeReport.buckets.within90Days / bookingLeadTimeReport.total) * 100).toFixed(1)}%
                           </div>
                         </div>
-                        <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
-                          <div className="text-xs text-blue-700 mb-1">90+ Days</div>
-                          <div className="text-xl font-bold text-blue-900">{bookingLeadTimeReport.buckets.over90Days}</div>
-                          <div className="text-xs text-blue-600 mt-1">
+                        <div className="rounded-lg border border-primary/20 bg-primary/10 p-3">
+                          <div className="text-xs text-primary mb-1">90+ Days</div>
+                          <div className="text-xl font-bold text-primary">{bookingLeadTimeReport.buckets.over90Days}</div>
+                          <div className="text-xs text-primary mt-1">
                             {((bookingLeadTimeReport.buckets.over90Days / bookingLeadTimeReport.total) * 100).toFixed(1)}%
                           </div>
                         </div>
@@ -5531,21 +5590,21 @@ function ReportsPageInner() {
                         <div className="text-xs text-muted-foreground">Confirmed & pending bookings</div>
                       </div>
                       <div className="grid grid-cols-2 gap-3">
-                        <div className="rounded-lg border border-border bg-blue-50 p-3">
-                          <div className="text-xs text-blue-700 mb-1">Bookings</div>
-                          <div className="text-2xl font-bold text-blue-900">{futureRevenue.count}</div>
+                        <div className="rounded-lg border border-border bg-primary/10 p-3">
+                          <div className="text-xs text-primary mb-1">Bookings</div>
+                          <div className="text-2xl font-bold text-primary">{futureRevenue.count}</div>
                         </div>
-                        <div className="rounded-lg border border-border bg-emerald-50 p-3">
-                          <div className="text-xs text-emerald-700 mb-1">Total Value</div>
-                          <div className="text-2xl font-bold text-emerald-900">${futureRevenue.totalRevenue.toFixed(0)}</div>
+                        <div className="rounded-lg border border-border bg-status-success/10 p-3">
+                          <div className="text-xs text-status-success mb-1">Total Value</div>
+                          <div className="text-2xl font-bold text-status-success">${futureRevenue.totalRevenue.toFixed(0)}</div>
                         </div>
-                        <div className="rounded-lg border border-border bg-green-50 p-3">
-                          <div className="text-xs text-green-700 mb-1">Paid</div>
-                          <div className="text-lg font-bold text-green-900">${futureRevenue.totalPaid.toFixed(0)}</div>
+                        <div className="rounded-lg border border-border bg-status-success/10 p-3">
+                          <div className="text-xs text-status-success mb-1">Paid</div>
+                          <div className="text-lg font-bold text-status-success">${futureRevenue.totalPaid.toFixed(0)}</div>
                         </div>
-                        <div className="rounded-lg border border-border bg-amber-50 p-3">
-                          <div className="text-xs text-amber-700 mb-1">Outstanding</div>
-                          <div className="text-lg font-bold text-amber-900">${futureRevenue.outstanding.toFixed(0)}</div>
+                        <div className="rounded-lg border border-border bg-status-warning/10 p-3">
+                          <div className="text-xs text-status-warning mb-1">Outstanding</div>
+                          <div className="text-lg font-bold text-status-warning">${futureRevenue.outstanding.toFixed(0)}</div>
                         </div>
                       </div>
                     </Card>
@@ -5565,17 +5624,17 @@ function ReportsPageInner() {
                           <div className="text-xs text-muted-foreground mb-1">Total Revenue</div>
                           <div className="text-xl font-bold text-foreground">{formatCurrency(paymentStats.totalRevenue, 0)}</div>
                         </div>
-                        <div className="rounded-lg border border-border bg-green-50 p-3">
-                          <div className="text-xs text-green-700 mb-1">Collected</div>
-                          <div className="text-xl font-bold text-green-900">{formatCurrency(paymentStats.totalPaid, 0)}</div>
+                        <div className="rounded-lg border border-border bg-status-success/10 p-3">
+                          <div className="text-xs text-status-success mb-1">Collected</div>
+                          <div className="text-xl font-bold text-status-success">{formatCurrency(paymentStats.totalPaid, 0)}</div>
                         </div>
-                        <div className="rounded-lg border border-border bg-amber-50 p-3">
-                          <div className="text-xs text-amber-700 mb-1">Outstanding</div>
-                          <div className="text-xl font-bold text-amber-900">{formatCurrency(paymentStats.totalBalance, 0)}</div>
+                        <div className="rounded-lg border border-border bg-status-warning/10 p-3">
+                          <div className="text-xs text-status-warning mb-1">Outstanding</div>
+                          <div className="text-xl font-bold text-status-warning">{formatCurrency(paymentStats.totalBalance, 0)}</div>
                         </div>
-                        <div className="rounded-lg border border-border bg-blue-50 p-3">
-                          <div className="text-xs text-blue-700 mb-1">Collection Rate</div>
-                          <div className="text-xl font-bold text-blue-900">{paymentStats.paidPercentage}%</div>
+                        <div className="rounded-lg border border-border bg-primary/10 p-3">
+                          <div className="text-xs text-primary mb-1">Collection Rate</div>
+                          <div className="text-xl font-bold text-primary">{paymentStats.paidPercentage}%</div>
                         </div>
                       </div>
                     </Card>
@@ -5593,13 +5652,13 @@ function ReportsPageInner() {
                       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                         <div className="space-y-2">
                           <div className="text-xs font-semibold text-foreground uppercase">Current Month</div>
-                          <div className="rounded-lg border border-border bg-blue-50 p-3">
-                            <div className="text-xs text-blue-700 mb-1">Bookings</div>
-                            <div className="text-2xl font-bold text-blue-900">{monthlyComparison.current.bookings}</div>
+                          <div className="rounded-lg border border-border bg-primary/10 p-3">
+                            <div className="text-xs text-primary mb-1">Bookings</div>
+                            <div className="text-2xl font-bold text-primary">{monthlyComparison.current.bookings}</div>
                           </div>
-                          <div className="rounded-lg border border-border bg-emerald-50 p-3">
-                            <div className="text-xs text-emerald-700 mb-1">Revenue</div>
-                            <div className="text-2xl font-bold text-emerald-900">{formatCurrency(monthlyComparison.current.revenue, 0)}</div>
+                          <div className="rounded-lg border border-border bg-status-success/10 p-3">
+                            <div className="text-xs text-status-success mb-1">Revenue</div>
+                            <div className="text-2xl font-bold text-status-success">{formatCurrency(monthlyComparison.current.revenue, 0)}</div>
                           </div>
                         </div>
                         <div className="space-y-2">
@@ -5615,15 +5674,15 @@ function ReportsPageInner() {
                         </div>
                         <div className="space-y-2">
                           <div className="text-xs font-semibold text-foreground uppercase">Change</div>
-                          <div className={`rounded-lg border border-border p-3 ${monthlyComparison.change.bookings >= 0 ? 'bg-green-50' : 'bg-rose-50'}`}>
-                            <div className="text-xs mb-1 ${monthlyComparison.change.bookings >= 0 ? 'text-green-700' : 'text-rose-700'}">Bookings</div>
-                            <div className={`text-2xl font-bold ${monthlyComparison.change.bookings >= 0 ? 'text-green-900' : 'text-rose-900'}`}>
+                          <div className={`rounded-lg border border-border p-3 ${monthlyComparison.change.bookings >= 0 ? 'bg-status-success/10' : 'bg-status-error/10'}`}>
+                            <div className="text-xs mb-1 ${monthlyComparison.change.bookings >= 0 ? 'text-status-success' : 'text-status-error'}">Bookings</div>
+                            <div className={`text-2xl font-bold ${monthlyComparison.change.bookings >= 0 ? 'text-status-success' : 'text-status-error'}`}>
                               {monthlyComparison.change.bookings >= 0 ? '+' : ''}{monthlyComparison.change.bookings}
                             </div>
                           </div>
-                          <div className={`rounded-lg border border-border p-3 ${parseFloat(monthlyComparison.change.revenuePercent) >= 0 ? 'bg-green-50' : 'bg-rose-50'}`}>
-                            <div className="text-xs mb-1 ${parseFloat(monthlyComparison.change.revenuePercent) >= 0 ? 'text-green-700' : 'text-rose-700'}">Revenue</div>
-                            <div className={`text-2xl font-bold ${parseFloat(monthlyComparison.change.revenuePercent) >= 0 ? 'text-green-900' : 'text-rose-900'}`}>
+                          <div className={`rounded-lg border border-border p-3 ${parseFloat(monthlyComparison.change.revenuePercent) >= 0 ? 'bg-status-success/10' : 'bg-status-error/10'}`}>
+                            <div className="text-xs mb-1 ${parseFloat(monthlyComparison.change.revenuePercent) >= 0 ? 'text-status-success' : 'text-status-error'}">Revenue</div>
+                            <div className={`text-2xl font-bold ${parseFloat(monthlyComparison.change.revenuePercent) >= 0 ? 'text-status-success' : 'text-status-error'}`}>
                               {parseFloat(monthlyComparison.change.revenuePercent) >= 0 ? '+' : ''}{monthlyComparison.change.revenuePercent}%
                             </div>
                           </div>
@@ -5646,13 +5705,13 @@ function ReportsPageInner() {
                           <div className="text-xs text-muted-foreground mb-1">Total</div>
                           <div className="text-2xl font-bold text-foreground">{guestStats.total}</div>
                         </div>
-                        <div className="rounded-lg border border-border bg-purple-50 p-3">
-                          <div className="text-xs text-purple-700 mb-1">Repeat</div>
-                          <div className="text-2xl font-bold text-purple-900">{guestStats.repeat}</div>
+                        <div className="rounded-lg border border-border bg-primary/10 p-3">
+                          <div className="text-xs text-primary mb-1">Repeat</div>
+                          <div className="text-2xl font-bold text-primary">{guestStats.repeat}</div>
                         </div>
-                        <div className="rounded-lg border border-border bg-blue-50 p-3">
-                          <div className="text-xs text-blue-700 mb-1">Rate</div>
-                          <div className="text-2xl font-bold text-blue-900">{guestStats.repeatRate}%</div>
+                        <div className="rounded-lg border border-border bg-primary/10 p-3">
+                          <div className="text-xs text-primary mb-1">Rate</div>
+                          <div className="text-2xl font-bold text-primary">{guestStats.repeatRate}%</div>
                         </div>
                       </div>
                     </Card>
@@ -5679,7 +5738,7 @@ function ReportsPageInner() {
                               </div>
                               <div className="h-2 bg-muted rounded overflow-hidden">
                                 <div
-                                  className="h-full bg-purple-500"
+                                  className="h-full bg-primary"
                                   style={{ width: `${percentage}%` }}
                                 />
                               </div>
@@ -5709,7 +5768,7 @@ function ReportsPageInner() {
                                 <div className="text-xs text-muted-foreground">{guest.bookings} bookings</div>
                               </div>
                               <div className="text-right">
-                                <div className="text-sm font-bold text-emerald-600">{formatCurrency(guest.revenue, 0)}</div>
+                                <div className="text-sm font-bold text-status-success">{formatCurrency(guest.revenue, 0)}</div>
                                 <div className="text-xs text-muted-foreground">{formatCurrency(guest.revenue / guest.bookings, 0)}/booking</div>
                               </div>
                             </div>
@@ -5736,13 +5795,13 @@ function ReportsPageInner() {
                           <div className="text-xs text-muted-foreground mb-1">Total Guests</div>
                           <div className="text-2xl font-bold text-foreground">{guestLoyaltyReport.stats.totalGuests}</div>
                         </div>
-                        <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3">
-                          <div className="text-xs text-emerald-700 mb-1">Repeat Guests</div>
-                          <div className="text-2xl font-bold text-emerald-900">{guestLoyaltyReport.stats.repeatGuests}</div>
+                        <div className="rounded-lg border border-status-success/20 bg-status-success/10 p-3">
+                          <div className="text-xs text-status-success mb-1">Repeat Guests</div>
+                          <div className="text-2xl font-bold text-status-success">{guestLoyaltyReport.stats.repeatGuests}</div>
                         </div>
-                        <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
-                          <div className="text-xs text-blue-700 mb-1">Repeat Rate</div>
-                          <div className="text-2xl font-bold text-blue-900">{guestLoyaltyReport.stats.repeatRate.toFixed(1)}%</div>
+                        <div className="rounded-lg border border-primary/20 bg-primary/10 p-3">
+                          <div className="text-xs text-primary mb-1">Repeat Rate</div>
+                          <div className="text-2xl font-bold text-primary">{guestLoyaltyReport.stats.repeatRate.toFixed(1)}%</div>
                         </div>
                       </div>
                       {guestLoyaltyReport.guests.length === 0 ? (
@@ -5760,10 +5819,10 @@ function ReportsPageInner() {
                             </thead>
                             <tbody>
                               {guestLoyaltyReport.guests.slice(0, 25).map((guest, idx) => (
-                                <tr key={guest.guestId} className={idx % 2 === 0 ? 'bg-emerald-50' : 'bg-card'}>
+                                <tr key={guest.guestId} className={idx % 2 === 0 ? 'bg-status-success/10' : 'bg-card'}>
                                   <td className="py-2 font-medium">{guest.name}</td>
                                   <td className="py-2 text-center">
-                                    <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${guest.visits >= 10 ? 'bg-purple-100 text-purple-800' :
+                                    <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${guest.visits >= 10 ? 'bg-primary/10 text-primary' :
                                       guest.visits >= 5 ? 'bg-status-success-bg text-status-success-text' :
                                         guest.visits >= 3 ? 'bg-status-info-bg text-status-info-text' :
                                           'bg-muted text-muted-foreground'
@@ -5772,7 +5831,7 @@ function ReportsPageInner() {
                                     </span>
                                   </td>
                                   <td className="py-2 text-right">
-                                    <span className="font-semibold text-emerald-700">{formatCurrency(guest.totalSpent)}</span>
+                                    <span className="font-semibold text-status-success">{formatCurrency(guest.totalSpent)}</span>
                                   </td>
                                   <td className="py-2 text-muted-foreground">{guest.lastVisit}</td>
                                 </tr>
@@ -5795,42 +5854,42 @@ function ReportsPageInner() {
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {guestSegmentationReport.segments.map(segment => (
-                          <div key={segment.type} className={`rounded-lg border-2 p-4 ${segment.type === 'New Guests' ? 'border-blue-300 bg-blue-50' : 'border-emerald-300 bg-emerald-50'
+                          <div key={segment.type} className={`rounded-lg border-2 p-4 ${segment.type === 'New Guests' ? 'border-primary/30 bg-primary/10' : 'border-status-success/30 bg-status-success/10'
                             }`}>
-                            <div className={`text-sm font-semibold mb-3 ${segment.type === 'New Guests' ? 'text-blue-900' : 'text-emerald-900'
+                            <div className={`text-sm font-semibold mb-3 ${segment.type === 'New Guests' ? 'text-primary' : 'text-status-success'
                               }`}>
                               {segment.type}
                             </div>
                             <div className="space-y-2">
                               <div className="flex justify-between items-center">
-                                <span className={`text-xs ${segment.type === 'New Guests' ? 'text-blue-700' : 'text-emerald-700'}`}>
+                                <span className={`text-xs ${segment.type === 'New Guests' ? 'text-primary' : 'text-status-success'}`}>
                                   Total Guests
                                 </span>
-                                <span className={`text-lg font-bold ${segment.type === 'New Guests' ? 'text-blue-900' : 'text-emerald-900'}`}>
+                                <span className={`text-lg font-bold ${segment.type === 'New Guests' ? 'text-primary' : 'text-status-success'}`}>
                                   {segment.count}
                                 </span>
                               </div>
                               <div className="flex justify-between items-center">
-                                <span className={`text-xs ${segment.type === 'New Guests' ? 'text-blue-700' : 'text-emerald-700'}`}>
+                                <span className={`text-xs ${segment.type === 'New Guests' ? 'text-primary' : 'text-status-success'}`}>
                                   Bookings
                                 </span>
-                                <span className={`text-lg font-bold ${segment.type === 'New Guests' ? 'text-blue-900' : 'text-emerald-900'}`}>
+                                <span className={`text-lg font-bold ${segment.type === 'New Guests' ? 'text-primary' : 'text-status-success'}`}>
                                   {segment.bookings}
                                 </span>
                               </div>
                               <div className="flex justify-between items-center">
-                                <span className={`text-xs ${segment.type === 'New Guests' ? 'text-blue-700' : 'text-emerald-700'}`}>
+                                <span className={`text-xs ${segment.type === 'New Guests' ? 'text-primary' : 'text-status-success'}`}>
                                   Total Revenue
                                 </span>
-                                <span className={`text-xl font-bold ${segment.type === 'New Guests' ? 'text-blue-900' : 'text-emerald-900'}`}>
+                                <span className={`text-xl font-bold ${segment.type === 'New Guests' ? 'text-primary' : 'text-status-success'}`}>
                                   {formatCurrency(segment.revenue, 0)}
                                 </span>
                               </div>
                               <div className="flex justify-between items-center pt-2 border-t border-current/20">
-                                <span className={`text-xs ${segment.type === 'New Guests' ? 'text-blue-600' : 'text-emerald-600'}`}>
+                                <span className={`text-xs ${segment.type === 'New Guests' ? 'text-primary' : 'text-status-success'}`}>
                                   Avg Per Booking
                                 </span>
-                                <span className={`text-sm font-semibold ${segment.type === 'New Guests' ? 'text-blue-800' : 'text-emerald-800'}`}>
+                                <span className={`text-sm font-semibold ${segment.type === 'New Guests' ? 'text-primary' : 'text-status-success'}`}>
                                   {formatCurrency(segment.avgRevenue)}
                                 </span>
                               </div>
@@ -5858,13 +5917,13 @@ function ReportsPageInner() {
                               <div className="text-xs text-muted-foreground mb-1">Total</div>
                               <div className="text-2xl font-bold text-foreground">{cancellationStats.total}</div>
                             </div>
-                            <div className="rounded-lg border border-border bg-rose-50 p-3">
-                              <div className="text-xs text-rose-700 mb-1">Rate</div>
-                              <div className="text-2xl font-bold text-rose-900">{cancellationStats.rate}%</div>
+                            <div className="rounded-lg border border-border bg-status-error/10 p-3">
+                              <div className="text-xs text-status-error mb-1">Rate</div>
+                              <div className="text-2xl font-bold text-status-error">{cancellationStats.rate}%</div>
                             </div>
-                            <div className="rounded-lg border border-border bg-amber-50 p-3">
-                              <div className="text-xs text-amber-700 mb-1">Lost $</div>
-                              <div className="text-2xl font-bold text-amber-900">{formatCurrency(cancellationStats.revenueLost, 0)}</div>
+                            <div className="rounded-lg border border-border bg-status-warning/10 p-3">
+                              <div className="text-xs text-status-warning mb-1">Lost $</div>
+                              <div className="text-2xl font-bold text-status-warning">{formatCurrency(cancellationStats.revenueLost, 0)}</div>
                             </div>
                           </div>
                         </Card>
@@ -5918,13 +5977,13 @@ function ReportsPageInner() {
                               <div key={day} className="flex items-center gap-2">
                                 <div className="w-20 text-xs text-muted-foreground flex-shrink-0">{day.slice(0, 3)}</div>
                                 <div className="flex-1 grid grid-cols-2 gap-2">
-                                  <div className="rounded-md border border-border bg-blue-50 px-2 py-1 text-xs">
-                                    <span className="text-blue-700">In: </span>
-                                    <span className="font-semibold text-blue-900">{arrivals}</span>
+                                  <div className="rounded-md border border-border bg-primary/10 px-2 py-1 text-xs">
+                                    <span className="text-primary">In: </span>
+                                    <span className="font-semibold text-primary">{arrivals}</span>
                                   </div>
-                                  <div className="rounded-md border border-border bg-amber-50 px-2 py-1 text-xs">
-                                    <span className="text-amber-700">Out: </span>
-                                    <span className="font-semibold text-amber-900">{departures}</span>
+                                  <div className="rounded-md border border-border bg-status-warning/10 px-2 py-1 text-xs">
+                                    <span className="text-status-warning">Out: </span>
+                                    <span className="font-semibold text-status-warning">{departures}</span>
                                   </div>
                                 </div>
                               </div>
@@ -5946,15 +6005,15 @@ function ReportsPageInner() {
                               <div className="text-3xl font-bold text-foreground mb-3">{revenueConcentrationStats.totalSites}</div>
                               <div className="text-xs text-muted-foreground">In your campground</div>
                             </div>
-                            <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4">
-                              <div className="text-xs text-emerald-700 mb-2">Top 20% of Sites</div>
-                              <div className="text-3xl font-bold text-emerald-900 mb-3">{revenueConcentrationStats.top20Percent}%</div>
-                              <div className="text-xs text-emerald-700">of total revenue</div>
+                            <div className="rounded-lg border border-status-success/20 bg-status-success/10 p-4">
+                              <div className="text-xs text-status-success mb-2">Top 20% of Sites</div>
+                              <div className="text-3xl font-bold text-status-success mb-3">{revenueConcentrationStats.top20Percent}%</div>
+                              <div className="text-xs text-status-success">of total revenue</div>
                             </div>
-                            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
-                              <div className="text-xs text-blue-700 mb-2">Top 50% of Sites</div>
-                              <div className="text-3xl font-bold text-blue-900 mb-3">{revenueConcentrationStats.top50Percent}%</div>
-                              <div className="text-xs text-blue-700">of total revenue</div>
+                            <div className="rounded-lg border border-primary/20 bg-primary/10 p-4">
+                              <div className="text-xs text-primary mb-2">Top 50% of Sites</div>
+                              <div className="text-3xl font-bold text-primary mb-3">{revenueConcentrationStats.top50Percent}%</div>
+                              <div className="text-xs text-primary">of total revenue</div>
                             </div>
                           </div>
                           <div className="rounded-md bg-muted border border-border px-3 py-2 text-xs text-foreground">
@@ -5979,26 +6038,26 @@ function ReportsPageInner() {
                           <div className="text-xs text-muted-foreground mb-1">Total</div>
                           <div className="text-2xl font-bold text-foreground">{marketingStats.total}</div>
                         </div>
-                        <div className="rounded-lg border border-green-200 bg-green-50 p-3">
-                          <div className="text-xs text-green-700 mb-1">Confirmed</div>
-                          <div className="text-2xl font-bold text-green-900">{marketingStats.confirmed}</div>
+                        <div className="rounded-lg border border-status-success/20 bg-status-success/10 p-3">
+                          <div className="text-xs text-status-success mb-1">Confirmed</div>
+                          <div className="text-2xl font-bold text-status-success">{marketingStats.confirmed}</div>
                         </div>
-                        <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
-                          <div className="text-xs text-blue-700 mb-1">Pending</div>
-                          <div className="text-2xl font-bold text-blue-900">{marketingStats.pending}</div>
+                        <div className="rounded-lg border border-primary/20 bg-primary/10 p-3">
+                          <div className="text-xs text-primary mb-1">Pending</div>
+                          <div className="text-2xl font-bold text-primary">{marketingStats.pending}</div>
                         </div>
-                        <div className="rounded-lg border border-rose-200 bg-rose-50 p-3">
-                          <div className="text-xs text-rose-700 mb-1">Cancelled</div>
-                          <div className="text-2xl font-bold text-rose-900">{marketingStats.cancelled}</div>
+                        <div className="rounded-lg border border-status-error/20 bg-status-error/10 p-3">
+                          <div className="text-xs text-status-error mb-1">Cancelled</div>
+                          <div className="text-2xl font-bold text-status-error">{marketingStats.cancelled}</div>
                         </div>
-                        <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3">
-                          <div className="text-xs text-emerald-700 mb-1">Conv. Rate</div>
-                          <div className="text-2xl font-bold text-emerald-900">{marketingStats.conversionRate}%</div>
+                        <div className="rounded-lg border border-status-success/20 bg-status-success/10 p-3">
+                          <div className="text-xs text-status-success mb-1">Conv. Rate</div>
+                          <div className="text-2xl font-bold text-status-success">{marketingStats.conversionRate}%</div>
                         </div>
                       </div>
-                      <div className="rounded-lg border border-purple-200 bg-purple-50 p-4">
-                        <div className="text-xs text-purple-700 mb-1">Average Booking Value</div>
-                        <div className="text-3xl font-bold text-purple-900">{formatCurrency(marketingStats.avgBookingValue)}</div>
+                      <div className="rounded-lg border border-primary/20 bg-primary/10 p-4">
+                        <div className="text-xs text-primary mb-1">Average Booking Value</div>
+                        <div className="text-3xl font-bold text-primary">{formatCurrency(marketingStats.avgBookingValue)}</div>
                       </div>
                     </Card>
                   )
@@ -6012,10 +6071,10 @@ function ReportsPageInner() {
                         <div className="text-xs text-muted-foreground">Future bookings on the books</div>
                       </div>
                       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                        <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
-                          <div className="text-xs text-blue-700 mb-1">Next 30 Days</div>
-                          <div className="text-2xl font-bold text-blue-900">{bookingPaceStats.next30Days}</div>
-                          <div className="text-xs text-blue-700">bookings</div>
+                        <div className="rounded-lg border border-primary/20 bg-primary/10 p-3">
+                          <div className="text-xs text-primary mb-1">Next 30 Days</div>
+                          <div className="text-2xl font-bold text-primary">{bookingPaceStats.next30Days}</div>
+                          <div className="text-xs text-primary">bookings</div>
                         </div>
                         <div className="rounded-lg border border-cyan-200 bg-cyan-50 p-3">
                           <div className="text-xs text-cyan-700 mb-1">31-60 Days</div>
@@ -6027,10 +6086,10 @@ function ReportsPageInner() {
                           <div className="text-2xl font-bold text-teal-900">{bookingPaceStats.next90Days}</div>
                           <div className="text-xs text-teal-700">bookings</div>
                         </div>
-                        <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-3">
-                          <div className="text-xs text-emerald-700 mb-1">Total Future</div>
-                          <div className="text-2xl font-bold text-emerald-900">{bookingPaceStats.total}</div>
-                          <div className="text-xs text-emerald-700">bookings</div>
+                        <div className="rounded-lg border border-status-success/20 bg-status-success/10 p-3">
+                          <div className="text-xs text-status-success mb-1">Total Future</div>
+                          <div className="text-2xl font-bold text-status-success">{bookingPaceStats.total}</div>
+                          <div className="text-xs text-status-success">bookings</div>
                         </div>
                       </div>
                     </Card>
@@ -6048,7 +6107,7 @@ function ReportsPageInner() {
                       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                         {revenueForecast.map(({ month, revenue, bookings }) => (
                           <div key={month} className="rounded-lg border border-border bg-status-info/10 p-4 space-y-2">
-                            <div className="text-sm font-bold text-blue-900">{month}</div>
+                            <div className="text-sm font-bold text-primary">{month}</div>
                             <div>
                               <div className="text-xs text-muted-foreground">Projected Revenue</div>
                               <div className="text-3xl font-bold text-foreground">{formatCurrency(revenue, 0)}</div>
@@ -6079,7 +6138,7 @@ function ReportsPageInner() {
                           <div className="w-24 text-xs text-muted-foreground">0-30 days</div>
                           <div className="flex-1 h-10 bg-muted rounded relative overflow-hidden">
                             <div
-                              className="h-full bg-blue-500"
+                              className="h-full bg-primary"
                               style={{ width: `${(bookingPaceStats.next30Days / bookingPaceStats.total) * 100}%` }}
                             />
                             <div className="absolute inset-0 flex items-center px-2">
@@ -6131,25 +6190,25 @@ function ReportsPageInner() {
                           return (
                             <div
                               key={month.month}
-                              className={`rounded-lg border p-3 ${isPeak ? 'border-emerald-300 bg-emerald-50' :
-                                isOffPeak ? 'border-amber-300 bg-amber-50' :
+                              className={`rounded-lg border p-3 ${isPeak ? 'border-status-success/30 bg-status-success/10' :
+                                isOffPeak ? 'border-status-warning/30 bg-status-warning/10' :
                                   'border-border bg-muted'
                                 }`}
                             >
-                              <div className={`text-xs mb-1 font-medium ${isPeak ? 'text-emerald-700' :
-                                isOffPeak ? 'text-amber-700' :
+                              <div className={`text-xs mb-1 font-medium ${isPeak ? 'text-status-success' :
+                                isOffPeak ? 'text-status-warning' :
                                   'text-muted-foreground'
                                 }`}>
                                 {month.month}
                               </div>
-                              <div className={`text-lg font-bold ${isPeak ? 'text-emerald-900' :
-                                isOffPeak ? 'text-amber-900' :
+                              <div className={`text-lg font-bold ${isPeak ? 'text-status-success' :
+                                isOffPeak ? 'text-status-warning' :
                                   'text-foreground'
                                 }`}>
                                 {formatCurrency(month.revenue, 0)}
                               </div>
-                              <div className={`text-xs mt-1 ${isPeak ? 'text-emerald-600' :
-                                isOffPeak ? 'text-amber-600' :
+                              <div className={`text-xs mt-1 ${isPeak ? 'text-status-success' :
+                                isOffPeak ? 'text-status-warning' :
                                   'text-muted-foreground'
                                 }`}>
                                 {month.bookings} bookings
@@ -6176,16 +6235,16 @@ function ReportsPageInner() {
                           return (
                             <div
                               key={day.day}
-                              className={`rounded-lg border p-3 ${isWeekend ? 'border-blue-300 bg-blue-50' : 'border-border bg-muted'
+                              className={`rounded-lg border p-3 ${isWeekend ? 'border-primary/30 bg-primary/10' : 'border-border bg-muted'
                                 }`}
                             >
-                              <div className={`text-xs mb-1 ${isWeekend ? 'text-blue-700 font-medium' : 'text-muted-foreground'}`}>
+                              <div className={`text-xs mb-1 ${isWeekend ? 'text-primary font-medium' : 'text-muted-foreground'}`}>
                                 {day.day.substring(0, 3)}
                               </div>
-                              <div className={`text-xl font-bold ${isWeekend ? 'text-blue-900' : 'text-foreground'}`}>
+                              <div className={`text-xl font-bold ${isWeekend ? 'text-primary' : 'text-foreground'}`}>
                                 {day.bookings}
                               </div>
-                              <div className={`text-xs mt-1 ${isWeekend ? 'text-blue-600' : 'text-muted-foreground'}`}>
+                              <div className={`text-xs mt-1 ${isWeekend ? 'text-primary' : 'text-muted-foreground'}`}>
                                 {formatCurrency(day.revenue, 0)}
                               </div>
                             </div>
@@ -6205,18 +6264,18 @@ function ReportsPageInner() {
                         <div className="text-xs text-muted-foreground">Actionable insights to improve performance</div>
                       </div>
                       {revenueOptimizationReport.length === 0 ? (
-                        <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-center">
-                          <div className="text-emerald-800 font-medium">All systems performing well!</div>
-                          <div className="text-xs text-emerald-600 mt-1">No optimization opportunities detected</div>
+                        <div className="rounded-lg border border-status-success/20 bg-status-success/10 p-4 text-center">
+                          <div className="text-status-success font-medium">All systems performing well!</div>
+                          <div className="text-xs text-status-success mt-1">No optimization opportunities detected</div>
                         </div>
                       ) : (
                         <div className="space-y-2">
                           {revenueOptimizationReport.map((opp, idx) => (
                             <div
                               key={idx}
-                              className={`rounded-lg border p-3 ${opp.severity === 'high' ? 'border-red-200 bg-red-50' :
-                                opp.severity === 'medium' ? 'border-amber-200 bg-amber-50' :
-                                  'border-blue-200 bg-blue-50'
+                              className={`rounded-lg border p-3 ${opp.severity === 'high' ? 'border-status-error/20 bg-status-error/10' :
+                                opp.severity === 'medium' ? 'border-status-warning/20 bg-status-warning/10' :
+                                  'border-primary/20 bg-primary/10'
                                 }`}
                             >
                               <div className="flex items-start justify-between gap-3">
@@ -6228,16 +6287,16 @@ function ReportsPageInner() {
                                       }`}>
                                       {opp.severity.toUpperCase()}
                                     </span>
-                                    <span className={`text-xs font-medium ${opp.severity === 'high' ? 'text-red-700' :
-                                      opp.severity === 'medium' ? 'text-amber-700' :
-                                        'text-blue-700'
+                                    <span className={`text-xs font-medium ${opp.severity === 'high' ? 'text-status-error' :
+                                      opp.severity === 'medium' ? 'text-status-warning' :
+                                        'text-primary'
                                       }`}>
                                       {opp.type}
                                     </span>
                                   </div>
-                                  <div className={`text-sm ${opp.severity === 'high' ? 'text-red-900' :
-                                    opp.severity === 'medium' ? 'text-amber-900' :
-                                      'text-blue-900'
+                                  <div className={`text-sm ${opp.severity === 'high' ? 'text-status-error' :
+                                    opp.severity === 'medium' ? 'text-status-warning' :
+                                      'text-primary'
                                     }`}>
                                     {opp.description}
                                   </div>
@@ -6286,9 +6345,9 @@ function ReportsPageInner() {
                                       <div className="flex-1 h-6 bg-muted rounded relative overflow-hidden max-w-xs">
                                         <div
                                           className={`h-full transition-all duration-500 ${day.occupancy >= 80 ? 'bg-status-success' :
-                                            day.occupancy >= 60 ? 'bg-blue-500' :
-                                              day.occupancy >= 40 ? 'bg-amber-500' :
-                                                'bg-red-500'
+                                            day.occupancy >= 60 ? 'bg-primary' :
+                                              day.occupancy >= 40 ? 'bg-status-warning' :
+                                                'bg-status-error'
                                             }`}
                                           style={{ width: `${day.occupancy}%` }}
                                         />
@@ -6318,24 +6377,24 @@ function ReportsPageInner() {
                       </div>
                       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                         {extendedStayReport.summary.map(category => (
-                          <div key={category.type} className="rounded-lg border-2 border-purple-300 bg-purple-50 p-4">
-                            <div className="text-xs font-semibold text-purple-900 mb-3">{category.type}</div>
+                          <div key={category.type} className="rounded-lg border-2 border-primary/30 bg-primary/10 p-4">
+                            <div className="text-xs font-semibold text-primary mb-3">{category.type}</div>
                             <div className="space-y-2">
                               <div className="flex justify-between items-center">
-                                <span className="text-xs text-purple-700">Bookings</span>
-                                <span className="text-lg font-bold text-purple-900">{category.count}</span>
+                                <span className="text-xs text-primary">Bookings</span>
+                                <span className="text-lg font-bold text-primary">{category.count}</span>
                               </div>
                               <div className="flex justify-between items-center">
-                                <span className="text-xs text-purple-700">Unique Guests</span>
-                                <span className="text-lg font-bold text-purple-900">{category.uniqueGuests}</span>
+                                <span className="text-xs text-primary">Unique Guests</span>
+                                <span className="text-lg font-bold text-primary">{category.uniqueGuests}</span>
                               </div>
                               <div className="flex justify-between items-center">
-                                <span className="text-xs text-purple-700">Revenue</span>
-                                <span className="text-lg font-bold text-purple-900">{formatCurrency(category.revenue, 0)}</span>
+                                <span className="text-xs text-primary">Revenue</span>
+                                <span className="text-lg font-bold text-primary">{formatCurrency(category.revenue, 0)}</span>
                               </div>
                               <div className="flex justify-between items-center">
-                                <span className="text-xs text-purple-700">Avg Stay</span>
-                                <span className="text-lg font-bold text-purple-900">{category.avgStay.toFixed(1)} nights</span>
+                                <span className="text-xs text-primary">Avg Stay</span>
+                                <span className="text-lg font-bold text-primary">{category.avgStay.toFixed(1)} nights</span>
                               </div>
                             </div>
                           </div>
@@ -6361,8 +6420,8 @@ function ReportsPageInner() {
                                 {extendedStayReport.extendedStays.map((stay, idx) => (
                                   <tr key={idx} className={idx % 2 === 0 ? 'bg-muted' : ''}>
                                     <td className="py-2">
-                                      <span className={`inline-block px-2 py-0.5 rounded text-xs ${stay.type === 'Monthly (30+)' ? 'bg-purple-100 text-purple-800' :
-                                        stay.type === 'Bi-Weekly (14-29)' ? 'bg-indigo-100 text-indigo-800' :
+                                      <span className={`inline-block px-2 py-0.5 rounded text-xs ${stay.type === 'Monthly (30+)' ? 'bg-primary/10 text-primary' :
+                                        stay.type === 'Bi-Weekly (14-29)' ? 'bg-primary/10 text-primary' :
                                           'bg-status-info-bg text-status-info-text'
                                         }`}>
                                         {stay.type}
@@ -6394,21 +6453,21 @@ function ReportsPageInner() {
                         <div className="text-xs text-muted-foreground">Parties of 5+ guests | Total: {groupBookingReport.totalGroups} groups</div>
                       </div>
                       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                        <div className="rounded-lg border border-border bg-blue-50 p-3">
-                          <div className="text-xs text-blue-700 mb-1">Total Groups</div>
-                          <div className="text-2xl font-bold text-blue-900">{groupBookingReport.totalGroups}</div>
+                        <div className="rounded-lg border border-border bg-primary/10 p-3">
+                          <div className="text-xs text-primary mb-1">Total Groups</div>
+                          <div className="text-2xl font-bold text-primary">{groupBookingReport.totalGroups}</div>
                         </div>
-                        <div className="rounded-lg border border-border bg-emerald-50 p-3">
-                          <div className="text-xs text-emerald-700 mb-1">Total Revenue</div>
-                          <div className="text-2xl font-bold text-emerald-900">{formatCurrency(groupBookingReport.totalRevenue, 0)}</div>
+                        <div className="rounded-lg border border-border bg-status-success/10 p-3">
+                          <div className="text-xs text-status-success mb-1">Total Revenue</div>
+                          <div className="text-2xl font-bold text-status-success">{formatCurrency(groupBookingReport.totalRevenue, 0)}</div>
                         </div>
-                        <div className="rounded-lg border border-border bg-purple-50 p-3">
-                          <div className="text-xs text-purple-700 mb-1">Avg Party Size</div>
-                          <div className="text-2xl font-bold text-purple-900">{groupBookingReport.avgPartySize.toFixed(1)}</div>
+                        <div className="rounded-lg border border-border bg-primary/10 p-3">
+                          <div className="text-xs text-primary mb-1">Avg Party Size</div>
+                          <div className="text-2xl font-bold text-primary">{groupBookingReport.avgPartySize.toFixed(1)}</div>
                         </div>
-                        <div className="rounded-lg border border-border bg-amber-50 p-3">
-                          <div className="text-xs text-amber-700 mb-1">Avg Revenue/Person</div>
-                          <div className="text-2xl font-bold text-amber-900">{formatCurrency(groupBookingReport.avgRevenuePerPerson, 0)}</div>
+                        <div className="rounded-lg border border-border bg-status-warning/10 p-3">
+                          <div className="text-xs text-status-warning mb-1">Avg Revenue/Person</div>
+                          <div className="text-2xl font-bold text-status-warning">{formatCurrency(groupBookingReport.avgRevenuePerPerson, 0)}</div>
                         </div>
                       </div>
                       {groupBookingReport.largestGroups.length > 0 && (
@@ -6435,8 +6494,8 @@ function ReportsPageInner() {
                                     <td className="py-2">{group.arrival}</td>
                                     <td className="py-2">{group.departure}</td>
                                     <td className="py-2 text-right">
-                                      <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold ${group.partySize >= 10 ? 'bg-purple-100 text-purple-800' :
-                                        group.partySize >= 8 ? 'bg-indigo-100 text-indigo-800' :
+                                      <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold ${group.partySize >= 10 ? 'bg-primary/10 text-primary' :
+                                        group.partySize >= 8 ? 'bg-primary/10 text-primary' :
                                           'bg-status-info-bg text-status-info-text'
                                         }`}>
                                         {group.partySize}
@@ -6465,69 +6524,69 @@ function ReportsPageInner() {
                       </div>
                       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                         {advanceBookingReport.categories.map(cat => (
-                          <div key={cat.type} className={`rounded-lg border-2 p-4 ${cat.type === 'Same Day / Walk-in' ? 'border-red-300 bg-red-50' :
-                            cat.type === 'Advance (1-30 days)' ? 'border-amber-300 bg-amber-50' :
-                              'border-emerald-300 bg-emerald-50'
+                          <div key={cat.type} className={`rounded-lg border-2 p-4 ${cat.type === 'Same Day / Walk-in' ? 'border-status-error/30 bg-status-error/10' :
+                            cat.type === 'Advance (1-30 days)' ? 'border-status-warning/30 bg-status-warning/10' :
+                              'border-status-success/30 bg-status-success/10'
                             }`}>
-                            <div className={`text-xs font-semibold mb-3 ${cat.type === 'Same Day / Walk-in' ? 'text-red-900' :
-                              cat.type === 'Advance (1-30 days)' ? 'text-amber-900' :
-                                'text-emerald-900'
+                            <div className={`text-xs font-semibold mb-3 ${cat.type === 'Same Day / Walk-in' ? 'text-status-error' :
+                              cat.type === 'Advance (1-30 days)' ? 'text-status-warning' :
+                                'text-status-success'
                               }`}>
                               {cat.type}
                             </div>
                             <div className="space-y-2">
                               <div className="flex justify-between items-center">
-                                <span className={`text-xs ${cat.type === 'Same Day / Walk-in' ? 'text-red-700' :
-                                  cat.type === 'Advance (1-30 days)' ? 'text-amber-700' :
-                                    'text-emerald-700'
+                                <span className={`text-xs ${cat.type === 'Same Day / Walk-in' ? 'text-status-error' :
+                                  cat.type === 'Advance (1-30 days)' ? 'text-status-warning' :
+                                    'text-status-success'
                                   }`}>
                                   Bookings
                                 </span>
-                                <span className={`text-lg font-bold ${cat.type === 'Same Day / Walk-in' ? 'text-red-900' :
-                                  cat.type === 'Advance (1-30 days)' ? 'text-amber-900' :
-                                    'text-emerald-900'
+                                <span className={`text-lg font-bold ${cat.type === 'Same Day / Walk-in' ? 'text-status-error' :
+                                  cat.type === 'Advance (1-30 days)' ? 'text-status-warning' :
+                                    'text-status-success'
                                   }`}>
                                   {cat.count}
                                 </span>
                               </div>
                               <div className="flex justify-between items-center">
-                                <span className={`text-xs ${cat.type === 'Same Day / Walk-in' ? 'text-red-700' :
-                                  cat.type === 'Advance (1-30 days)' ? 'text-amber-700' :
-                                    'text-emerald-700'
+                                <span className={`text-xs ${cat.type === 'Same Day / Walk-in' ? 'text-status-error' :
+                                  cat.type === 'Advance (1-30 days)' ? 'text-status-warning' :
+                                    'text-status-success'
                                   }`}>
                                   Percentage
                                 </span>
-                                <span className={`text-lg font-bold ${cat.type === 'Same Day / Walk-in' ? 'text-red-900' :
-                                  cat.type === 'Advance (1-30 days)' ? 'text-amber-900' :
-                                    'text-emerald-900'
+                                <span className={`text-lg font-bold ${cat.type === 'Same Day / Walk-in' ? 'text-status-error' :
+                                  cat.type === 'Advance (1-30 days)' ? 'text-status-warning' :
+                                    'text-status-success'
                                   }`}>
                                   {cat.percentage.toFixed(1)}%
                                 </span>
                               </div>
                               <div className="flex justify-between items-center">
-                                <span className={`text-xs ${cat.type === 'Same Day / Walk-in' ? 'text-red-700' :
-                                  cat.type === 'Advance (1-30 days)' ? 'text-amber-700' :
-                                    'text-emerald-700'
+                                <span className={`text-xs ${cat.type === 'Same Day / Walk-in' ? 'text-status-error' :
+                                  cat.type === 'Advance (1-30 days)' ? 'text-status-warning' :
+                                    'text-status-success'
                                   }`}>
                                   Revenue
                                 </span>
-                                <span className={`text-lg font-bold ${cat.type === 'Same Day / Walk-in' ? 'text-red-900' :
-                                  cat.type === 'Advance (1-30 days)' ? 'text-amber-900' :
-                                    'text-emerald-900'
+                                <span className={`text-lg font-bold ${cat.type === 'Same Day / Walk-in' ? 'text-status-error' :
+                                  cat.type === 'Advance (1-30 days)' ? 'text-status-warning' :
+                                    'text-status-success'
                                   }`}>
                                   {formatCurrency(cat.revenue, 0)}
                                 </span>
                               </div>
                               <div className="flex justify-between items-center">
-                                <span className={`text-xs ${cat.type === 'Same Day / Walk-in' ? 'text-red-700' :
-                                  cat.type === 'Advance (1-30 days)' ? 'text-amber-700' :
-                                    'text-emerald-700'
+                                <span className={`text-xs ${cat.type === 'Same Day / Walk-in' ? 'text-status-error' :
+                                  cat.type === 'Advance (1-30 days)' ? 'text-status-warning' :
+                                    'text-status-success'
                                   }`}>
                                   Avg/Booking
                                 </span>
-                                <span className={`text-lg font-bold ${cat.type === 'Same Day / Walk-in' ? 'text-red-900' :
-                                  cat.type === 'Advance (1-30 days)' ? 'text-amber-900' :
-                                    'text-emerald-900'
+                                <span className={`text-lg font-bold ${cat.type === 'Same Day / Walk-in' ? 'text-status-error' :
+                                  cat.type === 'Advance (1-30 days)' ? 'text-status-warning' :
+                                    'text-status-success'
                                   }`}>
                                   {formatCurrency(cat.avgRevenue, 0)}
                                 </span>
@@ -6589,7 +6648,7 @@ function ReportsPageInner() {
                               {rec.potentialIncrease > 0 && (
                                 <div>
                                   <span className="text-muted-foreground">Potential:</span>
-                                  <span className="ml-1 font-semibold text-emerald-700">+{formatCurrency(rec.potentialIncrease, 0)}</span>
+                                  <span className="ml-1 font-semibold text-status-success">+{formatCurrency(rec.potentialIncrease, 0)}</span>
                                 </div>
                               )}
                             </div>
@@ -6648,50 +6707,50 @@ function ReportsPageInner() {
                         <div className="text-xs text-muted-foreground">Weekday vs Weekend rate comparison (Friday/Saturday arrivals)</div>
                       </div>
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-                        <div className="rounded-lg border-2 border-blue-300 bg-blue-50 p-4">
-                          <div className="text-sm font-semibold text-blue-900 mb-3">Weekday Bookings</div>
+                        <div className="rounded-lg border-2 border-primary/30 bg-primary/10 p-4">
+                          <div className="text-sm font-semibold text-primary mb-3">Weekday Bookings</div>
                           <div className="space-y-2">
                             <div className="flex justify-between items-center">
-                              <span className="text-xs text-blue-700">Total Bookings</span>
-                              <span className="text-lg font-bold text-blue-900">{weekendPremiumReport.weekday.bookings}</span>
+                              <span className="text-xs text-primary">Total Bookings</span>
+                              <span className="text-lg font-bold text-primary">{weekendPremiumReport.weekday.bookings}</span>
                             </div>
                             <div className="flex justify-between items-center">
-                              <span className="text-xs text-blue-700">Total Revenue</span>
-                              <span className="text-lg font-bold text-blue-900">{formatCurrency(weekendPremiumReport.weekday.revenue, 0)}</span>
+                              <span className="text-xs text-primary">Total Revenue</span>
+                              <span className="text-lg font-bold text-primary">{formatCurrency(weekendPremiumReport.weekday.revenue, 0)}</span>
                             </div>
                             <div className="flex justify-between items-center">
-                              <span className="text-xs text-blue-700">Avg Rate</span>
-                              <span className="text-xl font-bold text-blue-900">{formatCurrency(weekendPremiumReport.weekday.avgRate, 0)}</span>
+                              <span className="text-xs text-primary">Avg Rate</span>
+                              <span className="text-xl font-bold text-primary">{formatCurrency(weekendPremiumReport.weekday.avgRate, 0)}</span>
                             </div>
                           </div>
                         </div>
-                        <div className="rounded-lg border-2 border-purple-300 bg-purple-50 p-4">
-                          <div className="text-sm font-semibold text-purple-900 mb-3">Weekend Bookings</div>
+                        <div className="rounded-lg border-2 border-primary/30 bg-primary/10 p-4">
+                          <div className="text-sm font-semibold text-primary mb-3">Weekend Bookings</div>
                           <div className="space-y-2">
                             <div className="flex justify-between items-center">
-                              <span className="text-xs text-purple-700">Total Bookings</span>
-                              <span className="text-lg font-bold text-purple-900">{weekendPremiumReport.weekend.bookings}</span>
+                              <span className="text-xs text-primary">Total Bookings</span>
+                              <span className="text-lg font-bold text-primary">{weekendPremiumReport.weekend.bookings}</span>
                             </div>
                             <div className="flex justify-between items-center">
-                              <span className="text-xs text-purple-700">Total Revenue</span>
-                              <span className="text-lg font-bold text-purple-900">{formatCurrency(weekendPremiumReport.weekend.revenue, 0)}</span>
+                              <span className="text-xs text-primary">Total Revenue</span>
+                              <span className="text-lg font-bold text-primary">{formatCurrency(weekendPremiumReport.weekend.revenue, 0)}</span>
                             </div>
                             <div className="flex justify-between items-center">
-                              <span className="text-xs text-purple-700">Avg Rate</span>
-                              <span className="text-xl font-bold text-purple-900">{formatCurrency(weekendPremiumReport.weekend.avgRate, 0)}</span>
+                              <span className="text-xs text-primary">Avg Rate</span>
+                              <span className="text-xl font-bold text-primary">{formatCurrency(weekendPremiumReport.weekend.avgRate, 0)}</span>
                             </div>
                           </div>
                         </div>
                       </div>
-                      <div className={`rounded-lg border-2 p-4 ${weekendPremiumReport.premium > 0 ? 'border-emerald-300 bg-emerald-50' : 'border-rose-300 bg-rose-50'
+                      <div className={`rounded-lg border-2 p-4 ${weekendPremiumReport.premium > 0 ? 'border-status-success/30 bg-status-success/10' : 'border-status-error/30 bg-status-error/10'
                         }`}>
                         <div className="flex items-center justify-between">
                           <div>
-                            <div className={`text-sm font-semibold mb-1 ${weekendPremiumReport.premium > 0 ? 'text-emerald-900' : 'text-rose-900'
+                            <div className={`text-sm font-semibold mb-1 ${weekendPremiumReport.premium > 0 ? 'text-status-success' : 'text-status-error'
                               }`}>
                               Weekend Premium
                             </div>
-                            <div className={`text-xs ${weekendPremiumReport.premium > 0 ? 'text-emerald-700' : 'text-rose-700'
+                            <div className={`text-xs ${weekendPremiumReport.premium > 0 ? 'text-status-success' : 'text-status-error'
                               }`}>
                               {weekendPremiumReport.premium > 0
                                 ? 'Weekend rates are higher - good!'
@@ -6701,8 +6760,8 @@ function ReportsPageInner() {
                             </div>
                           </div>
                           <div className="flex flex-col items-end gap-2 text-right">
-                            <div className={`text-2xl font-bold ${weekendPremiumReport.premium > 0 ? 'text-emerald-900' :
-                              weekendPremiumReport.premium < -5 ? 'text-rose-900' : 'text-foreground'
+                            <div className={`text-2xl font-bold ${weekendPremiumReport.premium > 0 ? 'text-status-success' :
+                              weekendPremiumReport.premium < -5 ? 'text-status-error' : 'text-foreground'
                               }`}>
                               {weekendPremiumReport.premium > 0 ? '+' : ''}{weekendPremiumReport.premium.toFixed(1)}%
                             </div>
@@ -6779,17 +6838,17 @@ function ReportsPageInner() {
                           <div className="text-xs text-muted-foreground mb-1">Total Revenue</div>
                           <div className="text-2xl font-bold text-foreground">{formatCurrency(paymentStats.totalRevenue, 0)}</div>
                         </div>
-                        <div className="rounded-lg border border-green-200 bg-green-50 p-3">
-                          <div className="text-xs text-green-700 mb-1">Collected</div>
-                          <div className="text-2xl font-bold text-green-900">{formatCurrency(paymentStats.totalPaid, 0)}</div>
+                        <div className="rounded-lg border border-status-success/20 bg-status-success/10 p-3">
+                          <div className="text-xs text-status-success mb-1">Collected</div>
+                          <div className="text-2xl font-bold text-status-success">{formatCurrency(paymentStats.totalPaid, 0)}</div>
                         </div>
-                        <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
-                          <div className="text-xs text-amber-700 mb-1">Outstanding</div>
-                          <div className="text-2xl font-bold text-amber-900">{formatCurrency(paymentStats.totalBalance, 0)}</div>
+                        <div className="rounded-lg border border-status-warning/20 bg-status-warning/10 p-3">
+                          <div className="text-xs text-status-warning mb-1">Outstanding</div>
+                          <div className="text-2xl font-bold text-status-warning">{formatCurrency(paymentStats.totalBalance, 0)}</div>
                         </div>
-                        <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
-                          <div className="text-xs text-blue-700 mb-1">Collection %</div>
-                          <div className="text-2xl font-bold text-blue-900">{paymentStats.paidPercentage}%</div>
+                        <div className="rounded-lg border border-primary/20 bg-primary/10 p-3">
+                          <div className="text-xs text-primary mb-1">Collection %</div>
+                          <div className="text-2xl font-bold text-primary">{paymentStats.paidPercentage}%</div>
                         </div>
                       </div>
                     </Card>
@@ -6804,20 +6863,20 @@ function ReportsPageInner() {
                         <div className="text-xs text-muted-foreground">Breakdown by payment completion</div>
                       </div>
                       <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
-                        <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4">
-                          <div className="text-xs text-emerald-700 mb-2">Fully Paid</div>
-                          <div className="text-3xl font-bold text-emerald-900 mb-1">{paymentMethodStats.fullyPaid}</div>
-                          <div className="text-xs text-emerald-700">{((paymentMethodStats.fullyPaid / paymentMethodStats.total) * 100).toFixed(1)}% of total</div>
+                        <div className="rounded-lg border border-status-success/20 bg-status-success/10 p-4">
+                          <div className="text-xs text-status-success mb-2">Fully Paid</div>
+                          <div className="text-3xl font-bold text-status-success mb-1">{paymentMethodStats.fullyPaid}</div>
+                          <div className="text-xs text-status-success">{((paymentMethodStats.fullyPaid / paymentMethodStats.total) * 100).toFixed(1)}% of total</div>
                         </div>
-                        <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
-                          <div className="text-xs text-blue-700 mb-2">Partially Paid</div>
-                          <div className="text-3xl font-bold text-blue-900 mb-1">{paymentMethodStats.partiallyPaid}</div>
-                          <div className="text-xs text-blue-700">{((paymentMethodStats.partiallyPaid / paymentMethodStats.total) * 100).toFixed(1)}% of total</div>
+                        <div className="rounded-lg border border-primary/20 bg-primary/10 p-4">
+                          <div className="text-xs text-primary mb-2">Partially Paid</div>
+                          <div className="text-3xl font-bold text-primary mb-1">{paymentMethodStats.partiallyPaid}</div>
+                          <div className="text-xs text-primary">{((paymentMethodStats.partiallyPaid / paymentMethodStats.total) * 100).toFixed(1)}% of total</div>
                         </div>
-                        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
-                          <div className="text-xs text-amber-700 mb-2">Unpaid</div>
-                          <div className="text-3xl font-bold text-amber-900 mb-1">{paymentMethodStats.unpaid}</div>
-                          <div className="text-xs text-amber-700">{((paymentMethodStats.unpaid / paymentMethodStats.total) * 100).toFixed(1)}% of total</div>
+                        <div className="rounded-lg border border-status-warning/20 bg-status-warning/10 p-4">
+                          <div className="text-xs text-status-warning mb-2">Unpaid</div>
+                          <div className="text-3xl font-bold text-status-warning mb-1">{paymentMethodStats.unpaid}</div>
+                          <div className="text-xs text-status-warning">{((paymentMethodStats.unpaid / paymentMethodStats.total) * 100).toFixed(1)}% of total</div>
                         </div>
                         <div className="rounded-lg border border-border bg-muted p-4">
                           <div className="text-xs text-muted-foreground mb-2">Total Bookings</div>
@@ -6838,15 +6897,15 @@ function ReportsPageInner() {
                         <div className="text-xs text-muted-foreground">Cancelled reservations with payment history</div>
                       </div>
                       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-                        <div className="rounded-lg border border-rose-200 bg-rose-50 p-4">
-                          <div className="text-xs text-rose-700 mb-2">Total Cancelled</div>
-                          <div className="text-3xl font-bold text-rose-900 mb-1">{refundStats.totalCancelled}</div>
-                          <div className="text-xs text-rose-700">Reservations</div>
+                        <div className="rounded-lg border border-status-error/20 bg-status-error/10 p-4">
+                          <div className="text-xs text-status-error mb-2">Total Cancelled</div>
+                          <div className="text-3xl font-bold text-status-error mb-1">{refundStats.totalCancelled}</div>
+                          <div className="text-xs text-status-error">Reservations</div>
                         </div>
-                        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
-                          <div className="text-xs text-amber-700 mb-2">Refunded Amount</div>
-                          <div className="text-3xl font-bold text-amber-900">{formatCurrency(refundStats.refundedAmount, 0)}</div>
-                          <div className="text-xs text-amber-700">Total refunds issued</div>
+                        <div className="rounded-lg border border-status-warning/20 bg-status-warning/10 p-4">
+                          <div className="text-xs text-status-warning mb-2">Refunded Amount</div>
+                          <div className="text-3xl font-bold text-status-warning">{formatCurrency(refundStats.refundedAmount, 0)}</div>
+                          <div className="text-xs text-status-warning">Total refunds issued</div>
                         </div>
                         <div className="rounded-lg border border-border bg-muted p-4">
                           <div className="text-xs text-muted-foreground mb-2">Avg Refund</div>
@@ -6895,30 +6954,30 @@ function ReportsPageInner() {
                         <div className="text-xs text-muted-foreground">Issues requiring attention</div>
                       </div>
                       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                        <div className={`rounded-lg border p-4 ${dataQualityStats.inactiveSites > 0 ? 'bg-amber-50 border-amber-200' : 'bg-green-50 border-green-200'}`}>
+                        <div className={`rounded-lg border p-4 ${dataQualityStats.inactiveSites > 0 ? 'bg-status-warning/10 border-status-warning/20' : 'bg-status-success/10 border-status-success/20'}`}>
                           <div className="text-xs text-foreground mb-2">Inactive Sites</div>
-                          <div className={`text-3xl font-bold mb-1 ${dataQualityStats.inactiveSites > 0 ? 'text-amber-900' : 'text-green-900'}`}>
+                          <div className={`text-3xl font-bold mb-1 ${dataQualityStats.inactiveSites > 0 ? 'text-status-warning' : 'text-status-success'}`}>
                             {dataQualityStats.inactiveSites}
                           </div>
                           <div className="text-xs text-muted-foreground">No bookings in 1 year</div>
                         </div>
-                        <div className={`rounded-lg border p-4 ${dataQualityStats.incompleteReservations > 0 ? 'bg-rose-50 border-rose-200' : 'bg-green-50 border-green-200'}`}>
+                        <div className={`rounded-lg border p-4 ${dataQualityStats.incompleteReservations > 0 ? 'bg-status-error/10 border-status-error/20' : 'bg-status-success/10 border-status-success/20'}`}>
                           <div className="text-xs text-foreground mb-2">Incomplete Data</div>
-                          <div className={`text-3xl font-bold mb-1 ${dataQualityStats.incompleteReservations > 0 ? 'text-rose-900' : 'text-green-900'}`}>
+                          <div className={`text-3xl font-bold mb-1 ${dataQualityStats.incompleteReservations > 0 ? 'text-status-error' : 'text-status-success'}`}>
                             {dataQualityStats.incompleteReservations}
                           </div>
                           <div className="text-xs text-muted-foreground">Missing critical fields</div>
                         </div>
-                        <div className={`rounded-lg border p-4 ${dataQualityStats.futureUnpaid > 0 ? 'bg-amber-50 border-amber-200' : 'bg-green-50 border-green-200'}`}>
+                        <div className={`rounded-lg border p-4 ${dataQualityStats.futureUnpaid > 0 ? 'bg-status-warning/10 border-status-warning/20' : 'bg-status-success/10 border-status-success/20'}`}>
                           <div className="text-xs text-foreground mb-2">Future Unpaid</div>
-                          <div className={`text-3xl font-bold mb-1 ${dataQualityStats.futureUnpaid > 0 ? 'text-amber-900' : 'text-green-900'}`}>
+                          <div className={`text-3xl font-bold mb-1 ${dataQualityStats.futureUnpaid > 0 ? 'text-status-warning' : 'text-status-success'}`}>
                             {dataQualityStats.futureUnpaid}
                           </div>
                           <div className="text-xs text-muted-foreground">Confirmed, no payment</div>
                         </div>
-                        <div className={`rounded-lg border p-4 ${dataQualityStats.negativeBalance > 0 ? 'bg-rose-50 border-rose-200' : 'bg-green-50 border-green-200'}`}>
+                        <div className={`rounded-lg border p-4 ${dataQualityStats.negativeBalance > 0 ? 'bg-status-error/10 border-status-error/20' : 'bg-status-success/10 border-status-success/20'}`}>
                           <div className="text-xs text-foreground mb-2">Negative Balance</div>
-                          <div className={`text-3xl font-bold mb-1 ${dataQualityStats.negativeBalance > 0 ? 'text-rose-900' : 'text-green-900'}`}>
+                          <div className={`text-3xl font-bold mb-1 ${dataQualityStats.negativeBalance > 0 ? 'text-status-error' : 'text-status-success'}`}>
                             {dataQualityStats.negativeBalance}
                           </div>
                           <div className="text-xs text-muted-foreground">Overpayment issues</div>
@@ -6954,9 +7013,9 @@ function ReportsPageInner() {
                           <div className="text-xs text-muted-foreground mb-1">Sites Checked</div>
                           <div className="text-2xl font-bold text-foreground">{rateConsistencyStats.totalSitesChecked}</div>
                         </div>
-                        <div className={`rounded-lg border p-3 ${rateConsistencyStats.inconsistentSites > 0 ? 'bg-amber-50 border-amber-200' : 'bg-green-50 border-green-200'}`}>
-                          <div className={`text-xs mb-1 ${rateConsistencyStats.inconsistentSites > 0 ? 'text-amber-700' : 'text-green-700'}`}>Inconsistent Rates</div>
-                          <div className={`text-2xl font-bold ${rateConsistencyStats.inconsistentSites > 0 ? 'text-amber-900' : 'text-green-900'}`}>
+                        <div className={`rounded-lg border p-3 ${rateConsistencyStats.inconsistentSites > 0 ? 'bg-status-warning/10 border-status-warning/20' : 'bg-status-success/10 border-status-success/20'}`}>
+                          <div className={`text-xs mb-1 ${rateConsistencyStats.inconsistentSites > 0 ? 'text-status-warning' : 'text-status-success'}`}>Inconsistent Rates</div>
+                          <div className={`text-2xl font-bold ${rateConsistencyStats.inconsistentSites > 0 ? 'text-status-warning' : 'text-status-success'}`}>
                             {rateConsistencyStats.inconsistentSites}
                           </div>
                         </div>
@@ -6970,10 +7029,10 @@ function ReportsPageInner() {
                           <div className="text-xs font-semibold text-foreground mb-2 uppercase">Top Issues</div>
                           <div className="space-y-2">
                             {rateConsistencyStats.siteVariance.map((site) => (
-                              <div key={site.siteName} className="rounded-md border border-amber-200 bg-amber-50 p-3">
+                              <div key={site.siteName} className="rounded-md border border-status-warning/20 bg-status-warning/10 p-3">
                                 <div className="flex items-center justify-between mb-2">
                                   <div className="text-sm font-medium text-foreground">{site.siteName}</div>
-                                  <div className="text-sm font-bold text-amber-700">{site.variance.toFixed(1)}% variance</div>
+                                  <div className="text-sm font-bold text-status-warning">{site.variance.toFixed(1)}% variance</div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-2 text-xs">
                                   <div>
@@ -7011,9 +7070,9 @@ function ReportsPageInner() {
                           <div className="text-xs text-muted-foreground mb-1">Total Sites</div>
                           <div className="text-2xl font-bold text-foreground">{sitesQuery.data.length}</div>
                         </div>
-                        <div className="rounded-lg border border-green-200 bg-green-50 p-3">
-                          <div className="text-xs text-green-700 mb-1">Active</div>
-                          <div className="text-2xl font-bold text-green-900">
+                        <div className="rounded-lg border border-status-success/20 bg-status-success/10 p-3">
+                          <div className="text-xs text-status-success mb-1">Active</div>
+                          <div className="text-2xl font-bold text-status-success">
                             {sitesQuery.data.filter(s => s.isActive).length}
                           </div>
                         </div>

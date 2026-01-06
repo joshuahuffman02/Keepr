@@ -87,19 +87,19 @@ const getMovementIcon = (type: string) => {
 const getMovementColor = (type: string) => {
     switch (type) {
         case "sale":
-            return "text-red-600 bg-red-50";
+            return "text-status-error bg-status-error/10";
         case "return":
-            return "text-green-600 bg-green-50";
+            return "text-status-success bg-status-success/10";
         case "restock":
-            return "text-blue-600 bg-blue-50";
+            return "text-status-success bg-status-success/10";
         case "adjustment":
-            return "text-amber-600 bg-amber-50";
+            return "text-status-warning bg-status-warning/10";
         case "transfer_out":
-            return "text-purple-600 bg-purple-50";
+            return "text-status-info bg-status-info/10";
         case "transfer_in":
-            return "text-purple-600 bg-purple-50";
+            return "text-status-info bg-status-info/10";
         default:
-            return "text-slate-600 bg-slate-50";
+            return "text-muted-foreground bg-muted";
     }
 };
 
@@ -154,10 +154,10 @@ export default function InventoryMovementsPage() {
             <div className="space-y-6">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+                        <h1 className="text-2xl font-bold tracking-tight text-foreground">
                             Inventory Movements
                         </h1>
-                        <p className="text-slate-500">
+                        <p className="text-muted-foreground">
                             Audit log of all inventory changes across locations
                         </p>
                     </div>
@@ -175,7 +175,7 @@ export default function InventoryMovementsPage() {
                         <div className="flex flex-wrap gap-4">
                             <div className="w-48">
                                 <Select value={movementType} onValueChange={setMovementType}>
-                                    <SelectTrigger>
+                                    <SelectTrigger aria-label="Movement type">
                                         <SelectValue placeholder="Movement type" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -189,7 +189,7 @@ export default function InventoryMovementsPage() {
                             </div>
                             <div className="w-48">
                                 <Select value={locationFilter} onValueChange={setLocationFilter}>
-                                    <SelectTrigger>
+                                    <SelectTrigger aria-label="Location filter">
                                         <SelectValue placeholder="Location" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -207,13 +207,15 @@ export default function InventoryMovementsPage() {
                                     type="date"
                                     value={startDate}
                                     onChange={(e) => setStartDate(e.target.value)}
+                                    aria-label="Start date"
                                     className="w-40"
                                 />
-                                <span className="text-slate-400">to</span>
+                                <span className="text-muted-foreground">to</span>
                                 <Input
                                     type="date"
                                     value={endDate}
                                     onChange={(e) => setEndDate(e.target.value)}
+                                    aria-label="End date"
                                     className="w-40"
                                 />
                             </div>
@@ -237,11 +239,11 @@ export default function InventoryMovementsPage() {
                 <Card>
                     <CardContent className="pt-6">
                         {isLoading ? (
-                            <div className="text-center py-8 text-slate-500">Loading movements...</div>
+                            <div className="text-center py-8 text-muted-foreground">Loading movements...</div>
                         ) : movements.length === 0 ? (
                             <div className="text-center py-8">
-                                <Package className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-                                <p className="text-slate-500">No inventory movements found</p>
+                                <Package className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                                <p className="text-muted-foreground">No inventory movements found</p>
                             </div>
                         ) : (
                             <Table>
@@ -260,7 +262,7 @@ export default function InventoryMovementsPage() {
                                 <TableBody>
                                     {movements.map((m) => (
                                         <TableRow key={m.id}>
-                                            <TableCell className="text-sm text-slate-500 whitespace-nowrap">
+                                            <TableCell className="text-sm text-muted-foreground whitespace-nowrap">
                                                 {formatDate(m.createdAt)}
                                             </TableCell>
                                             <TableCell>
@@ -278,7 +280,7 @@ export default function InventoryMovementsPage() {
                                             <TableCell>
                                                 <div className="font-medium">{m.product?.name}</div>
                                                 {m.product?.sku && (
-                                                    <div className="text-xs text-slate-500">
+                                                    <div className="text-xs text-muted-foreground">
                                                         {m.product.sku}
                                                     </div>
                                                 )}
@@ -289,14 +291,14 @@ export default function InventoryMovementsPage() {
                                                         {m.location.code || m.location.name}
                                                     </Badge>
                                                 ) : (
-                                                    <span className="text-slate-400">Shared</span>
+                                                    <span className="text-muted-foreground">Shared</span>
                                                 )}
                                             </TableCell>
                                             <TableCell className="text-right font-mono">
                                                 <span
                                                     className={cn(
                                                         "font-medium",
-                                                        m.qty > 0 ? "text-green-600" : "text-red-600"
+                                                        m.qty > 0 ? "text-status-success" : "text-status-error"
                                                     )}
                                                 >
                                                     {m.qty > 0 ? "+" : ""}
@@ -304,8 +306,8 @@ export default function InventoryMovementsPage() {
                                                 </span>
                                             </TableCell>
                                             <TableCell className="text-right font-mono">
-                                                <span className="text-slate-500">{m.previousQty}</span>
-                                                <span className="text-slate-400 mx-1">→</span>
+                                                <span className="text-muted-foreground">{m.previousQty}</span>
+                                                <span className="text-muted-foreground mx-1">→</span>
                                                 <span className="font-medium">{m.newQty}</span>
                                             </TableCell>
                                             <TableCell className="text-sm">
@@ -313,7 +315,7 @@ export default function InventoryMovementsPage() {
                                                     ? `${m.actor.firstName} ${m.actor.lastName}`
                                                     : "—"}
                                             </TableCell>
-                                            <TableCell className="text-sm text-slate-500 max-w-[200px] truncate">
+                                            <TableCell className="text-sm text-muted-foreground max-w-[200px] truncate">
                                                 {m.notes || "—"}
                                             </TableCell>
                                         </TableRow>

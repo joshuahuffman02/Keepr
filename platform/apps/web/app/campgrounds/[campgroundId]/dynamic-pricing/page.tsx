@@ -158,7 +158,7 @@ export default function DynamicPricingPage({ params }: { params: { campgroundId:
                           }`}>
                             {formatAdjustment(rule)}
                           </span>
-                          <Button variant="ghost" size="sm" asChild>
+                          <Button variant="ghost" size="sm" asChild aria-label="Open advanced pricing rules">
                             <Link href="/dashboard/settings/pricing-rules">
                               <Pencil className="h-4 w-4" />
                             </Link>

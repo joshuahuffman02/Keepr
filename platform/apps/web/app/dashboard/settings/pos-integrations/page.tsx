@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -620,11 +621,11 @@ function WebhooksTab({ campgroundId }: { campgroundId: string }) {
                               : "border-border hover:bg-muted"
                           }`}
                         >
-                          <input
-                            type="checkbox"
+                          <Checkbox
                             checked={selectedEvents.includes(event.id)}
-                            onChange={() => toggleEvent(event.id)}
+                            onCheckedChange={() => toggleEvent(event.id)}
                             className="mt-1"
+                            aria-label={event.label}
                           />
                           <div>
                             <div className="font-medium text-sm">{event.label}</div>
