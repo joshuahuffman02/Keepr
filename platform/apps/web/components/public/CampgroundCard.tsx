@@ -137,7 +137,19 @@ export function CampgroundCard({
         ? [imageUrl, ...photos.filter((p) => p !== imageUrl)]
         : photos;
 
-    // Generate a placeholder gradient if no image
+    // Default placeholder images for campgrounds without photos (no query params - Next.js handles sizing)
+    const defaultImages = [
+        "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4", // Tent by lake at sunset
+        "https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7", // Camping tent in forest
+        "https://images.unsplash.com/photo-1537905569824-f89f14cceb68", // RV at sunset
+        "https://images.unsplash.com/photo-1510312305653-8ed496efae75", // Campfire at night
+        "https://images.unsplash.com/photo-1478131143081-80f7f84ca84d", // Mountain campsite
+        "https://images.unsplash.com/photo-1508739773434-c26b3d09e071"  // Sunset camping
+    ];
+    const defaultImageIndex = name.charCodeAt(0) % defaultImages.length;
+    const defaultImage = defaultImages[defaultImageIndex];
+
+    // Generate a placeholder gradient as fallback
     const gradients = [
         "from-keepr-evergreen to-keepr-evergreen-light",
         "from-keepr-clay to-keepr-clay-light",
@@ -154,19 +166,26 @@ export function CampgroundCard({
         <div className="group relative bg-card rounded-2xl overflow-hidden shadow-lg shadow-slate-900/5 hover:shadow-2xl hover:shadow-slate-900/10 transition-all duration-300 transform hover:-translate-y-1">
             {/* Image container */}
             <div className="relative aspect-[4/3] overflow-hidden">
-                {imageUrl ? (
-                    <img
-                        src={imageUrl}
-                        alt={name}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
-                ) : (
-                    <div className={`w-full h-full bg-gradient-to-br ${placeholderGradient} flex items-center justify-center`}>
-                        <svg className="w-16 h-16 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="m4 20 8-14 8 14M2 20h20M9 15h6" />
-                        </svg>
-                    </div>
-                )}
+                <img
+                    src={imageUrl || defaultImage}
+                    alt={name}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    onError={(e) => {
+                        // Fallback to gradient if image fails to load
+                        const target = e.currentTarget;
+                        target.style.display = "none";
+                        const fallback = target.nextElementSibling as HTMLElement;
+                        if (fallback) fallback.style.display = "flex";
+                    }}
+                />
+                <div
+                    className={`w-full h-full bg-gradient-to-br ${placeholderGradient} items-center justify-center absolute inset-0`}
+                    style={{ display: "none" }}
+                >
+                    <svg className="w-16 h-16 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="m4 20 8-14 8 14M2 20h20M9 15h6" />
+                    </svg>
+                </div>
 
                 {/* Overlay gradient */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />

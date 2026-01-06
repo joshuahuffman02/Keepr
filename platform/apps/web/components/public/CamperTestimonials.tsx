@@ -159,7 +159,7 @@ export function CamperTestimonials({
 
         {/* Bottom CTA */}
         <div className="mt-12 text-center">
-          <p className="text-muted-foreground mb-4">Join thousands of happy campers</p>
+          <p className="text-muted-foreground mb-4">Start your camping adventure today</p>
           <a
             href="#search"
             className="inline-flex items-center gap-2 bg-keepr-evergreen hover:bg-keepr-evergreen-light text-white font-semibold px-6 py-3 rounded-xl transition-colors"

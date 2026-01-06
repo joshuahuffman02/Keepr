@@ -105,38 +105,57 @@ pnpm lint:web               # Lint web app
 4. **Money in cents** - All amounts are integers (e.g., `9999` = $99.99)
 5. **No emojis** - Use Lucide SVG icons instead (professional and scalable)
 
-### DOCKER & RAILWAY CONFIG - NEVER MODIFY
+### DOCKER & RAILWAY CONFIG - CRITICAL
 
-These files control Railway deployment. Modifying them breaks production.
+These files control Railway deployment. **Reference `docs/RAILWAY_TROUBLESHOOTING.md` for detailed debugging.**
 
-| File | Purpose | NEVER CHANGE |
-|------|---------|--------------|
-| `Dockerfile.api` | API Docker build | Ports, CMD, paths |
-| `Dockerfile.web` | Web Docker build | Ports, CMD, paths |
-| `railway.api.toml` | API Railway config | dockerfilePath |
-| `railway.web.toml` | Web Railway config | dockerfilePath, buildArgs |
-| `railway.toml` | Root config (fallback) | Keep minimal |
+| File | Purpose | Notes |
+|------|---------|-------|
+| `Dockerfile.api` | API Docker build | Uses `./start.sh` |
+| `Dockerfile.web` | Web Docker build | **MUST use `pnpm exec`** |
+| `railway.toml` | Root Railway config | Shared build settings |
 
-**Current working configuration:**
+**Current working configuration (Jan 2026):**
 
-```
-Dockerfile.api:
-  - EXPOSE 4000 (but Railway injects PORT=8080, so Target Port = 8080 in dashboard)
-  - CMD ["./start.sh"]
+```dockerfile
+# Dockerfile.api
+EXPOSE 4000
+CMD ["./start.sh"]
+# Railway injects PORT=8080, so Target Port = 8080 in dashboard
 
-Dockerfile.web:
-  - EXPOSE 3000, Target Port = 3000
-  - CMD ["node", "node_modules/next/dist/bin/next", "start", "-p", "3000"]
-
-Railway Dashboard Settings:
-  - API: Config File = /railway.api.toml, Target Port = 8080
-  - Web: Config File = /railway.web.toml, Target Port = 3000
+# Dockerfile.web - CRITICAL: Use pnpm exec, NOT absolute paths!
+EXPOSE 3000
+CMD ["pnpm", "exec", "next", "start", "-H", "0.0.0.0", "-p", "3000"]
+# pnpm doesn't hoist packages like npm/yarn - absolute paths WILL FAIL
 ```
 
-**If builds break, check:**
-1. Railway dashboard "Config File" matches the service (api vs web)
-2. Target Port matches what the app listens on
-3. Environment variables exist (especially `NEXT_PUBLIC_API_BASE` for web builds)
+**Railway Dashboard Settings:**
+- API: Target Port = 8080
+- Web: Target Port = 3000
+
+### RAILWAY TROUBLESHOOTING - READ THIS FIRST
+
+**Common Issues & Quick Fixes:**
+
+| Symptom | Cause | Fix |
+|---------|-------|-----|
+| `Cannot find module '/app/node_modules/next/...'` | pnpm doesn't hoist packages | Use `pnpm exec next` instead of absolute path |
+| Build completes but immediately restarts (loop) | Watch Paths includes deleted file | Remove non-existent paths from Settings → Build → Watch Paths |
+| New deployment stuck "Waiting for build..." | Old build blocking queue | Cancel stuck build via deployment menu (⋮) |
+| 502 Bad Gateway but "Deployment successful" | Runtime crash, not build failure | Check **Deploy Logs** (not Build Logs) |
+
+**Debugging Steps:**
+1. Check **Deploy Logs** first (runtime errors) - Build Logs only show compile issues
+2. If build loops: Settings → Build → Watch Paths - remove any deleted files
+3. If queue stuck: Cancel old deployments via ⋮ menu → Remove
+4. Verify environment variables exist (especially `NEXT_PUBLIC_API_BASE`)
+
+**Watch Paths Best Practices:**
+- Only include paths that **actually exist** in the repo
+- Good: `/platform/apps/web/**`, `/Dockerfile.web`
+- Bad: `/railway.web.toml` (if file was deleted)
+
+See `docs/RAILWAY_TROUBLESHOOTING.md` for complete debugging guide.
 
 ---
 

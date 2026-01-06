@@ -86,7 +86,7 @@ export function HeroBanner({ onSearch, featuredCampground, isLoadingFeatured = f
       {/* Background Image with Overlay */}
       <div className="absolute inset-0">
         <Image
-          src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=2000&h=1200&fit=crop"
+          src="https://images.unsplash.com/photo-1504280390367-361c6d9f38f4"
           alt="Peaceful campground at sunset"
           fill
           className="object-cover"
@@ -110,7 +110,7 @@ export function HeroBanner({ onSearch, featuredCampground, isLoadingFeatured = f
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full border border-white/20">
               <Shield className="w-4 h-4 text-keepr-evergreen" />
               <span className="text-sm text-white/90 font-medium">
-                Trusted by 50,000+ happy campers
+                Verified campgrounds, transparent pricing
               </span>
               <div className="flex items-center gap-0.5 ml-2">
                 {[1, 2, 3, 4, 5].map((i) => (
