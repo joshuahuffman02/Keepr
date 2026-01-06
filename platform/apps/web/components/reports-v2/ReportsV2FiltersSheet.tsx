@@ -12,6 +12,73 @@ export type ReportsV2Filters = {
   groupBy: "none" | "site" | "status" | "date" | "siteType";
 };
 
+const toDateInput = (value: Date) => value.toISOString().slice(0, 10);
+
+const rangeFromToday = (days: number) => {
+  const end = new Date();
+  const start = new Date();
+  start.setDate(start.getDate() - (days - 1));
+  return { start: toDateInput(start), end: toDateInput(end) };
+};
+
+const rangeNextDays = (days: number) => {
+  const start = new Date();
+  const end = new Date();
+  end.setDate(end.getDate() + (days - 1));
+  return { start: toDateInput(start), end: toDateInput(end) };
+};
+
+const rangeThisMonth = () => {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), 1);
+  const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  return { start: toDateInput(start), end: toDateInput(end) };
+};
+
+const rangePreviousMonth = () => {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const end = new Date(now.getFullYear(), now.getMonth(), 0);
+  return { start: toDateInput(start), end: toDateInput(end) };
+};
+
+const rangeNextMonth = () => {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  const end = new Date(now.getFullYear(), now.getMonth() + 2, 0);
+  return { start: toDateInput(start), end: toDateInput(end) };
+};
+
+const rangeLastQuarter = () => {
+  const now = new Date();
+  const quarterIndex = Math.floor(now.getMonth() / 3);
+  const end = new Date(now.getFullYear(), quarterIndex * 3, 0);
+  const start = new Date(end.getFullYear(), end.getMonth() - 2, 1);
+  return { start: toDateInput(start), end: toDateInput(end) };
+};
+
+const rangeYearToDate = () => {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 1);
+  return { start: toDateInput(start), end: toDateInput(now) };
+};
+
+const rangePastYear = () => {
+  const end = new Date();
+  const start = new Date();
+  start.setFullYear(start.getFullYear() - 1);
+  start.setDate(start.getDate() + 1);
+  return { start: toDateInput(start), end: toDateInput(end) };
+};
+
+const rangeNextYear = () => {
+  const start = new Date();
+  const end = new Date();
+  end.setFullYear(end.getFullYear() + 1);
+  end.setDate(end.getDate() - 1);
+  return { start: toDateInput(start), end: toDateInput(end) };
+};
+
 type ReportsV2FiltersSheetProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -22,11 +89,18 @@ type ReportsV2FiltersSheetProps = {
 };
 
 const PRESETS = [
-  { label: "Today", days: 0 },
-  { label: "Last 7 days", days: 7 },
-  { label: "Last 30 days", days: 30 },
-  { label: "Last 90 days", days: 90 },
-  { label: "This year", days: 365 }
+  { label: "Today", range: () => rangeFromToday(1) },
+  { label: "Past 7 days", range: () => rangeFromToday(7) },
+  { label: "Past 30 days", range: () => rangeFromToday(30) },
+  { label: "Past 90 days", range: () => rangeFromToday(90) },
+  { label: "This month", range: rangeThisMonth },
+  { label: "Past month", range: rangePreviousMonth },
+  { label: "Next month", range: rangeNextMonth },
+  { label: "Last quarter", range: rangeLastQuarter },
+  { label: "YTD", range: rangeYearToDate },
+  { label: "Past year", range: rangePastYear },
+  { label: "Next 90 days", range: () => rangeNextDays(90) },
+  { label: "Next year", range: rangeNextYear }
 ];
 
 export function ReportsV2FiltersSheet({
@@ -47,14 +121,8 @@ export function ReportsV2FiltersSheet({
     }
   }, [open, dateRange, filters]);
 
-  const applyPreset = (days: number) => {
-    const end = new Date();
-    const start = new Date();
-    start.setDate(start.getDate() - days);
-    setDraftRange({
-      start: start.toISOString().slice(0, 10),
-      end: end.toISOString().slice(0, 10)
-    });
+  const applyPreset = (range: { start: string; end: string }) => {
+    setDraftRange(range);
   };
 
   const handleApply = () => {
@@ -87,7 +155,7 @@ export function ReportsV2FiltersSheet({
             <div className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Quick date range</div>
             <div className="mt-2 flex flex-wrap gap-2">
               {PRESETS.map((preset) => (
-                <Button key={preset.label} size="sm" variant="outline" onClick={() => applyPreset(preset.days)}>
+                <Button key={preset.label} size="sm" variant="outline" onClick={() => applyPreset(preset.range())}>
                   {preset.label}
                 </Button>
               ))}
