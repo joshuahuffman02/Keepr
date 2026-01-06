@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import { getToken } from "next-auth/jwt";
+import { auth } from "@/auth";
 
 const PUBLIC_PATHS = [
   "/",
@@ -14,6 +13,7 @@ const PUBLIC_PATHS = [
   "/terms",
   "/robots.txt",
   "/sitemap.xml",
+  "/brand",
 ];
 
 const PUBLIC_PREFIXES = [
@@ -24,26 +24,28 @@ const PUBLIC_PREFIXES = [
   "/assets",
   "/favicon",
   "/manifest",
+  "/park",      // Public campground pages
+  "/images",    // Public images
+  "/icons",     // Public icons
 ];
 
-export async function middleware(req: NextRequest) {
+export default auth((req) => {
   const { pathname } = req.nextUrl;
 
+  // Allow public paths
   const isPublicPath =
     PUBLIC_PATHS.includes(pathname) ||
     PUBLIC_PREFIXES.some((prefix) => pathname.startsWith(prefix));
   if (isPublicPath) return NextResponse.next();
 
-  const token = await getToken({
-    req,
-    secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET
-  });
-  if (!token) {
+  // Check if user is authenticated using NextAuth v5 auth wrapper
+  if (!req.auth) {
     const signInUrl = new URL("/auth/signin", req.url);
     signInUrl.searchParams.set("callbackUrl", req.nextUrl.pathname + req.nextUrl.search);
     return NextResponse.redirect(signInUrl);
   }
 
+  // Redirects for legacy routes
   if (pathname === "/pricing" || pathname.startsWith("/pricing/")) {
     const target = new URL("/settings/pricing-rules", req.url);
     target.search = req.nextUrl.search;
@@ -57,7 +59,7 @@ export async function middleware(req: NextRequest) {
   }
 
   return NextResponse.next();
-}
+});
 
 export const config = {
   matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
