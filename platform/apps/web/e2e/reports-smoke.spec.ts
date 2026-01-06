@@ -11,9 +11,10 @@ test.describe("Reports page smoke", () => {
     await expect(page.getByRole("button", { name: /daily/i })).toBeVisible();
     await expect(page.getByRole("button", { name: /revenue/i })).toBeVisible();
 
-    // Switch to a tab to ensure client hooks run without runtime errors.
+    // Navigate to a report via the dropdown to ensure routing works.
     await page.getByRole("button", { name: /revenue/i }).click();
+    await page.getByRole("menuitem", { name: /revenue overview/i }).click();
+    await expect(page).toHaveURL(/\/reports\/revenue\/revenue-overview/);
     await expect(page.getByText(/revenue overview/i)).toBeVisible();
   });
 });
-
