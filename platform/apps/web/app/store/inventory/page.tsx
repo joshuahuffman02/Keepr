@@ -130,9 +130,9 @@ export default function InventoryPage() {
                             icon={Package}
                             title="No inventory tracking enabled"
                             description="Inventory tracking helps you monitor stock levels and receive alerts when products run low. Enable tracking on individual products to see them here."
-                            action={{
+                            href={{
                                 label: "Manage Products",
-                                onClick: () => window.location.href = "/settings/store",
+                                url: "/settings/store",
                                 icon: Settings
                             }}
                         />

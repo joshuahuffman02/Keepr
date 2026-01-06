@@ -766,7 +766,7 @@ export default function GiftCardsPage() {
                               </Button>
                               <Button
                                 size="sm"
-                                variant="secondary"
+                                variant="outline"
                                 onClick={async () => {
                                   try {
                                     await adjustMutation.mutateAsync({

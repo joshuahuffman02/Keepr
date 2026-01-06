@@ -241,7 +241,7 @@ export default function LedgerPage() {
                 </div>
                 <Button
                   size="sm"
-                  variant="secondary"
+                  variant="outline"
                   className="flex items-center gap-2"
                   onClick={() => {
                     const qs = new URLSearchParams();

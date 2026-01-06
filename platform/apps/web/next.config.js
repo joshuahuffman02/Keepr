@@ -62,7 +62,7 @@ const nextConfig = {
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com",
       "font-src 'self' https://fonts.gstatic.com data:",
       "img-src 'self' data: blob: https: http:",
-      "connect-src 'self' https://api.stripe.com wss://*.stripe.com https://maps.googleapis.com https://*.railway.app https://*.keeprstay.com https://keeprstay.com https://*.ingest.us.sentry.io https://*.sentry.io https://nominatim.openstreetmap.org https://*.cloudflareinsights.com http://localhost:* ws://localhost:*",
+      "connect-src 'self' https://api.stripe.com wss://*.stripe.com https://maps.googleapis.com https://*.railway.app https://*.keeprstay.com https://keeprstay.com https://staging.keeprstay.com https://api-staging.keeprstay.com https://*.ingest.us.sentry.io https://*.sentry.io https://nominatim.openstreetmap.org https://*.cloudflareinsights.com http://localhost:* ws://localhost:*",
       "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://www.google.com",
       "object-src 'none'",
       "base-uri 'self'",
@@ -166,12 +166,11 @@ const nextConfig = {
 
   // Rewrites to proxy API requests to the backend
   async rewrites() {
-    // In production, use the Railway API backend URL
-    // In development, use localhost
-    const isProduction = process.env.NODE_ENV === "production";
-    const backendUrl = isProduction
-      ? "https://api.keeprstay.com"
-      : "http://localhost:4000";
+    // Use NEXT_PUBLIC_API_BASE for environment-specific backend URL
+    // This enables staging environments to work correctly
+    const apiBase = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api";
+    // Extract base URL without /api suffix for rewrites
+    const backendUrl = apiBase.replace(/\/api\/?$/, "");
 
     // Use afterFiles so that Next.js API routes (like /api/auth/*) are matched first
     // Only requests that don't match any page/API route will be rewritten

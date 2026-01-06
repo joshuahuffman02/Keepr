@@ -36,6 +36,7 @@ import { useSyncStatus } from "@/contexts/SyncStatusContext";
 import { VoiceCommandIndicator } from "../../components/pos/VoiceCommandIndicator";
 import { useVoiceCommands } from "../../hooks/use-voice-commands";
 import { haptic } from "../../hooks/use-haptic";
+import { AlertTriangle, Check, Receipt, Search, ShoppingBag, X } from "lucide-react";
 
 const posApi = {
     getProducts: (campgroundId: string, locationId?: string) =>
@@ -681,7 +682,7 @@ export default function POSPage() {
                             <Button size="sm" variant="outline" onClick={() => flushQueue()} className="hidden md:flex">
                                 Flush now
                             </Button>
-                            <Button asChild size="sm" variant="secondary" className="hidden lg:flex">
+                            <Button asChild size="sm" variant="outline" className="hidden lg:flex">
                                 <Link href="/store" title="Manage products, categories, add-ons, taxes, hours, channel allotments">Manage inventory</Link>
                             </Button>
                             <Button
@@ -718,23 +719,14 @@ export default function POSPage() {
                                     aria-label="Search products"
                                     className="h-10 w-full pl-10 pr-10 text-sm"
                                 />
-                                <svg
-                                    className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                 {searchQuery && (
                                     <button
                                         onClick={() => setSearchQuery("")}
                                         className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                                         aria-label="Clear search"
                                     >
-                                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
+                                        <X className="h-4 w-4" />
                                     </button>
                                 )}
                             </div>
@@ -755,7 +747,7 @@ export default function POSPage() {
                                 <div key={c.id} className="flex items-center justify-between gap-2">
                                     <span className="truncate text-xs">Order {c.id.slice(0, 8)}…</span>
                                     <div className="flex items-center gap-2">
-                                        <Button size="sm" variant="secondary" onClick={() => retryConflict(c.id)}>
+                                        <Button size="sm" variant="outline" onClick={() => retryConflict(c.id)}>
                                             Retry
                                         </Button>
                                         <Button size="sm" variant="outline" onClick={() => discardConflict(c.id)}>
@@ -775,9 +767,7 @@ export default function POSPage() {
                         return (
                             <div className="rounded-lg border border-rose-200 bg-rose-50 text-rose-900 p-3 text-sm space-y-2">
                                 <div className="font-semibold flex items-center gap-2">
-                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                    </svg>
+                                    <AlertTriangle className="h-4 w-4" />
                                     Inventory Alerts
                                 </div>
                                 {outOfStockProducts.length > 0 && (
@@ -896,9 +886,7 @@ export default function POSPage() {
                     ) : recentOrders.length === 0 ? (
                         <div className="rounded-lg border-2 border-dashed border-border bg-muted p-8 text-center">
                             <div className="mx-auto w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-4">
-                                <svg className="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                                </svg>
+                                <ShoppingBag className="w-6 h-6 text-muted-foreground" />
                             </div>
                             <p className="text-sm font-medium text-foreground mb-1">No POS orders yet</p>
                             <p className="text-xs text-muted-foreground mb-4">Start selling by adding products to your cart</p>
@@ -930,7 +918,7 @@ export default function POSPage() {
                                             <Badge variant="outline" className="text-[11px] uppercase">{order.status}</Badge>
                                             <Button
                                                 size="sm"
-                                                variant="secondary"
+                                                variant="outline"
                                                 onClick={() => {
                                                     setSelectedOrderForRefund(order.id);
                                                     setIsRefundOpen(true);
@@ -1019,14 +1007,7 @@ export default function POSPage() {
                         <div className="relative mx-auto w-20 h-20 mb-4">
                             <div className="absolute inset-0 bg-emerald-100 rounded-full motion-safe:animate-ping opacity-75" />
                             <div className="relative flex items-center justify-center w-20 h-20 bg-emerald-500 rounded-full">
-                                <svg
-                                    className="w-10 h-10 text-white motion-safe:animate-in motion-safe:zoom-in motion-safe:duration-300 motion-safe:delay-150"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                                </svg>
+                                <Check className="w-10 h-10 text-white motion-safe:animate-in motion-safe:zoom-in motion-safe:duration-300 motion-safe:delay-150" />
                             </div>
                         </div>
                         <h2 className="text-2xl font-bold text-foreground mb-2">Order Complete!</h2>
@@ -1037,9 +1018,7 @@ export default function POSPage() {
                             Payment processed successfully
                         </p>
                         <div className="mt-4 flex items-center justify-center gap-1 text-xs text-muted-foreground">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                            </svg>
+                            <Receipt className="w-4 h-4" />
                             Receipt ready
                         </div>
                     </div>

@@ -167,7 +167,7 @@ export default function FulfillmentQueuePage() {
                         <Button variant="outline" onClick={() => loadData()} disabled={loading}>
                             Refresh
                         </Button>
-                        <Button asChild variant="secondary">
+                        <Button asChild variant="outline">
                             <Link href="/store/locations">Manage Locations</Link>
                         </Button>
                     </div>

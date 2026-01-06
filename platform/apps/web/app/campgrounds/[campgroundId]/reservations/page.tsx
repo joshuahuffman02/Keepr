@@ -1057,7 +1057,7 @@ export default function ReservationsPage() {
           subtitle="Track arrivals, departures, balances, and guest communications."
           actions={(
             <>
-              <Button variant="secondary" onClick={() => router.push(`/calendar?campgroundId=${campgroundId}`)}>
+              <Button variant="outline" onClick={() => router.push(`/calendar?campgroundId=${campgroundId}`)}>
                 Open calendar
               </Button>
               <Button onClick={() => router.push(`/booking?campgroundId=${campgroundId}`)}>
@@ -1279,7 +1279,7 @@ export default function ReservationsPage() {
                           {res.status === "confirmed" && (
                             <Button
                               size="sm"
-                              variant="secondary"
+                              variant="outline"
                               onClick={() => updateReservation.mutate({ id: res.id, data: { status: "checked_in" } })}
                               disabled={updateReservation.isPending}
                             >
@@ -1289,7 +1289,7 @@ export default function ReservationsPage() {
                           {res.status === "checked_in" && (
                             <Button
                               size="sm"
-                              variant="secondary"
+                              variant="outline"
                               onClick={() => updateReservation.mutate({ id: res.id, data: { status: "checked_out" } })}
                               disabled={updateReservation.isPending}
                             >
@@ -1414,7 +1414,7 @@ export default function ReservationsPage() {
                           {res.status === "confirmed" && (
                             <Button
                               size="sm"
-                              variant="secondary"
+                              variant="outline"
                               onClick={() => updateReservation.mutate({ id: res.id, data: { status: "checked_in" } })}
                               disabled={updateReservation.isPending}
                             >
@@ -1424,7 +1424,7 @@ export default function ReservationsPage() {
                           {res.status === "checked_in" && (
                             <Button
                               size="sm"
-                              variant="secondary"
+                              variant="outline"
                               onClick={() => updateReservation.mutate({ id: res.id, data: { status: "checked_out" } })}
                               disabled={updateReservation.isPending}
                             >
@@ -1686,7 +1686,7 @@ export default function ReservationsPage() {
                 <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-border">
                   <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Exports</div>
                   <div className="flex gap-2">
-                    <Button size="sm" variant="secondary" onClick={() => handleExport("csv")} disabled={!filteredReservations.length}>
+                    <Button size="sm" variant="outline" onClick={() => handleExport("csv")} disabled={!filteredReservations.length}>
                       Export CSV
                     </Button>
                     <Button size="sm" variant="ghost" onClick={() => handleExport("json")} disabled={!filteredReservations.length}>
@@ -1786,7 +1786,7 @@ export default function ReservationsPage() {
                 <div className="flex flex-wrap gap-2">
                   <Button
                     size="sm"
-                    variant="secondary"
+                    variant="outline"
                     disabled={bulkPending}
                     onClick={() => bulkUpdateStatus("checked_in", ["confirmed"])}
                   >
@@ -1794,7 +1794,7 @@ export default function ReservationsPage() {
                   </Button>
                   <Button
                     size="sm"
-                    variant="secondary"
+                    variant="outline"
                     disabled={bulkPending}
                     onClick={() => bulkUpdateStatus("checked_out", ["checked_in"])}
                   >
@@ -1802,7 +1802,7 @@ export default function ReservationsPage() {
                   </Button>
                   <Button
                     size="sm"
-                    variant="outline"
+                    variant="destructive"
                     disabled={bulkPending}
                     onClick={() => bulkUpdateStatus("cancelled", ["pending", "confirmed", "checked_in"])}
                   >
@@ -2007,7 +2007,7 @@ export default function ReservationsPage() {
                           {res.status === "confirmed" && (
                             <Button
                               size="sm"
-                              variant="secondary"
+                              variant="outline"
                               onClick={() => updateReservation.mutate({ id: res.id, data: { status: "checked_in" } })}
                               disabled={updateReservation.isPending}
                             >
@@ -2017,7 +2017,7 @@ export default function ReservationsPage() {
                           {res.status === "checked_in" && (
                             <Button
                               size="sm"
-                              variant="secondary"
+                              variant="outline"
                               onClick={() => updateReservation.mutate({ id: res.id, data: { status: "checked_out" } })}
                               disabled={updateReservation.isPending}
                             >
@@ -2055,7 +2055,7 @@ export default function ReservationsPage() {
                               Ledger
                             </a>
                           </Button>
-                          <Button size="sm" variant="ghost" onClick={() => deleteReservation.mutate(res.id)} disabled={deleteReservation.isPending}>
+                          <Button size="sm" variant="destructive" onClick={() => deleteReservation.mutate(res.id)} disabled={deleteReservation.isPending}>
                             Delete
                           </Button>
                         </div>
@@ -2228,7 +2228,7 @@ export default function ReservationsPage() {
                                 <div className="flex flex-wrap gap-2 text-xs">
                                   <Button
                                     size="sm"
-                                    variant="secondary"
+                                    variant="outline"
                                     onClick={() =>
                                       setEditing((prev) => ({
                                         ...prev,
@@ -2240,7 +2240,7 @@ export default function ReservationsPage() {
                                   </Button>
                                   <Button
                                     size="sm"
-                                    variant="secondary"
+                                    variant="outline"
                                     onMouseDown={() => beginDrag(res)}
                                     onClick={() =>
                                       setEditing((prev) => ({
@@ -2265,7 +2265,7 @@ export default function ReservationsPage() {
                                   </Button>
                                   <Button
                                     size="sm"
-                                    variant="ghost"
+                                    variant="destructive"
                                     onClick={() =>
                                       setEditing((prev) => ({
                                         ...prev,
@@ -2316,7 +2316,6 @@ export default function ReservationsPage() {
                                     </SelectContent>
                                   </Select>
                                   <Button
-                                    variant="secondary"
                                     size="sm"
                                     onClick={() =>
                                       recordPayment.mutate({
@@ -2361,7 +2360,7 @@ export default function ReservationsPage() {
                                     }
                                   />
                                   <Button
-                                    variant="secondary"
+                                    variant="outline"
                                     size="sm"
                                     onClick={() =>
                                       refundPayment.mutate({
@@ -2570,7 +2569,6 @@ export default function ReservationsPage() {
                                     />
                                     <Button
                                       size="sm"
-                                      variant="secondary"
                                       onClick={() =>
                                         updateGuestContact.mutate({
                                           guestId: res.guest!.id,
@@ -2765,7 +2763,7 @@ export default function ReservationsPage() {
                                   </Button>
                                   <Button
                                     size="sm"
-                                    variant="secondary"
+                                    variant="outline"
                                     className="text-xs"
                                     onClick={() => {
                                       localStorage.setItem("campreserv:openReservationId", res.id);
@@ -3067,7 +3065,6 @@ export default function ReservationsPage() {
                         )}
                         <div className="flex flex-wrap gap-2">
                           <Button
-                            variant="secondary"
                             onClick={() =>
                               updateReservation.mutate({
                                 id: res.id,

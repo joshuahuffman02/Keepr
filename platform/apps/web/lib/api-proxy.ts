@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
+import { API_BASE } from "@/lib/api-config";
 
 interface SessionWithToken {
   apiToken?: string;
@@ -10,11 +11,8 @@ interface SessionWithToken {
   };
 }
 
-export const API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE ||
-  (process.env.NODE_ENV === "production"
-    ? "https://api.keeprstay.com/api"
-    : "http://localhost:4000/api");
+// Re-export for backwards compatibility
+export { API_BASE };
 
 /**
  * Generic API proxy function

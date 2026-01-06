@@ -575,7 +575,7 @@ function TriggerModal({
   onSaved: () => void;
 }) {
   const modalRef = useRef<HTMLDivElement>(null);
-  const firstFocusRef = useRef<HTMLSelectElement>(null);
+  const firstFocusRef = useRef<HTMLButtonElement>(null);
 
   const [event, setEvent] = useState<TriggerEvent>(trigger?.event as TriggerEvent ?? "reservation_created");
   const [channel, setChannel] = useState<"email" | "sms" | "both">(trigger?.channel ?? "email");

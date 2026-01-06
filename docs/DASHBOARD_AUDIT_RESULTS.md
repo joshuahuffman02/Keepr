@@ -4,7 +4,7 @@
 - Total pages audited: 163
 - Critical issues: 0
 - Major issues: 0
-- Minor issues: 12
+- Minor issues: 0
 
 ## Phase 1 Checklist
 Tracking list generated from `platform/apps/web/app/dashboard`. Check items as each page is audited.
@@ -183,552 +183,552 @@ Dashboard routes listed first; non-/dashboard staff routes follow.
 ### /dashboard
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/analytics
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/analytics/features
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/analytics/funnels
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/analytics/live
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/analytics/pages
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/analytics/staff
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/feedback
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/help
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/help/changelog
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/help/contact
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/help/faq
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/help/shortcuts
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/help/tutorials
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/management
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/referrals
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/access-control
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/accessibility
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/account
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/analytics
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/billing
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/blackout-dates
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/branding
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/campaigns
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/access
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/access/api
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/access/audit
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/access/lock-codes
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/access/permissions
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/access/roles
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/access/security
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/access/users
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/bookings
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/bookings/blackouts
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/bookings/closures
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/bookings/custom-fields
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/bookings/optimization
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/bookings/policies
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/bookings/promotions
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/bookings/stay-rules
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/pricing
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/pricing/charge-codes
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/pricing/deposits
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/pricing/dynamic
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/pricing/rate-groups
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/pricing/seasonal
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/pricing/taxes
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/property
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/property/amenities
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/property/branding
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/property/equipment
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/property/hours
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/property/localization
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/property/photos
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/property/profile
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/property/sites
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/store
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/store/departments
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/store/discounts
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/store/pos
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/store/products
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/store/upsells
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/system
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/system/check
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/system/import
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/system/integrations
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/system/jobs
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/system/notifications
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/system/templates
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/central/system/webhooks
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/charity
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/communications
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/deposit-policies
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/developers
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/faqs
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/gamification
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/import
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/integrations
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/jobs
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/localization
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/memberships
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/notification-triggers
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/ota
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/payments
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/permissions
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/photos
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/policies
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/pos-integrations
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/pos-integrations/[integrationId]
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/pos-integrations/[integrationId]/mappings
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/pricing-rules
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/privacy
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/promotions
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/seasonal-rates
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/security
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/security-certification
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/sms
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/store-hours
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/tax-rules
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/templates
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/upsells
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/users
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/value-stack
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/settings/webhooks
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/site-layout
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/v2
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /dashboard/welcome
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /reservations
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /reservations/[id]
 **Status:** Good
@@ -738,13 +738,13 @@ Dashboard routes listed first; non-/dashboard staff routes follow.
 - [x] Errors not announced with `role="alert"` (severity: major)
 
 ### /campgrounds/[campgroundId]/reservations
-**Status:** Needs Work
+**Status:** Good
 **Issues:**
 - [x] Missing labels/aria-labels for form controls (severity: major)
 - [x] Icon-only buttons missing aria-labels (severity: major)
 - [x] Raw form controls/buttons instead of UI components (severity: minor)
 - [x] Errors not announced with `role="alert"` (severity: major)
-- [ ] Button variants inconsistent with design system (severity: minor)
+- [x] Button variants inconsistent with design system (severity: minor)
 
 ### /campgrounds/[campgroundId]/reservations/[reservationId]
 **Status:** Good
@@ -800,7 +800,7 @@ Dashboard routes listed first; non-/dashboard staff routes follow.
 ### /calendar
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /calendar-v2
 **Status:** Good
@@ -852,14 +852,14 @@ Dashboard routes listed first; non-/dashboard staff routes follow.
 - [x] Non-design colors/typography tokens (severity: minor)
 
 ### /reports/audit
-**Status:** Needs Work
+**Status:** Good
 **Issues:**
-- [ ] Uses non-standard card container instead of `Card` component (severity: minor)
+- [x] Uses non-standard card container instead of `Card` component (severity: minor)
 - [x] Missing labels/aria-labels for form controls (severity: major)
 - [x] Raw form controls/buttons instead of UI components (severity: minor)
 - [x] Table header/colSpan mismatch (severity: major)
 - [x] Errors not announced with `role="alert"` (severity: major)
-- [ ] Button variants inconsistent with design system (severity: minor)
+- [x] Button variants inconsistent with design system (severity: minor)
 
 ### /reports/devices
 **Status:** Good
@@ -875,11 +875,11 @@ Dashboard routes listed first; non-/dashboard staff routes follow.
 - [x] Non-design colors/typography tokens (severity: minor)
 
 ### /reports/saved
-**Status:** Needs Work
+**Status:** Good
 **Issues:**
 - [x] Missing labels/aria-labels for form controls (severity: major)
 - [x] Icon-only buttons missing aria-labels (severity: major)
-- [ ] Button variants inconsistent with design system (severity: minor)
+- [x] Button variants inconsistent with design system (severity: minor)
 
 ### /campgrounds/[campgroundId]/reports
 **Status:** Good
@@ -967,13 +967,13 @@ Dashboard routes listed first; non-/dashboard staff routes follow.
 - [x] Raw form controls/buttons instead of UI components (severity: minor)
 
 ### /pos
-**Status:** Needs Work
+**Status:** Good
 **Issues:**
 - [x] Missing labels/aria-labels for form controls (severity: major)
 - [x] Errors not announced with `role="alert"` (severity: major)
 - [x] Raw form controls/buttons instead of UI components (severity: minor)
-- [ ] Icon set inconsistent (inline SVG vs Lucide) (severity: minor)
-- [ ] Button variants inconsistent with design system (severity: minor)
+- [x] Icon set inconsistent (inline SVG vs Lucide) (severity: minor)
+- [x] Button variants inconsistent with design system (severity: minor)
 
 ### /store
 **Status:** Good
@@ -991,20 +991,20 @@ Dashboard routes listed first; non-/dashboard staff routes follow.
 - [x] Icon-only buttons missing aria-labels (severity: major)
 
 ### /store/fulfillment
-**Status:** Needs Work
+**Status:** Good
 **Issues:**
 - [x] Toggle buttons missing aria-pressed/aria-expanded (severity: major)
 - [x] Missing labels/aria-labels for form controls (severity: major)
 - [x] Raw form controls/buttons instead of UI components (severity: minor)
-- [ ] Button variants inconsistent with design system (severity: minor)
+- [x] Button variants inconsistent with design system (severity: minor)
 - [x] Non-design colors/typography tokens (severity: minor)
 
 ### /store/inventory
-**Status:** Needs Work
+**Status:** Good
 **Issues:**
 - [x] Missing labels/aria-labels for form controls (severity: major)
 - [x] Non-design colors/typography tokens (severity: minor)
-- [ ] Uses `window.location.href` instead of Link (severity: minor)
+- [x] Uses `window.location.href` instead of Link (severity: minor)
 
 ### /store/inventory/movements
 **Status:** Good
@@ -1067,9 +1067,9 @@ Dashboard routes listed first; non-/dashboard staff routes follow.
 - [x] Non-design colors/typography tokens (severity: minor)
 
 ### /finance/payouts/[payoutId]
-**Status:** Needs Work
+**Status:** Good
 **Issues:**
-- [ ] Code quality: unused import/state (severity: minor)
+- [x] Code quality: unused import/state (severity: minor)
 
 ### /finance/disputes
 **Status:** Good
@@ -1079,41 +1079,36 @@ Dashboard routes listed first; non-/dashboard staff routes follow.
 - [x] Non-design colors/typography tokens (severity: minor)
 
 ### /finance/disputes/[disputeId]
-**Status:** Needs Work
+**Status:** Good
 **Issues:**
-- [ ] Inefficient fetch: loads full list and filters client-side (severity: minor)
+- [x] Inefficient fetch: loads full list and filters client-side (severity: minor)
 
 ### /finance/gift-cards
-**Status:** Needs Work
+**Status:** Good
 **Issues:**
 - [x] Missing labels/aria-labels for form controls (severity: major)
-- [ ] Button variants inconsistent with design system (severity: minor)
+- [x] Button variants inconsistent with design system (severity: minor)
 
 ### /payouts
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /disputes
 **Status:** Good
 **Issues:**
-- [ ] None noted.
+- [x] None noted.
 
 ### /ledger
-**Status:** Needs Work
+**Status:** Good
 **Issues:**
 - [x] Raw form controls/buttons instead of UI components (severity: minor)
 - [x] Toggle buttons missing aria-pressed/aria-expanded (severity: major)
-- [ ] Button variants inconsistent with design system (severity: minor)
+- [x] Button variants inconsistent with design system (severity: minor)
 - [x] Non-design colors/typography tokens (severity: minor)
 
 ## Common Patterns Needing Fix
-1. Button variants inconsistent with design system appears on 7 pages
-2. Uses non-standard card container instead of `Card` component appears on 1 pages
-3. Icon set inconsistent (inline SVG vs Lucide) appears on 1 pages
-4. Uses `window.location.href` instead of Link appears on 1 pages
-5. Code quality: unused import/state appears on 1 pages
-6. Inefficient fetch: loads full list and filters client-side appears on 1 pages
+None noted.
 ## Priority Fix Order
 1. Critical accessibility issues (labels, icon-only buttons, toggle states)
 2. Error/empty-state semantics and table structure mismatches

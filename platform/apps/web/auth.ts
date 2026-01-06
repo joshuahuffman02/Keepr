@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import type { User } from "next-auth";
+import { API_BASE } from "@/lib/api-config";
 
 interface Campground {
   id: string;
@@ -22,8 +23,6 @@ interface ExtendedUser extends User {
   platformRole?: string;
   campgrounds?: Campground[];
 }
-
-const API_BASE = (process.env.NEXT_PUBLIC_API_BASE || process.env.API_BASE || "http://localhost:4000/api").replace(/\/$/, "");
 
 
 export const { handlers, signIn, signOut, auth } = NextAuth({

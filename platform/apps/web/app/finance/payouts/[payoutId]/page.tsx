@@ -10,7 +10,6 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
-import { useToast } from "@/components/ui/use-toast";
 
 function formatMoney(cents: number | null | undefined, currency = "USD") {
   if (cents === null || cents === undefined) return "-";
@@ -23,7 +22,6 @@ export default function PayoutDetailPage() {
   const params = useParams();
   const payoutId = params?.payoutId as string;
   const [campgroundId, setCampgroundId] = useState<string>("");
-  const { toast } = useToast();
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -151,4 +149,3 @@ export default function PayoutDetailPage() {
     </DashboardShell>
   );
 }
-

@@ -39,10 +39,7 @@ export default function DisputeDetailPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["dispute-detail", campgroundId, disputeId],
-    queryFn: async () => {
-      const disputes = await apiClient.listDisputes(campgroundId);
-      return disputes.find((d: any) => d.id === disputeId);
-    },
+    queryFn: () => apiClient.getDispute(campgroundId, disputeId),
     enabled: !!campgroundId && !!disputeId,
     staleTime: 30_000
   });
@@ -126,4 +123,3 @@ export default function DisputeDetailPage() {
     </DashboardShell>
   );
 }
-

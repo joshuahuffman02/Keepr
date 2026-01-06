@@ -125,14 +125,13 @@ export default function SavedReportsPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Link href={`/reports?tab=${r.tab}${r.subTab ? `&sub=${r.subTab}` : ""}${r.dateRange ? `&start=${r.dateRange.start}&end=${r.dateRange.end}` : ""}${r.filters?.status ? `&status=${r.filters.status}` : ""}${r.filters?.siteType ? `&siteType=${r.filters.siteType}` : ""}${r.filters?.groupBy ? `&groupBy=${r.filters.groupBy}` : ""}`}>
-                        <Button size="sm" variant="secondary" className="gap-1">
+                        <Button size="sm" className="gap-1">
                           <Play className="h-4 w-4" /> Run
                         </Button>
                       </Link>
                       <Button
                         size="sm"
-                        variant="ghost"
-                        className="text-rose-600 hover:text-rose-700"
+                        variant="destructive"
                         onClick={() => {
                           deleteReport(r.id);
                           setReports(listSavedReports(campgroundId));
@@ -157,7 +156,6 @@ export default function SavedReportsPage() {
             </div>
             <Button
               size="sm"
-              variant="secondary"
               className="gap-1"
               disabled={!campgroundId || queueExport.isPending}
               onClick={() => queueExport.mutate()}

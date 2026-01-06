@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { useMemo } from "react";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function AuditLogPage() {
   const [campgroundId, setCampgroundId] = useState<string | null>(null);
@@ -79,83 +79,84 @@ export default function AuditLogPage() {
     <DashboardShell>
       <div className="space-y-4">
         <Breadcrumbs items={[{ label: "Reports" }, { label: "Audit log" }]} />
-        <div className="card p-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div>
-            <div className="text-xl font-semibold text-foreground">Audit log</div>
-            <div className="text-sm text-muted-foreground">Role changes, invites, and future sensitive actions.</div>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <div className="flex items-center gap-2">
-              <Input
-                type="date"
-                value={start}
-                onChange={(e) => setStart(e.target.value)}
-                className="w-40"
-                aria-label="Start date"
-              />
-              <span className="text-muted-foreground text-xs">to</span>
-              <Input
-                type="date"
-                value={end}
-                onChange={(e) => setEnd(e.target.value)}
-                className="w-40"
-                aria-label="End date"
-              />
+        <Card>
+          <CardContent className="p-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div>
+              <div className="text-xl font-semibold text-foreground">Audit log</div>
+              <div className="text-sm text-muted-foreground">Role changes, invites, and future sensitive actions.</div>
             </div>
-            <Select value={actionFilter} onValueChange={setActionFilter}>
-              <SelectTrigger className="w-48" aria-label="Action filter">
-                <SelectValue placeholder="Action" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All actions</SelectItem>
-                {actions.map((a) => (
-                  <SelectItem key={a} value={a}>{a}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={entityFilter} onValueChange={setEntityFilter}>
-              <SelectTrigger className="w-48" aria-label="Entity filter">
-                <SelectValue placeholder="Entity" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All entities</SelectItem>
-                {entities.map((e) => (
-                  <SelectItem key={e} value={e}>{e}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => auditQuery.refetch()}
-              disabled={auditQuery.isFetching}
-            >
-              {auditQuery.isFetching ? "Refreshing..." : "Refresh"}
-            </Button>
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={() => {
-                if (!campgroundId) return;
-                const q = new URLSearchParams();
-                if (actionFilter !== "all") q.set("action", actionFilter);
-                if (start) q.set("start", start);
-                if (end) q.set("end", end);
-                q.set("format", "csv");
-                window.open(`/api-proxy/campgrounds/${campgroundId}/audit?${q.toString()}`, "_blank");
-              }}
-            >
-              Export CSV
-            </Button>
-          </div>
-        </div>
+            <div className="flex flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                <Input
+                  type="date"
+                  value={start}
+                  onChange={(e) => setStart(e.target.value)}
+                  className="w-40"
+                  aria-label="Start date"
+                />
+                <span className="text-muted-foreground text-xs">to</span>
+                <Input
+                  type="date"
+                  value={end}
+                  onChange={(e) => setEnd(e.target.value)}
+                  className="w-40"
+                  aria-label="End date"
+                />
+              </div>
+              <Select value={actionFilter} onValueChange={setActionFilter}>
+                <SelectTrigger className="w-48" aria-label="Action filter">
+                  <SelectValue placeholder="Action" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All actions</SelectItem>
+                  {actions.map((a) => (
+                    <SelectItem key={a} value={a}>{a}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={entityFilter} onValueChange={setEntityFilter}>
+                <SelectTrigger className="w-48" aria-label="Entity filter">
+                  <SelectValue placeholder="Entity" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All entities</SelectItem>
+                  {entities.map((e) => (
+                    <SelectItem key={e} value={e}>{e}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => auditQuery.refetch()}
+                disabled={auditQuery.isFetching}
+              >
+                {auditQuery.isFetching ? "Refreshing..." : "Refresh"}
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => {
+                  if (!campgroundId) return;
+                  const q = new URLSearchParams();
+                  if (actionFilter !== "all") q.set("action", actionFilter);
+                  if (start) q.set("start", start);
+                  if (end) q.set("end", end);
+                  q.set("format", "csv");
+                  window.open(`/api-proxy/campgrounds/${campgroundId}/audit?${q.toString()}`, "_blank");
+                }}
+              >
+                Export CSV
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
         {auditQuery.isError && (
           <div role="alert" className="rounded-md border border-status-error/30 bg-status-error/10 px-3 py-2 text-sm text-status-error">
             Failed to load audit log entries. Please try again.
           </div>
         )}
 
-        <div className="card">
+        <Card>
           <div className="p-4 border-b border-border flex items-center justify-between">
             <div className="text-sm text-muted-foreground">Showing {rows.length} entries</div>
           </div>
@@ -207,7 +208,7 @@ export default function AuditLogPage() {
               </tbody>
             </table>
           </div>
-        </div>
+        </Card>
       </div>
     </DashboardShell>
   );

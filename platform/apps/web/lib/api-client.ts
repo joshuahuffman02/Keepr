@@ -4304,6 +4304,28 @@ export const apiClient = {
     return z.array(z.object({ id: z.string(), label: z.string() })).parse(data);
   },
 
+  async getDispute(campgroundId: string, disputeId: string) {
+    const data = await fetchJSON<unknown>(`/campgrounds/${campgroundId}/disputes/${disputeId}`);
+    const DisputeSchema = z.object({
+      id: z.string(),
+      stripeDisputeId: z.string(),
+      stripeChargeId: z.string().nullable().optional(),
+      stripePaymentIntentId: z.string().nullable().optional(),
+      campgroundId: z.string(),
+      reservationId: z.string().nullable().optional(),
+      payoutId: z.string().nullable().optional(),
+      amountCents: z.number(),
+      currency: z.string(),
+      reason: z.string().nullable().optional(),
+      status: z.string(),
+      evidenceDueBy: z.string().nullable().optional(),
+      createdAt: z.string().optional(),
+      updatedAt: z.string().optional(),
+      notes: z.string().nullable().optional()
+    });
+    return DisputeSchema.parse(data);
+  },
+
   async listDisputes(campgroundId: string, status?: string) {
     const qs = new URLSearchParams();
     if (status) qs.set("status", status);
