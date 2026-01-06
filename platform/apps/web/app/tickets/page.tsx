@@ -92,12 +92,22 @@ export default function TicketsPage() {
     urgency: "Normal"
   });
 
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const canViewList = isAuthenticated !== false;
+
   const loadTickets = async () => {
     setLoading(true);
     setError(null);
     try {
       const res = await fetch("/api/tickets", { cache: "no-store" });
+      if (res.status === 401) {
+        // User not authenticated - they can still create tickets but can't view the list
+        setIsAuthenticated(false);
+        setTickets([]);
+        return;
+      }
       if (!res.ok) throw new Error(`Request failed (${res.status})`);
+      setIsAuthenticated(true);
       const data = await res.json();
       setTickets(data.tickets ?? []);
     } catch (err) {
@@ -358,62 +368,68 @@ export default function TicketsPage() {
             <p className="text-sm text-muted-foreground">Track issues, questions, and ideas—then respond fast.</p>
           </div>
           <div className="flex flex-col gap-2 items-end">
+            {canViewList && (
+              <div className="flex flex-wrap gap-2 justify-end">
+                <div className="flex items-center gap-1 rounded-full border border-border bg-card p-1 shadow-sm">
+                  {(["all", "open", "completed"] as const).map((key) => (
+                    <Button
+                      key={key}
+                      size="sm"
+                      variant={statusFilter === key ? "default" : "ghost"}
+                      onClick={() => setStatusFilter(key)}
+                    >
+                      {key === "all" ? "All" : key === "open" ? "Open" : "Completed"}
+                    </Button>
+                  ))}
+                </div>
+                <div className="flex items-center gap-1 rounded-full border border-border bg-card p-1 shadow-sm">
+                  {(["all", "issue", "question", "feature", "other"] as const).map((key) => (
+                    <Button
+                      key={key}
+                      size="sm"
+                      variant={categoryFilter === key ? "default" : "ghost"}
+                      onClick={() => setCategoryFilter(key)}
+                    >
+                      {key === "issue"
+                        ? "Issues"
+                        : key === "question"
+                          ? "Questions"
+                          : key === "feature"
+                            ? "Features"
+                            : key === "other"
+                              ? "Other"
+                              : "All Types"}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
             <div className="flex flex-wrap gap-2 justify-end">
-              <div className="flex items-center gap-1 rounded-full border border-border bg-card p-1 shadow-sm">
-                {(["all", "open", "completed"] as const).map((key) => (
-                  <Button
-                    key={key}
-                    size="sm"
-                    variant={statusFilter === key ? "default" : "ghost"}
-                    onClick={() => setStatusFilter(key)}
-                  >
-                    {key === "all" ? "All" : key === "open" ? "Open" : "Completed"}
-                  </Button>
-                ))}
-              </div>
-              <div className="flex items-center gap-1 rounded-full border border-border bg-card p-1 shadow-sm">
-                {(["all", "issue", "question", "feature", "other"] as const).map((key) => (
-                  <Button
-                    key={key}
-                    size="sm"
-                    variant={categoryFilter === key ? "default" : "ghost"}
-                    onClick={() => setCategoryFilter(key)}
-                  >
-                    {key === "issue"
-                      ? "Issues"
-                      : key === "question"
-                        ? "Questions"
-                        : key === "feature"
-                          ? "Features"
-                          : key === "other"
-                            ? "Other"
-                            : "All Types"}
-                  </Button>
-                ))}
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-2 justify-end">
-              <div className="flex items-center gap-1 rounded-full border border-border bg-card p-1 shadow-sm">
-                {areas.map((key) => (
-                  <Button
-                    key={key}
-                    size="sm"
-                    variant={areaFilter === key ? "default" : "ghost"}
-                    onClick={() => setAreaFilter(key)}
-                    className="capitalize"
-                  >
-                    {key}
-                  </Button>
-                ))}
-              </div>
-              <div className="flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 shadow-sm">
-                <Input
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search tickets..."
-                  className="h-9 w-48 border-0 bg-transparent px-0 text-sm focus-visible:ring-0"
-                />
-              </div>
+              {canViewList && (
+                <>
+                  <div className="flex items-center gap-1 rounded-full border border-border bg-card p-1 shadow-sm">
+                    {areas.map((key) => (
+                      <Button
+                        key={key}
+                        size="sm"
+                        variant={areaFilter === key ? "default" : "ghost"}
+                        onClick={() => setAreaFilter(key)}
+                        className="capitalize"
+                      >
+                        {key}
+                      </Button>
+                    ))}
+                  </div>
+                  <div className="flex items-center gap-2 rounded-full border border-border bg-card px-3 py-1 shadow-sm">
+                    <Input
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                      placeholder="Search tickets..."
+                      className="h-9 w-48 border-0 bg-transparent px-0 text-sm focus-visible:ring-0"
+                    />
+                  </div>
+                </>
+              )}
               <Button variant="outline" asChild>
                 <a href="/roadmap" className="flex items-center gap-2" target="_blank" rel="noreferrer">
                   Roadmap
@@ -423,61 +439,93 @@ export default function TicketsPage() {
                 <Plus className="h-4 w-4" />
                 New Ticket
               </Button>
-              <Button variant="secondary" onClick={loadTickets} disabled={loading}>
-                {loading ? "Refreshing..." : "Refresh"}
-              </Button>
+              {canViewList ? (
+                <Button variant="secondary" onClick={loadTickets} disabled={loading}>
+                  {loading ? "Refreshing..." : "Refresh"}
+                </Button>
+              ) : (
+                <Button variant="secondary" asChild>
+                  <a href="/auth/signin?callbackUrl=/tickets">Sign in</a>
+                </Button>
+              )}
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 shadow-sm">
-            <div className="flex items-center gap-2 text-xs font-semibold text-emerald-700">
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-              Open
+        {canViewList ? (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 shadow-sm">
+              <div className="flex items-center gap-2 text-xs font-semibold text-emerald-700">
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+                Open
+              </div>
+              <div className="text-2xl font-bold text-emerald-900">{openCount}</div>
+              <div className="text-xs text-emerald-700/80">In flight</div>
             </div>
-            <div className="text-2xl font-bold text-emerald-900">{openCount}</div>
-            <div className="text-xs text-emerald-700/80">In flight</div>
-          </div>
-          <div className="rounded-xl border border-border bg-card px-4 py-3 shadow-sm">
-            <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M5 13l4 4L19 7" />
-              </svg>
-              Completed
+            <div className="rounded-xl border border-border bg-card px-4 py-3 shadow-sm">
+              <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M5 13l4 4L19 7" />
+                </svg>
+                Completed
+              </div>
+              <div className="text-2xl font-bold text-foreground">{completedCount}</div>
+              <div className="text-xs text-muted-foreground">Shipped & done</div>
             </div>
-            <div className="text-2xl font-bold text-foreground">{completedCount}</div>
-            <div className="text-xs text-muted-foreground">Shipped & done</div>
-          </div>
-          <div className="rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 shadow-sm">
-            <div className="flex items-center gap-2 text-xs font-semibold text-amber-700">
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M12 3v18M5 9l7-6 7 6M5 15l7 6 7-6" />
-              </svg>
-              Features
+            <div className="rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 shadow-sm">
+              <div className="flex items-center gap-2 text-xs font-semibold text-amber-700">
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 3v18M5 9l7-6 7 6M5 15l7 6 7-6" />
+                </svg>
+                Features
+              </div>
+              <div className="text-2xl font-bold text-amber-900">{featureCount}</div>
+              <div className="text-xs text-amber-700/80">Requests</div>
             </div>
-            <div className="text-2xl font-bold text-amber-900">{featureCount}</div>
-            <div className="text-xs text-amber-700/80">Requests</div>
-          </div>
-          <div className="rounded-xl border border-sky-100 bg-sky-50 px-4 py-3 shadow-sm">
-            <div className="flex items-center gap-2 text-xs font-semibold text-sky-700">
-              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M9.5 9a2.5 2.5 0 1 1 4.9.5c0 1.5-1.5 2-2.4 2.9-.3.3-.5.8-.5 1.3" />
-                <path d="M12 17h.01" />
-                <circle cx="12" cy="12" r="9" />
-              </svg>
-              Questions
+            <div className="rounded-xl border border-sky-100 bg-sky-50 px-4 py-3 shadow-sm">
+              <div className="flex items-center gap-2 text-xs font-semibold text-sky-700">
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M9.5 9a2.5 2.5 0 1 1 4.9.5c0 1.5-1.5 2-2.4 2.9-.3.3-.5.8-.5 1.3" />
+                  <path d="M12 17h.01" />
+                  <circle cx="12" cy="12" r="9" />
+                </svg>
+                Questions
+              </div>
+              <div className="text-2xl font-bold text-sky-900">{questionCount}</div>
+              <div className="text-xs text-sky-700/80">Need answers</div>
             </div>
-            <div className="text-2xl font-bold text-sky-900">{questionCount}</div>
-            <div className="text-xs text-sky-700/80">Need answers</div>
           </div>
-        </div>
+        ) : (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            <div className="font-semibold">Sign in to view and manage tickets</div>
+            <p className="text-xs text-amber-800 mt-1">
+              You can still submit a ticket without logging in, but the list and responses are staff-only.
+            </p>
+          </div>
+        )}
 
         {error && <div className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</div>}
 
-        {loading ? (
+        {!canViewList ? (
+          <div className="flex flex-col items-center justify-center py-10 text-muted-foreground">
+            <div className="p-4 rounded-full bg-muted border border-border mb-4">
+              <Search className="h-6 w-6 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-medium text-foreground">Ticket history is staff-only</h3>
+            <p className="text-sm mt-1 mb-4">Sign in to view the ticket queue or create a new ticket below.</p>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button variant="secondary" asChild>
+                <a href="/auth/signin?callbackUrl=/tickets">Sign in</a>
+              </Button>
+              <Button onClick={() => setCreateOpen(true)} className="gap-2">
+                <Plus className="h-4 w-4" />
+                New Ticket
+              </Button>
+            </div>
+          </div>
+        ) : loading ? (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
             Loading tickets...
