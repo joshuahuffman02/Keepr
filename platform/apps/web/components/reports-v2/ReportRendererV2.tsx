@@ -302,7 +302,7 @@ export function ReportRendererV2({
 
   const renderReport = () => {
     if (tab === "overview") {
-      return <OverviewReport campgroundId={campgroundId} />;
+      return <OverviewReport campgroundId={campgroundId} dateRange={dateRange} />;
     }
 
     if (tab === "daily") {

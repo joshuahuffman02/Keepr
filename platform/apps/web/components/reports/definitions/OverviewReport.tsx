@@ -3,9 +3,20 @@ import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "@/lib/api-client";
 import { KpiCard, TrendChart, BreakdownPie, formatCurrency } from "@/components/analytics";
 import { DollarSign, TrendingUp, Percent, Calendar, Home, AlertTriangle, Wrench, Users, Star } from "lucide-react";
+import {
+    addDays,
+    differenceInCalendarDays,
+    eachMonthOfInterval,
+    endOfDay,
+    format,
+    isSameDay,
+    startOfDay,
+    subYears
+} from "date-fns";
 
 interface OverviewReportProps {
     campgroundId: string;
+    dateRange?: { start: string; end: string };
 }
 
 const formatCurrencyLocal = (value: number, decimals: number = 0) => {
@@ -17,7 +28,19 @@ const formatCurrencyLocal = (value: number, decimals: number = 0) => {
     }).format(value);
 };
 
-export function OverviewReport({ campgroundId }: OverviewReportProps) {
+const formatRangeLabel = (range: { start: string; end: string }) => {
+    const start = new Date(range.start);
+    const end = new Date(range.end);
+    if (isSameDay(start, end)) {
+        return format(start, "MMM d, yyyy");
+    }
+    const sameYear = start.getFullYear() === end.getFullYear();
+    const startLabel = format(start, sameYear ? "MMM d" : "MMM d, yyyy");
+    const endLabel = format(end, "MMM d, yyyy");
+    return `${startLabel} – ${endLabel}`;
+};
+
+export function OverviewReport({ campgroundId, dateRange }: OverviewReportProps) {
     const summaryQuery = useQuery({
         queryKey: ["reports-summary", campgroundId],
         queryFn: () => apiClient.getDashboardSummary(campgroundId),
@@ -42,6 +65,59 @@ export function OverviewReport({ campgroundId }: OverviewReportProps) {
         enabled: !!campgroundId
     });
 
+    const rangeContext = useMemo(() => {
+        if (!dateRange || !reservationsQuery.data || !sitesQuery.data) return null;
+
+        const start = startOfDay(new Date(dateRange.start));
+        const end = startOfDay(new Date(dateRange.end));
+        const endExclusive = addDays(end, 1);
+        const rangeNights = Math.max(1, differenceInCalendarDays(endExclusive, start));
+        const rangeLabel = formatRangeLabel(dateRange);
+
+        const reservationsInRange = reservationsQuery.data.filter((r: any) => {
+            if (r.status === "cancelled") return false;
+            const arrival = startOfDay(new Date(r.arrivalDate));
+            return arrival >= start && arrival <= end;
+        });
+
+        let occupiedNights = 0;
+        let revenue = 0;
+
+        reservationsQuery.data.forEach((r: any) => {
+            if (r.status === "cancelled") return;
+            const arrival = startOfDay(new Date(r.arrivalDate));
+            const departure = startOfDay(new Date(r.departureDate));
+            const reservationNights = Math.max(1, differenceInCalendarDays(departure, arrival));
+
+            const overlapStart = arrival > start ? arrival : start;
+            const overlapEnd = departure < endExclusive ? departure : endExclusive;
+            const overlapNights = Math.max(0, differenceInCalendarDays(overlapEnd, overlapStart));
+
+            if (overlapNights <= 0) return;
+            occupiedNights += overlapNights;
+
+            const totalAmount = (r.totalAmount || 0) / 100;
+            revenue += totalAmount * (overlapNights / reservationNights);
+        });
+
+        const availableNights = sitesQuery.data.length * rangeNights;
+        const occupancy = availableNights > 0 ? (occupiedNights / availableNights) * 100 : 0;
+        const adr = occupiedNights > 0 ? revenue / occupiedNights : 0;
+        const revpar = availableNights > 0 ? revenue / availableNights : 0;
+
+        return {
+            start,
+            end,
+            rangeLabel,
+            reservationsInRange,
+            revenue,
+            adr,
+            revpar,
+            occupancy,
+            bookings: reservationsInRange.length
+        };
+    }, [dateRange, reservationsQuery.data, sitesQuery.data]);
+
     const cards = useMemo(() => {
         if (!summaryQuery.data) return [];
         const s = summaryQuery.data;
@@ -63,38 +139,44 @@ export function OverviewReport({ campgroundId }: OverviewReportProps) {
         if (!reservationsQuery.data) return null;
 
         const now = new Date();
-        const thisYearStart = new Date(now.getFullYear(), 0, 1);
-        const lastYearStart = new Date(now.getFullYear() - 1, 0, 1);
-        const lastYearEnd = new Date(now.getFullYear() - 1, 11, 31);
+        const defaultStart = new Date(now.getFullYear(), 0, 1);
+        const defaultEnd = new Date(now.getFullYear(), 11, 31);
+        const rangeStart = dateRange ? startOfDay(new Date(dateRange.start)) : defaultStart;
+        const rangeEnd = dateRange ? endOfDay(new Date(dateRange.end)) : defaultEnd;
+        const prevStart = subYears(rangeStart, 1);
+        const prevEnd = subYears(rangeEnd, 1);
 
-        const thisYear = reservationsQuery.data.filter((r: any) => {
+        const thisPeriod = reservationsQuery.data.filter((r: any) => {
+            if (r.status === "cancelled") return false;
             const arrival = new Date(r.arrivalDate);
-            return arrival >= thisYearStart && r.status !== 'cancelled';
+            return arrival >= rangeStart && arrival <= rangeEnd;
         });
 
-        const lastYear = reservationsQuery.data.filter((r: any) => {
+        const lastPeriod = reservationsQuery.data.filter((r: any) => {
+            if (r.status === "cancelled") return false;
             const arrival = new Date(r.arrivalDate);
-            return arrival >= lastYearStart && arrival <= lastYearEnd && r.status !== 'cancelled';
+            return arrival >= prevStart && arrival <= prevEnd;
         });
 
-        const thisYearRevenue = thisYear.reduce((sum: number, r: any) => sum + (r.totalAmount || 0), 0) / 100;
-        const lastYearRevenue = lastYear.reduce((sum: number, r: any) => sum + (r.totalAmount || 0), 0) / 100;
+        const thisRevenue = thisPeriod.reduce((sum: number, r: any) => sum + (r.totalAmount || 0), 0) / 100;
+        const lastRevenue = lastPeriod.reduce((sum: number, r: any) => sum + (r.totalAmount || 0), 0) / 100;
 
-        const revenueChange = lastYearRevenue > 0 ? (((thisYearRevenue - lastYearRevenue) / lastYearRevenue) * 100).toFixed(1) : '0';
+        const revenueChange = lastRevenue > 0 ? (((thisRevenue - lastRevenue) / lastRevenue) * 100).toFixed(1) : "0";
 
         return {
-            thisYear: { bookings: thisYear.length, revenue: thisYearRevenue },
-            lastYear: { bookings: lastYear.length, revenue: lastYearRevenue },
+            thisYear: { bookings: thisPeriod.length, revenue: thisRevenue },
+            lastYear: { bookings: lastPeriod.length, revenue: lastRevenue },
             change: {
-                bookings: thisYear.length - lastYear.length,
+                bookings: thisPeriod.length - lastPeriod.length,
                 revenuePercent: revenueChange
             }
         };
-    }, [reservationsQuery.data]);
+    }, [dateRange, reservationsQuery.data]);
 
     // Seasonal stats (Derived)
     const seasonalStats = useMemo(() => {
-        if (!reservationsQuery.data) return null;
+        const reservations = rangeContext?.reservationsInRange ?? reservationsQuery.data;
+        if (!reservations) return null;
 
         const stats: Record<string, { revenue: number, bookings: number, nights: number }> = {
             'Spring': { revenue: 0, bookings: 0, nights: 0 },
@@ -111,7 +193,7 @@ export function OverviewReport({ campgroundId }: OverviewReportProps) {
             return 'Winter';
         };
 
-        reservationsQuery.data.forEach((r: any) => {
+        reservations.forEach((r: any) => {
             if (r.status === 'cancelled') return;
             const arrival = new Date(r.arrivalDate);
             const departure = new Date(r.departureDate);
@@ -131,11 +213,31 @@ export function OverviewReport({ campgroundId }: OverviewReportProps) {
             bookings: data.bookings,
             avgNights: data.bookings > 0 ? (data.nights / data.bookings).toFixed(1) : '0'
         }));
-    }, [reservationsQuery.data]);
+    }, [rangeContext, reservationsQuery.data]);
 
     // Monthly revenue trend data for charts
     const monthlyRevenueTrend = useMemo(() => {
         if (!reservationsQuery.data) return [];
+
+        if (rangeContext) {
+            const labelFormat = rangeContext.start.getFullYear() === rangeContext.end.getFullYear() ? "MMM" : "MMM yyyy";
+            const months = eachMonthOfInterval({ start: rangeContext.start, end: rangeContext.end });
+            const totals = new Map<string, number>();
+            months.forEach((month) => totals.set(format(month, labelFormat), 0));
+
+            rangeContext.reservationsInRange.forEach((r: any) => {
+                if (r.status === "cancelled") return;
+                const arrival = new Date(r.arrivalDate);
+                if (arrival < rangeContext.start || arrival > rangeContext.end) return;
+                const key = format(new Date(arrival.getFullYear(), arrival.getMonth(), 1), labelFormat);
+                totals.set(key, (totals.get(key) ?? 0) + (r.totalAmount || 0) / 100);
+            });
+
+            return months.map((month) => {
+                const key = format(month, labelFormat);
+                return { month: key, revenue: totals.get(key) ?? 0 };
+            });
+        }
 
         const now = new Date();
         const months: Record<string, number> = {};
@@ -157,14 +259,15 @@ export function OverviewReport({ campgroundId }: OverviewReportProps) {
         });
 
         return Object.entries(months).map(([month, revenue]) => ({ month, revenue }));
-    }, [reservationsQuery.data]);
+    }, [rangeContext, reservationsQuery.data]);
 
     // Status breakdown for pie chart
     const statusBreakdown = useMemo(() => {
-        if (!reservationsQuery.data) return [];
+        const reservations = rangeContext?.reservationsInRange ?? reservationsQuery.data;
+        if (!reservations) return [];
 
         const statusCounts: Record<string, number> = {};
-        reservationsQuery.data.forEach((r: any) => {
+        reservations.forEach((r: any) => {
             const status = r.status || 'unknown';
             statusCounts[status] = (statusCounts[status] || 0) + 1;
         });
@@ -183,11 +286,13 @@ export function OverviewReport({ campgroundId }: OverviewReportProps) {
             value,
             color: colors[name] || '#6b7280',
         }));
-    }, [reservationsQuery.data]);
+    }, [rangeContext, reservationsQuery.data]);
 
-    const isLoading = summaryQuery.isLoading;
+    const isLoading = dateRange
+        ? reservationsQuery.isLoading || sitesQuery.isLoading
+        : summaryQuery.isLoading;
 
-    if (summaryQuery.error) {
+    if (summaryQuery.error && !dateRange) {
         return (
             <div className="rounded-lg border border-amber-600/50 bg-amber-900/20 px-4 py-3 text-sm text-amber-400">
                 Some report data failed to load. Try again or refresh.
@@ -195,42 +300,49 @@ export function OverviewReport({ campgroundId }: OverviewReportProps) {
         );
     }
 
+    const primaryStats = rangeContext ?? null;
+    const totalSites = sitesQuery.data?.length ?? summaryQuery.data?.sites ?? 0;
+    const revenueTitle = dateRange ? "Revenue" : "Revenue (30d)";
+    const bookingsTitle = dateRange ? "Bookings" : "Future Reservations";
+
     return (
         <div className="space-y-6">
             {/* Overview KPI Cards - Admin Analytics Style */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
                 <KpiCard
-                    title="Revenue (30d)"
-                    value={summaryQuery.data?.revenue ?? 0}
+                    title={revenueTitle}
+                    value={primaryStats?.revenue ?? summaryQuery.data?.revenue ?? 0}
                     format="currency"
                     loading={isLoading}
                     icon={<DollarSign className="h-5 w-5 text-green-400" />}
+                    subtitle={primaryStats?.rangeLabel}
                 />
                 <KpiCard
                     title="ADR"
-                    value={summaryQuery.data?.adr ?? 0}
+                    value={primaryStats?.adr ?? summaryQuery.data?.adr ?? 0}
                     format="currency"
                     loading={isLoading}
                     icon={<TrendingUp className="h-5 w-5 text-blue-400" />}
-                    subtitle="Average Daily Rate"
+                    subtitle={primaryStats?.rangeLabel ?? "Average Daily Rate"}
                 />
                 <KpiCard
                     title="RevPAR"
-                    value={summaryQuery.data?.revpar ?? 0}
+                    value={primaryStats?.revpar ?? summaryQuery.data?.revpar ?? 0}
                     format="currency"
                     loading={isLoading}
-                    subtitle="Revenue per Available"
+                    subtitle={primaryStats?.rangeLabel ?? "Revenue per Available"}
                 />
                 <KpiCard
                     title="Occupancy"
-                    value={summaryQuery.data?.occupancy ?? 0}
+                    value={primaryStats?.occupancy ?? summaryQuery.data?.occupancy ?? 0}
                     format="percent"
                     loading={isLoading}
                     icon={<Percent className="h-5 w-5 text-amber-400" />}
+                    subtitle={primaryStats?.rangeLabel}
                 />
                 <KpiCard
-                    title="Future Reservations"
-                    value={summaryQuery.data?.futureReservations ?? 0}
+                    title={bookingsTitle}
+                    value={primaryStats?.bookings ?? summaryQuery.data?.futureReservations ?? 0}
                     format="number"
                     loading={isLoading}
                     icon={<Calendar className="h-5 w-5 text-purple-400" />}
@@ -241,9 +353,9 @@ export function OverviewReport({ campgroundId }: OverviewReportProps) {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <KpiCard
                     title="Total Sites"
-                    value={summaryQuery.data?.sites ?? 0}
+                    value={totalSites}
                     format="number"
-                    loading={isLoading}
+                    loading={sitesQuery.isLoading}
                     icon={<Home className="h-5 w-5 text-muted-foreground" />}
                 />
                 <KpiCard
@@ -252,6 +364,7 @@ export function OverviewReport({ campgroundId }: OverviewReportProps) {
                     format="currency"
                     loading={isLoading}
                     icon={<AlertTriangle className="h-5 w-5 text-red-400" />}
+                    subtitle={dateRange ? "Current" : undefined}
                 />
                 <KpiCard
                     title="Maintenance Open"
@@ -259,6 +372,7 @@ export function OverviewReport({ campgroundId }: OverviewReportProps) {
                     format="number"
                     loading={isLoading}
                     icon={<Wrench className="h-5 w-5 text-amber-400" />}
+                    subtitle={dateRange ? "Current" : undefined}
                 />
                 <KpiCard
                     title="Maintenance Overdue"
@@ -266,6 +380,7 @@ export function OverviewReport({ campgroundId }: OverviewReportProps) {
                     format="number"
                     loading={isLoading}
                     icon={<Wrench className="h-5 w-5 text-red-400" />}
+                    subtitle={dateRange ? "Current" : undefined}
                 />
             </div>
 
@@ -274,7 +389,7 @@ export function OverviewReport({ campgroundId }: OverviewReportProps) {
                 <div className="lg:col-span-2">
                     <TrendChart
                         title="Revenue Trend"
-                        description="Monthly revenue over the last 6 months"
+                        description={rangeContext ? "Monthly revenue for the selected range" : "Monthly revenue over the last 6 months"}
                         data={monthlyRevenueTrend}
                         dataKeys={[{ key: "revenue", color: "#10b981", name: "Revenue" }]}
                         xAxisKey="month"
