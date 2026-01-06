@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { usePathname } from "next/navigation";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Button } from "@/components/ui/button";
@@ -13,8 +14,11 @@ import Link from "next/link";
 import { Trash2, Play, RotateCcw, RefreshCw } from "lucide-react";
 import { apiClient } from "@/lib/api-client";
 import { useToast } from "@/components/ui/use-toast";
+import { ReportsNavBar } from "@/components/reports/ReportsNavBar";
+import { buildReportHref } from "@/lib/report-links";
 
 export default function SavedReportsPage() {
+  const pathname = usePathname();
   const { toast } = useToast();
   const qc = useQueryClient();
   const [campgroundId, setCampgroundId] = useState<string | null>(null);
@@ -63,10 +67,17 @@ export default function SavedReportsPage() {
     );
   }, [reports, search]);
 
+  const reportNavLinks = [
+    { label: "Saved", href: "/reports/saved", active: pathname === "/reports/saved" },
+    { label: "Portfolio", href: "/reports/portfolio", active: pathname.startsWith("/reports/portfolio") },
+    { label: "Devices", href: "/reports/devices", active: pathname.startsWith("/reports/devices") }
+  ];
+
   return (
     <DashboardShell>
       <div className="space-y-4">
         <Breadcrumbs items={[{ label: "Reports", href: "/reports" }, { label: "Saved" }]} />
+        <ReportsNavBar activeTab={null} extraLinks={reportNavLinks} />
         <div className="rounded-xl border border-border bg-card shadow-sm p-5 space-y-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div className="space-y-1">
@@ -124,7 +135,12 @@ export default function SavedReportsPage() {
                       )}
                     </div>
                     <div className="flex items-center gap-2">
-                      <Link href={`/reports?tab=${r.tab}${r.subTab ? `&sub=${r.subTab}` : ""}${r.dateRange ? `&start=${r.dateRange.start}&end=${r.dateRange.end}` : ""}${r.filters?.status ? `&status=${r.filters.status}` : ""}${r.filters?.siteType ? `&siteType=${r.filters.siteType}` : ""}${r.filters?.groupBy ? `&groupBy=${r.filters.groupBy}` : ""}`}>
+                      <Link href={buildReportHref({
+                        tab: r.tab,
+                        subTab: r.subTab ?? null,
+                        dateRange: r.dateRange,
+                        filters: r.filters
+                      })}>
                         <Button size="sm" className="gap-1">
                           <Play className="h-4 w-4" /> Run
                         </Button>

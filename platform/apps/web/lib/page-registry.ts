@@ -1,3 +1,5 @@
+import { reportCatalog, subTabs } from "@/lib/report-registry";
+
 /**
  * Page Registry - Centralized definition of all pages in the application
  * Used for customizable sidebar menu, command palette search, and "All Pages" discovery
@@ -25,6 +27,32 @@ export interface PageDefinition {
   defaultForRoles?: string[]; // Include in default menu for these roles
   dynamic?: boolean; // Contains dynamic segments like [campgroundId]
 }
+
+const REPORT_PAGE_DEFINITIONS: PageDefinition[] = reportCatalog.flatMap((category) => {
+  if (category.id === "overview") {
+    return [{
+      href: "/reports/overview",
+      label: "Reports Overview",
+      icon: "reports",
+      category: "reports",
+      description: category.description,
+      keywords: ["reports", "overview", "dashboard", "summary"],
+      permissions: ["reportsRead"]
+    }];
+  }
+
+  const subReports = subTabs[category.id as keyof typeof subTabs] || category.subReports;
+
+  return subReports.map((sub) => ({
+    href: `/reports/${category.id}/${sub.id}`,
+    label: `${category.label}: ${sub.label}`,
+    icon: "reports",
+    category: "reports",
+    description: sub.description || `${category.label} report`,
+    keywords: ["reports", category.label, sub.label, category.id, sub.id],
+    permissions: ["reportsRead"]
+  }));
+});
 
 /**
  * All pages in the application
@@ -275,6 +303,7 @@ export const PAGE_REGISTRY: PageDefinition[] = [
     defaultForRoles: ["manager", "owner", "admin"],
     permissions: ["reportsRead"],
   },
+  ...REPORT_PAGE_DEFINITIONS,
   {
     href: "/reports/saved",
     label: "Saved Reports",

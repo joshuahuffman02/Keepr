@@ -21,12 +21,12 @@ import { HelpAnchor } from "../../components/help/HelpAnchor";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "../../components/ui/dialog";
 import { apiClient } from "../../lib/api-client";
 import { saveReport, type SavedReport } from "@/components/reports/savedReports";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { FileDown, Calendar, FileSpreadsheet, X, Info, ChevronDown, ChevronUp, LayoutList, TrendingUp, Users, BarChart3, Megaphone, LineChart, Calculator, ClipboardList, ExternalLink, SlidersHorizontal, Filter } from "lucide-react";
-import { FilterChip } from "@/components/ui/filter-chip";
+import { FileDown, Calendar, FileSpreadsheet, X, ChevronDown, ChevronUp, TrendingUp, Users, BarChart3, Megaphone, LineChart, Calculator, ClipboardList, ExternalLink, SlidersHorizontal, Filter } from "lucide-react";
 import { SaveReportDialog } from "@/components/reports/SaveReportDialog";
 import { SavedReportsDropdown } from "@/components/reports/SavedReportsDropdown";
+import { ReportsNavBar } from "@/components/reports/ReportsNavBar";
 
 import { BookingSourcesTab } from "../../components/reports/BookingSourcesTab";
 import { GuestOriginsTab } from "../../components/reports/GuestOriginsTab";
@@ -34,12 +34,13 @@ import { HeatmapCard } from "../../components/reports/HeatmapCard";
 import { resolvePoints } from "../../components/reports/heatmap-utils";
 import { recordTelemetry } from "../../lib/sync-telemetry";
 
-import { reportCatalog, subTabs, ReportTab, SubTab } from "./registry";
+import { subTabs, type ReportTab } from "@/lib/report-registry";
 import { OverviewReport } from "@/components/reports/definitions/OverviewReport";
 import { ReportRenderer } from "@/components/reports/ReportRenderer";
 import { ExportDialog } from "@/components/reports/ExportDialog";
 import { useReportExport } from "@/components/reports/useReportExport";
 import type { ExportFormat } from "@/lib/export-utils";
+import { buildReportHref } from "@/lib/report-links";
 
 // Type definitions for entities with populated relations
 type SiteWithClass = {
@@ -91,9 +92,10 @@ const formatCurrency = (value: number, decimals: number = 0) => {
 function ReportsPageInner() {
   const { toast } = useToast();
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const [campgroundId, setCampgroundId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<string>('overview');
+  const [activeTab, setActiveTab] = useState<string>("overview");
   const [activeSubTab, setActiveSubTab] = useState<string | null>(null);
   const [pickupFilters, setPickupFilters] = useState({
     comparisonA: new Date().toISOString().slice(0, 10),
@@ -130,9 +132,6 @@ function ReportsPageInner() {
     tabName: string;
   } | null>(null);
 
-  // Report catalog panel state
-  const [showCatalog, setShowCatalog] = useState(false);
-
   // Report customization/filter state
   const [showFilters, setShowFilters] = useState(false);
   const [reportFilters, setReportFilters] = useState({
@@ -146,6 +145,20 @@ function ReportsPageInner() {
 
   // Initialize export hook
   const { exportReport } = useReportExport(campgroundId, dateRange);
+
+  const reportNavHref = (tab: string, subTab?: string | null) =>
+    buildReportHref({
+      tab,
+      subTab,
+      dateRange,
+      filters: reportFilters
+    });
+
+  const reportNavLinks = useMemo(() => ([
+    { label: "Saved", href: "/reports/saved", active: pathname === "/reports/saved" },
+    { label: "Portfolio", href: "/reports/portfolio", active: pathname?.startsWith("/reports/portfolio") },
+    { label: "Devices", href: "/reports/devices", active: pathname?.startsWith("/reports/devices") }
+  ]), [pathname]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -181,7 +194,7 @@ function ReportsPageInner() {
 
   // Ensure sub-tab defaults to first available for the active tab
   useEffect(() => {
-    if (activeTab === 'overview' || activeTab === 'audits') {
+    if (activeTab === 'overview') {
       setActiveSubTab(null);
       return;
     }
@@ -4021,26 +4034,21 @@ function ReportsPageInner() {
           <Breadcrumbs items={[{ label: "Reports" }]} />
 
           <div className="rounded-xl border border-border bg-card/90 shadow-sm p-5 space-y-4">
-            <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-semibold text-foreground">Reports</h1>
-                <HelpAnchor topicId="reports-overview" label="Reports help" />
-              </div>
-              <p className="text-muted-foreground text-sm">Financials, occupancy, marketing, audits—live and exportable.</p>
-              <div className="mt-2 text-xs bg-status-info/15 border border-status-info/30 rounded-lg px-3 py-2 text-status-info space-y-1">
-                <div className="flex items-start gap-2">
-                  <Info className="h-4 w-4 text-status-info mt-0.5 shrink-0" />
-                  <div>
-                    <strong>Reports are read-only views</strong> of your live data. To edit reservations or billing,
-                    use <a href="/reservations" className="underline font-medium">Reservations</a> or <a href="/billing" className="underline font-medium">Billing</a>.
-                  </div>
+            <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <h1 className="text-2xl font-semibold text-foreground">Reports</h1>
+                  <HelpAnchor topicId="reports-overview" label="Reports help" />
                 </div>
-                <div className="pl-6 text-status-info">
-                  <strong>Tip:</strong> Click <em>Save report</em> to bookmark your current view for quick access later.
-                </div>
+                <p className="text-muted-foreground text-sm">Financials, occupancy, marketing, audits—live and exportable.</p>
+                <p className="text-xs text-muted-foreground">
+                  Read-only views of live data. Edit in{" "}
+                  <Link href="/reservations" className="underline font-medium">Reservations</Link>{" "}
+                  or{" "}
+                  <Link href="/billing" className="underline font-medium">Billing</Link>. Tip: Save report to bookmark this view.
+                </p>
               </div>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
               <div className="flex items-center gap-2 bg-muted border border-border rounded-lg px-3 py-2">
                 <Label htmlFor="report-date-start" className="text-xs font-medium text-muted-foreground">From</Label>
                 <Input
@@ -4089,120 +4097,19 @@ function ReportsPageInner() {
                 <FileDown className="h-4 w-4" />
                 Export {getReportDisplayName(activeTab)}
               </Button>
+              </div>
             </div>
           </div>
 
-          {/* Report Catalog - Collapsible Browse All */}
-          <div className="border border-border rounded-xl bg-muted">
-            <button
-              onClick={() => setShowCatalog(!showCatalog)}
-              className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-muted/50 transition-colors rounded-xl"
-              aria-expanded={showCatalog}
-              aria-controls="report-catalog-panel"
-            >
-              <div className="flex items-center gap-3">
-                <LayoutList className="h-5 w-5 text-primary" />
-                <div>
-                  <span className="font-medium text-foreground">Browse All Reports</span>
-                  <span className="text-muted-foreground text-sm ml-2">({reportCatalog.reduce((acc, cat) => acc + cat.subReports.length, 0)} available)</span>
-                </div>
-              </div>
-              {showCatalog ? (
-                <ChevronUp className="h-5 w-5 text-muted-foreground" />
-              ) : (
-                <ChevronDown className="h-5 w-5 text-muted-foreground" />
-              )}
-            </button>
+          <ReportsNavBar
+            activeTab={activeTab as ReportTab}
+            activeSubTab={activeSubTab}
+            dateRange={dateRange}
+            filters={reportFilters}
+            extraLinks={reportNavLinks}
+          />
 
-            {showCatalog && (
-              <div id="report-catalog-panel" className="px-4 pb-4 pt-2 border-t border-border">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {reportCatalog.map((category) => {
-                    const IconComponent = category.icon;
-                    const isActive = activeTab === category.id;
-                    return (
-                      <div
-                        key={category.id}
-                        className={`rounded-lg border p-3 transition-all cursor-pointer hover:shadow-sm ${isActive
-                          ? 'border-primary/20 bg-primary/10 ring-1 ring-primary/15'
-                          : 'border-border bg-card hover:border-border'
-                          }`}
-                        onClick={() => {
-                          setActiveTab(category.id as ReportTab);
-                          if (category.id !== 'overview' && category.id !== 'audits') {
-                            const subs = subTabs[category.id as keyof typeof subTabs] || [];
-                            setActiveSubTab(subs[0]?.id ?? null);
-                          } else {
-                            setActiveSubTab(null);
-                          }
-                          setShowCatalog(false);
-                        }}
-                      >
-                        <div className="flex items-start gap-3">
-                          <div className={`p-2 rounded-lg ${isActive ? 'bg-primary/10' : 'bg-muted'}`}>
-                            <IconComponent className={`h-4 w-4 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="font-medium text-foreground text-sm">{category.label}</div>
-                            <div className="text-xs text-muted-foreground mt-0.5">{category.description}</div>
-                            <div className="mt-2 flex flex-wrap gap-1">
-                              {category.subReports.slice(0, 3).map((sub, idx) => (
-                                <span
-                                  key={idx}
-                                  className="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground"
-                                >
-                                  {sub.label}
-                                </span>
-                              ))}
-                              {category.subReports.length > 3 && (
-                                <span className="text-xs text-muted-foreground">+{category.subReports.length - 3}</span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-
-
-          {/* Sub-tabs - horizontal menu for specific reports within each section */}
-          {campgroundId && activeTab !== 'overview' && activeTab !== 'audits' && subTabs[activeTab as keyof typeof subTabs] && (
-            <div className="flex flex-wrap gap-2 -mx-1">
-              {subTabs[activeTab as keyof typeof subTabs].map((sub: SubTab, idx: number) => (
-                <button
-                  key={sub.id}
-                  onClick={() => setActiveSubTab(sub.id)}
-                  className={`px-3 py-2 rounded-lg border text-sm font-medium transition-colors whitespace-nowrap ${activeSubTab === sub.id || (!activeSubTab && idx === 0)
-                    ? 'border-status-success/30 bg-status-success/15 text-status-success'
-                    : 'border-border bg-card text-muted-foreground hover:bg-muted'
-                    }`}
-                  aria-pressed={activeSubTab === sub.id || (!activeSubTab && idx === 0)}
-                >
-                  {sub.label}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* DYNAMIC REPORT CONTENT - renders directly below sub-tabs */}
-          {campgroundId && activeTab !== 'overview' && (
-            <div className="rounded-xl border border-border bg-card shadow-sm p-4">
-              <ReportRenderer
-                key={`${activeTab}-${activeSubTab || 'default'}`}
-                tab={activeTab as ReportTab}
-                subTab={activeSubTab || (subTabs[activeTab as keyof typeof subTabs]?.[0]?.id)}
-                campgroundId={campgroundId}
-                dateRange={dateRange}
-                reportFilters={reportFilters}
-              />
-            </div>
-          )}
-
-          {/* Report Customization Panel */}
+          {/* Report Filters */}
           <div className="border border-border rounded-xl bg-card">
             <button
               onClick={() => setShowFilters(!showFilters)}
@@ -4213,8 +4120,8 @@ function ReportsPageInner() {
               <div className="flex items-center gap-3">
                 <SlidersHorizontal className="h-5 w-5 text-muted-foreground" />
                 <div>
-                  <span className="font-medium text-foreground">Customize Report</span>
-                  <span className="text-muted-foreground text-sm ml-2">Filters, date range, grouping</span>
+                  <span className="font-medium text-foreground">Filters & grouping</span>
+                  <span className="text-muted-foreground text-sm ml-2">Date presets, filters, grouping</span>
                 </div>
               </div>
               {showFilters ? (
@@ -4348,62 +4255,18 @@ function ReportsPageInner() {
             )}
           </div>
 
-          {/* Visible Filter Pills Row */}
-          {(reportFilters.status !== 'all' || reportFilters.siteType !== 'all' || reportFilters.groupBy !== 'none' || dateRange.start || dateRange.end) && (
-            <div className="flex flex-wrap items-center gap-2 py-3 px-1">
-              <span className="text-xs text-muted-foreground font-medium">Active:</span>
-              {reportFilters.status !== 'all' && (
-                <FilterChip
-                  label={`Status: ${reportFilters.status.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase())}`}
-                  selected
-                  removable
-                  onRemove={() => setReportFilters({ ...reportFilters, status: 'all' })}
-                  variant="subtle"
-                />
-              )}
-              {reportFilters.siteType !== 'all' && (
-                <FilterChip
-                  label={`Site Type: ${reportFilters.siteType}`}
-                  selected
-                  removable
-                  onRemove={() => setReportFilters({ ...reportFilters, siteType: 'all' })}
-                  variant="subtle"
-                />
-              )}
-              {reportFilters.groupBy !== 'none' && (
-                <FilterChip
-                  label={`Grouped: ${reportFilters.groupBy.replace(/\b\w/g, (c) => c.toUpperCase())}`}
-                  selected
-                  removable
-                  onRemove={() => setReportFilters({ ...reportFilters, groupBy: 'none' })}
-                  variant="subtle"
-                />
-              )}
-              {dateRange.start && dateRange.end && (
-                <FilterChip
-                  label={`Date: ${new Date(dateRange.start + "T00:00:00").toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} - ${new Date(dateRange.end + "T00:00:00").toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`}
-                  selected
-                  removable
-                  onRemove={() => {
-                    const end = new Date();
-                    const start = new Date();
-                    start.setDate(start.getDate() - 30);
-                    setDateRange({
-                      start: start.toISOString().slice(0, 10),
-                      end: end.toISOString().slice(0, 10)
-                    });
-                  }}
-                  variant="subtle"
-                />
-              )}
-              {[reportFilters.status !== 'all', reportFilters.siteType !== 'all', reportFilters.groupBy !== 'none'].filter(Boolean).length >= 2 && (
-                <button
-                  className="text-xs text-muted-foreground hover:text-foreground underline ml-2"
-                  onClick={() => setReportFilters({ status: 'all', siteType: 'all', groupBy: 'none' })}
-                >
-                  Clear all
-                </button>
-              )}
+
+          {/* DYNAMIC REPORT CONTENT - renders directly below sub-tabs */}
+          {campgroundId && activeTab !== 'overview' && (
+            <div className="rounded-xl border border-border bg-card shadow-sm p-4">
+              <ReportRenderer
+                key={`${activeTab}-${activeSubTab || 'default'}`}
+                tab={activeTab as ReportTab}
+                subTab={activeSubTab || (subTabs[activeTab as keyof typeof subTabs]?.[0]?.id)}
+                campgroundId={campgroundId}
+                dateRange={dateRange}
+                reportFilters={reportFilters}
+              />
             </div>
           )}
 
@@ -4432,13 +4295,19 @@ function ReportsPageInner() {
         <Breadcrumbs items={[{ label: "Reports" }]} />
 
         <div className="rounded-xl border border-border bg-card/90 shadow-sm p-5 space-y-4">
-          <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-            <div className="space-y-1">
+          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+            <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <h1 className="text-2xl font-semibold text-foreground">Reports</h1>
                 <HelpAnchor topicId="reports-overview" label="Reports help" />
               </div>
               <p className="text-muted-foreground text-sm">Financials, occupancy, marketing, audits—live and exportable.</p>
+              <p className="text-xs text-muted-foreground">
+                Read-only views of live data. Edit in{" "}
+                <Link href="/reservations" className="underline font-medium">Reservations</Link>{" "}
+                or{" "}
+                <Link href="/billing" className="underline font-medium">Billing</Link>. Tip: Save report to bookmark this view.
+              </p>
             </div>
             {campgroundId ? (
               <div className="flex flex-wrap items-center gap-2">
@@ -4463,9 +4332,12 @@ function ReportsPageInner() {
                 <SavedReportsDropdown
                   campgroundId={campgroundId}
                   onLoadReport={(report) => {
-                    // Navigate to the report with all saved parameters
-                    const url = `/reports?tab=${report.tab}${report.subTab ? `&sub=${report.subTab}` : ""}${report.dateRange ? `&start=${report.dateRange.start}&end=${report.dateRange.end}` : ""}${report.filters?.status ? `&status=${report.filters.status}` : ""}${report.filters?.siteType ? `&siteType=${report.filters.siteType}` : ""}${report.filters?.groupBy ? `&groupBy=${report.filters.groupBy}` : ""}`;
-                    router.push(url);
+                    router.push(buildReportHref({
+                      tab: report.tab,
+                      subTab: report.subTab ?? null,
+                      dateRange: report.dateRange,
+                      filters: report.filters
+                    }));
                   }}
                 />
                 <Link href="/reports/saved">
@@ -4494,87 +4366,17 @@ function ReportsPageInner() {
           </div>
 
 
+          <ReportsNavBar
+            activeTab={activeTab as ReportTab}
+            activeSubTab={activeSubTab}
+            dateRange={dateRange}
+            filters={reportFilters}
+            extraLinks={reportNavLinks}
+          />
+
           {!campgroundId && (
             <div className="rounded-lg border border-status-warning/30 bg-status-warning/15 px-4 py-3 text-sm text-status-warning">
               Choose a campground from the sidebar to load reports.
-            </div>
-          )}
-
-          {/* Report Catalog - Collapsible Browse All */}
-          {campgroundId && (
-            <div className="border border-border rounded-xl bg-muted">
-              <button
-                onClick={() => setShowCatalog(!showCatalog)}
-                className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-muted/50 transition-colors rounded-xl"
-                aria-expanded={showCatalog}
-                aria-controls="report-catalog-panel-main"
-              >
-                <div className="flex items-center gap-3">
-                  <LayoutList className="h-5 w-5 text-primary" />
-                  <div>
-                    <span className="font-medium text-foreground">Browse All Reports</span>
-                    <span className="text-muted-foreground text-sm ml-2">({reportCatalog.reduce((acc, cat) => acc + cat.subReports.length, 0)} available)</span>
-                  </div>
-                </div>
-                {showCatalog ? (
-                  <ChevronUp className="h-5 w-5 text-muted-foreground" />
-                ) : (
-                  <ChevronDown className="h-5 w-5 text-muted-foreground" />
-                )}
-              </button>
-
-              {showCatalog && (
-                <div id="report-catalog-panel-main" className="px-4 pb-4 pt-2 border-t border-border">
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {reportCatalog.map((category) => {
-                      const IconComponent = category.icon;
-                      const isActive = activeTab === category.id;
-                      return (
-                        <div
-                          key={category.id}
-                          className={`rounded-lg border p-3 transition-all cursor-pointer hover:shadow-sm ${isActive
-                            ? 'border-primary/20 bg-primary/10 ring-1 ring-primary/15'
-                            : 'border-border bg-card hover:border-border'
-                            }`}
-                          onClick={() => {
-                            setActiveTab(category.id as ReportTab);
-                            if (category.id !== 'overview' && category.id !== 'audits') {
-                              const subs = subTabs[category.id as keyof typeof subTabs] || [];
-                              setActiveSubTab(subs[0]?.id ?? null);
-                            } else {
-                              setActiveSubTab(null);
-                            }
-                            setShowCatalog(false);
-                          }}
-                        >
-                          <div className="flex items-start gap-3">
-                            <div className={`p-2 rounded-lg ${isActive ? 'bg-primary/10' : 'bg-muted'}`}>
-                              <IconComponent className={`h-4 w-4 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="font-medium text-foreground text-sm">{category.label}</div>
-                              <div className="text-xs text-muted-foreground mt-0.5">{category.description}</div>
-                              <div className="mt-2 flex flex-wrap gap-1">
-                                {category.subReports.slice(0, 3).map((sub, idx) => (
-                                  <span
-                                    key={idx}
-                                    className="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground"
-                                  >
-                                    {sub.label}
-                                  </span>
-                                ))}
-                                {category.subReports.length > 3 && (
-                                  <span className="text-xs text-muted-foreground">+{category.subReports.length - 3}</span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
             </div>
           )}
 
@@ -6947,7 +6749,7 @@ function ReportsPageInner() {
 
                 {/* AUDITS TAB */}
                 {
-                  activeTab === 'audits' && dataQualityStats && (
+                  activeTab === 'audits' && activeSubTab === 'audit-log' && dataQualityStats && (
                     <Card className="p-4 space-y-3">
                       <div>
                         <div className="text-sm font-semibold text-foreground">Data Quality Overview</div>
@@ -7002,7 +6804,7 @@ function ReportsPageInner() {
 
                 {/* AUDITS TAB - Rate Consistency Audit */}
                 {
-                  activeTab === 'audits' && rateConsistencyStats && (
+                  activeTab === 'audits' && activeSubTab === 'audit-log' && rateConsistencyStats && (
                     <Card className="p-4 space-y-3">
                       <div>
                         <div className="text-sm font-semibold text-foreground">Rate Consistency Audit</div>
@@ -7059,7 +6861,7 @@ function ReportsPageInner() {
                 }
 
                 {
-                  activeTab === 'audits' && sitesQuery.data && (
+                  activeTab === 'audits' && activeSubTab === 'audit-log' && sitesQuery.data && (
                     <Card className="p-4 space-y-3">
                       <div>
                         <div className="text-sm font-semibold text-foreground">Inventory Audit</div>

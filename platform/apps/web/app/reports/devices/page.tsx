@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { usePathname } from "next/navigation";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -9,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiClient } from "@/lib/api-client";
 import { Smartphone, Monitor, Tablet, TrendingUp, Users, ShoppingCart, Percent } from "lucide-react";
+import { ReportsNavBar } from "@/components/reports/ReportsNavBar";
 
 type DeviceData = {
   deviceType: string;
@@ -30,8 +32,15 @@ type DeviceReport = {
 };
 
 export default function DeviceAnalyticsPage() {
+  const pathname = usePathname();
   const [campgroundId, setCampgroundId] = useState<string | null>(null);
   const [days, setDays] = useState("30");
+
+  const reportNavLinks = [
+    { label: "Saved", href: "/reports/saved", active: pathname === "/reports/saved" },
+    { label: "Portfolio", href: "/reports/portfolio", active: pathname.startsWith("/reports/portfolio") },
+    { label: "Devices", href: "/reports/devices", active: pathname.startsWith("/reports/devices") }
+  ];
 
   useEffect(() => {
     const stored = typeof window !== "undefined" ? localStorage.getItem("campreserv:selectedCampground") : null;
@@ -109,6 +118,8 @@ export default function DeviceAnalyticsPage() {
             </SelectContent>
           </Select>
         </div>
+
+        <ReportsNavBar activeTab={null} extraLinks={reportNavLinks} />
 
         {!campgroundId ? (
           <Card>

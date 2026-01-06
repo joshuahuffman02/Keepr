@@ -1,19 +1,18 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { usePathname } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Breadcrumbs } from "@/components/breadcrumbs";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DashboardShell } from "@/components/ui/layout/DashboardShell";
+import { Breadcrumbs } from "@/components/breadcrumbs";
+import { ReportsV2Shell } from "@/components/reports-v2/ReportsV2Shell";
+import { ReportsV2PageHeader } from "@/components/reports-v2/ReportsV2PageHeader";
+import { ReportSection, ReportStatGrid } from "@/components/reports-v2/ReportPanels";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { apiClient } from "@/lib/api-client";
-import { ReportsNavBar } from "@/components/reports/ReportsNavBar";
+import { listSavedReports, type SavedReport } from "@/components/reports/savedReports";
 
 type FxRate = { base: string; quote: string; rate: number };
 
@@ -43,19 +42,20 @@ function resolveRate(fxRates: FxRate[], baseCurrency: string | undefined, from: 
   return 1;
 }
 
-export default function PortfolioFxReportPage() {
-  const pathname = usePathname();
+export default function ReportsV2PortfolioPage() {
   const qc = useQueryClient();
   const [portfolioId, setPortfolioId] = useState<string | null>(null);
   const [locale, setLocale] = useState("en-US");
   const [reportingCurrency, setReportingCurrency] = useState<string | null>(null);
   const [fxEnabled, setFxEnabled] = useState(true);
+  const [savedReports, setSavedReports] = useState<SavedReport[]>([]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     const storedPortfolio = localStorage.getItem("campreserv:selectedPortfolio");
     const storedLocale = localStorage.getItem("campreserv:locale");
     const storedReporting = localStorage.getItem("campreserv:reportingCurrency");
+    setSavedReports(listSavedReports(localStorage.getItem("campreserv:selectedCampground")));
     if (storedPortfolio) setPortfolioId(storedPortfolio);
     if (storedLocale) setLocale(storedLocale);
     if (storedReporting) setReportingCurrency(storedReporting);
@@ -147,38 +147,20 @@ export default function PortfolioFxReportPage() {
     };
   })();
 
-  const activePortfolio = useMemo(() => {
-    if (!portfoliosQuery.data || !portfolioId) return null;
-    return portfoliosQuery.data.portfolios.find((p) => p.id === portfolioId) ?? portfoliosQuery.data.portfolios[0];
-  }, [portfolioId, portfoliosQuery.data]);
-
   const isLoading = portfoliosQuery.isLoading || reportQuery.isLoading;
-
-  const reportNavLinks = [
-    { label: "Saved", href: "/reports/saved", active: pathname === "/reports/saved" },
-    { label: "Portfolio", href: "/reports/portfolio", active: pathname.startsWith("/reports/portfolio") },
-    { label: "Devices", href: "/reports/devices", active: pathname.startsWith("/reports/devices") }
-  ];
 
   return (
     <DashboardShell>
-      <Breadcrumbs items={[{ label: "Reports", href: "/reports" }, { label: "Portfolio FX", href: "/reports/portfolio" }]} />
+      <div className="space-y-5">
+        <Breadcrumbs items={[{ label: "Reports v2", href: "/reports-v2" }, { label: "Portfolio" }]} />
+        <ReportsV2Shell activeTab={null} activeSubTab={null} activeShortcut="portfolio" pinnedReports={savedReports.filter((r) => r.pinned)}>
+          <ReportsV2PageHeader
+            title="Portfolio reporting"
+            description="Cross-park occupancy, ADR, RevPAR, and revenue with FX support."
+          />
 
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-semibold text-foreground">Cross-park reporting</h1>
-          <p className="text-sm text-muted-foreground">Occupancy, ADR, and RevPAR per portfolio with currency conversion helpers.</p>
-        </div>
-
-        <ReportsNavBar activeTab={null} extraLinks={reportNavLinks} />
-
-        <Card>
-          <CardHeader className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-            <div>
-              <CardTitle>Scope & FX</CardTitle>
-              <CardDescription>Choose a portfolio and reporting currency.</CardDescription>
-            </div>
-            <div className="flex flex-wrap gap-3">
+          <ReportSection title="Scope and currency" description="Choose a portfolio and reporting currency.">
+            <div className="flex flex-wrap items-center gap-4">
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-muted-foreground">Portfolio</span>
                 <Select
@@ -189,7 +171,7 @@ export default function PortfolioFxReportPage() {
                     qc.invalidateQueries({ queryKey: ["portfolio-report"] });
                   }}
                 >
-                  <SelectTrigger className="w-60 text-sm" aria-label="Portfolio">
+                  <SelectTrigger className="w-64" aria-label="Portfolio">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -201,7 +183,6 @@ export default function PortfolioFxReportPage() {
                   </SelectContent>
                 </Select>
               </div>
-
               <div className="flex flex-col gap-1">
                 <span className="text-xs font-semibold text-muted-foreground">Reporting currency</span>
                 <Select
@@ -223,106 +204,26 @@ export default function PortfolioFxReportPage() {
                   </SelectContent>
                 </Select>
               </div>
-
-              <div className="flex items-center gap-2 rounded-md border border-border px-3 py-2">
-                <Switch checked={fxEnabled} onCheckedChange={setFxEnabled} aria-label="Toggle FX conversion" />
-                <div className="flex flex-col">
-                  <span className="text-xs font-semibold text-foreground">FX toggle</span>
-                  <span className="text-[11px] text-muted-foreground">Convert to {resolvedReportingCurrency}</span>
-                </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold text-muted-foreground">FX conversion</span>
+                <Switch checked={fxEnabled} onCheckedChange={setFxEnabled} />
               </div>
-
-              <Button variant="outline" size="sm" onClick={() => qc.invalidateQueries({ queryKey: ["portfolio-report"] })} disabled={!portfolioId}>
-                Refresh report
-              </Button>
             </div>
-          </CardHeader>
-        </Card>
+          </ReportSection>
 
-        <div className="grid gap-4 md:grid-cols-3">
-          <Card>
-            <CardHeader>
-              <CardTitle>Rollup</CardTitle>
-              <CardDescription>
-                Home: {reportQuery.data?.homeCurrency ?? "—"} · Reporting: {resolvedReportingCurrency}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="grid grid-cols-2 gap-4">
-              <div>
-                <div className="text-xs uppercase text-muted-foreground">Revenue</div>
-                <div className="text-xl font-semibold">{formatCurrency(rollup?.revenueHome ?? null, rollup?.currency ?? resolvedReportingCurrency, locale)}</div>
-              </div>
-              <div>
-                <div className="text-xs uppercase text-muted-foreground">Occupancy</div>
-                <div className="text-xl font-semibold">{formatPercent(rollup?.occupancy ?? null)}</div>
-              </div>
-              <div>
-                <div className="text-xs uppercase text-muted-foreground">ADR</div>
-                <div className="text-lg font-semibold">
-                  {formatCurrency(rollup?.adr ?? null, rollup?.currency ?? resolvedReportingCurrency, locale)}
-                </div>
-              </div>
-              <div>
-                <div className="text-xs uppercase text-muted-foreground">RevPAR</div>
-                <div className="text-lg font-semibold">
-                  {formatCurrency(rollup?.revpar ?? null, rollup?.currency ?? resolvedReportingCurrency, locale)}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <ReportStatGrid
+            stats={[
+              { label: "Portfolio revenue", value: rollup ? formatCurrency(rollup.revenueHome, rollup.currency, locale) : "—" },
+              { label: "Occupancy", value: rollup ? formatPercent(rollup.occupancy) : "—" },
+              { label: "ADR", value: rollup ? formatCurrency(rollup.adr, rollup.currency, locale) : "—" },
+              { label: "RevPAR", value: rollup ? formatCurrency(rollup.revpar, rollup.currency, locale) : "—" }
+            ]}
+          />
 
-          <Card>
-            <CardHeader>
-              <CardTitle>FX context</CardTitle>
-              <CardDescription>
-                {currencyTaxQuery.data?.fxProvider?.toUpperCase?.() ?? "Default"} · Updated {currencyTaxQuery.data?.updatedAt ? new Date(currencyTaxQuery.data.updatedAt).toLocaleString() : "—"}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <div className="text-sm text-foreground">
-                Base: {currencyTaxQuery.data?.baseCurrency ?? "USD"} · Reporting: {resolvedReportingCurrency}
-              </div>
-              <div className="space-y-1">
-                {(currencyTaxQuery.data?.fxRates ?? []).map((r) => (
-                  <div key={`${r.base}-${r.quote}`} className="flex items-center justify-between rounded border border-border px-3 py-2">
-                    <span className="text-sm font-semibold">
-                      {r.base} → {r.quote}
-                    </span>
-                    <span className="text-sm text-foreground">{r.rate}</span>
-                  </div>
-                ))}
-                {!currencyTaxQuery.data?.fxRates?.length && <div className="text-sm text-muted-foreground">No exchange rates configured.</div>}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Routing</CardTitle>
-              <CardDescription>Per-park admin/guest endpoints</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {(reportQuery.data?.routing ?? []).map((route) => (
-                <div key={route.parkId} className="rounded-lg border border-border px-3 py-2">
-                  <div className="text-sm font-semibold">{route.parkId}</div>
-                  <div className="text-xs text-muted-foreground">Admin: {route.adminHost || "Not configured"}</div>
-                  <div className="text-xs text-muted-foreground">Guest: {route.guestHost || "Not configured"}</div>
-                  <div className="text-xs text-muted-foreground">Path: {route.path || "/campgrounds/:id"}</div>
-                </div>
-              ))}
-              {!reportQuery.data?.routing?.length && <div className="text-sm text-muted-foreground">No routing configuration found.</div>}
-            </CardContent>
-          </Card>
-        </div>
-
-        <Card>
-          <CardHeader className="flex flex-col gap-1">
-            <CardTitle>Per-park metrics</CardTitle>
-            <CardDescription>
-              Occupancy and ADR stay local; amounts convert when FX toggle is on. As of {reportQuery.data?.asOf ? new Date(reportQuery.data.asOf).toLocaleString() : "—"}.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+          <ReportSection
+            title="Per-park metrics"
+            description={`As of ${reportQuery.data?.asOf ? new Date(reportQuery.data.asOf).toLocaleString() : "—"}.`}
+          >
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
@@ -340,7 +241,7 @@ export default function PortfolioFxReportPage() {
                   {isLoading && (
                     <TableRow>
                       <TableCell colSpan={7} className="text-sm text-muted-foreground">
-                        Loading…
+                        Loading metrics...
                       </TableCell>
                     </TableRow>
                   )}
@@ -358,7 +259,7 @@ export default function PortfolioFxReportPage() {
                             <Badge variant="outline">{m.displayCurrency}</Badge>
                             {fxEnabled && m.currency !== resolvedReportingCurrency && (
                               <span className="text-xs text-muted-foreground">
-                                {m.currency} → {resolvedReportingCurrency} @ {m.fxRate}
+                                {m.currency} to {resolvedReportingCurrency} @ {m.fxRate}
                               </span>
                             )}
                           </div>
@@ -375,17 +276,8 @@ export default function PortfolioFxReportPage() {
                 </TableBody>
               </Table>
             </div>
-          </CardContent>
-        </Card>
-
-        <Separator />
-
-        <div className="flex items-center gap-3 text-xs text-muted-foreground">
-          <Badge variant="secondary">Beta</Badge>
-          <span>
-            Cross-park FX uses the existing portfolio and localization endpoints. Toggle currencies to preview conversions per park.
-          </span>
-        </div>
+          </ReportSection>
+        </ReportsV2Shell>
       </div>
     </DashboardShell>
   );

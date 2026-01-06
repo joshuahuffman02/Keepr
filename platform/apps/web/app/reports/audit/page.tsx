@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState, useMemo as useReactMemo } from "react";
+import { useEffect, useMemo as useReactMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { usePathname } from "next/navigation";
 import { DashboardShell } from "../../../components/ui/layout/DashboardShell";
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { apiClient } from "@/lib/api-client";
@@ -10,8 +11,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
+import { ReportsNavBar } from "@/components/reports/ReportsNavBar";
 
 export default function AuditLogPage() {
+  const pathname = usePathname();
   const [campgroundId, setCampgroundId] = useState<string | null>(null);
   const [actionFilter, setActionFilter] = useState<string>("all");
   const [entityFilter, setEntityFilter] = useState<string>("all");
@@ -55,6 +58,12 @@ export default function AuditLogPage() {
     return filtered;
   }, [auditQuery.data, entityFilter]);
 
+  const reportNavLinks = [
+    { label: "Saved", href: "/reports/saved", active: pathname === "/reports/saved" },
+    { label: "Portfolio", href: "/reports/portfolio", active: pathname.startsWith("/reports/portfolio") },
+    { label: "Devices", href: "/reports/devices", active: pathname.startsWith("/reports/devices") }
+  ];
+
   const formatDiff = (before: any, after: any) => {
     if (!before && !after) return null;
     const keys = Array.from(new Set([...(before ? Object.keys(before) : []), ...(after ? Object.keys(after) : [])]));
@@ -79,6 +88,12 @@ export default function AuditLogPage() {
     <DashboardShell>
       <div className="space-y-4">
         <Breadcrumbs items={[{ label: "Reports" }, { label: "Audit log" }]} />
+        <ReportsNavBar
+          activeTab="audits"
+          activeSubTab="audit-log"
+          dateRange={{ start, end }}
+          extraLinks={reportNavLinks}
+        />
         <Card>
           <CardContent className="p-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div>

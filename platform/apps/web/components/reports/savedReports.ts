@@ -13,6 +13,7 @@ export type SavedReport = {
     groupBy: string;
   };
   campgroundId?: string | null;
+  pinned?: boolean;
   createdAt: string;
   updatedAt: string;
 };
@@ -46,11 +47,13 @@ export function saveReport(report: Omit<SavedReport, "id" | "createdAt" | "updat
   const all = loadAll();
   const now = new Date().toISOString();
   const existingIdx = report.id ? all.findIndex((r) => r.id === report.id) : -1;
+  const existingPinned = existingIdx >= 0 ? all[existingIdx].pinned : undefined;
   const final: SavedReport = {
     id: report.id || randomId(),
     createdAt: existingIdx >= 0 ? all[existingIdx].createdAt : now,
     updatedAt: now,
     ...report,
+    pinned: report.pinned ?? existingPinned ?? false,
   };
   if (existingIdx >= 0) {
     all[existingIdx] = final;
@@ -70,3 +73,16 @@ export function findReport(id: string) {
   return loadAll().find((r) => r.id === id);
 }
 
+export function togglePinnedReport(id: string, pinned?: boolean) {
+  const all = loadAll();
+  const idx = all.findIndex((r) => r.id === id);
+  if (idx < 0) return;
+  const nextPinned = pinned ?? !all[idx].pinned;
+  all[idx] = {
+    ...all[idx],
+    pinned: nextPinned,
+    updatedAt: new Date().toISOString()
+  };
+  saveAll(all);
+  return all[idx];
+}

@@ -324,47 +324,47 @@ export function OverviewReport({ campgroundId }: OverviewReportProps) {
                 </div>
             )}
 
-            {/* Year-over-Year Comparison - Dark Theme */}
+            {/* Year-over-Year Comparison */}
             {yearOverYearStats && (
-                <div className="rounded-xl border border-border bg-muted/50 shadow-sm p-4 space-y-3">
+                <div className="rounded-xl border border-border bg-card shadow-sm p-4 space-y-3">
                     <div>
-                        <div className="text-lg font-semibold text-white">Year-over-Year Comparison</div>
+                        <div className="text-lg font-semibold text-foreground">Year-over-Year Comparison</div>
                         <div className="text-sm text-muted-foreground">{new Date().getFullYear()} vs {new Date().getFullYear() - 1}</div>
                     </div>
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                         <div className="space-y-2">
                             <div className="text-xs font-semibold text-muted-foreground uppercase">This Year</div>
-                            <div className="rounded-lg border border-blue-600/30 bg-blue-900/20 p-3">
-                                <div className="text-xs text-blue-400 mb-1">Bookings</div>
-                                <div className="text-2xl font-bold text-white">{yearOverYearStats.thisYear.bookings}</div>
+                            <div className="rounded-lg border border-primary/20 bg-primary/10 p-3">
+                                <div className="text-xs text-primary mb-1">Bookings</div>
+                                <div className="text-2xl font-bold text-foreground">{yearOverYearStats.thisYear.bookings}</div>
                             </div>
-                            <div className="rounded-lg border border-emerald-600/30 bg-emerald-900/20 p-3">
-                                <div className="text-xs text-emerald-400 mb-1">Revenue</div>
-                                <div className="text-2xl font-bold text-white">{formatCurrencyLocal(yearOverYearStats.thisYear.revenue, 0)}</div>
+                            <div className="rounded-lg border border-status-success/30 bg-status-success/10 p-3">
+                                <div className="text-xs text-status-success mb-1">Revenue</div>
+                                <div className="text-2xl font-bold text-foreground">{formatCurrencyLocal(yearOverYearStats.thisYear.revenue, 0)}</div>
                             </div>
                         </div>
                         <div className="space-y-2">
                             <div className="text-xs font-semibold text-muted-foreground uppercase">Last Year</div>
-                            <div className="rounded-lg border border-border/30 bg-muted/30 p-3">
+                            <div className="rounded-lg border border-border bg-muted p-3">
                                 <div className="text-xs text-muted-foreground mb-1">Bookings</div>
-                                <div className="text-2xl font-bold text-muted-foreground">{yearOverYearStats.lastYear.bookings}</div>
+                                <div className="text-2xl font-bold text-foreground">{yearOverYearStats.lastYear.bookings}</div>
                             </div>
-                            <div className="rounded-lg border border-border/30 bg-muted/30 p-3">
+                            <div className="rounded-lg border border-border bg-muted p-3">
                                 <div className="text-xs text-muted-foreground mb-1">Revenue</div>
-                                <div className="text-2xl font-bold text-muted-foreground">{formatCurrencyLocal(yearOverYearStats.lastYear.revenue, 0)}</div>
+                                <div className="text-2xl font-bold text-foreground">{formatCurrencyLocal(yearOverYearStats.lastYear.revenue, 0)}</div>
                             </div>
                         </div>
                         <div className="space-y-2">
                             <div className="text-xs font-semibold text-muted-foreground uppercase">Growth</div>
-                            <div className={`rounded-lg border p-3 ${yearOverYearStats.change.bookings >= 0 ? 'bg-green-900/20 border-green-600/30' : 'bg-red-900/20 border-red-600/30'}`}>
-                                <div className={`text-xs mb-1 ${yearOverYearStats.change.bookings >= 0 ? 'text-green-400' : 'text-red-400'}`}>Bookings</div>
-                                <div className={`text-2xl font-bold ${yearOverYearStats.change.bookings >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                            <div className={`rounded-lg border p-3 ${yearOverYearStats.change.bookings >= 0 ? 'bg-status-success/10 border-status-success/30' : 'bg-status-error/10 border-status-error/30'}`}>
+                                <div className={`text-xs mb-1 ${yearOverYearStats.change.bookings >= 0 ? 'text-status-success' : 'text-status-error'}`}>Bookings</div>
+                                <div className={`text-2xl font-bold ${yearOverYearStats.change.bookings >= 0 ? 'text-status-success' : 'text-status-error'}`}>
                                     {yearOverYearStats.change.bookings >= 0 ? '+' : ''}{yearOverYearStats.change.bookings}
                                 </div>
                             </div>
-                            <div className={`rounded-lg border p-3 ${parseFloat(yearOverYearStats.change.revenuePercent) >= 0 ? 'bg-green-900/20 border-green-600/30' : 'bg-red-900/20 border-red-600/30'}`}>
-                                <div className={`text-xs mb-1 ${parseFloat(yearOverYearStats.change.revenuePercent) >= 0 ? 'text-green-400' : 'text-red-400'}`}>Revenue</div>
-                                <div className={`text-2xl font-bold ${parseFloat(yearOverYearStats.change.revenuePercent) >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                            <div className={`rounded-lg border p-3 ${parseFloat(yearOverYearStats.change.revenuePercent) >= 0 ? 'bg-status-success/10 border-status-success/30' : 'bg-status-error/10 border-status-error/30'}`}>
+                                <div className={`text-xs mb-1 ${parseFloat(yearOverYearStats.change.revenuePercent) >= 0 ? 'text-status-success' : 'text-status-error'}`}>Revenue</div>
+                                <div className={`text-2xl font-bold ${parseFloat(yearOverYearStats.change.revenuePercent) >= 0 ? 'text-status-success' : 'text-status-error'}`}>
                                     {parseFloat(yearOverYearStats.change.revenuePercent) >= 0 ? '+' : ''}{yearOverYearStats.change.revenuePercent}%
                                 </div>
                             </div>
@@ -373,33 +373,33 @@ export function OverviewReport({ campgroundId }: OverviewReportProps) {
                 </div>
             )}
 
-            {/* Seasonal Performance - Dark Theme */}
+            {/* Seasonal Performance */}
             {seasonalStats && (
-                <div className="rounded-xl border border-border bg-muted/50 shadow-sm p-4 space-y-3">
+                <div className="rounded-xl border border-border bg-card shadow-sm p-4 space-y-3">
                     <div>
-                        <div className="text-lg font-semibold text-white">Seasonal Performance</div>
+                        <div className="text-lg font-semibold text-foreground">Seasonal Performance</div>
                         <div className="text-sm text-muted-foreground">Revenue and bookings by season</div>
                     </div>
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                         {seasonalStats.map(({ season, revenue, bookings, avgNights }) => {
                             const colorMap: Record<string, string> = {
-                                'Spring': 'bg-green-900/20 border-green-600/30',
-                                'Summer': 'bg-orange-900/20 border-orange-600/30',
-                                'Fall': 'bg-amber-900/20 border-amber-600/30',
-                                'Winter': 'bg-blue-900/20 border-blue-600/30'
+                                Spring: "bg-status-success/10 border-status-success/30",
+                                Summer: "bg-status-warning/10 border-status-warning/30",
+                                Fall: "bg-status-info/10 border-status-info/30",
+                                Winter: "bg-primary/10 border-primary/20"
                             };
                             const textColorMap: Record<string, string> = {
-                                'Spring': 'text-green-400',
-                                'Summer': 'text-orange-400',
-                                'Fall': 'text-amber-400',
-                                'Winter': 'text-blue-400'
+                                Spring: "text-status-success",
+                                Summer: "text-status-warning",
+                                Fall: "text-status-info",
+                                Winter: "text-primary"
                             };
                             return (
                                 <div key={season} className={`rounded-xl border shadow-sm ${colorMap[season]} p-3 space-y-2`}>
                                     <div className={`text-sm font-bold ${textColorMap[season]}`}>{season}</div>
                                     <div className="space-y-1">
                                         <div className="text-xs text-muted-foreground">Revenue</div>
-                                        <div className="text-lg font-bold text-white">{formatCurrencyLocal(revenue, 0)}</div>
+                                        <div className="text-lg font-bold text-foreground">{formatCurrencyLocal(revenue, 0)}</div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-2 text-xs">
                                         <div>

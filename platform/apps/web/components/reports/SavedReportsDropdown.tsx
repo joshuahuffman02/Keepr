@@ -6,6 +6,7 @@ import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
 import { ChevronDown, Clock, Trash2, BookmarkCheck } from "lucide-react";
 import Link from "next/link";
+import { buildReportHref } from "@/lib/report-links";
 
 interface SavedReportsDropdownProps {
   campgroundId: string | null;
@@ -86,7 +87,12 @@ export function SavedReportsDropdown({ campgroundId, onLoadReport }: SavedReport
               ) : (
                 <div className="divide-y divide-border">
                   {reports.map((report) => {
-                    const url = `/reports?tab=${report.tab}${report.subTab ? `&sub=${report.subTab}` : ""}${report.dateRange ? `&start=${report.dateRange.start}&end=${report.dateRange.end}` : ""}${report.filters?.status ? `&status=${report.filters.status}` : ""}${report.filters?.siteType ? `&siteType=${report.filters.siteType}` : ""}${report.filters?.groupBy ? `&groupBy=${report.filters.groupBy}` : ""}`;
+                    const url = buildReportHref({
+                      tab: report.tab,
+                      subTab: report.subTab ?? null,
+                      dateRange: report.dateRange,
+                      filters: report.filters
+                    });
 
                     return (
                       <div

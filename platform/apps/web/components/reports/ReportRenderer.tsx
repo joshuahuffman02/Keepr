@@ -1,4 +1,4 @@
-import { ReportTab } from "@/app/reports/registry";
+import { ReportTab } from "@/lib/report-registry";
 import { OverviewReport } from "./definitions/OverviewReport";
 import { ArrivalsReport } from "./definitions/ArrivalsReport";
 import { RevenueBySourceReport } from "./definitions/RevenueBySourceReport";
