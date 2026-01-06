@@ -105,57 +105,48 @@ pnpm lint:web               # Lint web app
 4. **Money in cents** - All amounts are integers (e.g., `9999` = $99.99)
 5. **No emojis** - Use Lucide SVG icons instead (professional and scalable)
 
-### DOCKER & RAILWAY CONFIG - CRITICAL
+### Deployment Architecture
 
-These files control Railway deployment. **Reference `docs/RAILWAY_TROUBLESHOOTING.md` for detailed debugging.**
+| Environment | Frontend | API | Database |
+|-------------|----------|-----|----------|
+| **Production** | Vercel (`keeprstay.com`) | Railway (`api.keeprstay.com`) | Supabase (main) |
+| **Staging** | Vercel (`staging.keeprstay.com`) | Railway (`api-staging.keeprstay.com`) | Supabase (staging branch) |
+| **Preview** | Vercel (auto PR previews) | N/A | N/A |
 
-| File | Purpose | Notes |
-|------|---------|-------|
-| `Dockerfile.api` | API Docker build | Uses `./start.sh` |
-| `Dockerfile.web` | Web Docker build | **MUST use `pnpm exec`** |
-| `railway.toml` | Root Railway config | Shared build settings |
-
-**Current working configuration (Jan 2026):**
-
-```dockerfile
-# Dockerfile.api
-EXPOSE 4000
-CMD ["./start.sh"]
-# Railway injects PORT=8080, so Target Port = 8080 in dashboard
-
-# Dockerfile.web - CRITICAL: Use pnpm exec, NOT absolute paths!
-EXPOSE 3000
-CMD ["pnpm", "exec", "next", "start", "-H", "0.0.0.0", "-p", "3000"]
-# pnpm doesn't hoist packages like npm/yarn - absolute paths WILL FAIL
+**Branch Strategy:**
+```
+feature/* ─→ PR to staging ─→ merge ─→ test on staging ─→ PR to main ─→ production
 ```
 
-**Railway Dashboard Settings:**
-- API: Target Port = 8080
-- Web: Target Port = 3000
+### CI/CD Pipeline
 
-### RAILWAY TROUBLESHOOTING - READ THIS FIRST
+GitHub Actions runs automatically on PRs to `main` or `staging`:
 
-**Common Issues & Quick Fixes:**
+| Job | What it does |
+|-----|--------------|
+| `lint` | ESLint checks |
+| `test-api` | API smoke tests with PostgreSQL |
+| `test-sdk` | SDK unit tests |
+| `build` | Full build verification |
+| `e2e` | Playwright E2E tests (PRs only) |
 
-| Symptom | Cause | Fix |
-|---------|-------|-----|
-| `Cannot find module '/app/node_modules/next/...'` | pnpm doesn't hoist packages | Use `pnpm exec next` instead of absolute path |
-| Build completes but immediately restarts (loop) | Watch Paths includes deleted file | Remove non-existent paths from Settings → Build → Watch Paths |
-| New deployment stuck "Waiting for build..." | Old build blocking queue | Cancel stuck build via deployment menu (⋮) |
-| 502 Bad Gateway but "Deployment successful" | Runtime crash, not build failure | Check **Deploy Logs** (not Build Logs) |
+**Deployment triggers:**
+- Push to `staging` → deploys to staging environments
+- Push to `main` → deploys to production
 
-**Debugging Steps:**
-1. Check **Deploy Logs** first (runtime errors) - Build Logs only show compile issues
-2. If build loops: Settings → Build → Watch Paths - remove any deleted files
-3. If queue stuck: Cancel old deployments via ⋮ menu → Remove
-4. Verify environment variables exist (especially `NEXT_PUBLIC_API_BASE`)
+See `docs/DEVELOPER_WORKFLOW.md` for the complete workflow guide.
 
-**Watch Paths Best Practices:**
-- Only include paths that **actually exist** in the repo
-- Good: `/platform/apps/web/**`, `/Dockerfile.web`
-- Bad: `/railway.web.toml` (if file was deleted)
+### Environment-Based Configuration
 
-See `docs/RAILWAY_TROUBLESHOOTING.md` for complete debugging guide.
+API URLs are configured via `NEXT_PUBLIC_API_BASE` environment variable:
+
+| Environment | NEXT_PUBLIC_API_BASE |
+|-------------|---------------------|
+| Local | `http://localhost:4000/api` |
+| Staging | `https://api-staging.keeprstay.com/api` |
+| Production | `https://api.keeprstay.com/api` |
+
+The centralized config is in `platform/apps/web/lib/api-config.ts`.
 
 ---
 
@@ -226,16 +217,16 @@ cancelled
 
 ## Important Documentation
 
-**AI-First Development:**
+**Development & Deployment:**
+- `docs/DEVELOPER_WORKFLOW.md` - Branch strategy, CI/CD, deployment process
 - `docs/AI_FIRST_DEVELOPMENT.md` - Complete guide to Zod, Sentry, Testing
 - `docs/RUST_MIGRATION_PLAN.md` - Plan for migrating to Rust
-- `docs/RAILWAY_BACKUP_SETUP.md` - Database backup setup ($5/month)
 - `docs/OPENAI_INTEGRATION.md` - OpenAI + pgvector semantic search
 
 **Read these when:**
+- Deploying or setting up CI/CD → DEVELOPER_WORKFLOW.md
 - Building new features → AI_FIRST_DEVELOPMENT.md
 - After first customers → RUST_MIGRATION_PLAN.md
-- Before deploying → RAILWAY_BACKUP_SETUP.md
 - Adding AI features → OPENAI_INTEGRATION.md
 
 ## Known Issues & Technical Debt
@@ -420,7 +411,27 @@ NEXTAUTH_SECRET=...
 
 ## Deployment
 
-- **Platform**: Railway (auto-deploy on push to main)
-- **Database**: Railway PostgreSQL
-- **Build**: `tsup` for API, `next build` for Web
-- **Health check**: `GET /health` returns `{ status: "ok" }`
+**Platforms:**
+- **Frontend**: Vercel (auto-deploy on push)
+- **API**: Railway (auto-deploy on push)
+- **Database**: Supabase PostgreSQL (with GitHub branching integration)
+- **DNS**: Cloudflare
+
+**URLs:**
+| Environment | Frontend | API | Health Check |
+|-------------|----------|-----|--------------|
+| Production | https://keeprstay.com | https://api.keeprstay.com | `/api/health` |
+| Staging | https://staging.keeprstay.com | https://api-staging.keeprstay.com | `/api/health` |
+
+**Build tools:**
+- API: `tsup` (not `tsc`)
+- Web: `next build`
+
+**To deploy:**
+1. Create feature branch from `staging`
+2. Make changes, push, create PR to `staging`
+3. CI runs automatically - merge when green
+4. Test on staging environment
+5. Create PR from `staging` to `main` for production
+
+See `docs/DEVELOPER_WORKFLOW.md` for complete guide.
