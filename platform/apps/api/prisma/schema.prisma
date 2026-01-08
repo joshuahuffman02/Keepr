@@ -97,6 +97,19 @@ enum SenderType {
   staff
 }
 
+// AI Chat System enums
+enum ChatParticipantType {
+  guest
+  staff
+}
+
+enum ChatMessageRole {
+  user
+  assistant
+  tool
+  system
+}
+
 enum TaxRuleType {
   percentage
   flat
@@ -1568,6 +1581,9 @@ model Campground {
   analyticsFunnels      AnalyticsFunnel[]
   analyticsAnomalies    AnalyticsAnomaly[]
   analyticsStaffMetrics AnalyticsStaffMetrics[]
+
+  // AI Chat System
+  chatConversations ChatConversation[]
 
   // Soft delete
   deletedAt DateTime?
@@ -11188,4 +11204,44 @@ model CampgroundSeedJob {
   @@index([source])
   @@index([status])
   @@index([createdAt])
+}
+
+// =============================================================================
+// AI Chat System
+// =============================================================================
+
+model ChatConversation {
+  id              String              @id @default(cuid())
+  campgroundId    String
+  participantType ChatParticipantType
+  participantId   String              // guestId or userId depending on participantType
+  title           String?             // Optional summary/title generated from conversation
+  metadata        Json?               // Additional context (e.g., current reservation, role)
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  campground Campground       @relation(fields: [campgroundId], references: [id], onDelete: Cascade)
+  messages   ChatMessage[]
+
+  @@index([campgroundId])
+  @@index([participantType, participantId])
+  @@index([campgroundId, participantType])
+  @@index([updatedAt])
+}
+
+model ChatMessage {
+  id             String          @id @default(cuid())
+  conversationId String
+  role           ChatMessageRole
+  content        String          @db.Text
+  toolCalls      Json?           // Array of tool invocations: { name, args, id }
+  toolResults    Json?           // Tool execution results: { toolCallId, result }
+  metadata       Json?           // Additional data (tokens used, latency, etc.)
+  createdAt      DateTime        @default(now())
+
+  conversation ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([conversationId, createdAt])
+  @@index([role])
 }

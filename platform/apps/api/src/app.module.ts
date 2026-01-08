@@ -58,6 +58,7 @@ import { FormsModule } from './forms/forms.module';
 import { SocialPlannerModule } from './social-planner/social-planner.module';
 import { AnalyticsModule } from "./analytics/analytics.module";
 import { AiModule } from "./ai/ai.module";
+import { ChatModule } from "./chat/chat.module";
 import { SemanticSearchModule } from "./semantic-search/semantic-search.module";
 import { GamificationModule } from "./gamification/gamification.module";
 import { PushSubscriptionsModule } from "./push-subscriptions/push-subscriptions.module";
@@ -207,6 +208,7 @@ import { RustServicesModule } from "./rust-services/rust-services.module";
     GamificationModule,
     AnalyticsModule,
     AiModule,
+    ChatModule, // AI Chat System
     SemanticSearchModule,
     PushSubscriptionsModule,
     PerfModule,
