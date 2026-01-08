@@ -25,7 +25,7 @@ import { ChatParticipantType, Guest } from '@prisma/client';
 // Types for authenticated staff requests
 interface StaffAuthenticatedRequest extends Request {
   user: {
-    sub: string;
+    id: string;
     email: string;
     campgroundId?: string;
     role?: string;
@@ -65,12 +65,12 @@ export class ChatController {
     @Body() dto: SendMessageDto,
     @Request() req: StaffAuthenticatedRequest,
   ): Promise<ChatMessageResponse> {
-    this.logger.log(`Staff chat message from user ${req.user.sub}`);
+    this.logger.log(`Staff chat message from user ${req.user.id}`);
 
     return this.chatService.sendMessage(dto, {
       campgroundId,
       participantType: ChatParticipantType.staff,
-      participantId: req.user.sub,
+      participantId: req.user.id,
       role: this.getStaffRole(req, campgroundId),
     });
   }
@@ -88,13 +88,13 @@ export class ChatController {
     @Body() dto: SendMessageDto,
     @Request() req: StaffAuthenticatedRequest,
   ): Promise<{ status: string; message: string }> {
-    this.logger.log(`Staff chat stream from user ${req.user.sub}`);
+    this.logger.log(`Staff chat stream from user ${req.user.id}`);
 
     // Fire and forget - response comes via WebSocket
     this.chatService.sendMessageStream(dto, {
       campgroundId,
       participantType: ChatParticipantType.staff,
-      participantId: req.user.sub,
+      participantId: req.user.id,
       role: this.getStaffRole(req, campgroundId),
     }).catch(err => {
       this.logger.error('Staff stream error:', err);
@@ -119,7 +119,7 @@ export class ChatController {
     return this.chatService.executeAction(dto, {
       campgroundId,
       participantType: ChatParticipantType.staff,
-      participantId: req.user.sub,
+      participantId: req.user.id,
       role: this.getStaffRole(req, campgroundId),
     });
   }
@@ -138,7 +138,7 @@ export class ChatController {
     return this.chatService.getHistory(dto, {
       campgroundId,
       participantType: ChatParticipantType.staff,
-      participantId: req.user.sub,
+      participantId: req.user.id,
       role: this.getStaffRole(req, campgroundId),
     });
   }
