@@ -113,6 +113,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     // Save user message
     const userMessage = await this.prisma.chatMessage.create({
       data: {
+        id: randomUUID(),
         conversationId: conversation.id,
         role: ChatMessageRole.user,
         content: message,
@@ -180,6 +181,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
       // Save assistant message
       const assistantMessage = await this.prisma.chatMessage.create({
         data: {
+          id: randomUUID(),
           conversationId: conversation.id,
           role: ChatMessageRole.assistant,
           content: finalContent,
@@ -210,6 +212,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
       // Save error as system message
       await this.prisma.chatMessage.create({
         data: {
+          id: randomUUID(),
           conversationId: conversation.id,
           role: ChatMessageRole.system,
           content: 'I encountered an error processing your request. Please try again.',
@@ -239,6 +242,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     // Save user message
     await this.prisma.chatMessage.create({
       data: {
+        id: randomUUID(),
         conversationId: conversation.id,
         role: ChatMessageRole.user,
         content: message,
@@ -336,6 +340,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
           // Save partial assistant message
           const assistantMessage = await this.prisma.chatMessage.create({
             data: {
+              id: randomUUID(),
               conversationId: conversation.id,
               role: ChatMessageRole.assistant,
               content: finalContent || 'I need your confirmation to proceed.',
@@ -377,6 +382,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
       // Save assistant message
       const assistantMessage = await this.prisma.chatMessage.create({
         data: {
+          id: randomUUID(),
           conversationId: conversation.id,
           role: ChatMessageRole.assistant,
           content: finalContent,
@@ -414,6 +420,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
       // Save error as system message
       await this.prisma.chatMessage.create({
         data: {
+          id: randomUUID(),
           conversationId: conversation.id,
           role: ChatMessageRole.system,
           content: 'I encountered an error processing your request. Please try again.',
@@ -494,6 +501,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
       // Save tool execution as message
       await this.prisma.chatMessage.create({
         data: {
+          id: randomUUID(),
           conversationId,
           role: ChatMessageRole.tool,
           content: `Executed: ${pendingAction.tool}`,
@@ -625,6 +633,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
   private async createConversation(context: ChatContext) {
     return this.prisma.chatConversation.create({
       data: {
+        id: randomUUID(),
         campgroundId: context.campgroundId,
         participantType: context.participantType,
         participantId: context.participantId,
@@ -632,6 +641,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
           role: context.role,
           currentReservationId: context.currentReservationId,
         },
+        updatedAt: new Date(),
       },
     });
   }
