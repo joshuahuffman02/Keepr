@@ -5,19 +5,24 @@ Scope: hardening only (no new features). Owners are suggested; update status as 
 ### Observability & reliability
 | Item | Owner | Status | Notes |
 | --- | --- | --- | --- |
-| `/health` (liveness) + `/ready` (DB/cache/queue reachability) | Backend | TODO | Split liveness vs readiness for rollout safety |
-| Cron/queues: emit success/failure/lag; alert on lag >5m or failure >1% | Platform | TODO | Add metrics + PagerDuty/Slack routes |
-| OTA sync: success rate/latency/backlog; alert on drop >5% or backlog >15m | Integrations | TODO | Per-provider breakdown |
-| Comms: delivery %, bounce/complaint %, SMS DLR; alert on delivery <98% or bounce >2% | Messaging | TODO | Wire bounce/DLR webhooks |
-| Perf budgets: LCP <2.5s p75, TTFB <500ms; API p95 <400ms (pricing, workflow, staff scheduling, portfolio, OTA kick-off) | FE/BE | TODO | Enforce via budgets/tests |
+| `/health` (liveness) + `/ready` (DB/cache/queue reachability) | Backend | DONE | `health.controller.ts` + `health.service.ts` with DB, Redis, queue checks |
+| Cron/queues: emit success/failure/lag; alert on lag >5m or failure >1% | Platform | DONE | `observability.service.ts` + `alert-monitor.service.ts` with SLO thresholds |
+| OTA sync: success rate/latency/backlog; alert on drop >5% or backlog >15m | Integrations | DONE | `recordOtaStatus()` + OTA monitoring in alert-monitor |
+| Comms: delivery %, bounce/complaint %, SMS DLR; alert on delivery <98% or bounce >2% | Messaging | DONE | `recordCommsStatus()` with delivery/bounce/complaint tracking |
+| Perf budgets: LCP <2.5s p75, TTFB <500ms; API p95 <400ms | FE/BE | DONE | SLO targets in `observability.service.ts` (configurable via env) |
+| Sentry error tracking | Platform | DONE | Full integration in API + Web (needs DSN env var) |
+| Alert sinks (Slack, PagerDuty) | Platform | DONE | `alert-sinks.service.ts` with rate limiting |
+| Synthetic checks (DB, Redis, Stripe, Email) | Platform | DONE | `synthetic-checks.service.ts` with configurable intervals |
 
 ### Security & compliance
 | Item | Owner | Status | Notes |
 | --- | --- | --- | --- |
-| Auth guards on new pages (pricing, workflows, staff scheduling, portfolio) + server actions ownership checks | Security | TODO | Verify both UI routing and server actions |
+| Auth guards on new pages (pricing, workflows, staff scheduling, portfolio) + server actions ownership checks | Security | DONE | Middleware protects all /dashboard routes; ScopeGuard validates campgroundId on API |
 | PII redaction in logs/traces (phone/email/card-last4) + sample review | Platform | DONE | Implemented redacting logger in API (`platform/apps/api/src/logger/redacting.logger.ts`) |
+| Rate limiting | Platform | DONE | @Throttle decorators on all endpoints; configurable via env |
+| Multi-tenant isolation | Platform | DONE | ScopeGuard validates user.memberships contains campgroundId |
 | Consent/SMS/email compliance: opt-in stored, unsubscribe visible, quiet hours, sender ID/shortcode rules | Messaging/Legal | TODO | Confirm auditability |
-| Backup/DR: validate RPO/RTO, recent restore test, tabletop for OTA outage + comms provider failover | Infra | TODO | Schedule drill |
+| Backup/DR: validate RPO/RTO, recent restore test, tabletop for OTA outage + comms provider failover | Infra | TODO | Schedule drill (Supabase has auto backups) |
 
 ### UX polish
 | Item | Owner | Status | Notes |
@@ -37,11 +42,11 @@ Scope: hardening only (no new features). Owners are suggested; update status as 
 | OTA sync happy-path: push listing + pull reservation; monitoring events emitted | QA/Integrations | TODO | Include provider variance |
 
 ### Quick wins to do first
-- Add lag/failure alerts for cron/queues.
-- Add OTA backlog gauge + >15m alert.
-- Enable log redaction filter and spot-check logs.
-- Add empty/error/loading states on new pages.
-- Run a fast keyboard/contrast a11y pass.
+- [x] ~~Add lag/failure alerts for cron/queues.~~ - Done via `alert-monitor.service.ts`
+- [x] ~~Add OTA backlog gauge + >15m alert.~~ - Done via `recordOtaStatus()` + alert-monitor
+- [x] ~~Enable log redaction filter and spot-check logs.~~ - Done via `redacting.logger.ts`
+- [ ] Add empty/error/loading states on new pages.
+- [ ] Run a fast keyboard/contrast a11y pass.
 
 ### Config/env to stage
 - `PAGERDUTY_SERVICE_KEY`, `SLACK_ALERT_WEBHOOK`, `OTEL_EXPORTER_OTLP_ENDPOINT`, `METRICS_NAMESPACE=campreserv`.

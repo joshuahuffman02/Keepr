@@ -1,7 +1,12 @@
 [build]
 builder = "DOCKERFILE"
 dockerfilePath = "/Dockerfile.api"
-watchPatterns = []
+watchPatterns = [
+  "platform/apps/api/**",
+  "platform/packages/shared/**",
+  "Dockerfile.api",
+  "pnpm-lock.yaml"
+]
 
 [deploy]
 restartPolicyType = "ON_FAILURE"

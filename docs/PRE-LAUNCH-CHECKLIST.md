@@ -28,20 +28,21 @@ Actionable steps required before going live with paying customers.
 ## 2. Domain & SSL
 
 ### Current State
-- Using Railway's default subdomain (`*.up.railway.app`)
+- [x] **COMPLETE** - Custom domains configured:
+  - Production: `keeprstay.com` (Vercel) + `api.keeprstay.com` (Railway)
+  - Staging: `staging.keeprstay.com` (Vercel) + `api-staging.keeprstay.com` (Railway)
+- [x] SSL certificates active (auto via Vercel/Railway)
+- [x] DNS managed via Cloudflare
 
 ### Action Items
-- [ ] Purchase domain (e.g., `campeveryday.com` or `campreserv.com`)
-- [ ] Add custom domain in Railway dashboard for both services:
-  - API: `api.campeveryday.com`
-  - Web: `app.campeveryday.com` (or just `campeveryday.com`)
-- [ ] Configure DNS records as Railway instructs (CNAME)
-- [ ] SSL certificates are automatic via Railway
-- [ ] Update all hardcoded URLs in codebase:
-  - `NEXT_PUBLIC_API_URL`
-  - `NEXTAUTH_URL`
-  - OAuth callback URLs
-  - Email templates
+- [x] ~~Purchase domain~~ - `keeprstay.com` acquired
+- [x] ~~Add custom domain in Vercel for frontend~~
+- [x] ~~Add custom domain in Railway for API~~
+- [x] ~~Configure DNS records (Cloudflare)~~
+- [x] ~~SSL certificates~~ - automatic
+- [x] ~~Update environment variables~~:
+  - `NEXT_PUBLIC_API_BASE` configured per environment
+  - `NEXTAUTH_URL` set correctly
 
 ---
 
@@ -53,7 +54,7 @@ Actionable steps required before going live with paying customers.
 ### Action Items
 - [ ] Create Intuit Developer account: https://developer.intuit.com/
 - [ ] Create a new app (QuickBooks Online and Payments)
-- [ ] Set OAuth redirect URI: `https://api.campeveryday.com/integrations/oauth/qbo/callback`
+- [ ] Set OAuth redirect URI: `https://api.keeprstay.com/integrations/oauth/qbo/callback`
 - [ ] Get credentials and set in Railway:
   ```
   QBO_CLIENT_ID=...
@@ -67,77 +68,74 @@ Actionable steps required before going live with paying customers.
 ## 4. Email Provider
 
 ### Current State
-- Using development/test email setup
+- [x] **COMPLETE** - Resend integration built (`email.service.ts`)
+- Supports Resend (primary), Postmark, and SMTP fallback
+- All transactional email templates implemented
 
 ### Action Items
-- [ ] Choose email provider: **Resend**, **SendGrid**, **Postmark**, or **AWS SES**
-- [ ] Create account and verify sending domain
-- [ ] Set environment variables:
-  ```
-  EMAIL_PROVIDER=resend  (or sendgrid, etc.)
-  EMAIL_API_KEY=...
-  EMAIL_FROM=hello@campeveryday.com
-  ```
-- [ ] Configure SPF, DKIM, and DMARC DNS records for deliverability
-- [ ] Test all transactional emails:
-  - Reservation confirmation
-  - Payment receipt
-  - Password reset
-  - Check-in reminder
+- [x] ~~Choose email provider~~ - Resend selected
+- [x] ~~Integration code~~ - Full Resend API integration in `email.service.ts`
+- [ ] Set `RESEND_API_KEY` in Railway (or use `onboarding@resend.dev` for testing)
+- [ ] Verify sending domain in Resend dashboard for production
+- [ ] Configure SPF, DKIM, DMARC DNS records (in Cloudflare)
+- [ ] Test transactional emails work in staging
 
 ---
 
 ## 5. SMS Provider (Optional)
 
 ### Current State
-- SMS not configured
+- [x] **COMPLETE** - Twilio integration built (`sms.service.ts`)
+- SMS delivery tracking and DLR (delivery receipts) supported
 
 ### Action Items
-- [ ] Choose provider: **Twilio** or **AWS SNS**
-- [ ] Create account, get phone number
-- [ ] Set environment variables:
+- [x] ~~Choose provider~~ - Twilio selected
+- [x] ~~Integration code~~ - Full Twilio integration in `sms.service.ts`
+- [ ] Set Twilio env vars in Railway:
   ```
   TWILIO_ACCOUNT_SID=...
   TWILIO_AUTH_TOKEN=...
   TWILIO_PHONE_NUMBER=+1...
   ```
-- [ ] Test SMS for check-in reminders, gate codes
+- [ ] Test SMS for check-in reminders
 
 ---
 
 ## 6. Database
 
 ### Current State
-- Using Railway Postgres (good for production)
+- [x] **COMPLETE** - Using Supabase PostgreSQL with GitHub branching integration
+- Production database on main Supabase project
+- Staging uses Supabase branch database
 
 ### Action Items
-- [ ] Enable automated backups in Railway
-- [ ] Set up point-in-time recovery if available
+- [x] ~~Automated backups~~ - enabled via Supabase
+- [x] ~~Point-in-time recovery~~ - available via Supabase
 - [ ] Document backup/restore procedure
-- [ ] Consider connection pooling for scale (PgBouncer)
+- [x] ~~Connection pooling~~ - Supabase Pooler enabled
 
 ---
 
 ## 7. Authentication & Security
 
 ### Current State
-- NextAuth configured with basic setup
+- [x] **MOSTLY COMPLETE** - NextAuth v5 configured with JWT strategy
+- [x] Rate limiting via `@nestjs/throttler` on all endpoints
+- [x] ScopeGuard validates campgroundId ownership on every request
+- [x] RolesGuard enforces role-based access control
+- [x] Account lockout after failed login attempts
 
 ### Action Items
-- [ ] Generate new production secrets:
+- [x] ~~Rate limiting~~ - Implemented via @Throttle decorators
+- [x] ~~Auth guards~~ - JwtAuthGuard, ScopeGuard, RolesGuard all active
+- [x] ~~Multi-tenant isolation~~ - ScopeGuard validates user memberships
+- [ ] Generate new production secrets (if not already set):
   ```bash
   openssl rand -base64 32  # For NEXTAUTH_SECRET
   openssl rand -base64 32  # For JWT_SECRET
   ```
-- [ ] Set in Railway:
-  ```
-  NEXTAUTH_SECRET=...
-  JWT_SECRET=...
-  NEXTAUTH_URL=https://app.campeveryday.com
-  ```
-- [ ] Review and test password reset flow
-- [ ] Consider adding rate limiting for auth endpoints
-- [ ] Enable HTTPS-only cookies in production
+- [ ] Verify NEXTAUTH_URL is set correctly in Vercel
+- [ ] Test password reset flow in staging
 
 ---
 
@@ -163,17 +161,23 @@ Actionable steps required before going live with paying customers.
 
 ## 9. Monitoring & Alerts
 
+### Current State
+- [x] **COMPLETE** - Full observability stack built
+- [x] Sentry integration ready (`sentry.ts` + `sentry.*.config.ts`)
+- [x] Health endpoints: `/health` (liveness) + `/ready` (readiness)
+- [x] Prometheus metrics with SLO tracking
+- [x] Alert sinks: Slack + PagerDuty integration
+- [x] Synthetic checks: DB, Redis, Stripe, Email
+- [x] Queue lag monitoring with alerts
+
 ### Action Items
-- [ ] Set up error tracking: **Sentry** (recommended)
-  ```
-  SENTRY_DSN=...
-  ```
-- [ ] Set up uptime monitoring: **BetterUptime**, **UptimeRobot**, or Railway's built-in
-- [ ] Configure Slack/Discord alerts for:
-  - Deployment failures
-  - Error spikes
-  - Payment failures
-- [ ] Set up basic analytics: **Plausible**, **PostHog**, or **Vercel Analytics**
+- [x] ~~Error tracking code~~ - Sentry fully integrated
+- [x] ~~Health endpoints~~ - `/health` and `/ready` implemented
+- [x] ~~Alert infrastructure~~ - AlertSinksService with rate limiting
+- [ ] Set `SENTRY_DSN` in Railway (API) and `NEXT_PUBLIC_SENTRY_DSN` in Vercel (Web)
+- [ ] Set `SLACK_WEBHOOK_URL` for Slack alerts (or `PAGERDUTY_ROUTING_KEY` for PagerDuty)
+- [ ] Set up external uptime monitoring (BetterUptime/UptimeRobot) pointing to `/health`
+- [ ] Optional: Add Vercel Analytics or PostHog for product analytics
 
 ---
 
@@ -193,7 +197,7 @@ Actionable steps required before going live with paying customers.
 ### Xero (International Accounting)
 - [ ] Register at https://developer.xero.com/
 - [ ] Set `XERO_CLIENT_ID`, `XERO_CLIENT_SECRET`
-- [ ] Callback: `https://api.campeveryday.com/integrations/oauth/xero/callback`
+- [ ] Callback: `https://api.keeprstay.com/integrations/oauth/xero/callback`
 
 ### HubSpot (CRM)
 - [ ] Register at https://developers.hubspot.com/
@@ -219,29 +223,43 @@ Actionable steps required before going live with paying customers.
 
 ## Environment Variables Summary
 
+### Railway (API) - Required
 ```bash
-# Production Essentials
 NODE_ENV=production
-DATABASE_URL=postgresql://...
-
-# Domain
-NEXT_PUBLIC_API_URL=https://api.campeveryday.com
-NEXTAUTH_URL=https://app.campeveryday.com
+DATABASE_URL=postgresql://...    # Supabase connection string
 
 # Auth
-NEXTAUTH_SECRET=<generate new>
-JWT_SECRET=<generate new>
+JWT_SECRET=<generate with: openssl rand -base64 32>
 
-# Stripe (LIVE)
-STRIPE_SECRET_KEY=sk_live_...
-STRIPE_PUBLISHABLE_KEY=pk_live_...
+# Stripe (switch to sk_live_... when ready)
+STRIPE_SECRET_KEY=sk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
 
-# Email
-EMAIL_PROVIDER=resend
-EMAIL_API_KEY=...
-EMAIL_FROM=hello@campeveryday.com
+# Email (Resend)
+RESEND_API_KEY=re_...
 
+# SMS (Twilio) - Optional
+TWILIO_ACCOUNT_SID=...
+TWILIO_AUTH_TOKEN=...
+TWILIO_PHONE_NUMBER=+1...
+
+# Monitoring
+SENTRY_DSN=https://...@sentry.io/...
+SLACK_WEBHOOK_URL=https://hooks.slack.com/...  # For alerts
+```
+
+### Vercel (Web) - Required
+```bash
+NEXT_PUBLIC_API_BASE=https://api.keeprstay.com/api
+NEXTAUTH_URL=https://keeprstay.com
+NEXTAUTH_SECRET=<generate with: openssl rand -base64 32>
+AUTH_SECRET=<same as NEXTAUTH_SECRET>
+NEXT_PUBLIC_SENTRY_DSN=https://...@sentry.io/...
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+```
+
+### Optional Integrations
+```bash
 # QuickBooks
 QBO_CLIENT_ID=...
 QBO_CLIENT_SECRET=...
@@ -249,26 +267,34 @@ QBO_CLIENT_SECRET=...
 # File Storage
 AWS_ACCESS_KEY_ID=...
 AWS_SECRET_ACCESS_KEY=...
-AWS_S3_BUCKET=...
-
-# Monitoring
-SENTRY_DSN=...
+AWS_S3_BUCKET=keepr-uploads
 ```
 
 ---
 
 ## Launch Day Checklist
 
-- [ ] All environment variables set in Railway production
-- [ ] DNS propagated (check with `dig` or online tools)
-- [ ] SSL working on custom domain
-- [ ] Real Stripe payment test passed
-- [ ] Email delivery confirmed
-- [ ] Monitoring/alerts active
-- [ ] Backup verified
+### Infrastructure (Already Done)
+- [x] DNS configured (Cloudflare)
+- [x] SSL working on custom domains
+- [x] Database backups enabled (Supabase)
+- [x] Health endpoints responding
+
+### Before Launch
+- [ ] All env vars set in Railway + Vercel (see summary above)
+- [ ] Sentry DSN configured and test error captured
+- [ ] Slack webhook configured and test alert sent
+- [ ] Stripe webhook verified for production URL
+- [ ] Email delivery tested (Resend)
+- [ ] Full booking flow tested end-to-end
+
+### Go Live
+- [ ] Switch Stripe to live mode keys
+- [ ] Test real $1 payment + refund
+- [ ] Monitor error dashboard for first 24 hours
 - [ ] Support email/chat ready
 - [ ] Announcement ready (social, email list)
 
 ---
 
-**Last Updated:** December 2024
+**Last Updated:** January 2026
