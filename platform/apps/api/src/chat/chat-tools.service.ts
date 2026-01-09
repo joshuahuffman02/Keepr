@@ -287,9 +287,9 @@ export class ChatToolsService {
         if (query) {
           where.OR = [
             { confirmationCode: { contains: query, mode: 'insensitive' } },
-            { guest: { firstName: { contains: query, mode: 'insensitive' } } },
-            { guest: { lastName: { contains: query, mode: 'insensitive' } } },
-            { guest: { email: { contains: query, mode: 'insensitive' } } },
+            { Guest: { primaryFirstName: { contains: query, mode: 'insensitive' } } },
+            { Guest: { primaryLastName: { contains: query, mode: 'insensitive' } } },
+            { Guest: { email: { contains: query, mode: 'insensitive' } } },
           ];
         }
 
@@ -306,7 +306,7 @@ export class ChatToolsService {
         const reservations = await prisma.reservation.findMany({
           where,
           include: {
-            Guest: { select: { firstName: true, lastName: true, email: true, phone: true } },
+            Guest: { select: { primaryFirstName: true, primaryLastName: true, email: true, phone: true } },
             Site: { select: { name: true } },
           },
           orderBy: { arrivalDate: 'asc' },
@@ -318,7 +318,7 @@ export class ChatToolsService {
           reservations: reservations.map(r => ({
             id: r.id,
             confirmationCode: r.confirmationCode,
-            guestName: r.Guest ? `${r.Guest.firstName} ${r.Guest.lastName}` : 'Unknown',
+            guestName: r.Guest ? `${r.Guest.primaryFirstName} ${r.Guest.primaryLastName}` : 'Unknown',
             guestEmail: r.Guest?.email,
             site: r.Site?.name,
             arrival: r.arrivalDate.toISOString().split('T')[0],
@@ -363,7 +363,7 @@ export class ChatToolsService {
         const reservation = await prisma.reservation.findFirst({
           where,
           include: {
-            Guest: { select: { firstName: true, lastName: true, email: true, phone: true } },
+            Guest: { select: { primaryFirstName: true, primaryLastName: true, email: true, phone: true } },
             Site: { select: { name: true, siteClass: { select: { name: true } } } },
             Payment: { orderBy: { createdAt: 'desc' }, take: 5 },
           },
@@ -380,7 +380,7 @@ export class ChatToolsService {
             confirmationCode: reservation.confirmationCode,
             status: reservation.status,
             guest: reservation.Guest ? {
-              name: `${reservation.Guest.firstName} ${reservation.Guest.lastName}`,
+              name: `${reservation.Guest.primaryFirstName} ${reservation.Guest.primaryLastName}`,
               email: reservation.Guest.email,
               phone: reservation.Guest.phone,
             } : null,
@@ -548,7 +548,7 @@ export class ChatToolsService {
             status: { in: ['pending', 'confirmed'] },
           },
           include: {
-            Guest: { select: { firstName: true, lastName: true, phone: true } },
+            Guest: { select: { primaryFirstName: true, primaryLastName: true, phone: true } },
             Site: { select: { name: true } },
           },
           orderBy: { arrivalDate: 'asc' },
@@ -559,7 +559,7 @@ export class ChatToolsService {
           arrivals: arrivals.map(r => ({
             id: r.id,
             confirmationCode: r.confirmationCode,
-            guestName: r.Guest ? `${r.Guest.firstName} ${r.Guest.lastName}` : 'Unknown',
+            guestName: r.Guest ? `${r.Guest.primaryFirstName} ${r.Guest.primaryLastName}` : 'Unknown',
             phone: r.Guest?.phone,
             site: r.Site?.name,
             balance: `$${(r.balanceDueCents / 100).toFixed(2)}`,
@@ -594,7 +594,7 @@ export class ChatToolsService {
             status: 'checked_in',
           },
           include: {
-            Guest: { select: { firstName: true, lastName: true } },
+            Guest: { select: { primaryFirstName: true, primaryLastName: true } },
             Site: { select: { name: true } },
           },
           orderBy: { departureDate: 'asc' },
@@ -605,7 +605,7 @@ export class ChatToolsService {
           departures: departures.map(r => ({
             id: r.id,
             confirmationCode: r.confirmationCode,
-            guestName: r.Guest ? `${r.Guest.firstName} ${r.Guest.lastName}` : 'Unknown',
+            guestName: r.Guest ? `${r.Guest.primaryFirstName} ${r.Guest.primaryLastName}` : 'Unknown',
             site: r.Site?.name,
             balance: `$${(r.balanceDueCents / 100).toFixed(2)}`,
           })),
@@ -640,7 +640,7 @@ export class ChatToolsService {
             OR: [{ id: reservationId }, { confirmationCode: reservationId }],
           },
           include: {
-            Guest: { select: { firstName: true, lastName: true } },
+            Guest: { select: { primaryFirstName: true, primaryLastName: true } },
             Site: { select: { name: true } },
           },
         });
@@ -660,7 +660,7 @@ export class ChatToolsService {
 
         return {
           success: true,
-          message: `Checked in ${reservation.Guest?.firstName} ${reservation.Guest?.lastName} to ${reservation.Site?.name}`,
+          message: `Checked in ${reservation.Guest?.primaryFirstName} ${reservation.Guest?.primaryLastName} to ${reservation.Site?.name}`,
           reservation: {
             id: updated.id,
             confirmationCode: updated.confirmationCode,
@@ -695,7 +695,7 @@ export class ChatToolsService {
             OR: [{ id: reservationId }, { confirmationCode: reservationId }],
           },
           include: {
-            Guest: { select: { firstName: true, lastName: true } },
+            Guest: { select: { primaryFirstName: true, primaryLastName: true } },
             Site: { select: { name: true } },
           },
         });
@@ -724,7 +724,7 @@ export class ChatToolsService {
 
         return {
           success: true,
-          message: `Checked out ${reservation.Guest?.firstName} ${reservation.Guest?.lastName} from ${reservation.Site?.name}`,
+          message: `Checked out ${reservation.Guest?.primaryFirstName} ${reservation.Guest?.primaryLastName} from ${reservation.Site?.name}`,
           reservation: {
             id: updated.id,
             confirmationCode: updated.confirmationCode,
@@ -764,7 +764,7 @@ export class ChatToolsService {
             confirmationCode: true,
             totalCents: true,
             balanceDueCents: true,
-            Guest: { select: { firstName: true, lastName: true } },
+            Guest: { select: { primaryFirstName: true, primaryLastName: true } },
           },
         });
 
@@ -1292,8 +1292,8 @@ export class ChatToolsService {
           where: {
             campgroundId: context.campgroundId,
             OR: [
-              { firstName: { contains: query, mode: 'insensitive' } },
-              { lastName: { contains: query, mode: 'insensitive' } },
+              { primaryFirstName: { contains: query, mode: 'insensitive' } },
+              { primaryLastName: { contains: query, mode: 'insensitive' } },
               { email: { contains: query, mode: 'insensitive' } },
               { phone: { contains: query, mode: 'insensitive' } },
             ],
@@ -1318,7 +1318,7 @@ export class ChatToolsService {
           success: true,
           guests: guests.map(g => ({
             id: g.id,
-            name: `${g.firstName} ${g.lastName}`,
+            name: `${g.primaryFirstName} ${g.primaryLastName}`,
             email: g.email,
             phone: g.phone,
             recentReservations: g.Reservation.map(r => ({
@@ -1373,7 +1373,7 @@ export class ChatToolsService {
 
         return {
           success: true,
-          message: `Message sent to ${guest.firstName} ${guest.lastName}`,
+          message: `Message sent to ${guest.primaryFirstName} ${guest.primaryLastName}`,
           messageId: created.id,
         };
       },
