@@ -1,8 +1,7 @@
 import { Controller, Get, HttpException, HttpStatus, UseGuards } from "@nestjs/common";
 import { HealthService } from "./health.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
-import { RolesGuard } from "../auth/guards/roles.guard";
-import { Roles } from "../auth/decorators/roles.decorator";
+import { RolesGuard, Roles } from "../auth/guards/roles.guard";
 
 @Controller()
 export class HealthController {
