@@ -60,16 +60,30 @@ type Reservation = {
   notes?: string | null;
 };
 
+// Helper to get today's date as YYYY-MM-DD string
+function getTodayDateString() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 export default function CheckInOutPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  // Use local date, not UTC (toISOString gives UTC which can be a different day)
-  const [date, setDate] = useState(() => {
-    const d = new Date();
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-  });
+
+  // Track client-side hydration to prevent SSR mismatch
+  const [hasMounted, setHasMounted] = useState(false);
+
+  // Use empty string for SSR, then set on client to prevent hydration mismatch
+  // (server time may differ from client time due to timezone differences)
+  const [date, setDate] = useState("");
   const [campgroundId, setCampgroundId] = useState<string>("");
-  const dateLabel = useMemo(() => format(new Date(`${date}T00:00:00`), "EEE, MMM d"), [date]);
+
+  // Format date label safely (only on client after date is set)
+  const dateLabel = useMemo(() => {
+    if (!date) return "Today";
+    return format(new Date(`${date}T00:00:00`), "EEE, MMM d");
+  }, [date]);
+
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "balance" | "unassigned">("all");
   const [tab, setTab] = useState<"arrivals" | "departures" | "onsite">("arrivals");
@@ -94,10 +108,16 @@ export default function CheckInOutPage() {
   const [checkInAfterPayment, setCheckInAfterPayment] = useState(false);
   const [checkOutAfterPayment, setCheckOutAfterPayment] = useState(false);
 
+  // Initialize date and campground on mount (client-only)
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    // Set today's date on client to avoid SSR mismatch
+    setDate(getTodayDateString());
+
+    // Get campground from localStorage
     const stored = localStorage.getItem("campreserv:selectedCampground");
     if (stored) setCampgroundId(stored);
+
+    setHasMounted(true);
   }, []);
 
   const reservationsQuery = useQuery({
@@ -168,11 +188,12 @@ export default function CheckInOutPage() {
 
   const reservations = (reservationsQuery.data as Reservation[]) || [];
 
-  // Helper to compare dates in local timezone (handles UTC offset)
+  // Helper to compare dates by extracting the date portion directly from ISO strings
+  // This avoids timezone issues when comparing dates stored in the database
   const isSameLocalDate = (isoDateStr: string, targetDate: string) => {
-    const d = new Date(isoDateStr);
-    const localDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-    return localDate === targetDate;
+    // Extract just the date portion (YYYY-MM-DD) from the ISO string
+    const datePart = isoDateStr.split('T')[0];
+    return datePart === targetDate;
   };
 
   // Arrivals: exclude cancelled, checked_in, and checked_out (only show pending arrivals)
@@ -426,10 +447,7 @@ export default function CheckInOutPage() {
                   className="h-7 w-[150px] border-0 bg-transparent p-0 text-sm font-semibold focus-visible:ring-0"
                 />
               </div>
-              <Button variant="outline" onClick={() => {
-                const d = new Date();
-                setDate(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`);
-              }}>
+              <Button variant="outline" onClick={() => setDate(getTodayDateString())}>
                 Today
               </Button>
             </>

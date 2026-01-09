@@ -404,6 +404,14 @@ export default function Dashboard() {
     placeholderData: keepPreviousData,
   });
 
+  // Get today's date as YYYY-MM-DD string (for reliable date comparison)
+  const todayString = useMemo(() => {
+    if (!hasMounted) return null;
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  }, [hasMounted]);
+
+  // Also keep a Date object for display purposes
   const today = useMemo(() => {
     if (!hasMounted) return null;
     const d = new Date();
@@ -424,7 +432,7 @@ export default function Dashboard() {
 
   // Single-pass computation of all dashboard metrics
   const dashboardMetrics = useMemo(() => {
-    if (!today) {
+    if (!today || !todayString) {
       return {
         todayArrivals: [],
         todayDepartures: [],
@@ -452,41 +460,44 @@ export default function Dashboard() {
 
     // Pre-compute 14-day range for occupancy chart
     const days14: Date[] = [];
+    const days14Strings: string[] = [];
     const occupancy14Counts = new Array(14).fill(0);
     for (let i = 0; i < 14; i++) {
       const d = new Date(today);
       d.setDate(d.getDate() + i);
       days14.push(d);
+      // Also store as YYYY-MM-DD string for reliable comparison
+      days14Strings.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`);
     }
+
+    // Helper to extract date portion (YYYY-MM-DD) from ISO string
+    const getDatePart = (isoStr: string) => isoStr.split('T')[0];
 
     if (reservations) {
       for (const r of reservations) {
         if (r.status === "cancelled") continue;
 
-        const arrival = new Date(r.arrivalDate);
-        const departure = new Date(r.departureDate);
-        arrival.setHours(0, 0, 0, 0);
-        departure.setHours(0, 0, 0, 0);
-        const arrivalTime = arrival.getTime();
-        const departureTime = departure.getTime();
+        // Use string comparison for reliable date matching across timezones
+        const arrivalDateStr = getDatePart(r.arrivalDate);
+        const departureDateStr = getDatePart(r.departureDate);
 
         // Today's arrivals (exclude already checked in)
-        if (arrivalTime === todayTime && r.status !== "checked_in" && r.status !== "checked_out") {
+        if (arrivalDateStr === todayString && r.status !== "checked_in" && r.status !== "checked_out") {
           todayArrivals.push(r);
         }
 
         // Today's departures (exclude already checked out)
-        if (departureTime === todayTime && r.status !== "checked_out") {
+        if (departureDateStr === todayString && r.status !== "checked_out") {
           todayDepartures.push(r);
         }
 
         // In-house (arrival <= today && departure > today)
-        if (arrivalTime <= todayTime && departureTime > todayTime) {
+        if (arrivalDateStr <= todayString && departureDateStr > todayString) {
           inHouse.push(r);
         }
 
         // Future reservations
-        if (arrivalTime > todayTime) {
+        if (arrivalDateStr > todayString) {
           futureReservationsCount++;
         }
 
@@ -497,10 +508,10 @@ export default function Dashboard() {
           withBalance.push({ ...r, balance });
 
           // Calculate aging based on arrival date
-          if (arrivalTime < todayTime) {
+          if (arrivalDateStr < todayString) {
             // Overdue: arrival was in the past
             balanceOverdue += balance;
-          } else if (arrivalTime === todayTime) {
+          } else if (arrivalDateStr === todayString) {
             // Due today: arrival is today
             balanceDueToday += balance;
           } else {
@@ -511,8 +522,8 @@ export default function Dashboard() {
 
         // 14-day occupancy (check each day the reservation spans)
         for (let i = 0; i < 14; i++) {
-          const dayTime = days14[i].getTime();
-          if (arrivalTime <= dayTime && departureTime > dayTime) {
+          const dayStr = days14Strings[i];
+          if (arrivalDateStr <= dayStr && departureDateStr > dayStr) {
             occupancy14Counts[i]++;
           }
         }
@@ -544,7 +555,7 @@ export default function Dashboard() {
       attentionList,
       occupancy14,
     };
-  }, [reservations, today, totalSites]);
+  }, [reservations, today, todayString, totalSites]);
 
   const {
     todayArrivals,
