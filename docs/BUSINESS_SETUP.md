@@ -171,6 +171,39 @@ When you have another project:
 
 ---
 
+## QuickBooks Setup
+
+### Step 1: Create QuickBooks Account
+1. Sign up at [quickbooks.intuit.com](https://quickbooks.intuit.com)
+2. Choose "Simple Start" plan (~$30/month) or "Essentials" if you need multiple users
+3. Set up for Keepr LLC (not Holdings)
+
+### Step 2: Connect QuickBooks to Keepr
+1. Go to Keepr Dashboard → Settings → Integrations
+2. Click "Connect QuickBooks"
+3. Sign in with your Intuit account
+4. Authorize the connection
+
+### Step 3: Configure Chart of Accounts
+QuickBooks will auto-create accounts, but verify these exist:
+- **Income:** Reservation Revenue, Add-on Revenue, Late Fees
+- **Expenses:** Stripe Fees, Refunds, Operating Expenses
+- **Assets:** Accounts Receivable, Bank Account
+
+### Step 4: Set Environment Variables (Railway)
+```
+QBO_CLIENT_ID=your_client_id
+QBO_CLIENT_SECRET=your_client_secret
+```
+
+### What Syncs Automatically
+- Payments → recorded as income
+- Refunds → recorded as expenses
+- Daily revenue summary
+- Customer records (optional)
+
+---
+
 ## Links
 
 - Minnesota LLC Portal: https://mblsportal.sos.state.mn.us
@@ -178,6 +211,20 @@ When you have another project:
 - Mercury Bank: https://mercury.com
 - Relay Bank: https://relayfi.com
 - Stripe Dashboard: https://dashboard.stripe.com
+- QuickBooks: https://quickbooks.intuit.com
+- Intuit Developer (for API keys): https://developer.intuit.com
+
+---
+
+## Complete Timeline
+
+| Week | Tasks |
+|------|-------|
+| Week 1 | Register Holdings LLC, get EIN, open bank account |
+| Week 2 | Register Keepr LLC, get EIN, open bank account |
+| Week 2-3 | Stripe verification + go live |
+| Week 3-4 | QuickBooks setup + connect to Keepr |
+| **Total** | **~3-4 weeks** |
 
 ---
 
