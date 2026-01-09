@@ -367,22 +367,108 @@ Say Keepr made $5,000 this month:
 | - Cash buffer (if needed) | -$300 | $3,000 |
 | **= What you can take** | | **$3,000** |
 
-### How Much Should You Actually Take?
+### Your Goal: Passive Income (5 hrs/week max)
 
-**Early stage (first 6-12 months):**
-- Take 40-50% of profit (after tax reserve)
-- Build up a 3-month expense buffer in the business
-- You need runway in case of slow months
+You want to hire people to run this so you're not trading time for money. That means:
+- **Take less now** → Build a hiring fund
+- **Hire contractors early** → Buy back your time
+- **Target: 5 hours/week** → Strategy calls, decisions, not execution
 
-**Stable stage (consistent revenue):**
-- Take 60-70% of profit (after tax reserve)
-- Keep 2 months expenses as buffer
-- More predictable, can be more aggressive
+### The Hiring Fund Strategy
 
-**Growth stage (reinvesting):**
-- Take 30-40% of profit
-- Use rest for marketing, features, hiring contractors
-- Building value now, pay yourself more later
+Instead of taking all the profit, split it:
+
+```
+Net Profit (after tax reserve)
+  ├── 30% → Your pocket (living money)
+  ├── 50% → Hiring fund (to pay contractors/employees)
+  └── 20% → Growth fund (marketing, tools, runway)
+```
+
+**Why 50% to hiring?** Contractors cost $25-75/hr. You need runway to:
+- Hire a part-time support person ($500-1500/mo)
+- Hire a developer for features ($2000-5000/mo)
+- Have 2-3 months of their pay saved up before hiring
+
+### When Can You Hire?
+
+| Role | Cost | Revenue Needed | Your Time Saved |
+|------|------|----------------|-----------------|
+| Support (part-time VA) | $500-800/mo | $2,000/mo | 10-15 hrs/week |
+| Developer (contractor) | $2,000-4,000/mo | $6,000/mo | 15-20 hrs/week |
+| Operations manager | $3,000-5,000/mo | $10,000/mo | 20+ hrs/week |
+
+**First hire recommendation:** Part-time VA for customer support. Biggest time sink, easiest to delegate.
+
+### Adjusted Draw Strategy
+
+**Phase 1: Pre-Revenue / Early ($0-2k/mo)**
+- Take: 20-30% of profit (just enough to stay motivated)
+- Hiring fund: 50%
+- Buffer: 20-30%
+- **Your time:** 15-20 hrs/week (building)
+
+**Phase 2: First Customers ($2k-5k/mo)**
+- Take: 30% of profit
+- Hiring fund: 50% → Hire support VA
+- Buffer/growth: 20%
+- **Your time:** 10-15 hrs/week (VA handles support)
+
+**Phase 3: Growing ($5k-10k/mo)**
+- Take: 30-40% of profit
+- Hiring fund: 40% → Add part-time dev
+- Growth: 20%
+- **Your time:** 5-10 hrs/week (strategy only)
+
+**Phase 4: Scaled ($10k+/mo)**
+- Take: 40-50% of profit
+- Team costs: 30-40%
+- Growth: 10-20%
+- **Your time:** 5 hrs/week (CEO role - decisions only)
+
+### Realistic Timeline to 5 hrs/week
+
+| Revenue | Timeline | Your Role |
+|---------|----------|-----------|
+| $0-2k/mo | Months 1-6 | Everything (founder mode) |
+| $2-5k/mo | Months 6-12 | Hire VA, stop doing support |
+| $5-10k/mo | Year 1-2 | Hire dev, stop doing features |
+| $10k+/mo | Year 2+ | Strategy only, 5 hrs/week |
+
+### What 5 hrs/week Looks Like
+
+When you're there, your week is:
+- **Monday (1 hr):** Review metrics, check Slack from team
+- **Wednesday (2 hrs):** Weekly call with team, make decisions
+- **Friday (2 hrs):** Review finances, plan next week, strategic thinking
+
+Everything else is handled by:
+- VA: Customer support, onboarding help, email
+- Developer: Bug fixes, new features, deployments
+- You: Direction, big decisions, relationships
+
+### Contractor vs Employee
+
+**Start with contractors:**
+- No payroll taxes
+- No benefits to provide
+- Easy to scale up/down
+- Pay per hour or per project
+
+**Consider employees when:**
+- Need someone 30+ hrs/week consistently
+- Want more control/loyalty
+- Revenue exceeds $15-20k/mo
+- Ready for payroll complexity
+
+### Where to Find Good Contractors
+
+| Role | Where to Look | Budget |
+|------|---------------|--------|
+| Support VA | Belay, Time Etc, Upwork | $15-25/hr |
+| Developer | Toptal, Gun.io, referrals | $50-150/hr |
+| Designer | Dribbble, 99designs | $50-100/hr |
+| Marketing | Mayple, MarketerHire | $50-100/hr |
 
 ### What "Profit" Actually Means
 
