@@ -4302,14 +4302,67 @@ model OnboardingSession {
   expiresAt              DateTime?
   createdAt              DateTime                @default(now())
   updatedAt              DateTime
+
+  // AI Import fields
+  emailVerified          Boolean                 @default(false)
+  emailVerifiedAt        DateTime?
+  emailVerifyCode        String?
+  emailVerifyExpiry      DateTime?
+  aiCallsUsed            Int                     @default(0)
+  aiAccessTier           String                  @default("none") // none, trial, full
+  lastAiCallAt           DateTime?
+
+  // Relations
   OnboardingQuizResponse OnboardingQuizResponse?
   Campground             Campground?             @relation(fields: [campgroundId], references: [id])
   OnboardingInvite       OnboardingInvite        @relation(fields: [inviteId], references: [id], onDelete: Cascade)
   Organization           Organization?           @relation(fields: [organizationId], references: [id])
+  importDrafts           OnboardingImportDraft[]
+  aiUsageLogs            OnboardingAiUsage[]
 
   @@index([campgroundId])
   @@index([inviteId])
   @@index([organizationId])
+}
+
+model OnboardingImportDraft {
+  id            String            @id @default(uuid())
+  sessionId     String
+  documentId    String            @unique
+  documentType  String            // csv, excel, pdf, image
+  targetEntity  String            // sites, guests, reservations, rates
+  originalFile  String            // temp file path or S3 key
+  fileName      String?           // original file name
+  extractedData Json?             // { rows: RowConfidence[], summary: {...} }
+  corrections   Json?             // user corrections applied
+  status        ImportDraftStatus @default(pending_upload)
+  aiCallsUsed   Int               @default(0)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  expiresAt     DateTime          // TTL for cleanup
+
+  session OnboardingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@index([expiresAt])
+  @@index([status])
+}
+
+model OnboardingAiUsage {
+  id           String   @id @default(uuid())
+  sessionId    String
+  featureType  String   // classification, extraction, chat, autofill
+  inputTokens  Int
+  outputTokens Int
+  costCents    Int
+  modelUsed    String
+  success      Boolean  @default(true)
+  errorType    String?
+  createdAt    DateTime @default(now())
+
+  session OnboardingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, createdAt])
 }
 
 model OpBadge {
@@ -8718,6 +8771,18 @@ enum OnboardingStatus {
   completed
   expired
   cancelled
+}
+
+enum ImportDraftStatus {
+  pending_upload
+  pending_classification
+  pending_extraction
+  extraction_complete
+  review_in_progress
+  confirmed
+  imported
+  failed
+  expired
 }
 
 enum OnboardingStep {

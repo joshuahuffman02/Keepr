@@ -1043,6 +1043,7 @@ export default function OnboardingPage() {
       case "data_import":
         return (
           <DataImport
+            sessionId={sessionQuery.data?.session.id || ""}
             campgroundId={sessionQuery.data?.session.campgroundId || ""}
             token={token}
             onComplete={handleDataImportComplete}
@@ -1346,6 +1347,8 @@ export default function OnboardingPage() {
             }}
             onLaunch={handleLaunch}
             onPreview={handlePreview}
+            onGoToStep={(step) => goToStep(step as OnboardingStepKey)}
+            sessionId={sessionQuery.data?.session.id}
             campgroundId={state.campground?.id}
             token={token}
             sites={state.sites?.map((s) => ({

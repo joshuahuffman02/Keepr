@@ -4,6 +4,9 @@ import { OnboardingService } from "./onboarding.service";
 import { CreateOnboardingInviteDto, StartOnboardingDto, UpdateOnboardingStepDto } from "./dto";
 import { StripeService } from "../payments/stripe.service";
 import { PrismaService } from "../prisma/prisma.service";
+import { OnboardingTokenGateService } from "./onboarding-token-gate.service";
+import { OnboardingGoLiveCheckService } from "./onboarding-go-live-check.service";
+import { EmailService } from "../email/email.service";
 
 @Controller("onboarding")
 export class OnboardingController {
@@ -13,6 +16,9 @@ export class OnboardingController {
     private readonly onboarding: OnboardingService,
     private readonly stripe: StripeService,
     private readonly prisma: PrismaService,
+    private readonly tokenGate: OnboardingTokenGateService,
+    private readonly goLiveCheck: OnboardingGoLiveCheckService,
+    private readonly email: EmailService,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -160,5 +166,229 @@ export class OnboardingController {
     const token = body.token ?? tokenHeader;
     if (!token) throw new BadRequestException("Missing onboarding token");
     return this.onboarding.completeOnboarding(id, token, req.user.id);
+  }
+
+  // ============================================
+  // AI Import Token Gate Endpoints
+  // ============================================
+
+  /**
+   * Get AI access status for the session
+   */
+  @Get("session/:id/ai-gate/status")
+  async getAiGateStatus(
+    @Param("id") sessionId: string,
+    @Headers("x-onboarding-token") tokenHeader: string,
+    @Query("token") tokenQuery: string,
+  ) {
+    const token = tokenQuery ?? tokenHeader;
+    if (!token) throw new BadRequestException("Missing onboarding token");
+
+    // Validate session first
+    await this.onboarding.getSession(sessionId, token);
+
+    return this.tokenGate.checkAccess(sessionId);
+  }
+
+  /**
+   * Request email verification to unlock AI features
+   */
+  @Post("session/:id/verify-email")
+  async requestEmailVerification(
+    @Param("id") sessionId: string,
+    @Headers("x-onboarding-token") tokenHeader: string,
+    @Body() body: { token?: string; email?: string },
+  ) {
+    const token = body.token ?? tokenHeader;
+    if (!token) throw new BadRequestException("Missing onboarding token");
+
+    // Validate session
+    const { session } = await this.onboarding.getSession(sessionId, token);
+
+    // Check if already verified
+    if (session.emailVerified) {
+      return { success: true, message: "Email already verified", alreadyVerified: true };
+    }
+
+    // Get email from session invite
+    const invite = await this.prisma.onboardingInvite.findFirst({
+      where: { id: session.inviteId },
+      select: { email: true },
+    });
+
+    const emailToVerify = body.email || invite?.email;
+    if (!emailToVerify) {
+      throw new BadRequestException("No email address found for verification");
+    }
+
+    // Generate verification code
+    const { code, expiresAt } = await this.tokenGate.initiateEmailVerification(sessionId);
+
+    // Send verification email
+    await this.email.sendEmail({
+      to: emailToVerify,
+      subject: "Verify your email for AI-assisted import",
+      html: this.buildVerificationEmailHtml(code),
+    });
+
+    this.logger.log(`Verification email sent to ${emailToVerify} for session ${sessionId}`);
+
+    return {
+      success: true,
+      message: "Verification code sent to your email",
+      email: this.maskEmail(emailToVerify),
+      expiresAt,
+    };
+  }
+
+  /**
+   * Confirm email verification code
+   */
+  @Post("session/:id/confirm-email-code")
+  async confirmEmailCode(
+    @Param("id") sessionId: string,
+    @Headers("x-onboarding-token") tokenHeader: string,
+    @Body() body: { token?: string; code: string },
+  ) {
+    const token = body.token ?? tokenHeader;
+    if (!token) throw new BadRequestException("Missing onboarding token");
+
+    if (!body.code || body.code.length !== 6) {
+      throw new BadRequestException("Invalid verification code format");
+    }
+
+    // Validate session
+    await this.onboarding.getSession(sessionId, token);
+
+    // Verify the code
+    const verified = await this.tokenGate.verifyEmailCode(sessionId, body.code);
+
+    if (!verified) {
+      throw new BadRequestException("Invalid or expired verification code");
+    }
+
+    // Get updated access status
+    const accessStatus = await this.tokenGate.checkAccess(sessionId);
+
+    return {
+      success: true,
+      message: "Email verified! AI-assisted import is now available.",
+      accessStatus,
+    };
+  }
+
+  /**
+   * Mask email for privacy in responses
+   */
+  private maskEmail(email: string): string {
+    const [local, domain] = email.split("@");
+    if (!domain) return email;
+    const maskedLocal =
+      local.length <= 2
+        ? local[0] + "*"
+        : local[0] + "*".repeat(local.length - 2) + local[local.length - 1];
+    return `${maskedLocal}@${domain}`;
+  }
+
+  /**
+   * Build HTML email for verification code
+   */
+  private buildVerificationEmailHtml(code: string): string {
+    return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Your Email</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f4f5;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="min-width: 100%; background-color: #f4f4f5;">
+    <tr>
+      <td align="center" style="padding: 40px 20px;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 480px; background-color: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+          <tr>
+            <td style="padding: 40px 32px; text-align: center;">
+              <!-- Logo placeholder -->
+              <div style="margin-bottom: 24px;">
+                <span style="font-size: 24px; font-weight: 700; color: #18181b;">Keepr</span>
+              </div>
+
+              <!-- Title -->
+              <h1 style="margin: 0 0 8px; font-size: 20px; font-weight: 600; color: #18181b;">
+                Verify your email
+              </h1>
+              <p style="margin: 0 0 32px; font-size: 14px; color: #71717a; line-height: 1.5;">
+                Enter this code to unlock AI-assisted import
+              </p>
+
+              <!-- Code -->
+              <div style="background-color: #f4f4f5; border-radius: 8px; padding: 20px; margin-bottom: 32px;">
+                <span style="font-family: 'SF Mono', Monaco, 'Courier New', monospace; font-size: 32px; font-weight: 700; letter-spacing: 8px; color: #18181b;">
+                  ${code}
+                </span>
+              </div>
+
+              <!-- Info -->
+              <p style="margin: 0; font-size: 13px; color: #a1a1aa; line-height: 1.5;">
+                This code expires in 10 minutes.<br>
+                If you didn't request this, you can safely ignore this email.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 24px 32px; background-color: #fafafa; border-top: 1px solid #e4e4e7; border-radius: 0 0 12px 12px;">
+              <p style="margin: 0; font-size: 12px; color: #a1a1aa; text-align: center;">
+                Keepr - Campground Management Made Simple
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+    `.trim();
+  }
+
+  // ============================================
+  // Go-Live Check Endpoints
+  // ============================================
+
+  /**
+   * Check if session is ready to go live
+   */
+  @Get("session/:id/go-live-check")
+  async getGoLiveCheck(
+    @Param("id") sessionId: string,
+    @Headers("x-onboarding-token") tokenHeader: string,
+    @Query("token") tokenQuery: string,
+  ) {
+    const token = tokenQuery ?? tokenHeader;
+    if (!token) throw new BadRequestException("Missing onboarding token");
+
+    // Validate session
+    await this.onboarding.getSession(sessionId, token);
+
+    return this.goLiveCheck.check(sessionId);
+  }
+
+  /**
+   * Get a quick summary of go-live readiness
+   */
+  @Get("session/:id/go-live-summary")
+  async getGoLiveSummary(
+    @Param("id") sessionId: string,
+    @Headers("x-onboarding-token") tokenHeader: string,
+    @Query("token") tokenQuery: string,
+  ) {
+    const token = tokenQuery ?? tokenHeader;
+    if (!token) throw new BadRequestException("Missing onboarding token");
+
+    // Validate session
+    await this.onboarding.getSession(sessionId, token);
+
+    return this.goLiveCheck.getSummary(sessionId);
   }
 }

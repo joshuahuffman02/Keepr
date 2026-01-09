@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   Rocket,
@@ -16,6 +16,9 @@ import {
   FileSpreadsheet,
   ChevronDown,
   ChevronUp,
+  AlertCircle,
+  AlertTriangle,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -34,11 +37,39 @@ interface SetupSummary {
   taxRulesCount: number;
 }
 
+interface GoLiveIssue {
+  code: string;
+  message: string;
+  stepToFix: string;
+  autoFixable: boolean;
+  severity: "blocker" | "warning";
+}
+
+interface GoLiveCheckResult {
+  canLaunch: boolean;
+  blockers: GoLiveIssue[];
+  warnings: GoLiveIssue[];
+  completionPercent: number;
+  requirements: {
+    sitesExist: boolean;
+    ratesSet: boolean;
+    depositPolicySet: boolean;
+    teamMemberExists: boolean;
+    stripeConnected: boolean;
+    emailTemplatesConfigured: boolean;
+    cancellationPolicySet: boolean;
+    taxRulesConfigured: boolean;
+  };
+}
+
 interface ReviewLaunchProps {
   summary: SetupSummary;
   onLaunch: () => Promise<void>;
   onPreview: () => void;
+  onGoToStep?: (step: string) => void;
   isLoading?: boolean;
+  // For go-live check
+  sessionId?: string;
   // For reservation import
   campgroundId?: string;
   token?: string;
@@ -106,7 +137,9 @@ export function ReviewLaunch({
   summary,
   onLaunch,
   onPreview,
+  onGoToStep,
   isLoading = false,
+  sessionId,
   campgroundId,
   token,
   sites = [],
@@ -117,8 +150,43 @@ export function ReviewLaunch({
   const [importExpanded, setImportExpanded] = useState(false);
   const [importModalOpen, setImportModalOpen] = useState(false);
   const [importedCount, setImportedCount] = useState(0);
+  const [goLiveCheck, setGoLiveCheck] = useState<GoLiveCheckResult | null>(null);
+  const [checkLoading, setCheckLoading] = useState(false);
+
+  // Fetch go-live check on mount
+  useEffect(() => {
+    if (!sessionId || !token) return;
+
+    const fetchGoLiveCheck = async () => {
+      setCheckLoading(true);
+      try {
+        const apiBase = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:4000/api";
+        const response = await fetch(
+          `${apiBase}/onboarding/session/${sessionId}/go-live-check?token=${token}`,
+          {
+            headers: { "x-onboarding-token": token },
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setGoLiveCheck(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch go-live check:", err);
+      } finally {
+        setCheckLoading(false);
+      }
+    };
+
+    fetchGoLiveCheck();
+  }, [sessionId, token]);
 
   const handleLaunch = async () => {
+    // Don't allow launch if there are blockers
+    if (goLiveCheck && !goLiveCheck.canLaunch) {
+      return;
+    }
+
     setLaunching(true);
     try {
       await onLaunch();
@@ -128,6 +196,8 @@ export function ReviewLaunch({
       setLaunching(false);
     }
   };
+
+  const canLaunch = !goLiveCheck || goLiveCheck.canLaunch;
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -194,6 +264,87 @@ export function ReviewLaunch({
             />
           )}
         </div>
+
+        {/* Go-Live Check: Blockers and Warnings */}
+        {checkLoading && (
+          <motion.div
+            initial={prefersReducedMotion ? {} : { opacity: 0 }}
+            animate={prefersReducedMotion ? {} : { opacity: 1 }}
+            className="flex items-center justify-center gap-2 py-4 text-slate-400"
+          >
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span className="text-sm">Checking launch readiness...</span>
+          </motion.div>
+        )}
+
+        {goLiveCheck && (goLiveCheck.blockers.length > 0 || goLiveCheck.warnings.length > 0) && (
+          <motion.div
+            initial={prefersReducedMotion ? {} : { opacity: 0, y: 10 }}
+            animate={prefersReducedMotion ? {} : { opacity: 1, y: 0 }}
+            transition={{ delay: 0.38 }}
+            className="space-y-4"
+          >
+            {/* Blockers */}
+            {goLiveCheck.blockers.length > 0 && (
+              <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <AlertCircle className="w-5 h-5 text-red-400" />
+                  <h3 className="font-medium text-red-400">
+                    Required Before Launch
+                  </h3>
+                </div>
+                <ul className="space-y-2">
+                  {goLiveCheck.blockers.map((blocker) => (
+                    <li
+                      key={blocker.code}
+                      className="flex items-center justify-between text-sm"
+                    >
+                      <span className="text-red-300">{blocker.message}</span>
+                      {onGoToStep && (
+                        <button
+                          onClick={() => onGoToStep(blocker.stepToFix)}
+                          className="text-red-400 hover:text-red-300 underline text-xs"
+                        >
+                          Fix this
+                        </button>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Warnings */}
+            {goLiveCheck.warnings.length > 0 && (
+              <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <AlertTriangle className="w-5 h-5 text-amber-400" />
+                  <h3 className="font-medium text-amber-400">
+                    Recommended (Optional)
+                  </h3>
+                </div>
+                <ul className="space-y-2">
+                  {goLiveCheck.warnings.map((warning) => (
+                    <li
+                      key={warning.code}
+                      className="flex items-center justify-between text-sm"
+                    >
+                      <span className="text-amber-300">{warning.message}</span>
+                      {onGoToStep && (
+                        <button
+                          onClick={() => onGoToStep(warning.stepToFix)}
+                          className="text-amber-400 hover:text-amber-300 underline text-xs"
+                        >
+                          Configure
+                        </button>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </motion.div>
+        )}
 
         {/* Preview button */}
         <motion.div
@@ -277,13 +428,13 @@ export function ReviewLaunch({
           >
             <Button
               onClick={handleLaunch}
-              disabled={launching || isLoading}
+              disabled={launching || isLoading || !canLaunch}
               className={cn(
                 "relative w-full py-8 text-xl font-bold transition-all overflow-hidden group",
-                "bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-500",
-                "hover:from-emerald-400 hover:via-teal-400 hover:to-emerald-400",
-                "disabled:opacity-50",
-                "shadow-lg shadow-emerald-500/25"
+                canLaunch
+                  ? "bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-500 hover:from-emerald-400 hover:via-teal-400 hover:to-emerald-400 shadow-lg shadow-emerald-500/25"
+                  : "bg-slate-700 cursor-not-allowed",
+                "disabled:opacity-50"
               )}
               style={{
                 backgroundSize: "200% 100%",

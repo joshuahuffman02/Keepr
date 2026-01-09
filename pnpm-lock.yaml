@@ -7444,7 +7444,7 @@ packages:
       sirv: 3.0.2
       tinyglobby: 0.2.15
       tinyrainbow: 3.0.3
-      vitest: 2.1.9_3hiihkjeecqjc3y22avazgfzzy
+      vitest: 2.1.9_qg3e6vyjhz7jzgv55sxztha2fm
     dev: true
 
   /@vitest/utils/2.1.9:
