@@ -244,11 +244,11 @@ export class ReservationsService {
       reasons.push("payment_required");
     }
     if (reservation.idVerificationRequired) {
-      const verified = await this.hasVerifiedId(reservation.id, reservation.guestId);
+      const verified = await this.hasVerifiedId(reservation.id, reservation.GuestId);
       if (!verified) reasons.push("id_verification_required");
     }
     if (reservation.waiverRequired) {
-      const signed = await this.hasSignedWaiver(reservation.id, reservation.guestId);
+      const signed = await this.hasSignedWaiver(reservation.id, reservation.GuestId);
       if (!signed) {
         reasons.push("waiver_required");
         try {
@@ -284,7 +284,7 @@ export class ReservationsService {
     if (!reservation) return;
 
     const playbooks = await (this.prisma as any).communicationPlaybook.findMany({
-      where: { campgroundId: reservation.campgroundId, type, enabled: true, templateId: { not: null } }
+      where: { campgroundId: reservation.CampgroundId, type, enabled: true, templateId: { not: null } }
     });
 
     for (const pb of playbooks as CommunicationPlaybook[]) {
@@ -310,9 +310,9 @@ export class ReservationsService {
       await (this.prisma as any).communicationPlaybookJob.create({
         data: {
           playbookId: pb.id,
-          campgroundId: reservation.campgroundId,
+          campgroundId: reservation.CampgroundId,
           reservationId: reservation.id,
-          guestId: reservation.guestId,
+          guestId: reservation.GuestId,
           status: "pending",
           scheduledAt
         }
@@ -615,14 +615,14 @@ export class ReservationsService {
   async calculateDeposit(id: string) {
     const reservation = await this.prisma.reservation.findUnique({
       where: { id },
-      include: { site: { select: { siteClassId: true } } }
+      include: { Site: { select: { siteClassId: true } } }
     });
     if (!reservation) throw new NotFoundException("Reservation not found");
 
     const nights = this.computeNights(reservation.arrivalDate, reservation.departureDate);
     const depositCalc = await calculateReservationDepositV2(this.depositPoliciesService, {
-      campgroundId: reservation.campgroundId,
-      siteClassId: reservation.site?.siteClassId ?? null,
+      campgroundId: reservation.CampgroundId,
+      siteClassId: reservation.Site?.siteClassId ?? null,
       totalAmountCents: reservation.totalAmount,
       lodgingOnlyCents: reservation.baseSubtotal,
       nights
@@ -864,7 +864,7 @@ export class ReservationsService {
         siteId: true,
         arrivalDate: true,
         departureDate: true,
-        guest: {
+        Guest: {
           select: { primaryFirstName: true, primaryLastName: true }
         }
       }
@@ -873,7 +873,7 @@ export class ReservationsService {
     const occupiedSiteMap = new Map<string, { guestName: string; arrivalDate: Date; departureDate: Date }>();
     for (const r of conflictingReservations) {
       occupiedSiteMap.set(r.siteId, {
-        guestName: `${r.guest.primaryFirstName} ${r.guest.primaryLastName}`,
+        guestName: `${r.Guest.primaryFirstName} ${r.Guest.primaryLastName}`,
         arrivalDate: r.arrivalDate,
         departureDate: r.departureDate
       });
@@ -976,7 +976,7 @@ export class ReservationsService {
         ...(options?.fromDate && { arrivalDate: { gte: options.fromDate } }),
         ...(options?.toDate && { departureDate: { lte: options.toDate } })
       },
-      include: { guest: true, site: true },
+      include: { Guest: true, Site: true },
       orderBy: { arrivalDate: 'asc' }, // Changed to ASC so current/near-term reservations come first
       take: limit,
       skip: offset
@@ -1006,26 +1006,26 @@ export class ReservationsService {
         }),
         OR: [
           // Search by site number/name
-          { site: { number: { contains: searchTerm, mode: 'insensitive' } } },
-          { site: { name: { contains: searchTerm, mode: 'insensitive' } } },
+          { Site: { number: { contains: searchTerm, mode: 'insensitive' } } },
+          { Site: { name: { contains: searchTerm, mode: 'insensitive' } } },
           // Search by guest name
-          { guest: { firstName: { contains: searchTerm, mode: 'insensitive' } } },
-          { guest: { lastName: { contains: searchTerm, mode: 'insensitive' } } },
+          { Guest: { primaryFirstName: { contains: searchTerm, mode: 'insensitive' } } },
+          { Guest: { primaryLastName: { contains: searchTerm, mode: 'insensitive' } } },
           // Search by confirmation code
           { confirmationCode: { contains: searchTerm, mode: 'insensitive' } },
         ],
       },
       include: {
-        guest: {
+        Guest: {
           select: {
             id: true,
-            firstName: true,
-            lastName: true,
+            primaryFirstName: true,
+            primaryLastName: true,
             email: true,
             phone: true,
           },
         },
-        site: {
+        Site: {
           select: {
             id: true,
             number: true,
@@ -1056,9 +1056,9 @@ export class ReservationsService {
       totalAmount: res.totalAmount,
       paidAmount: res.paidAmount,
       balanceAmount: Math.max(0, res.totalAmount - (res.paidAmount ?? 0)),
-      guest: res.guest,
-      site: res.site,
-      displayLabel: `${res.site?.number || res.site?.name || 'No Site'} - ${res.guest?.firstName || ''} ${res.guest?.lastName || ''}`.trim(),
+      guest: res.Guest,
+      site: res.Site,
+      displayLabel: `${res.Site?.number || res.Site?.name || 'No Site'} - ${res.Guest?.primaryFirstName || ''} ${res.Guest?.primaryLastName || ''}`.trim(),
     }));
   }
 
@@ -1066,10 +1066,10 @@ export class ReservationsService {
     const reservation = await this.prisma.reservation.findUnique({
       where: { id },
       include: {
-        guest: true,
-        site: { include: { siteClass: true } },
-        campground: true,
-        payments: true
+        Guest: true,
+        Site: { include: { siteClass: true } },
+        Campground: true,
+        Payment: true
       }
     });
     if (!reservation) throw new NotFoundException("Reservation not found");
@@ -1400,13 +1400,13 @@ export class ReservationsService {
             notes: data.notes ?? null
           },
           include: {
-            site: {
+            Site: {
               include: {
                 siteClass: true
               }
             },
-            guest: true,
-            campground: { select: { name: true } }
+            Guest: true,
+            Campground: { select: { name: true } }
           }
         });
 
@@ -1420,10 +1420,10 @@ export class ReservationsService {
           before: null,
           after: {
             id: reservation.id,
-            guestId: reservation.guestId,
-            guestName: `${reservation.guest?.primaryFirstName} ${reservation.guest?.primaryLastName}`,
-            siteId: reservation.siteId,
-            siteName: reservation.site?.siteNumber,
+            guestId: reservation.GuestId,
+            guestName: `${reservation.Guest?.primaryFirstName} ${reservation.Guest?.primaryLastName}`,
+            siteId: reservation.SiteId,
+            siteName: reservation.Site?.siteNumber,
             arrivalDate: reservation.arrivalDate,
             departureDate: reservation.departureDate,
             status: reservation.status,
@@ -1462,8 +1462,8 @@ export class ReservationsService {
             }
           });
 
-          const revenueGl = reservation.site?.siteClass?.glCode ?? "REVENUE_UNMAPPED";
-          const revenueAccount = reservation.site?.siteClass?.clientAccount ?? "Revenue";
+          const revenueGl = reservation.Site?.siteClass?.glCode ?? "REVENUE_UNMAPPED";
+          const revenueAccount = reservation.Site?.siteClass?.clientAccount ?? "Revenue";
           await postBalancedLedgerEntries(this.prisma, [
             {
               campgroundId: data.campgroundId,
@@ -1492,14 +1492,14 @@ export class ReservationsService {
           // Send payment receipt email
           try {
             await this.emailService.sendPaymentReceipt({
-              guestEmail: reservation.guest.email,
-              guestName: `${reservation.guest.primaryFirstName} ${reservation.guest.primaryLastName}`,
-              campgroundName: reservation.campground?.name || "Campground",
+              guestEmail: reservation.Guest.email,
+              guestName: `${reservation.Guest.primaryFirstName} ${reservation.Guest.primaryLastName}`,
+              campgroundName: reservation.Campground?.name || "Campground",
               amountCents: paidAmount,
               paymentMethod: paymentMethod || "card",
               transactionId: transactionId ?? undefined,
               reservationId: reservation.id,
-              siteNumber: reservation.site?.siteNumber,
+              siteNumber: reservation.Site?.siteNumber,
               arrivalDate: reservation.arrivalDate,
               departureDate: reservation.departureDate,
               source: reservation.source || "admin",
@@ -1539,8 +1539,8 @@ export class ReservationsService {
             requester: overrideApprovedBy || data.updatedBy || data.createdBy || "unknown",
             metadata: {
               reservationId: reservation.id,
-              guestId: reservation.guestId,
-              siteId: reservation.siteId,
+              guestId: reservation.GuestId,
+              siteId: reservation.SiteId,
               baselineTotalCents: baselinePrice.totalCents
             }
           });
@@ -1549,9 +1549,9 @@ export class ReservationsService {
         try {
           await this.policiesService.applyPoliciesToReservation({
             reservation,
-            guest: reservation.guest,
-            site: reservation.site,
-            siteClass: reservation.site?.siteClass,
+            guest: reservation.Guest,
+            site: reservation.Site,
+            siteClass: reservation.Site?.siteClass,
             channel: reservation.source || "admin",
             acceptances: policyAcceptances
           });
@@ -1563,16 +1563,16 @@ export class ReservationsService {
         this.usageTracker.trackBookingCreated(reservation.id, data.campgroundId, {
           totalAmount: totalAmount,
           nights: this.computeNights(arrival, departure),
-          guestId: reservation.guestId,
+          guestId: reservation.GuestId,
         });
 
         // Emit real-time event for new reservation
         this.realtime.emitReservationCreated(data.campgroundId, {
           reservationId: reservation.id,
-          guestId: reservation.guestId,
-          guestName: `${reservation.guest.primaryFirstName} ${reservation.guest.primaryLastName}`,
-          siteId: reservation.siteId ?? undefined,
-          siteName: reservation.site?.siteNumber ?? undefined,
+          guestId: reservation.GuestId,
+          guestName: `${reservation.Guest.primaryFirstName} ${reservation.Guest.primaryLastName}`,
+          siteId: reservation.SiteId ?? undefined,
+          siteName: reservation.Site?.siteNumber ?? undefined,
           arrivalDate: reservation.arrivalDate.toISOString(),
           departureDate: reservation.departureDate.toISOString(),
           status: reservation.status,
@@ -1594,14 +1594,14 @@ export class ReservationsService {
   async update(id: string, data: Partial<CreateReservationDto>) {
     const existing = await this.prisma.reservation.findUnique({
       where: { id },
-      include: { guest: true, campground: true, site: true }
+      include: { Guest: true, Campground: true, Site: true }
     });
     if (!existing) throw new NotFoundException("Reservation not found");
 
     const arrival = data.arrivalDate ? new Date(data.arrivalDate) : existing.arrivalDate;
     const departure = data.departureDate ? new Date(data.departureDate) : existing.departureDate;
-    const targetSiteId = data.siteId ?? existing.siteId;
-    const lockIds = Array.from(new Set([existing.siteId, targetSiteId].filter(Boolean)));
+    const targetSiteId = data.siteId ?? existing.SiteId;
+    const lockIds = Array.from(new Set([existing.SiteId, targetSiteId].filter(Boolean)));
 
     try {
       return await this.locks.withLocks(lockIds, async () => {
@@ -1647,7 +1647,7 @@ export class ReservationsService {
         const baselinePrice = await evaluatePricingV2(
           this.prisma,
           this.pricingV2Service,
-          existing.campgroundId,
+          existing.CampgroundId,
           targetSiteId,
           arrival,
           departure
@@ -1655,7 +1655,7 @@ export class ReservationsService {
 
         // Get campground pricing control settings
         const pricingControls = await this.prisma.campground.findUnique({
-          where: { id: existing.campgroundId },
+          where: { id: existing.CampgroundId },
           select: {
             maxDiscountFraction: true,
             managerApprovalThreshold: true,
@@ -1725,7 +1725,7 @@ export class ReservationsService {
         }
 
         const depositCalc = await assertReservationDepositV2(this.depositPoliciesService, {
-          campgroundId: existing.campgroundId,
+          campgroundId: existing.CampgroundId,
           siteClassId: siteInfo?.siteClassId ?? null,
           totalAmountCents: totalAmount,
           lodgingOnlyCents: price?.baseSubtotalCents ?? data.baseSubtotal ?? existing.baseSubtotal ?? baselinePrice.baseSubtotalCents,
@@ -1819,14 +1819,14 @@ export class ReservationsService {
 
         // Audit reservation update
         await this.audit.record({
-          campgroundId: existing.campgroundId,
+          campgroundId: existing.CampgroundId,
           actorId: data.updatedBy ?? existing.updatedBy ?? null,
           action: auditAction,
           entity: "reservation",
           entityId: id,
           before: {
             status: existing.status,
-            siteId: existing.siteId,
+            siteId: existing.SiteId,
             arrivalDate: existing.arrivalDate,
             departureDate: existing.departureDate,
             totalAmount: existing.totalAmount,
@@ -1836,7 +1836,7 @@ export class ReservationsService {
           },
           after: {
             status: updatedReservation.status,
-            siteId: updatedReservation.siteId,
+            siteId: updatedReservation.SiteId,
             arrivalDate: updatedReservation.arrivalDate,
             departureDate: updatedReservation.departureDate,
             totalAmount: updatedReservation.totalAmount,
@@ -1848,7 +1848,7 @@ export class ReservationsService {
 
         if (needsOverrideApproval) {
           await this.audit.record({
-            campgroundId: existing.campgroundId,
+            campgroundId: existing.CampgroundId,
             actorId: overrideApprovedBy ?? data.updatedBy ?? existing.updatedBy ?? null,
             action: "reservation_override",
             entity: "reservation",
@@ -1873,8 +1873,8 @@ export class ReservationsService {
             requester: overrideApprovedBy || data.updatedBy || "unknown",
             metadata: {
               reservationId: id,
-              guestId: updatedReservation.guestId,
-              siteId: updatedReservation.siteId,
+              guestId: updatedReservation.GuestId,
+              siteId: updatedReservation.SiteId,
               baselineTotalCents: baselinePrice.totalCents
             }
           });
@@ -1883,13 +1883,13 @@ export class ReservationsService {
         // Send cancellation email if status changed to cancelled
         if (data.status === 'cancelled' && existing.status !== 'cancelled') {
           await this.emailService.sendEmail({
-            to: existing.guest.email,
-            subject: `Reservation Cancelled: ${existing.campground.name}`,
+            to: existing.Guest.email,
+            subject: `Reservation Cancelled: ${existing.Campground.name}`,
             html: `
                   <h1>Reservation Cancelled</h1>
-                  <p>Dear ${existing.guest.primaryFirstName},</p>
-                  <p>Your reservation at ${existing.campground.name} has been cancelled.</p>
-                  <p><strong>Site:</strong> ${existing.site.siteNumber}</p>
+                  <p>Dear ${existing.Guest.primaryFirstName},</p>
+                  <p>Your reservation at ${existing.Campground.name} has been cancelled.</p>
+                  <p><strong>Site:</strong> ${existing.Site.siteNumber}</p>
                   <p>If you did not request this cancellation, please contact us immediately.</p>
                 `
           });
@@ -1897,11 +1897,11 @@ export class ReservationsService {
           // Check waitlist for matches
           // We use the original reservation dates and site
           await this.waitlistService.checkWaitlist(
-            existing.campgroundId,
+            existing.CampgroundId,
             existing.arrivalDate,
             existing.departureDate,
-            existing.siteId,
-            existing.site.siteClassId ?? undefined
+            existing.SiteId,
+            existing.Site.siteClassId ?? undefined
           );
 
           await this.accessControl.blockAccessForReservation(id, "reservation_cancelled");
@@ -1913,7 +1913,7 @@ export class ReservationsService {
           const points = Math.floor(updatedReservation.totalAmount / 100);
           if (points > 0) {
             await this.loyaltyService.awardPoints(
-              existing.guestId,
+              existing.GuestId,
               points,
               `Reservation #${existing.id}`
             );
@@ -1923,10 +1923,10 @@ export class ReservationsService {
           try {
             await this.prisma.task.create({
               data: {
-                tenantId: existing.campgroundId,
+                tenantId: existing.CampgroundId,
                 type: 'turnover',
                 state: 'pending',
-                siteId: existing.siteId,
+                siteId: existing.SiteId,
                 reservationId: existing.id,
                 slaStatus: 'on_track',
                 slaDueAt: new Date(Date.now() + 4 * 60 * 60 * 1000), // 4 hours from now
@@ -1955,10 +1955,10 @@ export class ReservationsService {
         // Gamification: smooth check-in via standard update
         if (data.status === ReservationStatus.checked_in && existing.status !== ReservationStatus.checked_in && existing.createdBy) {
           const membership = await this.prisma.campgroundMembership.findFirst({
-            where: { userId: existing.createdBy, campgroundId: existing.campgroundId }
+            where: { userId: existing.createdBy, campgroundId: existing.CampgroundId }
           });
           await this.gamification.recordEvent({
-            campgroundId: existing.campgroundId,
+            campgroundId: existing.CampgroundId,
             userId: existing.createdBy,
             membershipId: membership?.id,
             category: GamificationEventCategory.check_in,
@@ -1972,10 +1972,10 @@ export class ReservationsService {
         // Emit real-time events based on status changes
         const eventData: ReservationEventData = {
           reservationId: updatedReservation.id,
-          guestId: updatedReservation.guestId,
-          guestName: `${updatedReservation.guest.primaryFirstName} ${updatedReservation.guest.primaryLastName}`,
-          siteId: updatedReservation.siteId ?? undefined,
-          siteName: updatedReservation.site?.siteNumber ?? undefined,
+          guestId: updatedReservation.GuestId,
+          guestName: `${updatedReservation.Guest.primaryFirstName} ${updatedReservation.Guest.primaryLastName}`,
+          siteId: updatedReservation.SiteId ?? undefined,
+          siteName: updatedReservation.Site?.siteNumber ?? undefined,
           arrivalDate: updatedReservation.arrivalDate.toISOString(),
           departureDate: updatedReservation.departureDate.toISOString(),
           status: updatedReservation.status,
@@ -1986,17 +1986,17 @@ export class ReservationsService {
         // Reuse statusChanged from earlier in this transaction
         if (statusChanged) {
           if (data.status === ReservationStatus.cancelled) {
-            this.realtime.emitReservationCancelled(existing.campgroundId, eventData);
+            this.realtime.emitReservationCancelled(existing.CampgroundId, eventData);
           } else if (data.status === ReservationStatus.checked_in) {
-            this.realtime.emitReservationCheckedIn(existing.campgroundId, eventData);
+            this.realtime.emitReservationCheckedIn(existing.CampgroundId, eventData);
           } else if (data.status === ReservationStatus.checked_out) {
-            this.realtime.emitReservationCheckedOut(existing.campgroundId, eventData);
+            this.realtime.emitReservationCheckedOut(existing.CampgroundId, eventData);
           } else {
-            this.realtime.emitReservationUpdated(existing.campgroundId, eventData);
+            this.realtime.emitReservationUpdated(existing.CampgroundId, eventData);
           }
         } else {
           // General update (dates, site, guest, etc.)
-          this.realtime.emitReservationUpdated(existing.campgroundId, eventData);
+          this.realtime.emitReservationUpdated(existing.CampgroundId, eventData);
         }
 
         return updatedReservation;
@@ -2028,7 +2028,7 @@ export class ReservationsService {
         select: { tenantId: true }
       });
       if (!group) throw new NotFoundException("Group not found");
-      if (group.tenantId !== reservation.campgroundId) {
+      if (group.tenantId !== reservation.CampgroundId) {
         throw new BadRequestException("Group belongs to a different campground");
       }
     }
@@ -2067,7 +2067,7 @@ export class ReservationsService {
     // Get reservation before deletion for audit
     const before = await this.prisma.reservation.findUnique({
       where: { id },
-      include: { guest: true, site: true }
+      include: { Guest: true, Site: true }
     });
 
     const deleted = await this.prisma.reservation.delete({ where: { id } });
@@ -2083,9 +2083,9 @@ export class ReservationsService {
         before: {
           id: before.id,
           guestId: before.guestId,
-          guestName: `${before.guest?.primaryFirstName} ${before.guest?.primaryLastName}`,
+          guestName: `${before.Guest?.primaryFirstName} ${before.Guest?.primaryLastName}`,
           siteId: before.siteId,
-          siteName: before.site?.siteNumber,
+          siteName: before.Site?.siteNumber,
           arrivalDate: before.arrivalDate,
           departureDate: before.departureDate,
           status: before.status,
@@ -2290,7 +2290,7 @@ export class ReservationsService {
     // Audit payment recording
     try {
       await this.audit.record({
-        campgroundId: reservation.campgroundId,
+        campgroundId: reservation.CampgroundId,
         actorId: null, // Payment recording doesn't always have actor context
         action: "reservation.payment",
         entity: "reservation",
@@ -2311,16 +2311,16 @@ export class ReservationsService {
     // Send payment receipt email
     try {
       await this.emailService.sendPaymentReceipt({
-        guestEmail: reservation.guest?.email,
-        guestName: `${reservation.guest?.primaryFirstName} ${reservation.guest?.primaryLastName}`,
-        campgroundName: reservation.campground?.name,
-        campgroundId: reservation.campgroundId,
-        guestId: reservation.guestId,
+        guestEmail: reservation.Guest?.email,
+        guestName: `${reservation.Guest?.primaryFirstName} ${reservation.Guest?.primaryLastName}`,
+        campgroundName: reservation.Campground?.name,
+        campgroundId: reservation.CampgroundId,
+        guestId: reservation.GuestId,
         amountCents: totalTenderCents,
         paymentMethod: options?.paymentMethod || (tenderList.length === 1 ? tenderList[0].method : 'Mixed'),
         transactionId: options?.transactionId,
         reservationId: reservation.id,
-        siteNumber: reservation.site?.siteNumber,
+        siteNumber: reservation.Site?.siteNumber,
         arrivalDate: reservation.arrivalDate,
         departureDate: reservation.departureDate,
         source: options?.source || reservation.source || 'admin',
@@ -2339,12 +2339,12 @@ export class ReservationsService {
     if (options?.recordedBy) {
       try {
         const membership = await this.prisma.campgroundMembership.findFirst({
-          where: { userId: options.recordedBy, campgroundId: reservation.campgroundId }
+          where: { userId: options.recordedBy, campgroundId: reservation.CampgroundId }
         });
         if (membership) {
           const isFullPayment = (updated.paidAmount ?? 0) >= updated.totalAmount;
           await this.gamification.recordEvent({
-            campgroundId: reservation.campgroundId,
+            campgroundId: reservation.CampgroundId,
             userId: options.recordedBy,
             membershipId: membership.id,
             category: GamificationEventCategory.payment_collection,
@@ -2557,7 +2557,7 @@ export class ReservationsService {
     // Audit refund
     try {
       await this.audit.record({
-        campgroundId: reservation.campgroundId,
+        campgroundId: reservation.CampgroundId,
         actorId: null,
         action: "reservation.refund",
         entity: "reservation",
@@ -2579,14 +2579,14 @@ export class ReservationsService {
     // Send refund receipt
     try {
       await this.emailService.sendPaymentReceipt({
-        guestEmail: reservation.guest?.email ?? "",
-        guestName: `${reservation.guest?.primaryFirstName ?? ""} ${reservation.guest?.primaryLastName ?? ""}`.trim(),
-        campgroundName: reservation.campground?.name ?? "Campground",
+        guestEmail: reservation.Guest?.email ?? "",
+        guestName: `${reservation.Guest?.primaryFirstName ?? ""} ${reservation.Guest?.primaryLastName ?? ""}`.trim(),
+        campgroundName: reservation.Campground?.name ?? "Campground",
         amountCents,
         paymentMethod: destination === "wallet" ? "Guest Wallet Credit" : "Card",
         transactionId: undefined,
         reservationId: reservation.id,
-        siteNumber: reservation.site?.siteNumber,
+        siteNumber: reservation.Site?.siteNumber,
         arrivalDate: reservation.arrivalDate,
         departureDate: reservation.departureDate,
         source: reservation.source ?? "admin",
@@ -2657,7 +2657,7 @@ export class ReservationsService {
 
       await tx.payment.create({
         data: {
-          campgroundId: reservation.campgroundId,
+          campgroundId: reservation.CampgroundId,
           reservationId: reservation.id,
           amountCents,
           method: "card",
@@ -2669,12 +2669,12 @@ export class ReservationsService {
         }
       });
 
-      const revenueGl = reservation.site?.siteClass?.glCode ?? "REVENUE_UNMAPPED";
-      const revenueAccount = reservation.site?.siteClass?.clientAccount ?? "Revenue";
+      const revenueGl = reservation.Site?.siteClass?.glCode ?? "REVENUE_UNMAPPED";
+      const revenueAccount = reservation.Site?.siteClass?.clientAccount ?? "Revenue";
       const dedupeKeyBase = stripeRefundId ? `res:${reservation.id}:refund:${stripeRefundId}` : `res:${reservation.id}:refund:${amountCents}`;
       await postBalancedLedgerEntries(tx, [
         {
-          campgroundId: reservation.campgroundId,
+          campgroundId: reservation.CampgroundId,
           reservationId: reservation.id,
           glCode: "CASH",
           account: "Cash",
@@ -2685,7 +2685,7 @@ export class ReservationsService {
           dedupeKey: `${dedupeKeyBase}:credit`
         },
         {
-          campgroundId: reservation.campgroundId,
+          campgroundId: reservation.CampgroundId,
           reservationId: reservation.id,
           glCode: revenueGl,
           account: revenueAccount,
@@ -2708,14 +2708,14 @@ export class ReservationsService {
     // Send refund receipt
     try {
       await this.emailService.sendPaymentReceipt({
-        guestEmail: (reservation as any)?.guest?.email ?? "",
-        guestName: reservation ? `${(reservation as any)?.guest?.primaryFirstName ?? ""} ${(reservation as any)?.guest?.primaryLastName ?? ""}`.trim() : "",
-        campgroundName: (reservation as any)?.campground?.name ?? "Campground",
+        guestEmail: (reservation as any)?.Guest?.email ?? "",
+        guestName: reservation ? `${(reservation as any)?.Guest?.primaryFirstName ?? ""} ${(reservation as any)?.Guest?.primaryLastName ?? ""}`.trim() : "",
+        campgroundName: (reservation as any)?.Campground?.name ?? "Campground",
         amountCents,
         paymentMethod: options?.paymentMethod ?? "Card",
         transactionId: stripeRefundId,
         reservationId: reservation.id,
-        siteNumber: (reservation as any)?.site?.siteNumber,
+        siteNumber: (reservation as any)?.Site?.siteNumber,
         arrivalDate: (reservation as any)?.arrivalDate,
         departureDate: (reservation as any)?.departureDate,
         source: options?.source ?? "admin",
@@ -2946,7 +2946,7 @@ export class ReservationsService {
     if (isOverride && !compliance.ok) {
       try {
         await this.audit.record({
-          campgroundId: reservation.campgroundId,
+          campgroundId: reservation.CampgroundId,
           actorId: options?.actorId ?? null,
           action: "checkin.override",
           entity: "Reservation",
@@ -2997,7 +2997,7 @@ export class ReservationsService {
 
         // Get campground's Stripe account
         const campground = await this.prisma.campground.findUnique({
-          where: { id: reservation.campgroundId },
+          where: { id: reservation.CampgroundId },
           select: { stripeAccountId: true, perBookingFeeCents: true }
         });
 
@@ -3016,7 +3016,7 @@ export class ReservationsService {
           campground.stripeAccountId,
           {
             reservationId: id,
-            campgroundId: reservation.campgroundId,
+            campgroundId: reservation.CampgroundId,
             source: 'kiosk_checkin',
             type: 'balance_due',
             upsellAmount: String(upsellTotalCents),
@@ -3035,7 +3035,7 @@ export class ReservationsService {
         // Record the payment
         await this.prisma.payment.create({
           data: {
-            campgroundId: reservation.campgroundId,
+            campgroundId: reservation.CampgroundId,
             reservationId: id,
             amountCents: balanceDue,
             method: 'card',
@@ -3082,7 +3082,7 @@ export class ReservationsService {
 
       // Audit successful kiosk check-in
       await this.audit.record({
-        campgroundId: reservation.campgroundId,
+        campgroundId: reservation.CampgroundId,
         actorId: options?.actorId ?? null,
         action: "reservation.checkin",
         entity: "reservation",
@@ -3108,10 +3108,10 @@ export class ReservationsService {
 
       if (reservation.createdBy) {
         const membership = await this.prisma.campgroundMembership.findFirst({
-          where: { userId: reservation.createdBy, campgroundId: reservation.campgroundId }
+          where: { userId: reservation.createdBy, campgroundId: reservation.CampgroundId }
         });
         await this.gamification.recordEvent({
-          campgroundId: reservation.campgroundId,
+          campgroundId: reservation.CampgroundId,
           userId: reservation.createdBy,
           membershipId: membership?.id,
           category: GamificationEventCategory.check_in,
@@ -3123,12 +3123,12 @@ export class ReservationsService {
       }
 
       // Emit real-time event for kiosk check-in
-      this.realtime.emitReservationCheckedIn(reservation.campgroundId, {
+      this.realtime.emitReservationCheckedIn(reservation.CampgroundId, {
         reservationId: updated.id,
-        guestId: reservation.guestId,
-        guestName: `${reservation.guest.primaryFirstName} ${reservation.guest.primaryLastName}`,
-        siteId: reservation.siteId ?? undefined,
-        siteName: reservation.site?.siteNumber ?? undefined,
+        guestId: reservation.GuestId,
+        guestName: `${reservation.Guest.primaryFirstName} ${reservation.Guest.primaryLastName}`,
+        siteId: reservation.SiteId ?? undefined,
+        siteName: reservation.Site?.siteNumber ?? undefined,
         arrivalDate: reservation.arrivalDate.toISOString(),
         departureDate: reservation.departureDate.toISOString(),
         status: updated.status
@@ -3151,7 +3151,7 @@ export class ReservationsService {
   ): Promise<{ reservation: Reservation; warning?: string }> {
     const reservation = await this.prisma.reservation.findUnique({
       where: { id },
-      include: { guest: true, site: true, campground: true }
+      include: { Guest: true, Site: true, Campground: true }
     });
 
     if (!reservation) {
@@ -3193,13 +3193,13 @@ export class ReservationsService {
         checkInStatus: CheckInStatus.completed,
         checkInAt: now
       },
-      include: { guest: true, site: true, campground: true }
+      include: { Guest: true, Site: true, Campground: true }
     });
 
     // Audit
     await this.audit.record({
       action: "reservation.checkin",
-      campgroundId: reservation.campgroundId,
+      campgroundId: reservation.CampgroundId,
       actorId: options?.actorId ?? null,
       entity: "reservation",
       entityId: id,
@@ -3214,10 +3214,10 @@ export class ReservationsService {
     // Gamification
     if (reservation.createdBy) {
       const membership = await this.prisma.campgroundMembership.findFirst({
-        where: { userId: reservation.createdBy, campgroundId: reservation.campgroundId }
+        where: { userId: reservation.createdBy, campgroundId: reservation.CampgroundId }
       });
       await this.gamification.recordEvent({
-        campgroundId: reservation.campgroundId,
+        campgroundId: reservation.CampgroundId,
         userId: reservation.createdBy,
         membershipId: membership?.id,
         category: GamificationEventCategory.operational,
@@ -3230,12 +3230,12 @@ export class ReservationsService {
     }
 
     // Emit real-time event for staff check-in
-    this.realtime.emitReservationCheckedIn(reservation.campgroundId, {
+    this.realtime.emitReservationCheckedIn(reservation.CampgroundId, {
       reservationId: updated.id,
-      guestId: updated.guestId,
-      guestName: `${updated.guest.primaryFirstName} ${updated.guest.primaryLastName}`,
-      siteId: updated.siteId ?? undefined,
-      siteName: updated.site?.siteNumber ?? undefined,
+      guestId: updated.GuestId,
+      guestName: `${updated.Guest.primaryFirstName} ${updated.Guest.primaryLastName}`,
+      siteId: updated.SiteId ?? undefined,
+      siteName: updated.Site?.siteNumber ?? undefined,
       arrivalDate: updated.arrivalDate.toISOString(),
       departureDate: updated.departureDate.toISOString(),
       status: updated.status
@@ -3253,7 +3253,7 @@ export class ReservationsService {
   ): Promise<{ reservation: Reservation; warning?: string }> {
     const reservation = await this.prisma.reservation.findUnique({
       where: { id },
-      include: { guest: true, site: true, campground: true }
+      include: { Guest: true, Site: true, Campground: true }
     });
 
     if (!reservation) {
@@ -3288,13 +3288,13 @@ export class ReservationsService {
         status: ReservationStatus.checked_out,
         checkOutAt: now
       },
-      include: { guest: true, site: true, campground: true }
+      include: { Guest: true, Site: true, Campground: true }
     });
 
     // Audit
     await this.audit.record({
       action: "reservation.checkout",
-      campgroundId: reservation.campgroundId,
+      campgroundId: reservation.CampgroundId,
       actorId: options?.actorId ?? null,
       entity: "reservation",
       entityId: id,
@@ -3306,12 +3306,12 @@ export class ReservationsService {
     await this.enqueuePlaybooksForReservation("post_departure", id);
 
     // Emit real-time event for staff check-out
-    this.realtime.emitReservationCheckedOut(reservation.campgroundId, {
+    this.realtime.emitReservationCheckedOut(reservation.CampgroundId, {
       reservationId: updated.id,
-      guestId: updated.guestId,
-      guestName: `${updated.guest.primaryFirstName} ${updated.guest.primaryLastName}`,
-      siteId: updated.siteId ?? undefined,
-      siteName: updated.site?.siteNumber ?? undefined,
+      guestId: updated.GuestId,
+      guestName: `${updated.Guest.primaryFirstName} ${updated.Guest.primaryLastName}`,
+      siteId: updated.SiteId ?? undefined,
+      siteName: updated.Site?.siteNumber ?? undefined,
       arrivalDate: updated.arrivalDate.toISOString(),
       departureDate: updated.departureDate.toISOString(),
       status: updated.status
@@ -3336,7 +3336,7 @@ export class ReservationsService {
   ) {
     const reservation = await this.prisma.reservation.findUnique({
       where: { id: reservationId },
-      include: { campground: true, guest: true, site: true }
+      include: { Campground: true, Guest: true, Site: true }
     });
 
     if (!reservation) {
@@ -3390,7 +3390,7 @@ export class ReservationsService {
       if (!site) {
         throw new NotFoundException(`Site ${seg.siteId} not found`);
       }
-      if (site.campgroundId !== reservation.campgroundId) {
+      if (site.campgroundId !== reservation.CampgroundId) {
         throw new BadRequestException(`Site ${seg.siteId} is not in this campground`);
       }
 
@@ -3409,7 +3409,7 @@ export class ReservationsService {
       const priceResult = await evaluatePricingV2(
         this.prisma,
         this.pricingV2Service,
-        reservation.campgroundId,
+        reservation.CampgroundId,
         seg.siteId,
         new Date(seg.startDate),
         new Date(seg.endDate)
@@ -3453,9 +3453,9 @@ export class ReservationsService {
             : `[Split Stay] ${sortedSegments.length} segments across sites.`
         },
         include: {
-          segments: { include: { site: true }, orderBy: { sortOrder: "asc" } },
-          guest: true,
-          campground: true
+          segments: { include: { Site: true }, orderBy: { sortOrder: "asc" } },
+          Guest: true,
+          Campground: true
         }
       });
 
@@ -3468,7 +3468,7 @@ export class ReservationsService {
       entity: "reservation",
       entityId: reservationId,
       actorId: options?.actorId ?? null,
-      campgroundId: reservation.campgroundId,
+      campgroundId: reservation.CampgroundId,
       before: { totalAmount: reservation.totalAmount, segmentCount: 0 },
       after: {
         segmentCount: sortedSegments.length,
@@ -3478,7 +3478,7 @@ export class ReservationsService {
     });
 
     // Send notification to guest about site change if requested
-    if (options?.sendNotification && reservation.guest?.email) {
+    if (options?.sendNotification && reservation.Guest?.email) {
       try {
         const siteNames = await Promise.all(
           sortedSegments.map(async (s) => {
@@ -3491,12 +3491,12 @@ export class ReservationsService {
         );
 
         await this.emailService.sendTemplatedEmail({
-          to: reservation.guest.email,
-          campgroundId: reservation.campgroundId,
+          to: reservation.Guest.email,
+          campgroundId: reservation.CampgroundId,
           template: "reservation_update",
           context: {
-            guestFirstName: reservation.guest.primaryFirstName,
-            campgroundName: reservation.campground.name,
+            guestFirstName: reservation.Guest.primaryFirstName,
+            campgroundName: reservation.Campground.name,
             arrivalDate: reservation.arrivalDate.toISOString().slice(0, 10),
             departureDate: reservation.departureDate.toISOString().slice(0, 10),
             message: `Your stay has been split across multiple sites: ${siteNames.join(" → ")}. We will ensure a smooth transition between sites.`,
@@ -3517,7 +3517,7 @@ export class ReservationsService {
   async getReservationSegments(reservationId: string) {
     return this.prisma.reservationSegment.findMany({
       where: { reservationId },
-      include: { site: true },
+      include: { Site: true },
       orderBy: { sortOrder: "asc" }
     });
   }

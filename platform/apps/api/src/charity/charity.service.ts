@@ -166,7 +166,7 @@ export class CharityService {
     return this.prisma.campgroundCharity.findUnique({
       where: { campgroundId },
       include: {
-        charity: true,
+        Charity: true,
       },
     });
   }
@@ -218,7 +218,7 @@ export class CharityService {
         glCode: data.glCode,
       },
       include: {
-        charity: true,
+        Charity: true,
       },
     });
   }
@@ -250,7 +250,7 @@ export class CharityService {
           status: "collected",
         },
         include: {
-          charity: true,
+          Charity: true,
         },
       });
 
@@ -263,7 +263,7 @@ export class CharityService {
             reservationId: data.reservationId,
             glCode: GL_CODES.CHARITY_CASH_COLLECTED,
             account: "Cash - Charity Collections",
-            description: `Charity donation collected for ${donation.charity.name}`,
+            description: `Charity donation collected for ${donation.Charity.name}`,
             amountCents: data.amountCents,
             direction: "debit",
             externalRef: `donation:${donation.id}:debit`,
@@ -273,7 +273,7 @@ export class CharityService {
             reservationId: data.reservationId,
             glCode: GL_CODES.CHARITY_DONATIONS_PAYABLE,
             account: "Charity Donations Payable",
-            description: `Charity donation payable to ${donation.charity.name}`,
+            description: `Charity donation payable to ${donation.Charity.name}`,
             amountCents: data.amountCents,
             direction: "credit",
             externalRef: `donation:${donation.id}:credit`,
@@ -300,7 +300,7 @@ export class CharityService {
     return this.prisma.charityDonation.findUnique({
       where: { reservationId },
       include: {
-        charity: true,
+        Charity: true,
       },
     });
   }
@@ -317,7 +317,7 @@ export class CharityService {
           refundedAt: new Date(),
         },
         include: {
-          charity: true,
+          Charity: true,
         },
       });
 
@@ -330,7 +330,7 @@ export class CharityService {
             reservationId,
             glCode: GL_CODES.CHARITY_DONATIONS_PAYABLE,
             account: "Charity Donations Payable",
-            description: `Charity donation refund - ${updatedDonation.charity.name}`,
+            description: `Charity donation refund - ${updatedDonation.Charity.name}`,
             amountCents: donation.amountCents,
             direction: "debit",
             externalRef: `donation-refund:${donation.id}:debit`,
@@ -340,7 +340,7 @@ export class CharityService {
             reservationId,
             glCode: GL_CODES.CHARITY_CASH_COLLECTED,
             account: "Cash - Charity Collections",
-            description: `Charity donation refund - ${updatedDonation.charity.name}`,
+            description: `Charity donation refund - ${updatedDonation.Charity.name}`,
             amountCents: donation.amountCents,
             direction: "credit",
             externalRef: `donation-refund:${donation.id}:credit`,
@@ -378,14 +378,14 @@ export class CharityService {
       this.prisma.charityDonation.findMany({
         where,
         include: {
-          charity: true,
-          reservation: {
+          Charity: true,
+          Reservation: {
             select: {
               id: true,
               arrivalDate: true,
               departureDate: true,
-              guest: {
-                select: { firstName: true, lastName: true, email: true },
+              Guest: {
+                select: { primaryFirstName: true, primaryLastName: true, email: true },
               },
             },
           },
@@ -543,7 +543,7 @@ export class CharityService {
           createdBy,
         },
         include: {
-          charity: true,
+          Charity: true,
         },
       });
 
@@ -566,7 +566,7 @@ export class CharityService {
     const payout = await this.prisma.charityPayout.findUnique({
       where: { id: payoutId },
       include: {
-        charity: true,
+        Charity: true,
         donations: {
           select: { campgroundId: true, amountCents: true },
         },
@@ -588,7 +588,7 @@ export class CharityService {
           notes,
         },
         include: {
-          charity: true,
+          Charity: true,
         },
       });
 
@@ -615,7 +615,7 @@ export class CharityService {
               campgroundId,
               glCode: GL_CODES.CHARITY_DONATIONS_PAYABLE,
               account: "Charity Donations Payable",
-              description: `Charity payout to ${payout.charity.name} (ref: ${reference || payoutId})`,
+              description: `Charity payout to ${payout.Charity.name} (ref: ${reference || payoutId})`,
               amountCents,
               direction: "debit",
               externalRef: `payout:${payoutId}:${campgroundId}:debit`,
@@ -624,7 +624,7 @@ export class CharityService {
               campgroundId,
               glCode: GL_CODES.CHARITY_CASH_PAID_OUT,
               account: "Cash - Charity Payouts",
-              description: `Charity payout to ${payout.charity.name} (ref: ${reference || payoutId})`,
+              description: `Charity payout to ${payout.Charity.name} (ref: ${reference || payoutId})`,
               amountCents,
               direction: "credit",
               externalRef: `payout:${payoutId}:${campgroundId}:credit`,
@@ -654,7 +654,7 @@ export class CharityService {
       this.prisma.charityPayout.findMany({
         where,
         include: {
-          charity: true,
+          Charity: true,
           _count: { select: { donations: true } },
         },
         orderBy: { createdAt: "desc" },

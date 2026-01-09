@@ -21,7 +21,7 @@ export class OperationsService {
                 ...(type && { type }),
                 ...(status && { status }),
             },
-            include: { site: true },
+            include: { Site: true },
             orderBy: { createdAt: 'desc' },
         });
     }
