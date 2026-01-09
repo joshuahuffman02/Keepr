@@ -404,12 +404,13 @@ export default function Dashboard() {
     placeholderData: keepPreviousData,
   });
 
-  // Get today's date as YYYY-MM-DD string in UTC (for reliable date comparison with backend)
-  // The backend stores all dates in UTC, so we must compare using UTC dates
+  // Get today's date as YYYY-MM-DD string in the campground's local timezone
+  // Reservations are created with dates in the campground's local context (e.g., "Jan 8" means Jan 8 local time)
+  // so we compare using the browser's local timezone (which should match the campground's timezone)
   const todayString = useMemo(() => {
     if (!hasMounted) return null;
     const d = new Date();
-    return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   }, [hasMounted]);
 
   // Also keep a Date object for display purposes
@@ -471,8 +472,12 @@ export default function Dashboard() {
       days14Strings.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`);
     }
 
-    // Helper to extract date portion (YYYY-MM-DD) from ISO string
-    const getDatePart = (isoStr: string) => isoStr.split('T')[0];
+    // Helper to convert ISO date to local timezone and extract YYYY-MM-DD
+    // This ensures dates are compared in the campground's local timezone
+    const getDatePart = (isoStr: string) => {
+      const d = new Date(isoStr);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    };
 
     if (reservations) {
       for (const r of reservations) {

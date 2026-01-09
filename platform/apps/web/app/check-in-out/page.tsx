@@ -60,11 +60,11 @@ type Reservation = {
   notes?: string | null;
 };
 
-// Helper to get today's date as YYYY-MM-DD string in UTC
-// (backend stores dates in UTC, so we compare using UTC for consistency)
+// Helper to get today's date as YYYY-MM-DD string in local timezone
+// (campground dates should match the local timezone, e.g., Central/Chicago)
 function getTodayDateString() {
   const d = new Date();
-  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
 
 export default function CheckInOutPage() {
