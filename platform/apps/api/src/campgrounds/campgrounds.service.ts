@@ -351,7 +351,7 @@ export class CampgroundsService {
         reviewCount: true,
         reviewSources: true,
         amenitySummary: true,
-        campgroundAwards: {
+        CampgroundAward: {
           where: { awardType: "campground_of_year" },
           select: { year: true, npsScore: true },
           orderBy: { year: "desc" }
@@ -484,13 +484,13 @@ export class CampgroundsService {
       const npsImprovement = risingStarData[cg.id] ?? null;
 
       // Get past Campground of the Year awards
-      const pastAwards = cg.campgroundAwards
+      const pastAwards = cg.CampgroundAward
         .filter(a => a.year < new Date().getFullYear())
         .map(a => ({ year: a.year, npsScore: a.npsScore }));
 
       return {
         ...cg,
-        campgroundAwards: undefined, // Remove raw data
+        CampgroundAward: undefined, // Remove raw data
         npsScore: nps?.score ?? null,
         npsResponseCount: nps?.responseCount ?? 0,
         npsRank: ranking?.rank ?? null,
