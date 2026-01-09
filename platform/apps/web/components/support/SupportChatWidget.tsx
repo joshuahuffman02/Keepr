@@ -252,8 +252,8 @@ export function SupportChatWidget() {
   const [partnerMessages, setPartnerMessages] = useState<PartnerMessage[]>([]);
   const [supportInput, setSupportInput] = useState("");
   const [partnerInput, setPartnerInput] = useState("");
-  const [supportSessionId] = useState(() => generateSessionId());
-  const [partnerSessionId] = useState(() => `partner_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`);
+  const [supportSessionId, setSupportSessionId] = useState("");
+  const [partnerSessionId, setPartnerSessionId] = useState("");
   const [campgroundId, setCampgroundId] = useState<string | null>(null);
   const [confirmingDraftId, setConfirmingDraftId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -265,6 +265,12 @@ export function SupportChatWidget() {
   useEffect(() => {
     scrollToBottom();
   }, [supportMessages, partnerMessages, mode]);
+
+  // Initialize session IDs client-side only (SSR-safe)
+  useEffect(() => {
+    setSupportSessionId(generateSessionId());
+    setPartnerSessionId(`partner_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`);
+  }, []);
 
   useEffect(() => {
     if (!isOpen || mode !== "partner") return;
