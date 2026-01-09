@@ -517,12 +517,12 @@ export class AiDashboardService {
         calculatedAt: { gte: periodStart },
       },
       include: {
-        waitlistEntry: { select: { status: true } },
+        WaitlistEntry: { select: { status: true } },
       },
     });
 
     const accepted = scores.filter(
-      (s) => s.waitlistEntry.status === "offered_accepted"
+      (s) => s.WaitlistEntry.status === "offered_accepted"
     );
 
     return {

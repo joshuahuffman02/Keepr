@@ -86,7 +86,7 @@ export class StaffService {
         ...(status ? { status: status as any } : {}),
       },
       include: {
-        user: { select: { id: true, firstName: true, lastName: true, email: true } },
+        User: { select: { id: true, firstName: true, lastName: true, email: true } },
       },
       orderBy: [{ shiftDate: 'asc' }, { startTime: 'asc' }],
     });
@@ -387,7 +387,7 @@ export class StaffService {
         ...(userId ? { userId } : {}),
       },
       include: {
-        user: { select: { id: true, firstName: true, lastName: true } },
+        User: { select: { id: true, firstName: true, lastName: true } },
       },
       orderBy: [{ userId: 'asc' }, { dayOfWeek: 'asc' }],
     });
@@ -525,7 +525,7 @@ export class StaffService {
         ...(endDate ? { periodEnd: { lte: endDate } } : {}),
       },
       include: {
-        user: { select: { id: true, firstName: true, lastName: true } },
+        User: { select: { id: true, firstName: true, lastName: true } },
       },
       orderBy: { periodStart: 'desc' },
     });
@@ -597,7 +597,7 @@ export class StaffService {
         reason: dto.reason,
       },
       include: {
-        user: { select: { id: true, email: true, firstName: true, lastName: true } },
+        User_TimeOffRequest_userIdToUser: { select: { id: true, email: true, firstName: true, lastName: true } },
       },
     });
   }
@@ -620,8 +620,8 @@ export class StaffService {
         ...(options?.endDate ? { endDate: { lte: options.endDate } } : {}),
       },
       include: {
-        user: { select: { id: true, email: true, firstName: true, lastName: true } },
-        reviewer: { select: { id: true, email: true, firstName: true, lastName: true } },
+        User_TimeOffRequest_userIdToUser: { select: { id: true, email: true, firstName: true, lastName: true } },
+        User_TimeOffRequest_reviewerIdToUser: { select: { id: true, email: true, firstName: true, lastName: true } },
       },
       orderBy: { startDate: 'desc' },
     });
@@ -645,8 +645,8 @@ export class StaffService {
         reviewedAt: new Date(),
       },
       include: {
-        user: { select: { id: true, email: true, firstName: true, lastName: true } },
-        reviewer: { select: { id: true, email: true, firstName: true, lastName: true } },
+        User_TimeOffRequest_userIdToUser: { select: { id: true, email: true, firstName: true, lastName: true } },
+        User_TimeOffRequest_reviewerIdToUser: { select: { id: true, email: true, firstName: true, lastName: true } },
       },
     });
   }
@@ -729,7 +729,7 @@ export class StaffService {
           : {}),
       },
       include: {
-        user: { select: { id: true, email: true, firstName: true, lastName: true } },
+        User: { select: { id: true, email: true, firstName: true, lastName: true } },
       },
       orderBy: { date: 'asc' },
     });
@@ -1334,9 +1334,9 @@ export class StaffService {
         ...(userId ? { userId } : {}),
       },
       include: {
-        user: { select: { id: true, firstName: true, lastName: true, email: true } },
-        shift: { select: { id: true, role: true, shiftDate: true } },
-        breaks: true,
+        User_StaffTimeEntry_userIdToUser: { select: { id: true, firstName: true, lastName: true, email: true } },
+        StaffShift: { select: { id: true, role: true, shiftDate: true } },
+        StaffBreak: true,
       },
       orderBy: { clockInAt: 'asc' },
     });
@@ -1369,17 +1369,17 @@ export class StaffService {
         const grossMins = e.clockOutAt
           ? Math.round((e.clockOutAt.getTime() - e.clockInAt.getTime()) / 60000)
           : 0;
-        const breakMins = e.breaks.reduce((sum, b) => sum + (b.durationMins || 0), 0);
-        const netMins = this.calculateNetWorkedMinutes(e.clockInAt, e.clockOutAt, e.breaks);
+        const breakMins = e.StaffBreak.reduce((sum, b) => sum + (b.durationMins || 0), 0);
+        const netMins = this.calculateNetWorkedMinutes(e.clockInAt, e.clockOutAt, e.StaffBreak);
 
         return {
           id: e.id,
           userId: e.userId,
-          userName: `${e.user.firstName} ${e.user.lastName}`,
+          userName: `${e.User_StaffTimeEntry_userIdToUser.firstName} ${e.User_StaffTimeEntry_userIdToUser.lastName}`,
           date: e.clockInAt.toISOString().split('T')[0],
           clockIn: e.clockInAt,
           clockOut: e.clockOutAt,
-          role: e.shift?.role,
+          role: e.StaffShift?.role,
           grossMinutes: grossMins,
           breakMinutes: breakMins,
           netMinutes: netMins,

@@ -30,7 +30,7 @@ export class GuestsService {
           orderBy: { arrivalDate: "desc" },
           ...(campgroundId ? { where: { campgroundId } } : {}),
           include: {
-            site: { include: { siteClass: true } }
+            Site: { include: { SiteClass: true } }
           }
         }
       }
@@ -59,7 +59,7 @@ export class GuestsService {
           take: 1,
           select: {
             departureDate: true,
-            site: {
+            Site: {
               select: { id: true, name: true, siteNumber: true, siteClassId: true }
             }
           }
@@ -105,7 +105,7 @@ export class GuestsService {
           where: { campgroundId },
           select: {
             departureDate: true,
-            site: {
+            Site: {
               select: { id: true, name: true, siteNumber: true, siteClassId: true }
             }
           }

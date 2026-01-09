@@ -123,7 +123,7 @@ export class PlatformStatsService {
         select: {
           eventName: true,
           occurredAt: true,
-          campground: {
+          Campground: {
             select: {
               name: true,
               slug: true,
@@ -167,12 +167,12 @@ export class PlatformStatsService {
       recentActivity: recentPageViews.map((event: {
         eventName: string;
         occurredAt: Date;
-        campground: { name: string; slug: string; state: string | null } | null;
+        Campground: { name: string; slug: string; state: string | null } | null;
       }) => ({
         type: (event.eventName === "availability_check" ? "search" : "page_view") as "page_view" | "search" | "booking",
-        campgroundName: event.campground?.name || null,
-        campgroundSlug: event.campground?.slug || null,
-        state: event.campground?.state || null,
+        campgroundName: event.Campground?.name || null,
+        campgroundSlug: event.Campground?.slug || null,
+        state: event.Campground?.state || null,
         minutesAgo: Math.round(
           (now.getTime() - event.occurredAt.getTime()) / 60000
         ),
