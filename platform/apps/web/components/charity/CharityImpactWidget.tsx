@@ -250,13 +250,13 @@ export function CharityImpactWidget({ campgroundId }: CharityImpactWidgetProps) 
         </CardContent>
       </Card>
 
-      <Card className="border-border">
+      <Card className="border-border overflow-hidden">
         <CardContent className="p-6">
           {statsLoading ? (
             <div className="animate-pulse">
-              <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="grid grid-cols-3 gap-2 text-center">
                 {Array.from({ length: 3 }).map((_, index) => (
-                  <div key={`charity-stats-skeleton-${index}`} className="space-y-2">
+                  <div key={`charity-stats-skeleton-${index}`} className="space-y-2 min-w-0">
                     <div className="h-6 w-12 bg-muted rounded mx-auto" />
                     <div className="h-3 w-16 bg-muted rounded mx-auto" />
                   </div>
@@ -269,32 +269,32 @@ export function CharityImpactWidget({ campgroundId }: CharityImpactWidgetProps) 
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div>
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <Heart className="h-5 w-5 text-rose-500" />
+              <div className="grid grid-cols-3 gap-2 text-center">
+                <div className="min-w-0">
+                  <div className="flex items-center justify-center gap-1 mb-2">
+                    <Heart className="h-5 w-5 text-rose-500 shrink-0" />
                   </div>
                   <p className="text-2xl font-bold text-rose-600">{animatedDonations}</p>
-                  <p className="text-xs text-muted-foreground">Donations</p>
-                  <p className="text-sm text-rose-600">
+                  <p className="text-xs text-muted-foreground truncate">Donations</p>
+                  <p className="text-sm text-rose-600 truncate">
                     Avg {averageDonationDisplay}
                   </p>
                 </div>
-                <div>
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <Users className="h-5 w-5 text-sky-500" />
+                <div className="min-w-0">
+                  <div className="flex items-center justify-center gap-1 mb-2">
+                    <Users className="h-5 w-5 text-sky-500 shrink-0" />
                   </div>
                   <p className="text-2xl font-bold text-sky-600">{animatedDonors}</p>
-                  <p className="text-xs text-muted-foreground">Donors</p>
-                  <p className="text-sm text-sky-600">Unique guests</p>
+                  <p className="text-xs text-muted-foreground truncate">Donors</p>
+                  <p className="text-sm text-sky-600 truncate">Unique guests</p>
                 </div>
-                <div>
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <DollarSign className="h-5 w-5 text-emerald-500" />
+                <div className="min-w-0">
+                  <div className="flex items-center justify-center gap-1 mb-2">
+                    <DollarSign className="h-5 w-5 text-emerald-500 shrink-0" />
                   </div>
                   <p className="text-2xl font-bold text-emerald-600">{optInDisplay}</p>
-                  <p className="text-xs text-muted-foreground">Opt-in rate</p>
-                  <p className="text-sm text-emerald-600">Of reservations</p>
+                  <p className="text-xs text-muted-foreground truncate">Opt-in rate</p>
+                  <p className="text-sm text-emerald-600 truncate">Of reservations</p>
                 </div>
               </div>
               <div className="mt-4 pt-4 border-t border-border">

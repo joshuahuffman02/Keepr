@@ -1826,31 +1826,31 @@ function NpsSummaryCard({
         </Card>
       )}
 
-      <Card className="border-border">
+      <Card className="border-border overflow-hidden">
         <CardContent className="p-6">
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <ThumbsUp className="h-5 w-5 text-green-500" />
+          <div className="grid grid-cols-3 gap-2 text-center">
+            <div className="min-w-0">
+              <div className="flex items-center justify-center gap-1 mb-2">
+                <ThumbsUp className="h-5 w-5 text-green-500 shrink-0" />
               </div>
               <p className="text-2xl font-bold text-green-600">{promoters}</p>
-              <p className="text-xs text-muted-foreground">Promoters</p>
+              <p className="text-xs text-muted-foreground truncate">Promoters</p>
               <p className="text-sm text-green-600">{formatPercent(promoters)}</p>
             </div>
-            <div>
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <Minus className="h-5 w-5 text-amber-500" />
+            <div className="min-w-0">
+              <div className="flex items-center justify-center gap-1 mb-2">
+                <Minus className="h-5 w-5 text-amber-500 shrink-0" />
               </div>
               <p className="text-2xl font-bold text-amber-600">{passives}</p>
-              <p className="text-xs text-muted-foreground">Passives</p>
+              <p className="text-xs text-muted-foreground truncate">Passives</p>
               <p className="text-sm text-amber-600">{formatPercent(passives)}</p>
             </div>
-            <div>
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <ThumbsDown className="h-5 w-5 text-red-500" />
+            <div className="min-w-0">
+              <div className="flex items-center justify-center gap-1 mb-2">
+                <ThumbsDown className="h-5 w-5 text-red-500 shrink-0" />
               </div>
               <p className="text-2xl font-bold text-red-600">{detractors}</p>
-              <p className="text-xs text-muted-foreground">Detractors</p>
+              <p className="text-xs text-muted-foreground truncate">Detractors</p>
               <p className="text-sm text-red-600">{formatPercent(detractors)}</p>
             </div>
           </div>
