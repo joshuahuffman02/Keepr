@@ -10,6 +10,51 @@ export class HealthController {
     return this.health.liveness();
   }
 
+  /**
+   * Check which services are configured (for beta launch verification)
+   * Does NOT expose secrets, just shows true/false for each service
+   */
+  @Get("health/services")
+  getServicesStatus() {
+    return {
+      timestamp: new Date().toISOString(),
+      services: {
+        stripe: {
+          configured: !!process.env.STRIPE_SECRET_KEY,
+          mode: process.env.STRIPE_SECRET_KEY?.startsWith("sk_live_") ? "live" :
+                process.env.STRIPE_SECRET_KEY?.startsWith("sk_test_") ? "test" : "unknown",
+          webhookConfigured: !!process.env.STRIPE_WEBHOOK_SECRET,
+        },
+        email: {
+          resend: !!process.env.RESEND_API_KEY,
+          postmark: !!process.env.POSTMARK_SERVER_TOKEN,
+          smtp: !!(process.env.SMTP_HOST && process.env.SMTP_USER),
+        },
+        sms: {
+          twilio: !!(process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN),
+          phoneConfigured: !!process.env.TWILIO_PHONE_NUMBER,
+        },
+        storage: {
+          s3Configured: !!(process.env.UPLOADS_S3_BUCKET && process.env.UPLOADS_S3_ACCESS_KEY),
+          bucket: process.env.UPLOADS_S3_BUCKET ? "configured" : "not set",
+          cdnConfigured: !!process.env.UPLOADS_CDN_BASE,
+        },
+        monitoring: {
+          sentry: !!process.env.SENTRY_DSN,
+          slackAlerts: !!process.env.SLACK_WEBHOOK_URL,
+          pagerduty: !!process.env.PAGERDUTY_ROUTING_KEY,
+        },
+        auth: {
+          jwtSecret: !!process.env.JWT_SECRET,
+        },
+        integrations: {
+          quickbooks: !!(process.env.QBO_CLIENT_ID && process.env.QBO_CLIENT_SECRET),
+          openai: !!process.env.OPENAI_API_KEY,
+        },
+      },
+    };
+  }
+
   @Get("healthz")
   async getHealthz() {
     const result = await this.health.liveness();
