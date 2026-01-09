@@ -485,13 +485,22 @@ export class IntegrationsService {
     return job;
   }
 
-  verifyHmac(raw: string, secret: string, signature?: string) {
-    if (!secret) return true;
+  verifyHmac(raw: string, secret: string, signature?: string): { valid: boolean; reason?: string } {
+    // SECURITY: Never allow unsigned webhooks - require secret configuration
+    if (!secret) {
+      this.logger.warn('Webhook secret not configured - rejecting request');
+      return { valid: false, reason: 'webhook_secret_not_configured' };
+    }
     const provided = (signature || "").replace(/^sha256=/i, "");
-    if (!provided) return false;
+    if (!provided) {
+      return { valid: false, reason: 'no_signature_provided' };
+    }
     const computed = crypto.createHmac("sha256", secret).update(raw).digest("hex");
-    if (provided.length !== computed.length) return false;
-    return crypto.timingSafeEqual(Buffer.from(computed), Buffer.from(provided));
+    if (provided.length !== computed.length) {
+      return { valid: false, reason: 'signature_length_mismatch' };
+    }
+    const isValid = crypto.timingSafeEqual(Buffer.from(computed), Buffer.from(provided));
+    return { valid: isValid, reason: isValid ? undefined : 'signature_mismatch' };
   }
 
   async handleWebhook(provider: string, body: any, rawBody: string, signature?: string, campgroundId?: string) {
@@ -503,8 +512,10 @@ export class IntegrationsService {
       }
     });
 
-    const secret = connection?.webhookSecret || process.env.INTEGRATIONS_WEBHOOK_SECRET || process.env.WEBHOOK_SECRET || "";
-    const signatureValid = this.verifyHmac(rawBody, secret, signature);
+    // SECURITY: Require webhook secret - no fallback to empty string
+    const secret = connection?.webhookSecret || process.env.INTEGRATIONS_WEBHOOK_SECRET || process.env.WEBHOOK_SECRET;
+    const verification = this.verifyHmac(rawBody, secret || '', signature);
+    const signatureValid = verification.valid;
 
     const event = await prisma.integrationWebhookEvent.create({
       data: {
@@ -513,7 +524,7 @@ export class IntegrationsService {
         eventType: body?.type || body?.event || null,
         status: signatureValid ? "received" : "failed",
         signatureValid,
-        message: signatureValid ? null : "Invalid signature",
+        message: signatureValid ? null : `Invalid signature: ${verification.reason || 'unknown'}`,
         payload: body ?? null,
       }
     });
@@ -522,14 +533,14 @@ export class IntegrationsService {
       await this.recordSyncLog(
         connection.id,
         signatureValid ? "queued" : "failed",
-        signatureValid ? "Webhook received" : "Webhook signature invalid",
+        signatureValid ? "Webhook received" : `Webhook signature invalid: ${verification.reason}`,
         { webhookEventId: event.id },
         connection.type,
         "webhook"
       );
     }
 
-    return { ok: signatureValid, connectionId: connection?.id ?? null, eventId: event.id };
+    return { ok: signatureValid, connectionId: connection?.id ?? null, eventId: event.id, reason: verification.reason };
   }
 }
 

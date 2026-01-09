@@ -1,7 +1,8 @@
-import { Controller, Post, Body, Get, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards, Request, Response } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { GuestAuthService } from './guest-auth.service';
 import { AuthGuard } from '@nestjs/passport';
+import { Response as ExpressResponse } from 'express';
 
 @Controller('guest-auth')
 export class GuestAuthController {
@@ -15,8 +16,26 @@ export class GuestAuthController {
 
     @Post('verify')
     @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 per minute - prevents brute force
-    async verifyToken(@Body('token') token: string) {
-        return this.guestAuthService.verifyToken(token);
+    async verifyToken(
+        @Body('token') token: string,
+        @Response({ passthrough: true }) res: ExpressResponse
+    ) {
+        const result = await this.guestAuthService.verifyToken(token);
+
+        // SECURITY: Set httpOnly cookie for secure token storage
+        // This prevents XSS attacks from stealing the token
+        if (result.token) {
+            const isProduction = process.env.NODE_ENV === 'production';
+            res.cookie('guest_token', result.token, {
+                httpOnly: true,      // Not accessible via JavaScript
+                secure: isProduction, // HTTPS only in production
+                sameSite: 'lax',     // CSRF protection
+                maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+                path: '/',
+            });
+        }
+
+        return result;
     }
 
     @Get('me')

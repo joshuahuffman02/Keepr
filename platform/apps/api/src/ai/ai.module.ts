@@ -34,6 +34,7 @@ import { AiEdgeCasesService } from './ai-edge-cases.service';
 import { AiExecutorService } from './ai-executor.service';
 import { AiService } from './ai.service';
 import { AiController } from './ai.controller';
+import { PromptSanitizerService } from './prompt-sanitizer.service';
 import { AiAutopilotController } from './ai-autopilot.controller';
 import { AiMonitoringController } from './ai-monitoring.controller';
 import { PrismaModule } from '../prisma/prisma.module';
@@ -104,6 +105,8 @@ import { AnomaliesModule } from '../anomalies/anomalies.module';
     // AI Executor (vibe-kanban pattern)
     AiExecutorService,
     AiService,
+    // Security
+    PromptSanitizerService,
   ],
   exports: [
     AiPrivacyService,
@@ -142,6 +145,8 @@ import { AnomaliesModule } from '../anomalies/anomalies.module';
     // AI Executor (vibe-kanban pattern)
     AiExecutorService,
     AiService,
+    // Security
+    PromptSanitizerService,
   ],
 })
 export class AiModule { }

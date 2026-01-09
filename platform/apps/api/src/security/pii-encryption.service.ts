@@ -36,6 +36,11 @@ export class PiiEncryptionService {
         "dateOfBirth",
         "bankAccount",
         "routingNumber",
+        // API keys and secrets
+        "aiApiKey",
+        "apiKey",
+        "apiSecret",
+        "webhookSecret",
     ];
 
     constructor() {

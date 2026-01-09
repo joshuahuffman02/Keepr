@@ -20,9 +20,9 @@ function VerifyPageInner() {
 
         const verify = async () => {
             try {
-                const result = await apiClient.verifyGuestToken(token);
-                // Store token
-                localStorage.setItem("campreserv:guestToken", result.token);
+                // SECURITY: Token is now stored in httpOnly cookie by the API
+                // No localStorage needed - the cookie is automatically sent with requests
+                await apiClient.verifyGuestToken(token);
                 // Redirect to my-stay
                 router.push("/portal/my-stay");
             } catch (err) {

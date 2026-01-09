@@ -5462,7 +5462,8 @@ export const apiClient = {
     const res = await fetch(`${API_BASE}/guest-auth/verify`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token })
+      body: JSON.stringify({ token }),
+      credentials: 'include' // SECURITY: Receive httpOnly cookie from API
     });
     const data = await parseResponse<unknown>(res);
     return z.object({
@@ -5475,9 +5476,11 @@ export const apiClient = {
       })
     }).parse(data);
   },
-  async getGuestMe(token: string) {
+  async getGuestMe(token?: string) {
+    // SECURITY: Prefer httpOnly cookie over localStorage token
     const res = await fetch(`${API_BASE}/guest-auth/me`, {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      credentials: 'include' // Send httpOnly cookie if set
     });
     const data = await parseResponse<unknown>(res);
     // We can refine this schema later, for now just return raw data or basic guest schema

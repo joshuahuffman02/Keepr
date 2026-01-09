@@ -14,6 +14,9 @@ import { AiRevenueManagerService } from "./ai-revenue-manager.service";
 import { AiWeatherService } from "./ai-weather.service";
 import { AiPredictiveMaintenanceService } from "./ai-predictive-maintenance.service";
 import { AiDashboardService } from "./ai-dashboard.service";
+import { PromptSanitizerService } from "./prompt-sanitizer.service";
+import { PiiEncryptionService } from "../security/pii-encryption.service";
+import { AiPrivacyService } from "./ai-privacy.service";
 
 @Injectable()
 export class AiService {
@@ -25,8 +28,28 @@ export class AiService {
     private readonly revenueService: AiRevenueManagerService,
     private readonly weatherService: AiWeatherService,
     private readonly maintenanceService: AiPredictiveMaintenanceService,
-    private readonly dashboardService: AiDashboardService
+    private readonly dashboardService: AiDashboardService,
+    private readonly promptSanitizer: PromptSanitizerService,
+    private readonly piiEncryption: PiiEncryptionService,
+    private readonly aiPrivacy: AiPrivacyService
   ) { }
+
+  /**
+   * Decrypt API key from database
+   */
+  private decryptApiKey(encryptedKey: string | null | undefined): string | null {
+    if (!encryptedKey) return null;
+    return this.piiEncryption.decrypt(encryptedKey);
+  }
+
+  /**
+   * Get API key for a campground (decrypted if stored encrypted)
+   */
+  private getApiKey(campground: { aiApiKey?: string | null }): string | null {
+    const encryptedKey = (campground as any)?.aiApiKey;
+    const decryptedKey = this.decryptApiKey(encryptedKey);
+    return decryptedKey || process.env.OPENAI_API_KEY || null;
+  }
 
   private async shouldUseMock(campgroundId?: string, forceMock?: boolean) {
     if (forceMock) return true;
@@ -37,8 +60,8 @@ export class AiService {
     });
     if (!cg) return true;
     if (!(cg as any).aiEnabled) return true;
-    // Use campground API key or fall back to platform env var
-    const apiKey = (cg as any).aiApiKey || process.env.OPENAI_API_KEY;
+    // SECURITY: Decrypt and check API key
+    const apiKey = this.getApiKey(cg);
     if (!apiKey) return true;
     return false;
   }
@@ -46,14 +69,20 @@ export class AiService {
   async updateSettings(campgroundId: string, dto: UpdateAiSettingsDto) {
     const cg = await this.prisma.campground.findUnique({ where: { id: campgroundId } });
     if (!cg) throw new BadRequestException("Campground not found");
+
+    // SECURITY: Encrypt API key before storing
+    const newApiKey = dto.openaiApiKey
+      ? this.piiEncryption.encrypt(dto.openaiApiKey)
+      : (cg as any).aiApiKey;
+
     await this.prisma.campground.update({
       where: { id: campgroundId },
       data: {
         aiEnabled: dto.enabled,
-        aiApiKey: dto.openaiApiKey ?? (cg as any).aiApiKey,
+        aiApiKey: newApiKey,
       } as any,
     });
-    return { ok: true, enabled: dto.enabled, hasKey: !!(dto.openaiApiKey ?? (cg as any).aiApiKey) };
+    return { ok: true, enabled: dto.enabled, hasKey: !!newApiKey };
   }
 
   async generate(dto: GenerateAiSuggestionsDto) {
@@ -62,7 +91,8 @@ export class AiService {
       select: { id: true, name: true, aiEnabled: true as any, aiApiKey: true as any } as any,
     });
     if (!cg) throw new BadRequestException("Campground not found");
-    const apiKey = (cg as any).aiApiKey || process.env.OPENAI_API_KEY;
+    // SECURITY: Decrypt API key from database
+    const apiKey = this.getApiKey(cg);
     if (!(cg as any).aiEnabled || !apiKey) {
       throw new ForbiddenException("AI suggestions not enabled for this campground");
     }
@@ -170,23 +200,29 @@ Guidelines:
       select: { id: true, name: true, aiEnabled: true as any, aiApiKey: true as any } as any,
     });
     if (!cg) throw new BadRequestException("Campground not found");
-    const apiKey = (cg as any).aiApiKey || process.env.OPENAI_API_KEY;
+    // SECURITY: Decrypt API key from database
+    const apiKey = this.getApiKey(cg);
     if (!(cg as any).aiEnabled || !apiKey) {
       throw new ForbiddenException("AI not enabled for this campground");
     }
 
     const cgId = (cg as any).id as string;
 
-    const scrubbedQuestion = dto.question
-      .replace(/\b\d{3}[-.\s]?\d{3}[-.\s]?\d{4}\b/g, "[phone]")
-      .replace(/\b\S+@\S+\.\S+\b/g, "[email]");
+    // SECURITY: Sanitize user input to prevent prompt injection
+    const { sanitized: sanitizedQuestion, blocked, warnings } = this.promptSanitizer.sanitize(dto.question);
+    if (blocked) {
+      this.logger.warn(`Blocked suspicious AI ask request for campground ${dto.campgroundId}`);
+      throw new BadRequestException("Your question contains invalid content. Please rephrase and try again.");
+    }
+    if (warnings.length > 0) {
+      this.logger.debug(`AI ask request sanitization warnings: ${warnings.join(', ')}`);
+    }
 
     const metrics90 = await this.getEventCounts(cgId, 90);
     const metrics365 = await this.getEventCounts(cgId, 365);
 
-    const prompt = `
-You are a campground admin helper for ${cg.name}. Provide concise, data-backed guidance. No PII. If unsure, say so briefly.
-User question: "${scrubbedQuestion}"
+    // SECURITY: Use structured prompt with clear separation of user input
+    const systemInstructions = `You are a campground admin helper for ${cg.name}. Provide concise, data-backed guidance. No PII. If unsure, say so briefly.
 
 Analytics (last 90d):
 - Views: ${metrics90.page_view}, Add-to-stay: ${metrics90.add_to_stay}, Starts: ${metrics90.reservation_start}, Abandoned: ${metrics90.reservation_abandoned}, Completed: ${metrics90.reservation_completed}
@@ -201,8 +237,9 @@ Analytics (last 365d):
 Return:
 - Short numeric summary (2-3 sentences) citing the metrics above.
 - 3-5 specific actions with expected impact; no navigation/how-to instructions.
-- If data is thin, say “Data is thin; suggest lightweight tests.”
-`;
+- If data is thin, say "Data is thin; suggest lightweight tests."`;
+
+    const prompt = this.promptSanitizer.createSafePrompt(systemInstructions, sanitizedQuestion);
 
     const body = {
       model: "gpt-4o-mini",
@@ -502,26 +539,37 @@ Respond with JSON only (no markdown):
       }),
     ]);
 
-    // Format data for search context
+    // SECURITY: Anonymize guest PII before sending to AI
+    // We use IDs and metadata only, not names/emails
     const searchableItems = [
-      ...guests.map((g) => ({
-        type: "guest",
-        id: g.id,
-        title: `${g.firstName} ${g.lastName}`,
-        content: `${g.firstName} ${g.lastName} ${g.email || ""} ${g.notes || ""} ${g.loyaltyTier || ""} ${(g.tags as string[] || []).join(" ")}`.trim(),
-      })),
+      ...guests.map((g, index) => {
+        // Anonymize guest data - only send non-PII attributes
+        const guestRef = `Guest_${index + 1}`;
+        const { anonymizedText } = this.aiPrivacy.anonymize(g.notes || '');
+        return {
+          type: "guest",
+          id: g.id,
+          title: guestRef, // Don't send real names to AI
+          content: `${guestRef} ${g.loyaltyTier || ""} ${(g.tags as string[] || []).join(" ")} ${anonymizedText}`.trim(),
+        };
+      }),
       ...sites.map((s) => ({
         type: "site",
         id: s.id,
         title: s.name,
         content: `${s.name} ${s.description || ""} ${s.siteType || ""} ${s.maxRigLength ? `fits ${s.maxRigLength}ft rigs` : ""} ${(s.hookups as string[] || []).join(" ")} ${(s.amenities as string[] || []).join(" ")}`.trim(),
       })),
-      ...messages.map((m) => ({
-        type: "message",
-        id: m.id,
-        title: m.subject || "Message",
-        content: `${m.subject || ""} ${(m.body || "").slice(0, 200)}`.trim(),
-      })),
+      ...messages.map((m) => {
+        // SECURITY: Anonymize message content to remove PII
+        const { anonymizedText: anonSubject } = this.aiPrivacy.anonymize(m.subject || '');
+        const { anonymizedText: anonBody } = this.aiPrivacy.anonymize((m.body || '').slice(0, 200));
+        return {
+          type: "message",
+          id: m.id,
+          title: anonSubject || "Message",
+          content: `${anonSubject} ${anonBody}`.trim(),
+        };
+      }),
     ];
 
     if (useMock) {

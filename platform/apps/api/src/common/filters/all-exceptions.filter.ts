@@ -79,10 +79,11 @@ export class AllExceptionsFilter implements ExceptionFilter {
     // Handle Prisma validation errors
     else if (exception instanceof Prisma.PrismaClientValidationError) {
       statusCode = HttpStatus.BAD_REQUEST;
-      // Include actual error for debugging
-      message = `Invalid data provided: ${exception.message.slice(0, 500)}`;
+      // SECURITY: Don't expose internal schema details to clients
+      message = 'Invalid data provided';
       error = 'Bad Request';
 
+      // Log full error server-side for debugging
       this.logger.warn(
         `Prisma validation error: ${exception.message}`,
         { requestId, path: request.url }
@@ -90,7 +91,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
     }
     // Handle other errors
     else if (exception instanceof Error) {
-      message = exception.message || message;
+      // SECURITY: Don't expose internal error details to clients in production
+      const isProduction = process.env.NODE_ENV === 'production';
+      message = isProduction ? 'An unexpected error occurred' : (exception.message || message);
 
       // Log the full error for debugging
       this.logger.error(

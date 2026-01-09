@@ -1,5 +1,8 @@
-import { Controller, Get, HttpException, HttpStatus } from "@nestjs/common";
+import { Controller, Get, HttpException, HttpStatus, UseGuards } from "@nestjs/common";
 import { HealthService } from "./health.service";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { RolesGuard } from "../auth/guards/roles.guard";
+import { Roles } from "../auth/decorators/roles.decorator";
 
 @Controller()
 export class HealthController {
@@ -12,17 +15,18 @@ export class HealthController {
 
   /**
    * Check which services are configured (for beta launch verification)
-   * Does NOT expose secrets, just shows true/false for each service
+   * SECURITY: Requires platform_admin role - exposes configuration info
    */
   @Get("health/services")
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles("platform_admin")
   getServicesStatus() {
     return {
       timestamp: new Date().toISOString(),
       services: {
         stripe: {
           configured: !!process.env.STRIPE_SECRET_KEY,
-          mode: process.env.STRIPE_SECRET_KEY?.startsWith("sk_live_") ? "live" :
-                process.env.STRIPE_SECRET_KEY?.startsWith("sk_test_") ? "test" : "unknown",
+          // SECURITY: Don't reveal live vs test mode to attackers
           webhookConfigured: !!process.env.STRIPE_WEBHOOK_SECRET,
         },
         email: {
@@ -36,7 +40,6 @@ export class HealthController {
         },
         storage: {
           s3Configured: !!(process.env.UPLOADS_S3_BUCKET && process.env.UPLOADS_S3_ACCESS_KEY),
-          bucket: process.env.UPLOADS_S3_BUCKET ? "configured" : "not set",
           cdnConfigured: !!process.env.UPLOADS_CDN_BASE,
         },
         monitoring: {
