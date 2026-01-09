@@ -75,34 +75,6 @@ type Reservation = {
   };
 };
 
-// Time-of-day greeting helper
-function getTimeOfDayGreeting() {
-  const hour = new Date().getHours();
-
-  if (hour < 12) {
-    return {
-      greeting: "Good morning",
-      icon: <Sun className="h-8 w-8 text-amber-500" />,
-      message: "Here's what's happening at the park today",
-      tone: "bg-card border-border"
-    };
-  } else if (hour < 17) {
-    return {
-      greeting: "Good afternoon",
-      icon: <Sunset className="h-8 w-8 text-sky-500" />,
-      message: "Let's check on today's progress",
-      tone: "bg-card border-border"
-    };
-  } else {
-    return {
-      greeting: "Good evening",
-      icon: <Moon className="h-8 w-8 text-indigo-500" />,
-      message: "Winding down the day",
-      tone: "bg-card border-border"
-    };
-  }
-}
-
 // Loading skeleton component
 function SkeletonCard() {
   return (
@@ -358,7 +330,32 @@ export default function Dashboard() {
         tone: "bg-card border-border"
       };
     }
-    return getTimeOfDayGreeting();
+
+    // Only call getTimeOfDayGreeting() on client after hydration
+    const hour = new Date().getHours();
+
+    if (hour < 12) {
+      return {
+        greeting: "Good morning",
+        icon: <Sun className="h-8 w-8 text-amber-500" />,
+        message: "Here's what's happening at the park today",
+        tone: "bg-card border-border"
+      };
+    } else if (hour < 17) {
+      return {
+        greeting: "Good afternoon",
+        icon: <Sunset className="h-8 w-8 text-sky-500" />,
+        message: "Let's check on today's progress",
+        tone: "bg-card border-border"
+      };
+    } else {
+      return {
+        greeting: "Good evening",
+        icon: <Moon className="h-8 w-8 text-indigo-500" />,
+        message: "Winding down the day",
+        tone: "bg-card border-border"
+      };
+    }
   }, [hasMounted]);
 
   // Update selection when campgrounds load (if no valid selection yet)
