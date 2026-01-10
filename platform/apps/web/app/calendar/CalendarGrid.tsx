@@ -24,6 +24,19 @@ export function CalendarGrid({ data, onSelectionComplete, onReservationMove }: C
     const { sites, reservations, blackouts } = queries;
     const { days, dayCount, reservationsBySite, ganttSelection } = derived;
 
+    // Group blackouts by siteId
+    const blackoutsBySite = useMemo(() => {
+        const grouped: Record<string, typeof blackouts.data> = {};
+        (blackouts.data || []).forEach((b) => {
+            if (!b.siteId) return; // Skip campground-wide blackouts for now
+            if (!grouped[b.siteId]) {
+                grouped[b.siteId] = [];
+            }
+            grouped[b.siteId]!.push(b);
+        });
+        return grouped;
+    }, [blackouts.data]);
+
     const gridTemplate = `180px repeat(${dayCount}, minmax(94px, 1fr))`;
 
     const resolveDragTarget = useCallback((clientX: number, clientY: number) => {
@@ -297,6 +310,7 @@ export function CalendarGrid({ data, onSelectionComplete, onReservationMove }: C
                             site={site}
                             days={days}
                             reservations={reservationsBySite[site.id] || []}
+                            blackouts={blackoutsBySite[site.id] || []}
                             gridTemplate={gridTemplate}
                             dayCount={dayCount}
                             zebra={idx % 2 === 0 ? "bg-card" : "bg-muted/30"}

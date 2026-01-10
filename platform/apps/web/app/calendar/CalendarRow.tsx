@@ -2,14 +2,15 @@ import { memo } from "react";
 import { ReservationPill } from "./ReservationPill";
 import { RowSelectionOverlay } from "./RowSelectionOverlay";
 import { cn } from "../../lib/utils";
-import type { CalendarSite, CalendarReservation, CalendarSelection, GanttSelection, DayMeta, ReservationDragMode } from "./types";
-import { Wrench, Sparkles, AlertTriangle, Calendar, Tent } from "lucide-react";
+import type { CalendarSite, CalendarReservation, CalendarSelection, GanttSelection, DayMeta, ReservationDragMode, CalendarBlackout } from "./types";
+import { Wrench, Sparkles, AlertTriangle, Calendar, Tent, Ban } from "lucide-react";
 import { diffInDays, parseLocalDateInput } from "./utils";
 
 interface CalendarRowProps {
     site: CalendarSite;
     days: DayMeta[];
     reservations: CalendarReservation[];
+    blackouts: CalendarBlackout[];
     gridTemplate: string;
     dayCount: number;
     zebra: string;
@@ -30,6 +31,7 @@ export const CalendarRow = memo(function CalendarRow({
     site,
     days,
     reservations,
+    blackouts,
     gridTemplate,
     dayCount,
     zebra,
@@ -132,6 +134,52 @@ export const CalendarRow = memo(function CalendarRow({
                                 </div>
                             );
                         })()}
+
+                    {/* Blackouts */}
+                    {blackouts.map((blackout) => {
+                        const start = days[0].date;
+                        const blackoutStart = parseLocalDateInput(blackout.startDate);
+                        const blackoutEnd = parseLocalDateInput(blackout.endDate);
+                        const startIdx = Math.max(0, diffInDays(blackoutStart, start));
+                        const endIdx = Math.min(dayCount, diffInDays(blackoutEnd, start) + 1); // +1 because end is inclusive
+
+                        if (endIdx <= 0 || startIdx >= dayCount) return null;
+
+                        const span = Math.max(1, endIdx - startIdx);
+
+                        return (
+                            <div
+                                key={blackout.id}
+                                className="relative h-full w-full pointer-events-none"
+                                style={{
+                                    gridColumn: `${startIdx + 1} / span ${span}`,
+                                    zIndex: 15
+                                }}
+                                title={blackout.reason || "Blocked"}
+                            >
+                                <div className="absolute inset-0 mx-0.5 my-1 rounded-md bg-destructive/10 border border-destructive/30 flex items-center justify-center overflow-hidden">
+                                    {/* Hatching pattern */}
+                                    <div
+                                        className="absolute inset-0 opacity-20"
+                                        style={{
+                                            backgroundImage: `repeating-linear-gradient(
+                                                45deg,
+                                                transparent,
+                                                transparent 4px,
+                                                currentColor 4px,
+                                                currentColor 5px
+                                            )`,
+                                            color: 'hsl(var(--destructive))'
+                                        }}
+                                    />
+                                    <div className="relative z-10 flex items-center gap-1 bg-card/90 px-2 py-0.5 rounded text-[10px] font-medium text-destructive">
+                                        <Ban className="h-3 w-3" />
+                                        <span className="truncate max-w-[80px]">{blackout.reason || "Blocked"}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
 
                     {/* Reservations */}
                     {reservations.map((res) => {
