@@ -1,6 +1,7 @@
 import { Injectable, Logger, NotFoundException, ForbiddenException, BadRequestException, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AiProviderService } from '../ai/ai-provider.service';
+import { RedisService } from '../redis/redis.service';
 import { AiFeatureType, ChatParticipantType, ChatMessageRole } from '@prisma/client';
 import { randomUUID } from 'crypto';
 import {
@@ -43,14 +44,17 @@ interface PendingAction {
 
 // Pending actions expire after 10 minutes
 const PENDING_ACTION_TTL_MS = 10 * 60 * 1000;
-// Cleanup runs every 5 minutes
+const PENDING_ACTION_TTL_SECONDS = 10 * 60; // For Redis TTL
+// Cleanup runs every 5 minutes (only used when Redis is unavailable)
 const CLEANUP_INTERVAL_MS = 5 * 60 * 1000;
+// Redis key prefix for pending actions
+const REDIS_PENDING_ACTION_PREFIX = 'chat:pending_action:';
 
 @Injectable()
 export class ChatService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(ChatService.name);
 
-  // In-memory store for pending actions with TTL
+  // In-memory fallback store for pending actions (used when Redis unavailable)
   private pendingActions = new Map<string, PendingAction>();
   private cleanupInterval: NodeJS.Timeout | null = null;
 
@@ -59,14 +63,19 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     private readonly aiProvider: AiProviderService,
     private readonly toolsService: ChatToolsService,
     private readonly chatGateway: ChatGateway,
+    private readonly redis: RedisService,
   ) {}
 
   onModuleInit() {
-    // Start cleanup interval for expired pending actions
-    this.cleanupInterval = setInterval(() => {
-      this.cleanupExpiredActions();
-    }, CLEANUP_INTERVAL_MS);
-    this.logger.log('Chat service initialized with pending action cleanup');
+    // Only start cleanup interval if Redis is not available (fallback mode)
+    if (!this.redis.isEnabled) {
+      this.cleanupInterval = setInterval(() => {
+        this.cleanupExpiredActions();
+      }, CLEANUP_INTERVAL_MS);
+      this.logger.warn('Chat service using in-memory pending actions (Redis unavailable)');
+    } else {
+      this.logger.log('Chat service initialized with Redis-backed pending actions');
+    }
   }
 
   onModuleDestroy() {
@@ -78,7 +87,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
   }
 
   /**
-   * Remove expired pending actions
+   * Remove expired pending actions (only used when Redis unavailable)
    */
   private cleanupExpiredActions() {
     const now = new Date();
@@ -93,6 +102,53 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
 
     if (cleanedCount > 0) {
       this.logger.log(`Cleaned up ${cleanedCount} expired pending actions`);
+    }
+  }
+
+  /**
+   * Store a pending action (Redis with fallback to in-memory)
+   */
+  private async storePendingAction(action: PendingAction): Promise<void> {
+    if (this.redis.isEnabled) {
+      const key = `${REDIS_PENDING_ACTION_PREFIX}${action.id}`;
+      // Serialize the action, converting Date to ISO string
+      const serialized = {
+        ...action,
+        expiresAt: action.expiresAt.toISOString(),
+      };
+      await this.redis.set(key, serialized, PENDING_ACTION_TTL_SECONDS);
+    } else {
+      this.pendingActions.set(action.id, action);
+    }
+  }
+
+  /**
+   * Retrieve a pending action (Redis with fallback to in-memory)
+   */
+  private async getPendingAction(actionId: string): Promise<PendingAction | null> {
+    if (this.redis.isEnabled) {
+      const key = `${REDIS_PENDING_ACTION_PREFIX}${actionId}`;
+      const data = await this.redis.get<any>(key);
+      if (!data) return null;
+      // Deserialize, converting ISO string back to Date
+      return {
+        ...data,
+        expiresAt: new Date(data.expiresAt),
+      };
+    } else {
+      return this.pendingActions.get(actionId) || null;
+    }
+  }
+
+  /**
+   * Delete a pending action (Redis with fallback to in-memory)
+   */
+  private async deletePendingAction(actionId: string): Promise<void> {
+    if (this.redis.isEnabled) {
+      const key = `${REDIS_PENDING_ACTION_PREFIX}${actionId}`;
+      await this.redis.del(key);
+    } else {
+      this.pendingActions.delete(actionId);
     }
   }
 
@@ -469,15 +525,15 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     // Verify conversation access
     await this.getConversation(conversationId, context);
 
-    // Get pending action
-    const pendingAction = this.pendingActions.get(actionId);
+    // Get pending action from Redis (or fallback to in-memory)
+    const pendingAction = await this.getPendingAction(actionId);
     if (!pendingAction) {
       throw new BadRequestException('Action not found or expired');
     }
 
-    // Check if action has expired
+    // Check if action has expired (Redis TTL should handle this, but double-check)
     if (pendingAction.expiresAt < new Date()) {
-      this.pendingActions.delete(actionId);
+      await this.deletePendingAction(actionId);
       throw new BadRequestException('Action has expired. Please try again.');
     }
 
@@ -495,8 +551,8 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
         context,
       );
 
-      // Clear pending action
-      this.pendingActions.delete(actionId);
+      // Clear pending action from Redis (or in-memory)
+      await this.deletePendingAction(actionId);
 
       // Save tool execution as message
       await this.prisma.chatMessage.create({
@@ -811,7 +867,8 @@ For destructive actions (refunds, cancellations), always confirm with the user f
           conversationId,
         };
 
-        this.pendingActions.set(actionId, pendingAction);
+        // Store pending action in Redis (or fallback to in-memory)
+        await this.storePendingAction(pendingAction);
 
         actionRequired = {
           type: 'confirmation',
