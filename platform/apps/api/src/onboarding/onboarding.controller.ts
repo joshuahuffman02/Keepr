@@ -23,13 +23,13 @@ export class OnboardingController {
 
   @UseGuards(JwtAuthGuard)
   @Post("invitations")
-  createInvite(@Body() dto: CreateOnboardingInviteDto, @Req() req: any) {
+  createInvite(@Body() dto: CreateOnboardingInviteDto, @Req() req: Request) {
     return this.onboarding.createInvite(dto, req.user);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post("invitations/:id/resend")
-  resendInvite(@Param("id") id: string, @Req() req: any) {
+  resendInvite(@Param("id") id: string, @Req() req: Request) {
     return this.onboarding.resendInvite(id, req.user);
   }
 
@@ -161,7 +161,7 @@ export class OnboardingController {
     @Param("id") id: string,
     @Headers("x-onboarding-token") tokenHeader: string,
     @Body() body: { token?: string },
-    @Req() req: any
+    @Req() req: Request
   ) {
     const token = body.token ?? tokenHeader;
     if (!token) throw new BadRequestException("Missing onboarding token");

@@ -102,7 +102,7 @@ export class PaymentMethodController {
         @Param("campgroundId") campgroundId: string,
         @Param("guestId") guestId: string,
         @Body() dto: AttachPaymentMethodDto,
-        @Req() req: any,
+        @Req() req: Request,
     ) {
         return this.paymentMethodService.attachPaymentMethod(
             campgroundId,
@@ -545,7 +545,7 @@ export class RefundController {
         @Param("campgroundId") campgroundId: string,
         @Param("paymentId") paymentId: string,
         @Body() dto: ProcessRefundDto,
-        @Req() req: any,
+        @Req() req: Request,
         @Headers("idempotency-key") idempotencyKey?: string,
     ) {
         return this.refundService.processRefund(

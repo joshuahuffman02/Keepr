@@ -46,7 +46,7 @@ export class TwoFactorController {
      * Get current 2FA status for the user
      */
     @Get("status")
-    async getStatus(@Request() req: any) {
+    async getStatus(@Request() req: Request) {
         const user = await this.prisma.user.findUnique({
             where: { id: req.user.id },
             select: {
@@ -69,7 +69,7 @@ export class TwoFactorController {
      * Start 2FA setup - generates QR code and secret
      */
     @Post("setup")
-    async startSetup(@Request() req: any) {
+    async startSetup(@Request() req: Request) {
         const user = await this.prisma.user.findUnique({
             where: { id: req.user.id },
             select: {
@@ -100,7 +100,7 @@ export class TwoFactorController {
      * Confirm 2FA setup with TOTP code
      */
     @Post("confirm")
-    async confirmSetup(@Request() req: any, @Body() dto: Setup2FADto) {
+    async confirmSetup(@Request() req: Request, @Body() dto: Setup2FADto) {
         if (!dto.code || dto.code.length !== 6) {
             throw new BadRequestException("Please provide a valid 6-digit code");
         }
@@ -129,7 +129,7 @@ export class TwoFactorController {
      * Disable 2FA (requires current TOTP code and password)
      */
     @Post("disable")
-    async disable(@Request() req: any, @Body() dto: Disable2FADto) {
+    async disable(@Request() req: Request, @Body() dto: Disable2FADto) {
         if (!dto.code || dto.code.length !== 6) {
             throw new BadRequestException("Please provide a valid 6-digit code");
         }
@@ -172,7 +172,7 @@ export class TwoFactorController {
      * Regenerate backup codes (requires current TOTP code)
      */
     @Post("backup-codes")
-    async regenerateBackupCodes(@Request() req: any, @Body() dto: Setup2FADto) {
+    async regenerateBackupCodes(@Request() req: Request, @Body() dto: Setup2FADto) {
         if (!dto.code || dto.code.length !== 6) {
             throw new BadRequestException("Please provide a valid 6-digit code");
         }

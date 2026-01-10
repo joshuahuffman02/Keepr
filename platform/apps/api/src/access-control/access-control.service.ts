@@ -25,19 +25,19 @@ export class AccessControlService {
   ) {}
 
   private grantsRepo() {
-    return (this.prisma as any).accessGrant;
+    return this.prisma.accessGrant;
   }
 
   private credentialsRepo() {
-    return (this.prisma as any).accessCredential;
+    return this.prisma.accessCredential;
   }
 
   private vehiclesRepo() {
-    return (this.prisma as any).vehicle;
+    return this.prisma.vehicle;
   }
 
   private integrationsRepo() {
-    return (this.prisma as any).accessIntegration;
+    return this.prisma.accessIntegration;
   }
 
   private toDate(value?: string | null) {

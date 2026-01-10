@@ -112,7 +112,7 @@ export class ReservationsService {
 
     if (evidence.request && (!evidence.request.reservationId || !evidence.request.guestId)) {
       ops.push(
-        (this.prisma as any).signatureRequest?.update?.({
+        this.prisma.signatureRequest?.update?.({
           where: { id: evidence.request.id },
           data: {
             reservationId: evidence.request.reservationId ?? reservationId,
@@ -124,7 +124,7 @@ export class ReservationsService {
 
     if (evidence.artifact && (!evidence.artifact.reservationId || !evidence.artifact.guestId)) {
       ops.push(
-        (this.prisma as any).signatureArtifact?.update?.({
+        this.prisma.signatureArtifact?.update?.({
           where: { id: evidence.artifact.id },
           data: {
             reservationId: evidence.artifact.reservationId ?? reservationId,
@@ -136,7 +136,7 @@ export class ReservationsService {
 
     if (evidence.digital && (!evidence.digital.reservationId || !evidence.digital.guestId)) {
       ops.push(
-        (this.prisma as any).digitalWaiver?.update?.({
+        this.prisma.digitalWaiver?.update?.({
           where: { id: evidence.digital.id },
           data: {
             reservationId: evidence.digital.reservationId ?? reservationId,
@@ -157,7 +157,7 @@ export class ReservationsService {
 
   private async hasSignedWaiver(reservationId: string, guestId: string) {
     const [signedRequest, digitalWaiver] = await Promise.all([
-      (this.prisma as any).signatureRequest.findFirst?.({
+      this.prisma.signatureRequest.findFirst?.({
         where: {
           documentType: "waiver",
           status: "signed",
@@ -166,7 +166,7 @@ export class ReservationsService {
         include: { artifact: true },
         orderBy: { signedAt: "desc" }
       }),
-      (this.prisma as any).digitalWaiver.findFirst?.({
+      this.prisma.digitalWaiver.findFirst?.({
         where: {
           OR: [{ reservationId }, { reservationId: null, guestId }],
           status: "signed"
@@ -177,7 +177,7 @@ export class ReservationsService {
 
     const signedArtifact =
       signedRequest?.artifact ??
-      (await (this.prisma as any).signatureArtifact?.findFirst?.({
+      (await this.prisma.signatureArtifact?.findFirst?.({
         where: {
           pdfUrl: { not: null },
           OR: [{ reservationId }, { reservationId: null, guestId }]
@@ -200,7 +200,7 @@ export class ReservationsService {
   private async attachIdVerification(reservationId: string, guestId: string, match: any) {
     if (!match || (match.reservationId && match.guestId)) return;
     try {
-      await (this.prisma as any).idVerification?.update?.({
+      await this.prisma.idVerification?.update?.({
         where: { id: match.id },
         data: {
           reservationId: match.reservationId ?? reservationId,
@@ -214,7 +214,7 @@ export class ReservationsService {
 
   private async hasVerifiedId(reservationId: string, guestId: string) {
     const now = new Date();
-    const match = await (this.prisma as any).idVerification.findFirst?.({
+    const match = await this.prisma.idVerification.findFirst?.({
       where: {
         status: "verified",
         OR: [
@@ -283,18 +283,18 @@ export class ReservationsService {
     });
     if (!reservation) return;
 
-    const playbooks = await (this.prisma as any).communicationPlaybook.findMany({
+    const playbooks = await this.prisma.communicationPlaybook.findMany({
       where: { campgroundId: reservation.CampgroundId, type, enabled: true, templateId: { not: null } }
     });
 
     for (const pb of playbooks as CommunicationPlaybook[]) {
-      const template = await (this.prisma as any).communicationTemplate.findFirst({
+      const template = await this.prisma.communicationTemplate.findFirst({
         where: { id: pb.templateId, status: "approved" }
       });
       if (!template) continue;
 
       // Check for existing pending/sent job for this playbook + reservation (prevents duplicates)
-      const existingJob = await (this.prisma as any).communicationPlaybookJob.findFirst({
+      const existingJob = await this.prisma.communicationPlaybookJob.findFirst({
         where: {
           playbookId: pb.id,
           reservationId: reservation.id,
@@ -307,7 +307,7 @@ export class ReservationsService {
       if (pb.offsetMinutes && Number.isFinite(pb.offsetMinutes)) {
         scheduledAt.setMinutes(scheduledAt.getMinutes() + pb.offsetMinutes);
       }
-      await (this.prisma as any).communicationPlaybookJob.create({
+      await this.prisma.communicationPlaybookJob.create({
         data: {
           playbookId: pb.id,
           campgroundId: reservation.CampgroundId,
@@ -333,7 +333,7 @@ export class ReservationsService {
     if (!due.length) return;
 
     // Fetch playbooks with their templates in a single query (join)
-    const playbooks = await (this.prisma as any).communicationPlaybook.findMany({
+    const playbooks = await this.prisma.communicationPlaybook.findMany({
       where: {
         type: "unpaid",
         enabled: true,
@@ -387,7 +387,7 @@ export class ReservationsService {
 
     // Single batch insert instead of N individual creates
     if (jobsToCreate.length > 0) {
-      await (this.prisma as any).communicationPlaybookJob.createMany({
+      await this.prisma.communicationPlaybookJob.createMany({
         data: jobsToCreate,
         skipDuplicates: true
       });
@@ -564,7 +564,7 @@ export class ReservationsService {
 
     // Active holds block assignments unless it's the same hold being referenced
     const now = new Date();
-    const holdCount = await (this.prisma as any).siteHold.count({
+    const holdCount = await this.prisma.siteHold.count({
       where: {
         siteId,
         status: "active",
@@ -763,7 +763,7 @@ export class ReservationsService {
 
     // Get active holds overlapping the range
     const now = new Date();
-    const holds = await (this.prisma as any).siteHold.findMany({
+    const holds = await this.prisma.siteHold.findMany({
       where: {
         campgroundId,
         status: "active",
@@ -1116,7 +1116,7 @@ export class ReservationsService {
       return await this.locks.withLocks([siteId], async () => {
         let hold: any = null;
         if (data.holdId) {
-          hold = await (this.prisma as any).siteHold.findUnique({ where: { id: data.holdId } });
+          hold = await this.prisma.siteHold.findUnique({ where: { id: data.holdId } });
           const now = new Date();
           if (!hold) {
             throw new NotFoundException("Hold not found");
@@ -1286,7 +1286,7 @@ export class ReservationsService {
         }
 
         if (data.referralProgramId || data.referralCode) {
-          referralProgram = await (this.prisma as any).referralProgram.findFirst({
+          referralProgram = await this.prisma.referralProgram.findFirst({
             where: {
               campgroundId: data.campgroundId,
               isActive: true,
@@ -1443,7 +1443,7 @@ export class ReservationsService {
         }
 
         if (hold?.id) {
-          await (this.prisma as any).siteHold.update({
+          await this.prisma.siteHold.update({
             where: { id: hold.id },
             data: { status: "released", expiresAt: hold.expiresAt ?? new Date() }
           });
@@ -1752,7 +1752,7 @@ export class ReservationsService {
 
         // If attempting to check in, ensure required forms are completed
         if (reservationData.status === ReservationStatus.checked_in) {
-          const pendingForms = await (this.prisma as any).formSubmission?.count?.({
+          const pendingForms = await this.prisma.formSubmission?.count?.({
             where: { reservationId: id, status: "pending" }
           }) ?? 0;
           if (pendingForms > 0) {
@@ -2849,7 +2849,7 @@ export class ReservationsService {
     if (conflictCount > 0) reasons.push("reservation");
 
     const now = new Date();
-    const holdCount = await (this.prisma as any).siteHold.count({
+    const holdCount = await this.prisma.siteHold.count({
       where: {
         siteId,
         status: "active",
@@ -2913,7 +2913,7 @@ export class ReservationsService {
     }
 
     // Require forms to be completed before check-in
-    const pendingForms = await (this.prisma as any).formSubmission?.count?.({
+    const pendingForms = await this.prisma.formSubmission?.count?.({
       where: { reservationId: id, status: "pending" }
     }) ?? 0;
     if (pendingForms > 0) {
@@ -3167,7 +3167,7 @@ export class ReservationsService {
     }
 
     // Check for pending forms
-    const pendingForms = await (this.prisma as any).formSubmission?.count?.({
+    const pendingForms = await this.prisma.formSubmission?.count?.({
       where: { reservationId: id, status: "pending" }
     }) ?? 0;
 

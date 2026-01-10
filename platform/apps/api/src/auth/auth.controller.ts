@@ -20,7 +20,7 @@ export class AuthController {
     @Throttle({ default: { limit: 5, ttl: 60000 } })
     login(
         @Body() dto: LoginDto,
-        @Req() req: any,
+        @Req() req: Request,
         @Headers('user-agent') userAgent: string
     ) {
         // Extract and validate client IP to prevent spoofing via x-forwarded-for
@@ -30,7 +30,7 @@ export class AuthController {
 
     @Get('me')
     @UseGuards(JwtAuthGuard)
-    getProfile(@Request() req: any) {
+    getProfile(@Request() req: Request) {
         return this.authService.getProfile(req.user.id);
     }
 
@@ -48,7 +48,7 @@ export class AuthController {
   @Throttle({ default: { limit: 5, ttl: 60000 } })
   mobileLogin(
     @Body() dto: MobileLoginDto,
-    @Req() req: any,
+    @Req() req: Request,
     @Headers('user-agent') userAgent: string
   ) {
     // Extract and validate client IP to prevent spoofing via x-forwarded-for
@@ -60,7 +60,7 @@ export class AuthController {
   @Throttle({ default: { limit: 10, ttl: 60000 } })
   refreshToken(
     @Body() dto: RefreshTokenDto,
-    @Req() req: any,
+    @Req() req: Request,
     @Headers('user-agent') userAgent: string
   ) {
     // Extract and validate client IP to prevent spoofing via x-forwarded-for
@@ -76,7 +76,7 @@ export class AuthController {
 
   @Get('mobile/sessions')
   @UseGuards(JwtAuthGuard)
-  getMobileSessions(@Request() req: any) {
+  getMobileSessions(@Request() req: Request) {
     return this.authService.getMobileSessions(req.user.id);
   }
 
@@ -84,7 +84,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   revokeMobileSession(
-    @Request() req: any,
+    @Request() req: Request,
     @Param('sessionId') sessionId: string
   ) {
     return this.authService.revokeMobileSession(req.user.id, sessionId);

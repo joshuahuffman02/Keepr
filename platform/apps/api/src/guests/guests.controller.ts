@@ -6,6 +6,7 @@ import { CurrentUser } from "../auth/decorators/current-user.decorator";
 import { RolesGuard, Roles } from "../auth/guards/roles.guard";
 import { ScopeGuard } from "../permissions/scope.guard";
 import { UserRole } from "@prisma/client";
+import type { AuthUser } from "../auth/auth.types";
 
 // SECURITY FIX (GUEST-HIGH-001): Added membership validation to prevent cross-tenant access
 @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
@@ -17,7 +18,7 @@ export class GuestsController {
    * Verify the authenticated user has access to the specified campground.
    * Prevents cross-tenant access by ensuring users can only access campgrounds they are members of.
    */
-  private assertCampgroundAccess(campgroundId: string, user: any): void {
+  private assertCampgroundAccess(campgroundId: string, user?: AuthUser | null): void {
     // Platform staff can access any campground
     const isPlatformStaff = user?.platformRole === 'platform_admin' ||
                             user?.platformRole === 'platform_superadmin' ||
@@ -26,7 +27,7 @@ export class GuestsController {
       return;
     }
 
-    const userCampgroundIds = user?.memberships?.map((m: any) => m.campgroundId) ?? [];
+    const userCampgroundIds = user?.memberships?.map((m) => m.campgroundId) ?? [];
     if (!userCampgroundIds.includes(campgroundId)) {
       throw new ForbiddenException("You do not have access to this campground");
     }
@@ -38,7 +39,7 @@ export class GuestsController {
     @Query("limit") limit?: string,
     @Query("offset") offset?: string,
     @Query("search") search?: string,
-    @CurrentUser() user?: any
+    @CurrentUser() user?: AuthUser | null
   ) {
     // Require campgroundId to prevent cross-tenant data access
     if (!campgroundId) {
@@ -58,7 +59,7 @@ export class GuestsController {
   findOne(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId?: string,
-    @CurrentUser() user?: any
+    @CurrentUser() user?: AuthUser | null
   ) {
     // When campgroundId provided, verify user has access to that campground
     if (campgroundId) {
@@ -71,7 +72,7 @@ export class GuestsController {
   create(
     @Body() body: CreateGuestDto,
     @Query("campgroundId") campgroundId?: string,
-    @CurrentUser() user?: any
+    @CurrentUser() user?: AuthUser | null
   ) {
     // SECURITY: Verify user has access to the campground if specified
     if (campgroundId) {
@@ -85,7 +86,7 @@ export class GuestsController {
     @Param("id") id: string,
     @Body() body: Partial<CreateGuestDto>,
     @Query("campgroundId") campgroundId: string,
-    @CurrentUser() user?: any
+    @CurrentUser() user?: AuthUser | null
   ) {
     // SECURITY: Require campgroundId to prevent cross-tenant guest modification
     if (!campgroundId) {
@@ -100,7 +101,7 @@ export class GuestsController {
   remove(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string,
-    @CurrentUser() user?: any
+    @CurrentUser() user?: AuthUser | null
   ) {
     // SECURITY: Require campgroundId to prevent cross-tenant guest deletion
     if (!campgroundId) {
@@ -115,7 +116,7 @@ export class GuestsController {
   merge(
     @Body() body: { primaryId: string; secondaryId: string },
     @Query("campgroundId") campgroundId: string,
-    @CurrentUser() user?: any
+    @CurrentUser() user?: AuthUser | null
   ) {
     // SECURITY: Require campgroundId to prevent cross-tenant guest merging
     if (!campgroundId) {

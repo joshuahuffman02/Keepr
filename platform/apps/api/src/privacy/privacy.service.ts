@@ -144,7 +144,7 @@ export class PrivacyService {
   }
 
   async listRecentRedactions(campgroundId: string) {
-    const logs = await (this.prisma as any).auditLog.findMany({
+    const logs = await this.prisma.auditLog.findMany({
       where: { campgroundId },
       select: { id: true, action: true, entity: true, entityId: true, before: true, after: true, createdAt: true },
       orderBy: { createdAt: "desc" },

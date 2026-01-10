@@ -11,6 +11,7 @@ import {
 import { RoomMovesService } from './room-moves.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import type { AuthUser } from '../auth/auth.types';
 
 @Controller('room-moves')
 @UseGuards(JwtAuthGuard)
@@ -27,7 +28,7 @@ export class RoomMovesController {
       isComplimentary?: boolean;
       notes?: string;
     },
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthUser,
   ) {
     return this.roomMovesService.createMoveRequest({
       ...body,
@@ -59,7 +60,7 @@ export class RoomMovesController {
   @Post(':id/approve')
   approveMoveRequest(
     @Param('id') id: string,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthUser,
   ) {
     return this.roomMovesService.approveMoveRequest(id, user.id);
   }
@@ -67,7 +68,7 @@ export class RoomMovesController {
   @Post(':id/complete')
   completeMoveRequest(
     @Param('id') id: string,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthUser,
   ) {
     return this.roomMovesService.completeMoveRequest(id, user.id);
   }

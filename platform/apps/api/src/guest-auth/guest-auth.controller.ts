@@ -40,7 +40,7 @@ export class GuestAuthController {
 
     @Get('me')
     @UseGuards(AuthGuard('guest-jwt'))
-    async getMe(@Request() req: any) {
+    async getMe(@Request() req: Request) {
         return this.guestAuthService.getMe(req.user.id);
     }
 }

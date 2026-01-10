@@ -31,7 +31,7 @@ export class SupportController {
   @Post()
   @UseGuards(JwtAuthGuard, ScopeGuard)
   @RequireScope({ resource: "support", action: "write" })
-  async create(@Body() dto: CreateSupportReportDto, @Req() req: any) {
+  async create(@Body() dto: CreateSupportReportDto, @Req() req: Request) {
     if (!this.canAct(req?.user)) {
       throw new ForbiddenException();
     }
@@ -42,7 +42,7 @@ export class SupportController {
   @UseGuards(JwtAuthGuard, ScopeGuard)
   @RequireScope({ resource: "support", action: "read" })
   @Get()
-  async list(@Req() req: any) {
+  async list(@Req() req: Request) {
     if (!this.canAct(req?.user)) {
       throw new ForbiddenException();
     }
@@ -58,7 +58,7 @@ export class SupportController {
   @UseGuards(JwtAuthGuard, ScopeGuard)
   @RequireScope({ resource: "support", action: "write" })
   @Patch(":id")
-  async update(@Param("id") id: string, @Body() dto: UpdateSupportReportDto, @Req() req: any) {
+  async update(@Param("id") id: string, @Body() dto: UpdateSupportReportDto, @Req() req: Request) {
     if (!this.canAct(req?.user)) {
       throw new ForbiddenException();
     }
@@ -76,7 +76,7 @@ export class SupportController {
   @UseGuards(JwtAuthGuard, ScopeGuard)
   @RequireScope({ resource: "support", action: "read" })
   @Get("/staff/directory")
-  async staffDirectory(@Req() req: any) {
+  async staffDirectory(@Req() req: Request) {
     const requestedRegion = req?.query?.region ?? null;
     const campgroundId = req?.query?.campgroundId ?? null;
     const userRegion = req?.user?.platformRegion ?? req?.user?.region ?? null;
@@ -89,7 +89,7 @@ export class SupportController {
   @UseGuards(JwtAuthGuard, ScopeGuard)
   @RequireScope({ resource: "support", action: "assign" })
   @Patch("/staff/:id/scope")
-  async updateStaffScope(@Param("id") id: string, @Body() dto: UpdateStaffScopeDto, @Req() req: any) {
+  async updateStaffScope(@Param("id") id: string, @Body() dto: UpdateStaffScopeDto, @Req() req: Request) {
     if (!this.canAct(req?.user)) {
       throw new ForbiddenException();
     }

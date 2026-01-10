@@ -23,7 +23,7 @@ export class NpsService {
   ) { }
 
   async createSurvey(dto: CreateNpsSurveyDto) {
-    const prisma = this.prisma as any;
+    const prisma = this.prisma;
     return prisma.npsSurvey.create({
       data: {
         campgroundId: dto.campgroundId,
@@ -41,7 +41,7 @@ export class NpsService {
   }
 
   async listSurveys(campgroundId: string) {
-    const prisma = this.prisma as any;
+    const prisma = this.prisma;
     return prisma.npsSurvey.findMany({
       where: { campgroundId },
       include: { rules: true },
@@ -50,7 +50,7 @@ export class NpsService {
   }
 
   async addRule(dto: CreateNpsRuleDto) {
-    const prisma = this.prisma as any;
+    const prisma = this.prisma;
     const survey = await prisma.npsSurvey.findUnique({ where: { id: dto.surveyId } });
     if (!survey) throw new NotFoundException("Survey not found");
     return prisma.npsRule.create({
@@ -71,7 +71,7 @@ export class NpsService {
 
   private async resolveGuestContact(guestId?: string, reservationId?: string, email?: string, phone?: string) {
     if (guestId) {
-      const guest = await (this.prisma as any).guest.findUnique({
+      const guest = await this.prisma.guest.findUnique({
         where: { id: guestId },
         select: { email: true, phone: true, primaryFirstName: true, primaryLastName: true }
       });
@@ -84,7 +84,7 @@ export class NpsService {
       }
     }
     if (reservationId) {
-      const reservation = await (this.prisma as any).reservation.findUnique({
+      const reservation = await this.prisma.reservation.findUnique({
         where: { id: reservationId },
         select: {
           guest: { select: { email: true, phone: true, primaryFirstName: true, primaryLastName: true } }
@@ -103,7 +103,7 @@ export class NpsService {
   }
 
   async createInvite(dto: CreateNpsInviteDto) {
-    const prisma = this.prisma as any;
+    const prisma = this.prisma;
     const survey = await prisma.npsSurvey.findUnique({
       where: { id: dto.surveyId },
       include: { campground: { select: { name: true } } }
@@ -197,7 +197,7 @@ export class NpsService {
   }
 
   async recordOpen(token: string) {
-    const prisma = this.prisma as any;
+    const prisma = this.prisma;
     const invite = await prisma.npsInvite.findUnique({ where: { token } });
     if (!invite) throw new NotFoundException("Invite not found");
     await prisma.npsInvite.update({
@@ -211,7 +211,7 @@ export class NpsService {
   }
 
   async respond(dto: RespondNpsDto, ip?: string) {
-    const prisma = this.prisma as any;
+    const prisma = this.prisma;
     const invite = await prisma.npsInvite.findUnique({
       where: { token: dto.token },
       include: { survey: true }
@@ -328,7 +328,7 @@ export class NpsService {
 
   @Cron("0 * * * *")
   async sendPostCheckoutInvites() {
-    const prisma = this.prisma as any;
+    const prisma = this.prisma;
     const now = new Date();
     const campgrounds = (await prisma.campground.findMany({
       select: { id: true, timezone: true, npsAutoSendEnabled: true, npsSendHour: true, npsTemplateId: true, npsSchedule: true }
@@ -431,7 +431,7 @@ export class NpsService {
   }
 
   async metrics(campgroundId: string) {
-    const prisma = this.prisma as any;
+    const prisma = this.prisma;
     const [responses, invites, systemResponses] = await Promise.all([
       prisma.npsResponse.findMany({
         where: { campgroundId },

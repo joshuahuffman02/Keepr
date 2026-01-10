@@ -256,7 +256,7 @@ export class ReservationImportExportService {
       return responseBase;
     }
 
-    const job = await (this.prisma as any).integrationExportJob.create({
+    const job = await this.prisma.integrationExportJob.create({
       data: {
         campgroundId: request.campgroundId,
         type: "api",
@@ -291,7 +291,7 @@ export class ReservationImportExportService {
     records: ReservationImportRecord[],
     validationErrors: ReservationImportValidationError[]
   ) {
-    await (this.prisma as any).integrationExportJob.update({
+    await this.prisma.integrationExportJob.update({
       where: { id: jobId },
       data: { status: "processing", startedAt: new Date() },
     });
@@ -332,7 +332,7 @@ export class ReservationImportExportService {
     }
 
     const status = failed.length ? "failed" : "success";
-    await (this.prisma as any).integrationExportJob.update({
+    await this.prisma.integrationExportJob.update({
       where: { id: jobId },
       data: {
         status,
@@ -366,7 +366,7 @@ export class ReservationImportExportService {
   }
 
   async getImportStatus(campgroundId: string, jobId: string) {
-    const job = await (this.prisma as any).integrationExportJob.findUnique({ where: { id: jobId } });
+    const job = await this.prisma.integrationExportJob.findUnique({ where: { id: jobId } });
     if (!job || job.campgroundId !== campgroundId || job.resource !== this.importResource) {
       throw new BadRequestException("Import job not found for this campground");
     }

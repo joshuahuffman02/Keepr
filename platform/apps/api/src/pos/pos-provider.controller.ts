@@ -9,37 +9,37 @@ export class PosProviderController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  list(@Req() req: any) {
+  list(@Req() req: Request) {
     return this.service.listIntegrations(req.user?.campgroundId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post(":provider/config")
-  configure(@Param("provider") provider: string, @Body() dto: UpsertPosProviderDto, @Req() req: any) {
+  configure(@Param("provider") provider: string, @Body() dto: UpsertPosProviderDto, @Req() req: Request) {
     return this.service.upsertIntegration(req.user?.campgroundId, provider, dto, req.user);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post(":provider/validate")
-  validate(@Param("provider") provider: string, @Body() dto: ValidatePosProviderDto, @Req() req: any) {
+  validate(@Param("provider") provider: string, @Body() dto: ValidatePosProviderDto, @Req() req: Request) {
     return this.service.validateCredentials(req.user?.campgroundId, provider, dto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get(":provider/status")
-  status(@Param("provider") provider: string, @Req() req: any) {
+  status(@Param("provider") provider: string, @Req() req: Request) {
     return this.service.syncStatus(req.user?.campgroundId, provider);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post(":provider/sync")
-  triggerSync(@Param("provider") provider: string, @Body() dto: TriggerPosSyncDto, @Req() req: any) {
+  triggerSync(@Param("provider") provider: string, @Body() dto: TriggerPosSyncDto, @Req() req: Request) {
     return this.service.syncIntegration(req.user?.campgroundId, provider, dto.target as any);
   }
 
   @Post(":provider/webhook/:campgroundId")
-  webhook(@Param("provider") provider: string, @Param("campgroundId") campgroundId: string, @Body() body: any, @Req() req: any) {
-    const rawBody = (req as any).rawBody ? (req as any).rawBody.toString() : JSON.stringify(body ?? {});
+  webhook(@Param("provider") provider: string, @Param("campgroundId") campgroundId: string, @Body() body: any, @Req() req: Request) {
+    const rawBody = req.rawBody ? req.rawBody.toString() : JSON.stringify(body ?? {});
     return this.service.handleWebhook(provider, campgroundId, body, req.headers, rawBody);
   }
 }

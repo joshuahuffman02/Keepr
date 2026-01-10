@@ -120,7 +120,7 @@ export class PermissionsService {
   }
 
   async listRules(campgroundId?: string | null, region?: string | null) {
-    const rules = await (this.prisma as any).permissionRule.findMany({
+    const rules = await this.prisma.permissionRule.findMany({
       where: {
         AND: [
           campgroundId ? { campgroundId } : {},
@@ -147,7 +147,7 @@ export class PermissionsService {
     createdById?: string | null;
   }) {
     const fields = this.buildFieldsWithRegions(params.fields ?? [], params.regions ?? []);
-    return (this.prisma as any).permissionRule.upsert({
+    return this.prisma.permissionRule.upsert({
       where: {
         campgroundId_role_resource_action: {
           campgroundId: params.campgroundId ?? null,
@@ -173,7 +173,7 @@ export class PermissionsService {
   }
 
   async deleteRule(params: { campgroundId?: string | null; role: UserRole; resource: string; action: string }) {
-    return (this.prisma as any).permissionRule.delete({
+    return this.prisma.permissionRule.delete({
       where: {
         campgroundId_role_resource_action: {
           campgroundId: params.campgroundId ?? null,
@@ -226,7 +226,7 @@ export class PermissionsService {
 
     if (role === UserRole.owner || role === UserRole.manager) return { allowed: true };
 
-    const rules = await (this.prisma as any).permissionRule.findMany({
+    const rules = await this.prisma.permissionRule.findMany({
       where: {
         role,
         resource: input.resource,

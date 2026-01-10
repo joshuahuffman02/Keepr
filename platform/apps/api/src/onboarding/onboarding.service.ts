@@ -400,7 +400,7 @@ export class OnboardingService {
             const expiresAt = new Date();
             expiresAt.setDate(expiresAt.getDate() + 7);
 
-            await (this.prisma as any).inviteToken.create({
+            await this.prisma.inviteToken.create({
               data: {
                 token: inviteToken,
                 userId: user.id,

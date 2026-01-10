@@ -48,7 +48,7 @@ export class UpsellsController {
 
   @Roles(UserRole.owner, UserRole.manager)
   @Get("campgrounds/:campgroundId/upsells")
-  list(@Param("campgroundId") campgroundId: string, @Req() req: any) {
+  list(@Param("campgroundId") campgroundId: string, @Req() req: Request) {
     this.assertCampgroundAccess(campgroundId, req.user);
     return this.upsells.list(campgroundId);
   }
@@ -58,7 +58,7 @@ export class UpsellsController {
   create(
     @Param("campgroundId") campgroundId: string,
     @Body() dto: CreateUpsellDto,
-    @Req() req: any
+    @Req() req: Request
   ) {
     this.assertCampgroundAccess(campgroundId, req.user);
     return this.upsells.create(campgroundId, dto);
@@ -70,7 +70,7 @@ export class UpsellsController {
     @Param("id") id: string,
     @Body() dto: UpdateUpsellDto,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -82,7 +82,7 @@ export class UpsellsController {
   remove(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);

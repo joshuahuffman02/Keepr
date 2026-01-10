@@ -26,35 +26,35 @@ export class PublicGuestsController {
 
   @Get()
   @ApiScopes("guests:read")
-  list(@Req() req: any) {
+  list(@Req() req: Request) {
     const campgroundId = req.apiPrincipal.campgroundId;
     return this.api.listGuests(campgroundId);
   }
 
   @Get(":id")
   @ApiScopes("guests:read")
-  get(@Req() req: any, @Param("id") id: string) {
+  get(@Req() req: Request, @Param("id") id: string) {
     const campgroundId = req.apiPrincipal.campgroundId;
     return this.api.getGuest(campgroundId, id);
   }
 
   @Post()
   @ApiScopes("guests:write")
-  create(@Req() req: any, @Body() body: CreateGuestBody) {
+  create(@Req() req: Request, @Body() body: CreateGuestBody) {
     const campgroundId = req.apiPrincipal.campgroundId;
     return this.api.createGuest(campgroundId, body);
   }
 
   @Patch(":id")
   @ApiScopes("guests:write")
-  update(@Req() req: any, @Param("id") id: string, @Body() body: UpdateGuestBody) {
+  update(@Req() req: Request, @Param("id") id: string, @Body() body: UpdateGuestBody) {
     const campgroundId = req.apiPrincipal.campgroundId;
     return this.api.updateGuest(campgroundId, id, body);
   }
 
   @Delete(":id")
   @ApiScopes("guests:write")
-  remove(@Req() req: any, @Param("id") id: string) {
+  remove(@Req() req: Request, @Param("id") id: string) {
     const campgroundId = req.apiPrincipal.campgroundId;
     return this.api.deleteGuest(campgroundId, id);
   }

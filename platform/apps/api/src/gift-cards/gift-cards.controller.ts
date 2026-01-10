@@ -48,7 +48,7 @@ export class GiftCardsController {
   @Roles(UserRole.owner, UserRole.manager, UserRole.finance)
   @Post("bookings/:bookingId/gift-cards/redeem")
   @SetHttpCode(200)
-  redeemBooking(@Param("bookingId") bookingId: string, @Body() body: RedeemGiftCardDto, @Req() req: any) {
+  redeemBooking(@Param("bookingId") bookingId: string, @Body() body: RedeemGiftCardDto, @Req() req: Request) {
     const requiredCampgroundId = this.requireCampgroundId(req);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
     const actor = { ...req.user, campgroundId: requiredCampgroundId };
@@ -58,7 +58,7 @@ export class GiftCardsController {
   @Roles(UserRole.owner, UserRole.manager, UserRole.finance)
   @Post("pos/orders/:orderId/gift-cards/redeem")
   @SetHttpCode(200)
-  redeemPosOrder(@Param("orderId") orderId: string, @Body() body: RedeemGiftCardDto, @Req() req: any) {
+  redeemPosOrder(@Param("orderId") orderId: string, @Body() body: RedeemGiftCardDto, @Req() req: Request) {
     const requiredCampgroundId = this.requireCampgroundId(req);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
     const actor = { ...req.user, campgroundId: requiredCampgroundId };

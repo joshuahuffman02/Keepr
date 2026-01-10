@@ -34,7 +34,7 @@ export class PaymentsReconciliationService {
 
   async lookupCampgroundIdByStripeAccount(accountId?: string | null) {
     if (!accountId) return '';
-    const cg = await (this.prisma as any).campground.findFirst({
+    const cg = await this.prisma.campground.findFirst({
       where: { stripeAccountId: accountId },
       select: { id: true }
     } as any);
@@ -97,7 +97,7 @@ export class PaymentsReconciliationService {
     chargeId?: string | null;
     balanceTransactionId?: string | null;
   }) {
-    return (this.prisma as any).payoutLine.create({
+    return this.prisma.payoutLine.create({
       data: {
         payoutId: opts.payoutId,
         type: opts.type,
@@ -132,7 +132,7 @@ export class PaymentsReconciliationService {
     glEntryId?: string | null;
     notes?: string | null;
   }) {
-    return (this.prisma as any).payoutReconLine.create({
+    return this.prisma.payoutReconLine.create({
       data: {
         payoutReconId: opts.payoutReconId,
         type: opts.type,
@@ -151,7 +151,7 @@ export class PaymentsReconciliationService {
     const payoutDate = payout.arrival_date ? new Date(payout.arrival_date * 1000) : null;
     const expected = payout.amount ?? 0;
     const actual = (payout.amount ?? 0) - (payout.fee ?? 0);
-    return (this.prisma as any).payoutRecon.upsert({
+    return this.prisma.payoutRecon.upsert({
       where: { id: payoutRecord.id },
       update: {
         provider: "stripe",
@@ -183,7 +183,7 @@ export class PaymentsReconciliationService {
     const paymentIntentId = dispute.payment_intent ?? null;
 
     // Check if we've already processed this dispute (idempotency)
-    const existingDispute = await (this.prisma as any).dispute.findUnique({
+    const existingDispute = await this.prisma.dispute.findUnique({
       where: { stripeDisputeId: disputeId }
     });
 
@@ -211,7 +211,7 @@ export class PaymentsReconciliationService {
     }
 
     // Upsert the dispute record
-    const disputeRecord = await (this.prisma as any).dispute.upsert({
+    const disputeRecord = await this.prisma.dispute.upsert({
       where: { stripeDisputeId: disputeId },
       update: {
         amountCents,
@@ -339,12 +339,12 @@ export class PaymentsReconciliationService {
     // Send alert about the chargeback
     await this.sendAlert(
       `Chargeback received for reservation ${reservationId}: $${(amountCents / 100).toFixed(2)} ` +
-      `(dispute ${stripeDisputeId}, reason: ${(await (this.prisma as any).dispute.findUnique({ where: { stripeDisputeId } }))?.reason ?? 'unknown'})`
+      `(dispute ${stripeDisputeId}, reason: ${(await this.prisma.dispute.findUnique({ where: { stripeDisputeId } }))?.reason ?? 'unknown'})`
     );
   }
 
   async upsertPayoutFromStripe(payout: any) {
-    const payoutRecord = await (this.prisma as any).payout.upsert({
+    const payoutRecord = await this.prisma.payout.upsert({
       where: { stripePayoutId: payout.id },
       update: {
         amountCents: payout.amount,
@@ -379,7 +379,7 @@ export class PaymentsReconciliationService {
     for (const tx of txns.data) {
       const chargeId = tx.source as any;
       const payment = chargeId
-        ? await (this.prisma as any).payment.findFirst({
+        ? await this.prisma.payment.findFirst({
             where: { stripeChargeId: chargeId },
             select: { reservationId: true, campgroundId: true }
           } as any)
@@ -473,7 +473,7 @@ export class PaymentsReconciliationService {
   }
 
   async computeReconSummary(payoutId: string, campgroundId: string) {
-    const payout = await (this.prisma as any).payout.findFirst({
+    const payout = await this.prisma.payout.findFirst({
       where: { id: payoutId, campgroundId },
       include: { lines: true }
     });
@@ -484,7 +484,7 @@ export class PaymentsReconciliationService {
 
     let ledgerNet = 0;
     if (reservationIds.length > 0) {
-      const ledgerEntries = await (this.prisma as any).ledgerEntry.findMany({
+      const ledgerEntries = await this.prisma.ledgerEntry.findMany({
         where: { reservationId: { in: reservationIds } }
       });
       ledgerNet = ledgerEntries.reduce((acc: number, e: any) => acc + (e.direction === "credit" ? e.amountCents : -e.amountCents), 0);
@@ -502,7 +502,7 @@ export class PaymentsReconciliationService {
           ? "drift"
           : "pending";
 
-    await (this.prisma as any).payout.update({
+    await this.prisma.payout.update({
       where: { id: payoutId },
       data: {
         reconStatus: status,
@@ -539,7 +539,7 @@ export class PaymentsReconciliationService {
     const occurredAt = payoutRecord.paidAt ?? payoutRecord.arrivalDate ?? new Date();
 
     // Skip if already posted
-    const existing = await (this.prisma as any).ledgerEntry.findFirst({
+    const existing = await this.prisma.ledgerEntry.findFirst({
       where: { externalRef, glCode: "BANK" },
       select: { id: true }
     });
@@ -556,7 +556,7 @@ export class PaymentsReconciliationService {
       reconciliationKey: externalRef
     });
 
-    await (this.prisma as any).payout.update({
+    await this.prisma.payout.update({
       where: { id: payoutRecord.id },
       data: { cashPostedAt: new Date() }
     });

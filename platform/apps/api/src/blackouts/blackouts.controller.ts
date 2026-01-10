@@ -45,13 +45,13 @@ export class BlackoutsController {
     }
 
     @Post()
-    create(@Body() createBlackoutDateDto: CreateBlackoutDateDto, @Req() req: any) {
+    create(@Body() createBlackoutDateDto: CreateBlackoutDateDto, @Req() req: Request) {
         this.assertCampgroundAccess(createBlackoutDateDto.campgroundId, req.user);
         return this.blackoutsService.create(createBlackoutDateDto);
     }
 
     @Get("campgrounds/:campgroundId")
-    findAll(@Param("campgroundId") campgroundId: string, @Req() req: any) {
+    findAll(@Param("campgroundId") campgroundId: string, @Req() req: Request) {
         this.assertCampgroundAccess(campgroundId, req.user);
         return this.blackoutsService.findAll(campgroundId);
     }
@@ -60,7 +60,7 @@ export class BlackoutsController {
     findOne(
         @Param("id") id: string,
         @Query("campgroundId") campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -72,7 +72,7 @@ export class BlackoutsController {
         @Param("id") id: string,
         @Body() updateBlackoutDateDto: UpdateBlackoutDateDto,
         @Query("campgroundId") campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -83,7 +83,7 @@ export class BlackoutsController {
     remove(
         @Param("id") id: string,
         @Query("campgroundId") campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         this.assertCampgroundAccess(requiredCampgroundId, req.user);

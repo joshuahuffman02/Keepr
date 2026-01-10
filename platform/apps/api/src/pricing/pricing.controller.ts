@@ -47,7 +47,7 @@ export class PricingController {
 
   @Roles(UserRole.owner, UserRole.manager)
   @Get("campgrounds/:campgroundId/pricing-rules")
-  list(@Param("campgroundId") campgroundId: string, @Req() req: any) {
+  list(@Param("campgroundId") campgroundId: string, @Req() req: Request) {
     this.assertCampgroundAccess(campgroundId, req.user);
     return this.pricing.listByCampground(campgroundId);
   }
@@ -57,7 +57,7 @@ export class PricingController {
   create(
     @Param("campgroundId") campgroundId: string,
     @Body() dto: CreatePricingRuleDto,
-    @Req() req: any
+    @Req() req: Request
   ) {
     this.assertCampgroundAccess(campgroundId, req.user);
     return this.pricing.create(campgroundId, dto);
@@ -69,7 +69,7 @@ export class PricingController {
     @Param("id") id: string,
     @Body() dto: Partial<CreatePricingRuleDto>,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -81,7 +81,7 @@ export class PricingController {
   remove(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);

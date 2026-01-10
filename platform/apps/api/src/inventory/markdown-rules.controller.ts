@@ -24,7 +24,7 @@ export class MarkdownRulesController {
     async createRule(
         @Param("campgroundId") campgroundId: string,
         @Body() dto: CreateMarkdownRuleDto,
-        @Request() req: any
+        @Request() req: Request
     ) {
         return this.markdownService.createRule(campgroundId, dto, req.user.id);
     }

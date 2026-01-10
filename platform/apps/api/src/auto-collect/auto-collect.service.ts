@@ -85,7 +85,7 @@ export class AutoCollectService {
       // Get deposit policy for retry schedule
       const policy = await this.getDepositPolicy(reservation);
       const retryPlan = policy?.retryPlanId
-        ? await (this.prisma as any).autoCollectSchedule.findUnique({ where: { id: policy.retryPlanId } })
+        ? await this.prisma.autoCollectSchedule.findUnique({ where: { id: policy.retryPlanId } })
         : null;
 
       // Check cutoff (don't attempt too close to arrival)
@@ -147,7 +147,7 @@ export class AutoCollectService {
       // Get retry plan and schedule next attempt with backoff
       const policy = await this.getDepositPolicy(reservation);
       const retryPlan = policy?.retryPlanId
-        ? await (this.prisma as any).autoCollectSchedule.findUnique({ where: { id: policy.retryPlanId } })
+        ? await this.prisma.autoCollectSchedule.findUnique({ where: { id: policy.retryPlanId } })
         : null;
       await this.scheduleNextAttempt(reservation, "error", retryPlan);
     }

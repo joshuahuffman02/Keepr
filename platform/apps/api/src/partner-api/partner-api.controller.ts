@@ -27,7 +27,7 @@ export class PartnerApiController {
    */
   @Post("scan")
   @ApiScopes("pos:read")
-  async scanProduct(@Req() req: any, @Body() dto: ScanProductDto) {
+  async scanProduct(@Req() req: Request, @Body() dto: ScanProductDto) {
     const principal: ApiPrincipal = req.apiPrincipal;
     return this.partnerApi.scanProduct(principal.campgroundId, dto);
   }
@@ -39,7 +39,7 @@ export class PartnerApiController {
   @Get("products")
   @ApiScopes("pos:read")
   async listProducts(
-    @Req() req: any,
+    @Req() req: Request,
     @Query("categoryId") categoryId?: string,
     @Query("search") search?: string,
     @Query("limit") limit?: string,
@@ -60,7 +60,7 @@ export class PartnerApiController {
    */
   @Get("products/:sku")
   @ApiScopes("pos:read")
-  async getProductBySku(@Req() req: any, @Param("sku") sku: string) {
+  async getProductBySku(@Req() req: Request, @Param("sku") sku: string) {
     const principal: ApiPrincipal = req.apiPrincipal;
     return this.partnerApi.getProductBySku(principal.campgroundId, sku);
   }
@@ -71,7 +71,7 @@ export class PartnerApiController {
    */
   @Get("products/:sku/batches")
   @ApiScopes("inventory:read")
-  async getProductBatches(@Req() req: any, @Param("sku") sku: string) {
+  async getProductBatches(@Req() req: Request, @Param("sku") sku: string) {
     const principal: ApiPrincipal = req.apiPrincipal;
     const product = await this.partnerApi.getProductBySku(
       principal.campgroundId,
@@ -86,7 +86,7 @@ export class PartnerApiController {
    */
   @Get("inventory/expiring")
   @ApiScopes("inventory:read")
-  async getExpiringInventory(@Req() req: any) {
+  async getExpiringInventory(@Req() req: Request) {
     const principal: ApiPrincipal = req.apiPrincipal;
     return this.partnerApi.getExpiringInventory(principal.campgroundId);
   }
@@ -97,7 +97,7 @@ export class PartnerApiController {
    */
   @Post("sales")
   @ApiScopes("pos:write")
-  async recordSale(@Req() req: any, @Body() dto: RecordSaleDto) {
+  async recordSale(@Req() req: Request, @Body() dto: RecordSaleDto) {
     const principal: ApiPrincipal = req.apiPrincipal;
     return this.partnerApi.recordSale(
       principal.campgroundId,
@@ -113,7 +113,7 @@ export class PartnerApiController {
   @Post("sales/:saleId/refund")
   @ApiScopes("pos:write")
   async recordRefund(
-    @Req() req: any,
+    @Req() req: Request,
     @Param("saleId") saleId: string,
     @Body() dto: RecordRefundDto
   ) {

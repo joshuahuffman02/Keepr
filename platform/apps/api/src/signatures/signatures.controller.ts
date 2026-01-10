@@ -20,7 +20,7 @@ export class SignaturesController {
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk, UserRole.finance)
   @RequireScope({ resource: "reservations", action: "write" })
   @Post("requests")
-  async create(@Req() req: any, @Body() dto: CreateSignatureRequestDto) {
+  async create(@Req() req: Request, @Body() dto: CreateSignatureRequestDto) {
     return this.signatures.createAndSend(dto, req?.user?.id ?? null);
   }
 
@@ -28,7 +28,7 @@ export class SignaturesController {
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk, UserRole.finance)
   @RequireScope({ resource: "reservations", action: "write" })
   @Post("requests/:id/resend")
-  async resend(@Req() req: any, @Param("id") id: string) {
+  async resend(@Req() req: Request, @Param("id") id: string) {
     return this.signatures.resend(id, req?.user?.id ?? null);
   }
 
@@ -36,7 +36,7 @@ export class SignaturesController {
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk, UserRole.finance)
   @RequireScope({ resource: "reservations", action: "write" })
   @Post("requests/:id/void")
-  async voidRequest(@Req() req: any, @Param("id") id: string) {
+  async voidRequest(@Req() req: Request, @Param("id") id: string) {
     return this.signatures.voidRequest(id, req?.user?.id ?? null);
   }
 
@@ -46,7 +46,7 @@ export class SignaturesController {
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
   @RequireScope({ resource: "reservations", action: "write" })
   @Post("requests/:id/paper-signed")
-  async markPaperSigned(@Req() req: any, @Param("id") id: string, @Body() dto: Omit<MarkPaperSignedDto, "id">) {
+  async markPaperSigned(@Req() req: Request, @Param("id") id: string, @Body() dto: Omit<MarkPaperSignedDto, "id">) {
     return this.signatures.markPaperSigned({ ...dto, id }, req.user.id);
   }
 
@@ -56,7 +56,7 @@ export class SignaturesController {
   @Roles(UserRole.owner, UserRole.manager)
   @RequireScope({ resource: "reservations", action: "write" })
   @Post("requests/:id/waive")
-  async waiveSignature(@Req() req: any, @Param("id") id: string, @Body() dto: Omit<WaiveSignatureDto, "id">) {
+  async waiveSignature(@Req() req: Request, @Param("id") id: string, @Body() dto: Omit<WaiveSignatureDto, "id">) {
     return this.signatures.waiveSignature({ ...dto, id }, req.user.id);
   }
 
@@ -138,7 +138,7 @@ export class SignaturesController {
   @Roles(UserRole.owner, UserRole.manager)
   @RequireScope({ resource: "reservations", action: "write" })
   @Post("contracts/renewal-campaign")
-  async sendRenewalCampaign(@Req() req: any, @Body() dto: SendRenewalCampaignDto) {
+  async sendRenewalCampaign(@Req() req: Request, @Body() dto: SendRenewalCampaignDto) {
     return this.signatures.sendRenewalCampaign(dto, req.user.id);
   }
 
@@ -152,7 +152,7 @@ export class SignaturesController {
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk, UserRole.finance)
   @RequireScope({ resource: "reservations", action: "write" })
   @Post("coi")
-  async uploadCoi(@Req() req: any, @Body() dto: CoiUploadDto) {
+  async uploadCoi(@Req() req: Request, @Body() dto: CoiUploadDto) {
     return this.signatures.createCoi(dto, req?.user?.id ?? null);
   }
 }

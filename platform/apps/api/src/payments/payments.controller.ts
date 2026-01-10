@@ -319,7 +319,7 @@ export class PaymentsController {
   @Post("payments/intents")
   async createIntent(
     @Body() body: CreatePaymentIntentDto,
-    @Req() req: any,
+    @Req() req: Request,
     @Headers("idempotency-key") idempotencyKey?: string
   ) {
     const currency = (body.currency || "usd").toLowerCase();
@@ -429,7 +429,7 @@ export class PaymentsController {
   @RequireScope({ resource: "payments", action: "write" })
   @Roles(UserRole.owner, UserRole.manager, UserRole.finance)
   @Post("payments/setup-intents")
-  async createSetupIntent(@Body() body: { reservationId: string; customerEmail?: string }, @Req() req: any) {
+  async createSetupIntent(@Body() body: { reservationId: string; customerEmail?: string }, @Req() req: Request) {
     if (!body.reservationId) throw new BadRequestException("reservationId is required");
     const ctx = await this.getPaymentContext(body.reservationId);
     this.ensureCampgroundMembership(req?.user, ctx.campgroundId);
@@ -600,7 +600,7 @@ export class PaymentsController {
   async confirmPublicPaymentIntent(
     @Param("id") paymentIntentId: string,
     @Body() body: { reservationId: string },
-    @Req() req: any
+    @Req() req: Request
   ) {
     // IDEMPOTENCY FIX (PAY-LOW-002): Use stable key derived from paymentIntentId + reservationId
     // Never use Date.now() as it creates different keys on retries, defeating idempotency
@@ -773,7 +773,7 @@ export class PaymentsController {
   @RequireScope({ resource: "payments", action: "write" })
   @Roles(UserRole.owner, UserRole.manager, UserRole.finance)
   @Post("campgrounds/:campgroundId/payments/connect")
-  async connectCampground(@Param("campgroundId") campgroundId: string, @Req() req: any) {
+  async connectCampground(@Param("campgroundId") campgroundId: string, @Req() req: Request) {
     this.ensureCampgroundMembership(req?.user, campgroundId);
     const campground = await this.prisma.campground.findUnique({
       where: { id: campgroundId },
@@ -854,7 +854,7 @@ export class PaymentsController {
   async updatePaymentSettings(
     @Param("campgroundId") campgroundId: string,
     @Body() body: UpdatePaymentSettingsDto,
-    @Req() req: any
+    @Req() req: Request
   ) {
     this.ensureCampgroundMembership(req?.user, campgroundId);
     const campground = await this.prisma.campground.findUnique({ where: { id: campgroundId } });
@@ -888,7 +888,7 @@ export class PaymentsController {
   @RequireScope({ resource: "payments", action: "write" })
   @Roles(UserRole.owner, UserRole.manager, UserRole.finance)
   @Post("campgrounds/:campgroundId/payments/capabilities/refresh")
-  async refreshCapabilities(@Param("campgroundId") campgroundId: string, @Req() req: any) {
+  async refreshCapabilities(@Param("campgroundId") campgroundId: string, @Req() req: Request) {
     this.ensureCampgroundMembership(req?.user, campgroundId);
     const cg = await this.prisma.campground.findUnique({
       where: { id: campgroundId },
@@ -938,7 +938,7 @@ export class PaymentsController {
   @RequireScope({ resource: "payments", action: "read" })
   @Roles(UserRole.owner, UserRole.manager, UserRole.finance)
   @Get("payments/intents/:id")
-  async getPaymentIntent(@Param("id") id: string, @Req() req: any) {
+  async getPaymentIntent(@Param("id") id: string, @Req() req: Request) {
     try {
       const intent = await this.stripeService.retrievePaymentIntent(id);
       const campgroundId = (intent.metadata as any)?.campgroundId ?? null;
@@ -973,7 +973,7 @@ export class PaymentsController {
   async capturePaymentIntent(
     @Param("id") id: string,
     @Body() body: CapturePaymentIntentDto,
-    @Req() req: any,
+    @Req() req: Request,
     @Headers("idempotency-key") idempotencyKey?: string
   ) {
     try {
@@ -1056,7 +1056,7 @@ export class PaymentsController {
   async refundPaymentIntent(
     @Param("id") id: string,
     @Body() body: RefundPaymentIntentDto,
-    @Req() req: any,
+    @Req() req: Request,
     @Headers("idempotency-key") idempotencyKey?: string
   ) {
     try {
@@ -1299,7 +1299,7 @@ export class PaymentsController {
     const limit = Math.min(parseInt(limitStr ?? "100", 10) || 100, 500);
     const offset = parseInt(offsetStr ?? "0", 10) || 0;
 
-    const payouts = await (this.prisma as any).payout.findMany({
+    const payouts = await this.prisma.payout.findMany({
       where: {
         campgroundId,
         status: status ? (status as string) : undefined
@@ -1324,7 +1324,7 @@ export class PaymentsController {
     @Req() req?: any
   ) {
     this.ensureCampgroundMembership(req?.user, campgroundId);
-    const payout = await (this.prisma as any).payout.findFirst({
+    const payout = await this.prisma.payout.findFirst({
       where: { id: payoutId, campgroundId },
       include: { lines: true }
     });
@@ -1360,7 +1360,7 @@ export class PaymentsController {
     @Req() req?: any
   ) {
     this.ensureCampgroundMembership(req?.user, campgroundId);
-    const payout = await (this.prisma as any).payout.findFirst({
+    const payout = await this.prisma.payout.findFirst({
       where: { id: payoutId, campgroundId },
       include: { lines: true }
     });
@@ -1395,14 +1395,14 @@ export class PaymentsController {
     @Req() req?: any
   ) {
     this.ensureCampgroundMembership(req?.user, campgroundId);
-    const payout = await (this.prisma as any).payout.findFirst({
+    const payout = await this.prisma.payout.findFirst({
       where: { id: payoutId, campgroundId },
       include: { lines: true }
     });
     if (!payout) throw new NotFoundException("Payout not found");
     const reservationIds = Array.from(new Set((payout.lines || []).map((l: any) => l.reservationId).filter(Boolean)));
     const ledgerEntries = reservationIds.length
-      ? await (this.prisma as any).ledgerEntry.findMany({ where: { reservationId: { in: reservationIds } } })
+      ? await this.prisma.ledgerEntry.findMany({ where: { reservationId: { in: reservationIds } } })
       : [];
     const headers = ["id", "reservation_id", "gl_code", "account", "description", "amount_cents", "direction", "occurred_at"];
     const rows = ledgerEntries.map((e: any) => [
@@ -1436,7 +1436,7 @@ export class PaymentsController {
     const limit = Math.min(parseInt(limitStr ?? "100", 10) || 100, 500);
     const offset = parseInt(offsetStr ?? "0", 10) || 0;
 
-    const disputes = await (this.prisma as any).dispute.findMany({
+    const disputes = await this.prisma.dispute.findMany({
       where: {
         campgroundId,
         status: status ? (status as string) : undefined
@@ -1458,7 +1458,7 @@ export class PaymentsController {
     @Req() req?: any
   ) {
     this.ensureCampgroundMembership(req?.user, campgroundId);
-    const dispute = await (this.prisma as any).dispute.findFirst({
+    const dispute = await this.prisma.dispute.findFirst({
       where: { id: disputeId, campgroundId }
     });
     if (!dispute) throw new NotFoundException("Dispute not found");
@@ -1476,7 +1476,7 @@ export class PaymentsController {
     @Req() req?: any
   ) {
     this.ensureCampgroundMembership(req?.user, campgroundId);
-    const disputes = await (this.prisma as any).dispute.findMany({
+    const disputes = await this.prisma.dispute.findMany({
       where: { campgroundId, status: status ? (status as string) : undefined }
     });
     const headers = ["stripe_dispute_id", "status", "amount_cents", "currency", "reason", "reservation_id", "charge_id", "payment_intent_id", "evidence_due_by"];
@@ -1592,7 +1592,7 @@ export class PaymentsController {
       );
 
       // Create balanced ledger entries for the ACH return
-      await (this.prisma as any).ledgerEntry.create({
+      await this.prisma.ledgerEntry.create({
         data: {
           campgroundId,
           reservationId,
@@ -1605,7 +1605,7 @@ export class PaymentsController {
         }
       });
 
-      await (this.prisma as any).ledgerEntry.create({
+      await this.prisma.ledgerEntry.create({
         data: {
           campgroundId,
           reservationId,

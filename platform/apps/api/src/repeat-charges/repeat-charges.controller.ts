@@ -43,7 +43,7 @@ export class RepeatChargesController {
 
     @Roles(UserRole.owner, UserRole.manager, UserRole.finance)
     @Get()
-    findAll(@Query('campgroundId') campgroundId: string, @Req() req: any) {
+    findAll(@Query('campgroundId') campgroundId: string, @Req() req: Request) {
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         this.assertCampgroundAccess(requiredCampgroundId, req.user);
         return this.repeatChargesService.getAllCharges(requiredCampgroundId);
@@ -54,7 +54,7 @@ export class RepeatChargesController {
     findByReservation(
         @Param('id') id: string,
         @Query('campgroundId') campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -66,7 +66,7 @@ export class RepeatChargesController {
     generate(
         @Param('id') id: string,
         @Query('campgroundId') campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -78,7 +78,7 @@ export class RepeatChargesController {
     process(
         @Param('id') id: string,
         @Query('campgroundId') campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         this.assertCampgroundAccess(requiredCampgroundId, req.user);

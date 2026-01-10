@@ -8,7 +8,7 @@ export class TaskBundlerController {
     constructor(private readonly bundler: TaskBundlerService) { }
 
     @Get()
-    async getBundles(@Req() req: any) {
+    async getBundles(@Req() req: Request) {
         // Assuming standard user object has campgroundId or tenantId
         // In many parts of this codebase campgroundId is used.
         // Task model has 'tenantId'. We should check if campgroundId maps to tenantId.

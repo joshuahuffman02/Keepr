@@ -17,19 +17,19 @@ export class GamificationController {
   }
 
   @Get("dashboard")
-  getDashboard(@Request() req: any, @Query("campgroundId") campgroundId: string): any {
+  getDashboard(@Request() req: Request, @Query("campgroundId") campgroundId: string): any {
     const cg = this.resolveCampgroundId(req, campgroundId);
     return this.gamificationService.getDashboard(req.user.id, cg);
   }
 
   @Get("settings")
-  getSettings(@Request() req: any, @Query("campgroundId") campgroundId: string): any {
+  getSettings(@Request() req: Request, @Query("campgroundId") campgroundId: string): any {
     const cg = this.resolveCampgroundId(req, campgroundId);
     return this.gamificationService.getSettingsForManager(req.user.id, cg);
   }
 
   @Patch("settings")
-  updateSettings(@Request() req: any, @Body() body: UpdateGamificationSettingsDto) {
+  updateSettings(@Request() req: Request, @Body() body: UpdateGamificationSettingsDto) {
     const cg = this.resolveCampgroundId(req, (body as any)?.campgroundId);
     const rawEnabled = (body as any)?.enabled;
     let enabled: boolean;
@@ -58,19 +58,19 @@ export class GamificationController {
   }
 
   @Get("rules")
-  getRules(@Request() req: any, @Query("campgroundId") campgroundId: string): any {
+  getRules(@Request() req: Request, @Query("campgroundId") campgroundId: string): any {
     const cg = this.resolveCampgroundId(req, campgroundId);
     return this.gamificationService.getRules(req.user.id, cg);
   }
 
   @Post("rules")
-  upsertRule(@Request() req: any, @Body() body: UpsertXpRuleDto): any {
+  upsertRule(@Request() req: Request, @Body() body: UpsertXpRuleDto): any {
     const cg = this.resolveCampgroundId(req, (body as any)?.campgroundId);
     return this.gamificationService.upsertRule(req.user.id, { ...body, campgroundId: cg });
   }
 
   @Post("award")
-  manualAward(@Request() req: any, @Body() body: AwardXpDto): any {
+  manualAward(@Request() req: Request, @Body() body: AwardXpDto): any {
     const cg = this.resolveCampgroundId(req, (body as any)?.campgroundId);
     return this.gamificationService.manualAward(req.user.id, { ...body, campgroundId: cg });
   }
@@ -82,7 +82,7 @@ export class GamificationController {
 
   @Get("leaderboard")
   getLeaderboard(
-    @Request() req: any,
+    @Request() req: Request,
     @Query("campgroundId") campgroundId: string,
     @Query("days") days?: string,
     @Query("limit") limit?: string,
@@ -99,7 +99,7 @@ export class GamificationController {
   }
 
   @Get("stats")
-  getStats(@Request() req: any, @Query("campgroundId") campgroundId: string, @Query("days") days?: string): any {
+  getStats(@Request() req: Request, @Query("campgroundId") campgroundId: string, @Query("days") days?: string): any {
     const cg = this.resolveCampgroundId(req, campgroundId);
     const parsedDays = days ? Number(days) : undefined;
     return this.gamificationService.getStats(cg, parsedDays);

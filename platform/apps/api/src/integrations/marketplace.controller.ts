@@ -315,8 +315,8 @@ export class MarketplaceController {
     @Headers("x-hmac-signature") hmacSignature?: string,
     @Headers("x-campground-id") campgroundId?: string
   ) {
-    const rawBody = (req as any).rawBody
-      ? (req as any).rawBody.toString()
+    const rawBody = req.rawBody
+      ? req.rawBody.toString()
       : JSON.stringify(body);
 
     const providedSignature =

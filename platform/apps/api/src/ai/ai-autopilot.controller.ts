@@ -148,7 +148,7 @@ export class AiAutopilotController {
     @Body() data: ReviewDraftDto,
     @Req() req: Request
   ) {
-    const user = (req as any).user;
+    const user = req.user;
     return this.autoReplyService.reviewDraft(id, data, user?.id);
   }
 
@@ -203,7 +203,7 @@ export class AiAutopilotController {
     @Body() data: UpdateAnomalyStatusDto,
     @Req() req: Request
   ) {
-    const user = (req as any).user;
+    const user = req.user;
     return this.anomalyService.updateAlertStatus(id, data, user?.id);
   }
 
@@ -333,7 +333,7 @@ export class AiAutopilotController {
     @Param("id") id: string,
     @Req() req: Request
   ) {
-    const user = (req as any).user;
+    const user = req.user;
     return this.dynamicPricingService.applyRecommendation(id, user?.id);
   }
 
@@ -344,7 +344,7 @@ export class AiAutopilotController {
     @Body("reason") reason: string,
     @Req() req: Request
   ) {
-    const user = (req as any).user;
+    const user = req.user;
     return this.dynamicPricingService.dismissRecommendation(id, user?.id, reason);
   }
 
@@ -409,7 +409,7 @@ export class AiAutopilotController {
     },
     @Req() req: Request
   ) {
-    const user = (req as any).user;
+    const user = req.user;
     return this.dynamicPricingService.createExperiment(campgroundId, {
       ...data,
       startDate: new Date(data.startDate),
@@ -522,7 +522,7 @@ export class AiAutopilotController {
     @Param("id") id: string,
     @Req() req: Request
   ) {
-    const user = (req as any).user;
+    const user = req.user;
     return this.predictiveMaintenanceService.acknowledgeAlert(id, user?.id);
   }
 
@@ -667,7 +667,7 @@ export class AiAutopilotController {
     @Body("reason") reason: string,
     @Req() req: Request
   ) {
-    const user = (req as any).user;
+    const user = req.user;
     return this.autonomousActionService.reverseAction(id, user?.id, reason);
   }
 

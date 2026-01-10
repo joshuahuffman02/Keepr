@@ -48,7 +48,7 @@ export class WaitlistController {
     create(
         @Param('campgroundId') campgroundId: string,
         @Body() createWaitlistDto: CreateWaitlistEntryDto,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const idempotencyKey = req.headers["idempotency-key"];
         const sequence = req.headers["x-client-seq"] ?? req.headers["client-seq"];
@@ -65,7 +65,7 @@ export class WaitlistController {
     createStaffEntry(
         @Param('campgroundId') campgroundId: string,
         @Body() dto: CreateStaffWaitlistDto,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const idempotencyKey = req.headers["idempotency-key"];
         const sequence = req.headers["x-client-seq"] ?? req.headers["client-seq"];
@@ -82,7 +82,7 @@ export class WaitlistController {
     accept(
         @Param('campgroundId') campgroundId: string,
         @Param('id') id: string,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const idempotencyKey = req.headers["idempotency-key"];
         const sequence = req.headers["x-client-seq"] ?? req.headers["client-seq"];

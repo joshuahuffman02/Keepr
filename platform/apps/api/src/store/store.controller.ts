@@ -65,7 +65,7 @@ export class StoreController {
     // ==================== CATEGORIES ====================
 
     @Get("campgrounds/:campgroundId/store/categories")
-    listCategories(@Param("campgroundId") campgroundId: string, @Req() req: any) {
+    listCategories(@Param("campgroundId") campgroundId: string, @Req() req: Request) {
         this.assertCampgroundAccess(campgroundId, req.user);
         return this.store.listCategories(campgroundId);
     }
@@ -74,7 +74,7 @@ export class StoreController {
     createCategory(
         @Param("campgroundId") campgroundId: string,
         @Body() body: Omit<CreateProductCategoryDto, "campgroundId">,
-        @Req() req: any
+        @Req() req: Request
     ) {
         this.assertCampgroundAccess(campgroundId, req.user);
         return this.store.createCategory({ campgroundId, ...body });
@@ -85,7 +85,7 @@ export class StoreController {
         @Param("id") id: string,
         @Body() body: UpdateProductCategoryDto,
         @Query("campgroundId") campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -96,7 +96,7 @@ export class StoreController {
     deleteCategory(
         @Param("id") id: string,
         @Query("campgroundId") campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -119,7 +119,7 @@ export class StoreController {
     getProduct(
         @Param("id") id: string,
         @Query("campgroundId") campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -130,7 +130,7 @@ export class StoreController {
     createProduct(
         @Param("campgroundId") campgroundId: string,
         @Body() body: Omit<CreateProductDto, "campgroundId">,
-        @Req() req: any
+        @Req() req: Request
     ) {
         this.assertCampgroundAccess(campgroundId, req.user);
         return this.store.createProduct({ campgroundId, ...body });
@@ -141,7 +141,7 @@ export class StoreController {
         @Param("campgroundId") campgroundId: string,
         @Param("id") id: string,
         @Body() body: { stockQty?: number; delta?: number; channel?: "pos" | "online" | "portal" | "kiosk" | "internal" },
-        @Req() req: any
+        @Req() req: Request
     ) {
         this.assertCampgroundAccess(campgroundId, req.user);
         if (typeof body.stockQty === "number") {
@@ -156,7 +156,7 @@ export class StoreController {
       @Param("id") id: string,
       @Body() body: UpdateProductDto,
       @Query("campgroundId") campgroundId: string | undefined,
-      @Req() req: any
+      @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -167,7 +167,7 @@ export class StoreController {
   deleteProduct(
       @Param("id") id: string,
       @Query("campgroundId") campgroundId: string | undefined,
-      @Req() req: any
+      @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -175,7 +175,7 @@ export class StoreController {
   }
 
     @Get("campgrounds/:campgroundId/store/products/low-stock")
-    getLowStockProducts(@Param("campgroundId") campgroundId: string, @Req() req: any) {
+    getLowStockProducts(@Param("campgroundId") campgroundId: string, @Req() req: Request) {
         this.assertCampgroundAccess(campgroundId, req.user);
         return this.store.getLowStockProducts(campgroundId);
     }
@@ -183,7 +183,7 @@ export class StoreController {
     // ==================== ADD-ONS ====================
 
     @Get("campgrounds/:campgroundId/store/addons")
-    listAddOns(@Param("campgroundId") campgroundId: string, @Req() req: any) {
+    listAddOns(@Param("campgroundId") campgroundId: string, @Req() req: Request) {
         this.assertCampgroundAccess(campgroundId, req.user);
         return this.store.listAddOns(campgroundId);
     }
@@ -192,7 +192,7 @@ export class StoreController {
     createAddOn(
         @Param("campgroundId") campgroundId: string,
         @Body() body: Omit<CreateAddOnDto, "campgroundId">,
-        @Req() req: any
+        @Req() req: Request
     ) {
         this.assertCampgroundAccess(campgroundId, req.user);
         return this.store.createAddOn({ campgroundId, ...body });
@@ -203,7 +203,7 @@ export class StoreController {
         @Param("id") id: string,
         @Body() body: UpdateAddOnDto,
         @Query("campgroundId") campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -214,7 +214,7 @@ export class StoreController {
     deleteAddOn(
         @Param("id") id: string,
         @Query("campgroundId") campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -251,7 +251,7 @@ export class StoreController {
     getOrder(
         @Param("id") id: string,
         @Query("campgroundId") campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -262,7 +262,7 @@ export class StoreController {
     createOrder(
         @Param("campgroundId") campgroundId: string,
         @Body() body: Omit<CreateOrderDto, "campgroundId">,
-        @Req() req: any
+        @Req() req: Request
     ) {
         this.assertCampgroundAccess(campgroundId, req?.user);
         return this.store.createOrder({ campgroundId, ...body }, req?.user?.id);
@@ -283,7 +283,7 @@ export class StoreController {
 
     @UseGuards(AuthGuard("guest-jwt"))
     @Post("portal/store/orders")
-    async createOrderPortal(@Req() req: any, @Body() body: Omit<CreateOrderDto, "campgroundId" | "guestId">) {
+    async createOrderPortal(@Req() req: Request, @Body() body: Omit<CreateOrderDto, "campgroundId" | "guestId">) {
         const guest = req.user as any;
         // Validate reservation belongs to this guest
         if (!body.reservationId) {
@@ -311,7 +311,7 @@ export class StoreController {
     completeOrder(
         @Param("id") id: string,
         @Query("campgroundId") campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         const user = req.user as any;
@@ -324,7 +324,7 @@ export class StoreController {
       @Param("id") id: string,
       @Body() body: { status: "pending" | "ready" | "delivered" | "completed" | "cancelled" | "refunded" },
       @Query("campgroundId") campgroundId: string | undefined,
-      @Req() req: any
+      @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     const user = req.user as any;
@@ -336,7 +336,7 @@ export class StoreController {
     getOrderHistory(
         @Param("id") id: string,
         @Query("campgroundId") campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -354,7 +354,7 @@ export class StoreController {
             note?: string | null;
         },
         @Query("campgroundId") campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         const user = req.user as any;
@@ -364,7 +364,7 @@ export class StoreController {
 
     // Staff notifications: list unseen/pending orders
     @Get("campgrounds/:campgroundId/store/orders/unseen")
-    listUnseen(@Param("campgroundId") campgroundId: string, @Req() req: any) {
+    listUnseen(@Param("campgroundId") campgroundId: string, @Req() req: Request) {
         this.assertCampgroundAccess(campgroundId, req.user);
         return this.store.listUnseenOrders(campgroundId);
     }
@@ -373,7 +373,7 @@ export class StoreController {
     markSeen(
         @Param("id") id: string,
         @Query("campgroundId") campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         this.assertCampgroundAccess(requiredCampgroundId, req.user);

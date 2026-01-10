@@ -59,7 +59,7 @@ export class StayRulesController {
             dateRanges?: DateRange[];
             ignoreDaysBefore?: number;
         },
-        @Req() req: any
+        @Req() req: Request
     ) {
         this.assertCampgroundAccess(campgroundId, req.user);
         return this.stayRulesService.create({
@@ -69,7 +69,7 @@ export class StayRulesController {
     }
 
     @Get('campgrounds/:campgroundId/stay-rules')
-    findAllByCampground(@Param('campgroundId') campgroundId: string, @Req() req: any) {
+    findAllByCampground(@Param('campgroundId') campgroundId: string, @Req() req: Request) {
         this.assertCampgroundAccess(campgroundId, req.user);
         return this.stayRulesService.findAllByCampground(campgroundId);
     }
@@ -78,7 +78,7 @@ export class StayRulesController {
     findOne(
         @Param('id') id: string,
         @Query('campgroundId') campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -98,7 +98,7 @@ export class StayRulesController {
             isActive: boolean;
         }>,
         @Query('campgroundId') campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -109,7 +109,7 @@ export class StayRulesController {
     remove(
         @Param('id') id: string,
         @Query('campgroundId') campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -120,7 +120,7 @@ export class StayRulesController {
     duplicate(
         @Param('id') id: string,
         @Query('campgroundId') campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         this.assertCampgroundAccess(requiredCampgroundId, req.user);

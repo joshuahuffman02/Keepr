@@ -1316,6 +1316,24 @@ export class ChatToolsService {
           const blockStartDate = startDate ? new Date(startDate) : new Date();
           const blockEndDate = endDate ? new Date(endDate) : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
 
+          // Check for overlapping blackouts on this site
+          const existingOverlap = await prisma.blackoutDate.findFirst({
+            where: {
+              campgroundId: context.campgroundId,
+              siteId: siteId,
+              startDate: { lt: blockEndDate },
+              endDate: { gt: blockStartDate },
+            },
+          });
+
+          if (existingOverlap) {
+            this.logger.warn(`block_site: Overlapping blackout exists for site ${site.name}`);
+            return {
+              success: false,
+              message: `Site ${site.name} already has a block from ${existingOverlap.startDate.toISOString().split('T')[0]} to ${existingOverlap.endDate.toISOString().split('T')[0]}. Please remove the existing block first or choose different dates.`,
+            };
+          }
+
           this.logger.log(`block_site: Creating blackout with id=${blockId}, startDate=${blockStartDate.toISOString()}, endDate=${blockEndDate.toISOString()}`);
 
           const block = await prisma.blackoutDate.create({

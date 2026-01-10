@@ -37,7 +37,7 @@ export class BatchInventoryController {
     async createBatch(
         @Param("campgroundId") campgroundId: string,
         @Body() dto: CreateBatchDto,
-        @Request() req: any
+        @Request() req: Request
     ) {
         return this.batchService.createBatch(campgroundId, dto, req.user.id);
     }
@@ -89,7 +89,7 @@ export class BatchInventoryController {
         @Param("campgroundId") campgroundId: string,
         @Param("id") id: string,
         @Body() dto: AdjustBatchDto,
-        @Request() req: any
+        @Request() req: Request
     ) {
         return this.batchService.adjustBatch(id, campgroundId, dto, req.user.id);
     }
@@ -99,7 +99,7 @@ export class BatchInventoryController {
         @Param("campgroundId") campgroundId: string,
         @Param("id") id: string,
         @Body() dto: DisposeBatchDto,
-        @Request() req: any
+        @Request() req: Request
     ) {
         return this.batchService.disposeBatch(id, campgroundId, dto, req.user.id);
     }
@@ -119,14 +119,14 @@ export class BatchInventoryController {
     }
 
     @Post("alerts/:id/acknowledge")
-    async acknowledgeAlert(@Param("id") id: string, @Request() req: any) {
+    async acknowledgeAlert(@Param("id") id: string, @Request() req: Request) {
         return this.alertService.acknowledgeAlert(id, req.user.id);
     }
 
     @Post("alerts/acknowledge-bulk")
     async acknowledgeAlertsBulk(
         @Body() body: { ids: string[] },
-        @Request() req: any
+        @Request() req: Request
     ) {
         return this.alertService.acknowledgeAlerts(body.ids, req.user.id);
     }

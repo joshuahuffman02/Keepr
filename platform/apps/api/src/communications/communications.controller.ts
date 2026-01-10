@@ -190,7 +190,7 @@ export class CommunicationsController {
   }
 
   private async requireTemplateApproval(templateId: string, campgroundId: string) {
-    const tpl = await (this.prisma as any).communicationTemplate.findUnique({ where: { id: templateId } });
+    const tpl = await this.prisma.communicationTemplate.findUnique({ where: { id: templateId } });
     if (!tpl || tpl.campgroundId !== campgroundId) {
       throw new BadRequestException("Template not found for campground");
     }
@@ -267,7 +267,7 @@ export class CommunicationsController {
     if (!body.guestId && !body.reservationId) {
       throw new BadRequestException("guestId or reservationId is required");
     }
-    const communication = await (this.prisma as any).communication.create({
+    const communication = await this.prisma.communication.create({
       data: {
         campgroundId: body.campgroundId,
         organizationId: body.organizationId ?? null,
@@ -302,7 +302,7 @@ export class CommunicationsController {
     if (query.type) where.type = query.type;
     if (query.direction) where.direction = query.direction;
 
-    const communications = await (this.prisma as any).communication.findMany({
+    const communications = await this.prisma.communication.findMany({
       where,
       orderBy: { createdAt: "desc" },
       take: limit + 1,
@@ -327,7 +327,7 @@ export class CommunicationsController {
   @Post("communications/send")
   async send(@Body() body: SendCommunicationDto) {
     if (!body.campgroundId) throw new BadRequestException("campgroundId is required");
-    const prisma = this.prisma as any;
+    const prisma = this.prisma;
     const clientConsentProvided = body.consentGranted === true || Boolean(body.consentSource);
     if (clientConsentProvided) {
       // Do not trust client-provided consent flags; enforce server-side logs only.
@@ -567,7 +567,7 @@ export class CommunicationsController {
     const resolvedCampgroundId = body.campgroundId || campgroundId || "";
     const conversationId = resolvedCampgroundId ? this.generateSmsConversationId(from, to, resolvedCampgroundId) : null;
 
-    const communication = await (this.prisma as any).communication.create({
+    const communication = await this.prisma.communication.create({
       data: {
         campgroundId: resolvedCampgroundId,
         organizationId: null,
@@ -618,7 +618,7 @@ export class CommunicationsController {
     }
     const status = this.normalizeTwilioStatus((body.MessageStatus || body.SmsStatus || "").toString());
 
-    await (this.prisma as any).communication.updateMany({
+    await this.prisma.communication.updateMany({
       where: { providerMessageId: messageSid },
       data: { status, metadata: body }
     });
@@ -675,7 +675,7 @@ export class CommunicationsController {
       })
       : null;
 
-    const communication = await (this.prisma as any).communication.create({
+    const communication = await this.prisma.communication.create({
       data: {
         campgroundId: body.campgroundId || reservation?.campgroundId || "",
         organizationId: null,
@@ -737,7 +737,7 @@ export class CommunicationsController {
       description: body.Description
     };
 
-    await (this.prisma as any).communication.updateMany({
+    await this.prisma.communication.updateMany({
       where: { providerMessageId: messageId },
       data: { status: finalStatus, metadata }
     });
@@ -777,7 +777,7 @@ export class CommunicationsController {
     if (!campgroundId) throw new BadRequestException("campgroundId is required");
     const where: any = { campgroundId };
     if (status) where.status = status;
-    const templates = await (this.prisma as any).communicationTemplate.findMany({
+    const templates = await this.prisma.communicationTemplate.findMany({
       where,
       orderBy: [{ updatedAt: "desc" }]
     });
@@ -791,7 +791,7 @@ export class CommunicationsController {
     if (!body.campgroundId || !body.name) {
       throw new BadRequestException("campgroundId and name are required");
     }
-    const template = await (this.prisma as any).communicationTemplate.create({
+    const template = await this.prisma.communicationTemplate.create({
       data: {
         campgroundId: body.campgroundId,
         name: body.name,
@@ -813,7 +813,7 @@ export class CommunicationsController {
     @Body() body: { name?: string; subject?: string; bodyHtml?: string; status?: string; campgroundId?: string },
     @Query("campgroundId") campgroundId?: string
   ) {
-    const existing = await (this.prisma as any).communicationTemplate.findUnique({ where: { id } });
+    const existing = await this.prisma.communicationTemplate.findUnique({ where: { id } });
     if (!existing) throw new BadRequestException("Template not found");
     if (campgroundId && existing.campgroundId !== campgroundId) {
       throw new BadRequestException("Unauthorized campground scope");
@@ -830,7 +830,7 @@ export class CommunicationsController {
       }, {})
     };
 
-    const updated = await (this.prisma as any).communicationTemplate.update({
+    const updated = await this.prisma.communicationTemplate.update({
       where: { id },
       data: {
         name: body.name ?? existing.name,
@@ -850,23 +850,23 @@ export class CommunicationsController {
     if (!campgroundId) throw new BadRequestException("campgroundId is required");
     const where: any = { campgroundId };
     if (status) where.status = status;
-    return (this.prisma as any).communicationPlaybookJob.findMany({
+    return this.prisma.communicationPlaybookJob.findMany({
       where,
       orderBy: [{ scheduledAt: "asc" }]
     });
   }
 
   private async processJob(job: any) {
-    const playbook = await (this.prisma as any).communicationPlaybook.findUnique({
+    const playbook = await this.prisma.communicationPlaybook.findUnique({
       where: { id: job.playbookId },
       include: { campground: true, template: true }
     });
     if (!playbook || !playbook.enabled) {
-      await (this.prisma as any).communicationPlaybookJob.update({ where: { id: job.id }, data: { status: "skipped", lastError: "Playbook disabled" } });
+      await this.prisma.communicationPlaybookJob.update({ where: { id: job.id }, data: { status: "skipped", lastError: "Playbook disabled" } });
       return;
     }
     if (!playbook.template || playbook.template.status !== "approved") {
-      await (this.prisma as any).communicationPlaybookJob.update({ where: { id: job.id }, data: { status: "skipped", lastError: "Template not approved" } });
+      await this.prisma.communicationPlaybookJob.update({ where: { id: job.id }, data: { status: "skipped", lastError: "Template not approved" } });
       return;
     }
     const now = new Date();
@@ -891,7 +891,7 @@ export class CommunicationsController {
           ).getTime()
         );
       }
-      await (this.prisma as any).communicationPlaybookJob.update({
+      await this.prisma.communicationPlaybookJob.update({
         where: { id: job.id },
         data: { scheduledAt: next, attempts: job.attempts + 1 }
       });
@@ -899,15 +899,15 @@ export class CommunicationsController {
     }
 
     const reservation = job.reservationId
-      ? await (this.prisma as any).reservation.findUnique({ where: { id: job.reservationId }, include: { Guest: true } })
+      ? await this.prisma.reservation.findUnique({ where: { id: job.reservationId }, include: { Guest: true } })
       : null;
-    const guest = reservation?.guest || (job.guestId ? await (this.prisma as any).guest.findUnique({ where: { id: job.guestId } }) : null);
+    const guest = reservation?.guest || (job.guestId ? await this.prisma.guest.findUnique({ where: { id: job.guestId } }) : null);
 
     const toEmail = guest?.email || reservation?.guest?.email;
     const toPhone = guest?.phone || reservation?.guest?.phone;
 
     try {
-      await (this.prisma as any).communicationPlaybookJob.update({ where: { id: job.id }, data: { status: "processing", attempts: job.attempts + 1 } });
+      await this.prisma.communicationPlaybookJob.update({ where: { id: job.id }, data: { status: "processing", attempts: job.attempts + 1 } });
 
       if (playbook.type === "nps") {
         if (!toEmail) throw new BadRequestException("Missing recipient email");
@@ -937,7 +937,7 @@ export class CommunicationsController {
         await this.smsService.sendSms({ to: toPhone, body: playbook.template.bodyHtml || playbook.template.subject || "Message" });
       }
 
-      await (this.prisma as any).communicationPlaybookJob.update({
+      await this.prisma.communicationPlaybookJob.update({
         where: { id: job.id },
         data: { status: "sent", lastError: null }
       });
@@ -946,7 +946,7 @@ export class CommunicationsController {
       const maxAttempts = 3;
       const nextTime = new Date(now);
       nextTime.setMinutes(nextTime.getMinutes() + Math.min(30, attempts * 5));
-      await (this.prisma as any).communicationPlaybookJob.update({
+      await this.prisma.communicationPlaybookJob.update({
         where: { id: job.id },
         data: {
           status: attempts >= maxAttempts ? "failed" : "pending",
@@ -963,7 +963,7 @@ export class CommunicationsController {
   @Post("communications/playbooks/run")
   async runPlaybookJobs(@Query("campgroundId") campgroundId?: string) {
     const now = new Date();
-    const jobs = await (this.prisma as any).communicationPlaybookJob.findMany({
+    const jobs = await this.prisma.communicationPlaybookJob.findMany({
       where: {
         status: "pending",
         scheduledAt: { lte: now },
@@ -987,12 +987,12 @@ export class CommunicationsController {
   @Roles(UserRole.owner, UserRole.manager, UserRole.marketing)
   @Post("communications/playbooks/jobs/:id/retry")
   async retryPlaybookJob(@Param("id") id: string, @Query("campgroundId") campgroundId?: string) {
-    const job = await (this.prisma as any).communicationPlaybookJob.findUnique({ where: { id } });
+    const job = await this.prisma.communicationPlaybookJob.findUnique({ where: { id } });
     if (!job) throw new BadRequestException("Job not found");
     if (campgroundId && job.campgroundId !== campgroundId) {
       throw new BadRequestException("Job does not belong to this campground");
     }
-    const updated = await (this.prisma as any).communicationPlaybookJob.update({
+    const updated = await this.prisma.communicationPlaybookJob.update({
       where: { id },
       data: {
         status: "pending",
@@ -1018,7 +1018,7 @@ export class CommunicationsController {
 
     const due = reservations.filter(r => Number(r.paidAmount || 0) < Number(r.totalAmount || 0));
 
-    const playbooks = await (this.prisma as any).communicationPlaybook.findMany({
+    const playbooks = await this.prisma.communicationPlaybook.findMany({
       where: {
         ...(campgroundId ? { campgroundId } : {}),
         type: "unpaid",
@@ -1029,7 +1029,7 @@ export class CommunicationsController {
 
     let enqueued = 0;
     for (const pb of playbooks) {
-      const tpl = await (this.prisma as any).communicationTemplate.findFirst({
+      const tpl = await this.prisma.communicationTemplate.findFirst({
         where: { id: pb.templateId, status: "approved" }
       });
       if (!tpl) continue;
@@ -1038,7 +1038,7 @@ export class CommunicationsController {
         if (pb.offsetMinutes && Number.isFinite(pb.offsetMinutes)) {
           scheduledAt.setMinutes(scheduledAt.getMinutes() + pb.offsetMinutes);
         }
-        await (this.prisma as any).communicationPlaybookJob.create({
+        await this.prisma.communicationPlaybookJob.create({
           data: {
             playbookId: pb.id,
             campgroundId: r.campgroundId,
@@ -1064,7 +1064,7 @@ export class CommunicationsController {
     @Query("campgroundId") campgroundId?: string,
     @Query("actorId") actorId?: string
   ) {
-    const existing = await (this.prisma as any).communicationTemplate.findUnique({ where: { id } });
+    const existing = await this.prisma.communicationTemplate.findUnique({ where: { id } });
     if (!existing) throw new BadRequestException("Template not found");
     if (campgroundId && existing.campgroundId !== campgroundId) {
       throw new BadRequestException("Unauthorized campground scope");
@@ -1075,7 +1075,7 @@ export class CommunicationsController {
       actorId: actorId ?? null,
       reason: body.reason ?? null
     };
-    const updated = await (this.prisma as any).communicationTemplate.update({
+    const updated = await this.prisma.communicationTemplate.update({
       where: { id },
       data: {
         status: "approved",
@@ -1096,7 +1096,7 @@ export class CommunicationsController {
     @Query("campgroundId") campgroundId?: string,
     @Query("actorId") actorId?: string
   ) {
-    const existing = await (this.prisma as any).communicationTemplate.findUnique({ where: { id } });
+    const existing = await this.prisma.communicationTemplate.findUnique({ where: { id } });
     if (!existing) throw new BadRequestException("Template not found");
     if (campgroundId && existing.campgroundId !== campgroundId) {
       throw new BadRequestException("Unauthorized campground scope");
@@ -1107,7 +1107,7 @@ export class CommunicationsController {
       actorId: actorId ?? null,
       reason: body.reason ?? null
     };
-    const updated = await (this.prisma as any).communicationTemplate.update({
+    const updated = await this.prisma.communicationTemplate.update({
       where: { id },
       data: {
         status: "rejected",
@@ -1128,7 +1128,7 @@ export class CommunicationsController {
   @Get("communications/playbooks")
   async listPlaybooks(@Query("campgroundId") campgroundId?: string) {
     if (!campgroundId) throw new BadRequestException("campgroundId is required");
-    return (this.prisma as any).communicationPlaybook.findMany({
+    return this.prisma.communicationPlaybook.findMany({
       where: { campgroundId },
       orderBy: { updatedAt: "desc" }
     });
@@ -1152,7 +1152,7 @@ export class CommunicationsController {
     }
   ) {
     if (!body.campgroundId || !body.type) throw new BadRequestException("campgroundId and type are required");
-    return (this.prisma as any).communicationPlaybook.create({
+    return this.prisma.communicationPlaybook.create({
       data: {
         campgroundId: body.campgroundId,
         type: body.type,
@@ -1186,12 +1186,12 @@ export class CommunicationsController {
     },
     @Query("campgroundId") campgroundId?: string
   ) {
-    const existing = await (this.prisma as any).communicationPlaybook.findUnique({ where: { id } });
+    const existing = await this.prisma.communicationPlaybook.findUnique({ where: { id } });
     if (!existing) throw new BadRequestException("Playbook not found");
     if (campgroundId && existing.campgroundId !== campgroundId) {
       throw new BadRequestException("Unauthorized campground scope");
     }
-    return (this.prisma as any).communicationPlaybook.update({
+    return this.prisma.communicationPlaybook.update({
       where: { id },
       data: {
         enabled: body.enabled ?? existing.enabled,
@@ -1221,7 +1221,7 @@ export class CommunicationsController {
     if (!campgroundId) throw new BadRequestException("campgroundId is required");
 
     // Get the latest message per conversationId, plus metadata
-    const conversations = await (this.prisma as any).$queryRaw`
+    const conversations = await this.prisma.$queryRaw`
       WITH latest_messages AS (
         SELECT
           "conversationId",
@@ -1287,7 +1287,7 @@ export class CommunicationsController {
     if (!campgroundId) throw new BadRequestException("campgroundId is required");
     const take = Math.min(Number(limit) || 50, 200);
 
-    const messages = await (this.prisma as any).communication.findMany({
+    const messages = await this.prisma.communication.findMany({
       where: {
         campgroundId,
         conversationId,
@@ -1339,7 +1339,7 @@ export class CommunicationsController {
     }
 
     // Get the conversation to find the phone number to reply to
-    const lastMessage = await (this.prisma as any).communication.findFirst({
+    const lastMessage = await this.prisma.communication.findFirst({
       where: {
         campgroundId: body.campgroundId,
         conversationId,
@@ -1361,7 +1361,7 @@ export class CommunicationsController {
     const normalizedPhone = this.normalizePhone(toPhone);
     const campgroundFromPhone = process.env.TWILIO_FROM_NUMBER || "";
 
-    const comm = await (this.prisma as any).communication.create({
+    const comm = await this.prisma.communication.create({
       data: {
         campgroundId: body.campgroundId,
         organizationId: null,
@@ -1383,7 +1383,7 @@ export class CommunicationsController {
 
     try {
       const result = await this.smsService.sendSms({ to: normalizedPhone, body: body.message });
-      const updated = await (this.prisma as any).communication.update({
+      const updated = await this.prisma.communication.update({
         where: { id: comm.id },
         data: {
           status: result.success ? "sent" : "failed",
@@ -1401,7 +1401,7 @@ export class CommunicationsController {
 
       return updated;
     } catch (err) {
-      await (this.prisma as any).communication.update({
+      await this.prisma.communication.update({
         where: { id: comm.id },
         data: { status: "failed", metadata: { error: (err as any)?.message } }
       });
@@ -1424,7 +1424,7 @@ export class CommunicationsController {
     if (!campgroundId) throw new BadRequestException("campgroundId is required");
 
     // Mark inbound messages as "delivered" (read)
-    const result = await (this.prisma as any).communication.updateMany({
+    const result = await this.prisma.communication.updateMany({
       where: {
         campgroundId,
         conversationId,

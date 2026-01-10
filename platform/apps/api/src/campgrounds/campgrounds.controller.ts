@@ -11,6 +11,8 @@ import { UserRole, PlatformRole } from "@prisma/client";
 import { ExternalCampgroundUpsertDto, OsmIngestRequestDto } from "./dto/external-campground.dto";
 import { UpdatePhotosDto } from "./dto/update-photos.dto";
 import { DepositConfigSchema, DepositRule } from "@keepr/shared";
+import type { DepositConfig } from "@keepr/shared";
+import type { AuthUser } from "../auth/auth.types";
 import { PrismaService } from "../prisma/prisma.service";
 
 @Controller()
@@ -28,7 +30,7 @@ export class CampgroundsController {
 
   @Get("public/campgrounds/:slug")
   async getPublicBySlug(@Param("slug") slug: string) {
-    const campground: any = await this.campgrounds.findBySlug(slug);
+    const campground = await this.campgrounds.findBySlug(slug);
     if (!campground) throw new NotFoundException("Campground not found");
     if (!campground.isPublished && !campground.isExternal) throw new NotFoundException("Campground not found");
     return campground;
@@ -90,8 +92,8 @@ export class CampgroundsController {
   @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
   @Get("campgrounds")
   listAll(@Req() req: Request) {
-    const user = (req as any).user;
-    const org = (req as any).organizationId || null;
+    const user = req.user;
+    const org = req.organizationId ?? null;
 
     // SECURITY: Platform admins can see all, others only see their memberships
     const isPlatformStaff = user?.platformRole === 'platform_admin' ||
@@ -103,7 +105,7 @@ export class CampgroundsController {
     }
 
     // For non-platform users, only return campgrounds they are members of
-    const memberCampgroundIds = user?.memberships?.map((m: any) => m.campgroundId) ?? [];
+    const memberCampgroundIds = user?.memberships?.map((m) => m.campgroundId) ?? [];
     if (memberCampgroundIds.length === 0) {
       return [];
     }
@@ -113,8 +115,8 @@ export class CampgroundsController {
   @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
   @Get("campgrounds/:id")
   getOne(@Param("id") id: string, @Req() req: Request) {
-    const user = (req as any).user;
-    const org = (req as any).organizationId || null;
+    const user = req.user;
+    const org = req.organizationId ?? null;
 
     // SECURITY: Platform admins can access any, others need membership
     const isPlatformStaff = user?.platformRole === 'platform_admin' ||
@@ -122,7 +124,7 @@ export class CampgroundsController {
                             user?.platformRole === 'support_agent';
 
     if (!isPlatformStaff) {
-      const memberCampgroundIds = user?.memberships?.map((m: any) => m.campgroundId) ?? [];
+      const memberCampgroundIds = user?.memberships?.map((m) => m.campgroundId) ?? [];
       if (!memberCampgroundIds.includes(id)) {
         throw new ForbiddenException("You do not have access to this campground");
       }
@@ -141,7 +143,7 @@ export class CampgroundsController {
     @Body() body: { storeOpenHour?: number; storeCloseHour?: number },
     @Req() req: Request
   ) {
-    const org = (req as any).organizationId || null;
+    const org = req.organizationId ?? null;
     return this.campgrounds.updateStoreHours(id, body.storeOpenHour, body.storeCloseHour, org || undefined);
   }
 
@@ -153,7 +155,7 @@ export class CampgroundsController {
     @Body() body: { orderWebhookUrl?: string },
     @Req() req: Request
   ) {
-    const org = (req as any).organizationId || null;
+    const org = req.organizationId ?? null;
     return this.campgrounds.updateOrderWebhook(id, body.orderWebhookUrl, org || undefined);
   }
 
@@ -165,7 +167,7 @@ export class CampgroundsController {
     @Body() body: { slaMinutes: number },
     @Req() req: Request
   ) {
-    const org = (req as any).organizationId || null;
+    const org = req.organizationId ?? null;
     return this.campgrounds.updateSlaMinutes(id, body.slaMinutes, org || undefined);
   }
 
@@ -177,7 +179,7 @@ export class CampgroundsController {
     @Body() body: { quietHoursStart?: string | null; quietHoursEnd?: string | null; routingAssigneeId?: string | null },
     @Req() req: Request
   ) {
-    const org = (req as any).organizationId || null;
+    const org = req.organizationId ?? null;
     return this.campgrounds.updateOpsSettings(id, body, org || undefined);
   }
 
@@ -189,7 +191,7 @@ export class CampgroundsController {
     @Body() body: { domain: string },
     @Req() req: Request
   ) {
-    const org = (req as any).organizationId || null;
+    const org = req.organizationId ?? null;
     return this.campgrounds.verifySenderDomain(id, body.domain, org || undefined);
   }
 
@@ -200,7 +202,7 @@ export class CampgroundsController {
     @Body() body: { gaMeasurementId?: string | null; metaPixelId?: string | null },
     @Req() req: Request
   ) {
-    const org = (req as any).organizationId || null;
+    const org = req.organizationId ?? null;
     return this.campgrounds.updateAnalytics(id, body, org || undefined);
   }
 
@@ -209,10 +211,10 @@ export class CampgroundsController {
   @Patch("campgrounds/:id/nps")
   updateNpsSettings(
     @Param("id") id: string,
-    @Body() body: { npsAutoSendEnabled?: boolean; npsSendHour?: number | null; npsTemplateId?: string | null; npsSchedule?: any },
+    @Body() body: { npsAutoSendEnabled?: boolean; npsSendHour?: number | null; npsTemplateId?: string | null; npsSchedule?: unknown },
     @Req() req: Request
   ) {
-    const org = (req as any).organizationId || null;
+    const org = req.organizationId ?? null;
     return this.campgrounds.updateNpsSettings(id, body, org || undefined);
   }
 
@@ -223,7 +225,7 @@ export class CampgroundsController {
     @Param("id") id: string,
     @Req() req: Request
   ) {
-    const org = (req as any).organizationId || null;
+    const org = req.organizationId ?? null;
     return this.campgrounds.getSmsSettings(id, org || undefined);
   }
 
@@ -241,7 +243,7 @@ export class CampgroundsController {
     },
     @Req() req: Request
   ) {
-    const org = (req as any).organizationId || null;
+    const org = req.organizationId ?? null;
     return this.campgrounds.updateSmsSettings(id, body, org || undefined);
   }
 
@@ -262,7 +264,7 @@ export class CampgroundsController {
     },
     @Req() req: Request
   ) {
-    const org = (req as any).organizationId || null;
+    const org = req.organizationId ?? null;
     return this.campgrounds.updateBranding(id, body, org || undefined);
   }
 
@@ -270,8 +272,8 @@ export class CampgroundsController {
   @Roles(UserRole.owner, UserRole.manager)
   @Patch("campgrounds/:id/photos")
   updatePhotos(@Param("id") id: string, @Body() body: UpdatePhotosDto, @Req() req: Request) {
-    const org = (req as any).organizationId || null;
-    const actorId = (req as any)?.user?.id || null;
+    const org = req.organizationId || null;
+    const actorId = req?.user?.id || null;
     return this.campgrounds.updatePhotos(id, body, org || undefined, actorId || undefined);
   }
 
@@ -283,7 +285,7 @@ export class CampgroundsController {
     @Body() body: { faqs: Array<{ id: string; question: string; answer: string; order: number }> },
     @Req() req: Request
   ) {
-    const org = (req as any).organizationId || null;
+    const org = req.organizationId || null;
     return this.campgrounds.updateFaqs(id, body.faqs, org || undefined);
   }
 
@@ -301,7 +303,7 @@ export class CampgroundsController {
     },
     @Req() req: Request
   ) {
-    const org = (req as any).organizationId || null;
+    const org = req.organizationId || null;
     return this.campgrounds.updatePolicies(id, body, org || undefined);
   }
 
@@ -318,7 +320,7 @@ export class CampgroundsController {
     },
     @Req() req: Request
   ) {
-    const org = (req as any).organizationId || null;
+    const org = req.organizationId || null;
     return this.campgrounds.updateFinancials(id, body, org || undefined);
   }
 
@@ -327,7 +329,7 @@ export class CampgroundsController {
   updateAccessibilitySettings(
     @Param("id") id: string,
     @Body() body: {
-      adaAssessment?: any;
+      adaAssessment?: unknown;
       adaCertificationLevel?: string;
       adaAccessibleSiteCount?: number;
       adaTotalSiteCount?: number;
@@ -338,7 +340,7 @@ export class CampgroundsController {
     },
     @Req() req: Request
   ) {
-    const org = (req as any).organizationId || null;
+    const org = req.organizationId || null;
     return this.campgrounds.updateAccessibilitySettings(id, body, org || undefined);
   }
 
@@ -347,7 +349,7 @@ export class CampgroundsController {
   updateSecuritySettings(
     @Param("id") id: string,
     @Body() body: {
-      securityAssessment?: any;
+      securityAssessment?: unknown;
       securityCertificationLevel?: string;
       securityAssessmentUpdatedAt?: string;
       securityVerified?: boolean;
@@ -358,7 +360,7 @@ export class CampgroundsController {
     },
     @Req() req: Request
   ) {
-    const org = (req as any).organizationId || null;
+    const org = req.organizationId || null;
     return this.campgrounds.updateSecuritySettings(id, body, org || undefined);
   }
 
@@ -383,12 +385,12 @@ export class CampgroundsController {
   @UseGuards(JwtAuthGuard, RolesGuard, ScopeGuard)
   @Roles(UserRole.owner, PlatformRole.platform_admin)
   @Delete("campgrounds/:id")
-  async remove(@Param("id") id: string, @CurrentUser() user: any) {
+  async remove(@Param("id") id: string, @CurrentUser() user: AuthUser) {
     // SECURITY: Only owners and platform admins can delete campgrounds
     // Additional ownership check for non-platform-admins
     if (user.platformRole !== 'platform_admin' && user.platformRole !== 'platform_superadmin') {
       const hasOwnership = user.memberships?.some(
-        (m: any) => m.campgroundId === id && m.role === 'owner'
+        (m) => m.campgroundId === id && m.role === 'owner'
       );
       if (!hasOwnership) {
         throw new ForbiddenException('Only campground owners can delete their campground');
@@ -420,7 +422,7 @@ export class CampgroundsController {
     const incomingRule = body.depositRule;
     const incomingPct = body.depositPercentage ?? null;
 
-    let parsedConfig: any = null;
+    let parsedConfig: DepositConfig | null = null;
     let normalizedRule = incomingRule || "none";
     let normalizedPct: number | null = incomingPct;
 
@@ -456,7 +458,7 @@ export class CampgroundsController {
   @Roles(UserRole.owner, UserRole.manager)
   @Post("campgrounds/:id/members")
   addMember(@Param("id") id: string, @Body() body: AddMemberDto, @Req() req: Request) {
-    const actorId = (req as any)?.user?.id;
+    const actorId = req?.user?.id;
     return this.campgrounds.addMember(
       id,
       {
@@ -478,7 +480,7 @@ export class CampgroundsController {
     @Body() body: UpdateMemberRoleDto,
     @Req() req: Request
   ) {
-    const actorId = (req as any)?.user?.id;
+    const actorId = req?.user?.id;
     return this.campgrounds.updateMemberRole(campgroundId, membershipId, body.role, actorId);
   }
 
@@ -490,7 +492,7 @@ export class CampgroundsController {
     @Param("membershipId") membershipId: string,
     @Req() req: Request
   ) {
-    const actorId = (req as any)?.user?.id;
+    const actorId = req?.user?.id;
     return this.campgrounds.removeMember(campgroundId, membershipId, actorId);
   }
 
@@ -502,7 +504,7 @@ export class CampgroundsController {
     @Param("membershipId") membershipId: string,
     @Req() req: Request
   ) {
-    const actorId = (req as any)?.user?.id;
+    const actorId = req?.user?.id;
     return this.campgrounds.resendInvite(campgroundId, membershipId, actorId);
   }
 
@@ -518,4 +520,3 @@ export class CampgroundsController {
     return { rule: "none", percentage: null };
   }
 }
-

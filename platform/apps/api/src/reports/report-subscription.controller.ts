@@ -25,7 +25,7 @@ export class ReportSubscriptionController {
     constructor(private readonly subscriptions: ReportSubscriptionService) { }
 
     @Get()
-    async list(@Req() req: any) {
+    async list(@Req() req: Request) {
         return this.subscriptions.findByUser(req.user.id);
     }
 
@@ -35,7 +35,7 @@ export class ReportSubscriptionController {
     }
 
     @Post()
-    async create(@Body() dto: CreateSubscriptionDto, @Req() req: any) {
+    async create(@Body() dto: CreateSubscriptionDto, @Req() req: Request) {
         return this.subscriptions.create({
             userId: req.user.id,
             userEmail: req.user.email,

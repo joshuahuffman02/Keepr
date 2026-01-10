@@ -49,7 +49,7 @@ export class BillingController {
   createMeter(
     @Param("campgroundId") campgroundId: string,
     @Body() body: { siteId: string; type: string; serialNumber?: string; ratePlanId?: string; billingMode?: string; billTo?: string; multiplier?: number; autoEmail?: boolean },
-    @Req() req: any
+    @Req() req: Request
   ) {
     this.assertCampgroundAccess(campgroundId, req.user);
     return this.billing.createMeter(campgroundId, body.siteId, body.type, body.serialNumber, body.ratePlanId, {
@@ -62,14 +62,14 @@ export class BillingController {
 
   @Roles(UserRole.owner, UserRole.manager, UserRole.finance)
   @Get("campgrounds/:campgroundId/utility-rate-plans")
-  listRatePlans(@Param("campgroundId") campgroundId: string, @Req() req: any) {
+  listRatePlans(@Param("campgroundId") campgroundId: string, @Req() req: Request) {
     this.assertCampgroundAccess(campgroundId, req.user);
     return this.billing.listRatePlans(campgroundId);
   }
 
   @Roles(UserRole.owner, UserRole.manager, UserRole.finance)
   @Get("campgrounds/:campgroundId/meters")
-  listMeters(@Param("campgroundId") campgroundId: string, @Req() req: any) {
+  listMeters(@Param("campgroundId") campgroundId: string, @Req() req: Request) {
     this.assertCampgroundAccess(campgroundId, req.user);
     return this.billing.listMeters(campgroundId);
   }
@@ -80,7 +80,7 @@ export class BillingController {
     @Param("meterId") meterId: string,
     @Body() body: { readingValue: number; readAt: string; readBy?: string; note?: string; source?: string },
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -100,7 +100,7 @@ export class BillingController {
   importReads(
     @Body()
     body: { campgroundId: string; reads: Array<{ meterId: string; readingValue: number; readAt: string; note?: string; readBy?: string; source?: string }> },
-    @Req() req: any
+    @Req() req: Request
   ) {
     this.assertCampgroundAccess(body.campgroundId, req.user);
     const reads = body.reads.map((r) => ({
@@ -118,7 +118,7 @@ export class BillingController {
     @Query("start") start?: string,
     @Query("end") end?: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -145,7 +145,7 @@ export class BillingController {
       serialNumber?: string | null;
     },
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -157,7 +157,7 @@ export class BillingController {
   billMeter(
     @Param("meterId") meterId: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -169,7 +169,7 @@ export class BillingController {
   seedMeters(
     @Param("siteClassId") siteClassId: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -183,7 +183,7 @@ export class BillingController {
     @Param("reservationId") reservationId: string,
     @Body() body: { cadence: string; periodStart: string; periodEnd: string },
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -201,7 +201,7 @@ export class BillingController {
   generateInvoice(
     @Param("cycleId") cycleId: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -213,7 +213,7 @@ export class BillingController {
   listInvoices(
     @Param("reservationId") reservationId: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -225,7 +225,7 @@ export class BillingController {
   getInvoice(
     @Param("invoiceId") invoiceId: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -238,7 +238,7 @@ export class BillingController {
     @Param("invoiceId") invoiceId: string,
     @Body() body: { reason: string; actorId?: string },
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -252,7 +252,7 @@ export class BillingController {
     @Param("lineId") lineId: string,
     @Body() body: { amountCents: number; note: string; actorId?: string },
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -268,7 +268,7 @@ export class BillingController {
 
   @Roles(UserRole.owner, UserRole.manager, UserRole.finance)
   @Post("billing/late-fees/run")
-  runLateFees(@Query("campgroundId") campgroundId: string | undefined, @Req() req: any) {
+  runLateFees(@Query("campgroundId") campgroundId: string | undefined, @Req() req: Request) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
     return this.billing.applyLateFeesForOverdue(requiredCampgroundId);

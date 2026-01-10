@@ -2,7 +2,6 @@ import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards, Fo
 import { SitesService } from "./sites.service";
 import { CreateSiteDto } from "./dto/create-site.dto";
 import { JwtAuthGuard, RolesGuard, ScopeGuard } from "../auth/guards";
-import { CurrentUser } from "../auth/decorators/current-user.decorator";
 import { Roles } from "../auth/guards/roles.guard";
 import { UserRole } from "@prisma/client";
 
@@ -46,8 +45,7 @@ export class SitesController {
   async update(
     @Param("campgroundId") campgroundId: string,
     @Param("id") id: string,
-    @Body() body: Partial<CreateSiteDto>,
-    @CurrentUser() user: any
+    @Body() body: Partial<CreateSiteDto>
   ) {
     // SECURITY: Verify site belongs to campground before update
     const site = await this.sites.findOne(id);
@@ -65,7 +63,6 @@ export class SitesController {
   async remove(
     @Param("campgroundId") campgroundId: string,
     @Param("id") id: string,
-    @CurrentUser() user: any
   ) {
     // SECURITY: Verify site belongs to campground before delete
     const site = await this.sites.findOne(id);

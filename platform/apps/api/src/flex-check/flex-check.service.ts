@@ -1,5 +1,38 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { isRecord } from '../utils/type-guards';
+
+type FlexCheckPolicyUpdate = {
+  earlyCheckInEnabled?: boolean;
+  earlyCheckInMinHours?: number;
+  earlyCheckInPricing?: unknown;
+  earlyCheckInAutoApprove?: boolean;
+  lateCheckoutEnabled?: boolean;
+  lateCheckoutMaxHours?: number;
+  lateCheckoutPricing?: unknown;
+  lateCheckoutAutoApprove?: boolean;
+};
+
+type FlexCheckPricing =
+  | { type: "flat"; amount: number }
+  | { type: "hourly"; amountPerHour: number }
+  | { type: "percentage"; percent?: number };
+
+const parseFlexCheckPricing = (value: unknown): FlexCheckPricing | null => {
+  if (!isRecord(value)) return null;
+  const typeValue = value.type;
+  if (typeValue === "flat" && typeof value.amount === "number") {
+    return { type: "flat", amount: value.amount };
+  }
+  if (typeValue === "hourly" && typeof value.amountPerHour === "number") {
+    return { type: "hourly", amountPerHour: value.amountPerHour };
+  }
+  if (typeValue === "percentage") {
+    const percent = typeof value.percent === "number" ? value.percent : undefined;
+    return { type: "percentage", percent };
+  }
+  return null;
+};
 
 @Injectable()
 export class FlexCheckService {
@@ -30,16 +63,7 @@ export class FlexCheckService {
     return policy;
   }
 
-  async upsertPolicy(campgroundId: string, data: {
-    earlyCheckInEnabled?: boolean;
-    earlyCheckInMinHours?: number;
-    earlyCheckInPricing?: any;
-    earlyCheckInAutoApprove?: boolean;
-    lateCheckoutEnabled?: boolean;
-    lateCheckoutMaxHours?: number;
-    lateCheckoutPricing?: any;
-    lateCheckoutAutoApprove?: boolean;
-  }) {
+  async upsertPolicy(campgroundId: string, data: FlexCheckPolicyUpdate) {
     return this.prisma.flexCheckPolicy.upsert({
       where: { campgroundId },
       update: data,
@@ -84,12 +108,12 @@ export class FlexCheckService {
     // Calculate charge based on pricing policy
     let charge = 0;
     if (policy.earlyCheckInPricing) {
-      const pricing = policy.earlyCheckInPricing as any;
-      if (pricing.type === 'flat') {
+      const pricing = parseFlexCheckPricing(policy.earlyCheckInPricing);
+      if (pricing?.type === 'flat') {
         charge = pricing.amount;
-      } else if (pricing.type === 'hourly') {
+      } else if (pricing?.type === 'hourly') {
         charge = Math.ceil(hoursEarly) * pricing.amountPerHour;
-      } else if (pricing.type === 'percentage') {
+      } else if (pricing?.type === 'percentage') {
         // Would need to calculate based on nightly rate
         charge = 0; // Simplified for now
       }
@@ -205,10 +229,10 @@ export class FlexCheckService {
     // Calculate charge based on pricing policy
     let charge = 0;
     if (policy.lateCheckoutPricing) {
-      const pricing = policy.lateCheckoutPricing as any;
-      if (pricing.type === 'flat') {
+      const pricing = parseFlexCheckPricing(policy.lateCheckoutPricing);
+      if (pricing?.type === 'flat') {
         charge = pricing.amount;
-      } else if (pricing.type === 'hourly') {
+      } else if (pricing?.type === 'hourly') {
         charge = Math.ceil(hoursLate) * pricing.amountPerHour;
       }
     }

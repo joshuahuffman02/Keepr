@@ -99,7 +99,7 @@ export class KioskController {
   @UseGuards(JwtAuthGuard)
   async generatePairingCode(
     @Param("campgroundId") campgroundId: string,
-    @Request() req: any
+    @Request() req: Request
   ) {
     return this.kioskService.generatePairingCode(campgroundId, req.user?.id);
   }

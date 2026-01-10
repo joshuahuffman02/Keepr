@@ -13,7 +13,7 @@ export class PermissionsController {
 
   @UseGuards(JwtAuthGuard)
   @Get("whoami")
-  async whoami(@Req() req: any) {
+  async whoami(@Req() req: Request) {
     const user = req.user ?? {};
     const memberships =
       (user.memberships ?? []).map((m: any) => ({

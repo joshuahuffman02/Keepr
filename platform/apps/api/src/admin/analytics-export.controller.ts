@@ -57,12 +57,12 @@ export class AnalyticsExportController {
   // ==================== EXPORTS ====================
 
   @Post("export")
-  async createExport(@Body() dto: CreateExportDto, @Req() req: any) {
+  async createExport(@Body() dto: CreateExportDto, @Req() req: Request) {
     return this.exportService.createExport(dto, req.user.id, req.user.email);
   }
 
   @Get("exports")
-  async listExports(@Req() req: any, @Query("limit") limit?: number) {
+  async listExports(@Req() req: Request, @Query("limit") limit?: number) {
     return this.exportService.listExports(req.user.id, limit);
   }
 
@@ -79,22 +79,22 @@ export class AnalyticsExportController {
   // ==================== SHARING ====================
 
   @Post("share")
-  async createShareLink(@Body() dto: CreateShareDto, @Req() req: any) {
+  async createShareLink(@Body() dto: CreateShareDto, @Req() req: Request) {
     return this.shareService.createShareLink(dto, req.user.id, req.user.email);
   }
 
   @Get("shares")
-  async listShareLinks(@Req() req: any, @Query("limit") limit?: number) {
+  async listShareLinks(@Req() req: Request, @Query("limit") limit?: number) {
     return this.shareService.listShareLinks(req.user.id, limit);
   }
 
   @Get("shares/:id")
-  async getShareLink(@Param("id") id: string, @Req() req: any) {
+  async getShareLink(@Param("id") id: string, @Req() req: Request) {
     return this.shareService.getShareLink(id, req.user.id);
   }
 
   @Post("shares/:id/revoke")
-  async revokeShareLink(@Param("id") id: string, @Req() req: any) {
+  async revokeShareLink(@Param("id") id: string, @Req() req: Request) {
     return this.shareService.revokeShareLink(id, req.user.id);
   }
 
@@ -102,7 +102,7 @@ export class AnalyticsExportController {
   async updateShareLink(
     @Param("id") id: string,
     @Body() dto: UpdateShareDto,
-    @Req() req: any
+    @Req() req: Request
   ) {
     return this.shareService.updateShareLink(id, req.user.id, dto);
   }

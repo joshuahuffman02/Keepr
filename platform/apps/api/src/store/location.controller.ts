@@ -70,7 +70,7 @@ export class LocationController {
     getLocation(
         @Param("id") id: string,
         @Query("campgroundId") campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -78,7 +78,7 @@ export class LocationController {
     }
 
     @Get("campgrounds/:campgroundId/store/locations/default")
-    getDefaultLocation(@Param("campgroundId") campgroundId: string, @Req() req: any) {
+    getDefaultLocation(@Param("campgroundId") campgroundId: string, @Req() req: Request) {
         this.assertCampgroundAccess(campgroundId, req.user);
         return this.locationService.getDefaultLocation(campgroundId);
     }
@@ -87,7 +87,7 @@ export class LocationController {
     createLocation(
         @Param("campgroundId") campgroundId: string,
         @Body() body: Omit<CreateStoreLocationDto, "campgroundId">,
-        @Req() req: any
+        @Req() req: Request
     ) {
         this.assertCampgroundAccess(campgroundId, req.user);
         return this.locationService.createLocation({ campgroundId, ...body });
@@ -98,7 +98,7 @@ export class LocationController {
         @Param("id") id: string,
         @Body() body: UpdateStoreLocationDto,
         @Query("campgroundId") campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -109,7 +109,7 @@ export class LocationController {
     deleteLocation(
         @Param("id") id: string,
         @Query("campgroundId") campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -136,7 +136,7 @@ export class LocationController {
         @Param("productId") productId: string,
         @Body() body: { stockQty?: number; adjustment?: number; lowStockAlert?: number; notes?: string },
         @Query("campgroundId") campgroundId?: string,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const userId = req.user?.id || req.user?.userId;
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
@@ -236,7 +236,7 @@ export class LocationController {
     // ==================== UTILITY ====================
 
     @Post("campgrounds/:campgroundId/store/locations/ensure-default")
-    ensureDefaultLocation(@Param("campgroundId") campgroundId: string, @Req() req: any) {
+    ensureDefaultLocation(@Param("campgroundId") campgroundId: string, @Req() req: Request) {
         this.assertCampgroundAccess(campgroundId, req.user);
         return this.locationService.ensureDefaultLocation(campgroundId);
     }

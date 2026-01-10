@@ -81,7 +81,7 @@ export class OpTasksController {
   @Get(':campgroundId/tasks/my-tasks')
   async getMyTasks(
     @Param('campgroundId') campgroundId: string,
-    @Request() req: any,
+    @Request() req: Request,
   ) {
     return this.taskService.getMyTasks(campgroundId, req.user.id);
   }
@@ -95,7 +95,7 @@ export class OpTasksController {
   async createTask(
     @Param('campgroundId') campgroundId: string,
     @Body() dto: CreateOpTaskDto,
-    @Request() req: any,
+    @Request() req: Request,
   ) {
     return this.taskService.create(campgroundId, dto, req.user.id);
   }
@@ -104,7 +104,7 @@ export class OpTasksController {
   async updateTask(
     @Param('taskId') taskId: string,
     @Body() dto: UpdateOpTaskDto,
-    @Request() req: any,
+    @Request() req: Request,
   ) {
     return this.taskService.update(taskId, dto, req.user.id);
   }
@@ -118,7 +118,7 @@ export class OpTasksController {
   async assignTask(
     @Param('taskId') taskId: string,
     @Body() body: { userId?: string; teamId?: string },
-    @Request() req: any,
+    @Request() req: Request,
   ) {
     return this.taskService.assign(taskId, body.userId, body.teamId, req.user.id);
   }
@@ -127,7 +127,7 @@ export class OpTasksController {
   async addComment(
     @Param('taskId') taskId: string,
     @Body() dto: CreateOpTaskCommentDto,
-    @Request() req: any,
+    @Request() req: Request,
   ) {
     return this.taskService.addComment(taskId, req.user.id, dto);
   }
@@ -135,7 +135,7 @@ export class OpTasksController {
   @Post(':campgroundId/tasks/bulk-update')
   async bulkUpdateState(
     @Body() body: { ids: string[]; state: OpTaskState },
-    @Request() req: any,
+    @Request() req: Request,
   ) {
     return this.taskService.bulkUpdateState(body.ids, body.state, req.user.id);
   }
@@ -316,7 +316,7 @@ export class OpTasksController {
   @Get(':campgroundId/teams/my-teams')
   async getMyTeams(
     @Param('campgroundId') campgroundId: string,
-    @Request() req: any,
+    @Request() req: Request,
   ) {
     return this.teamService.getUserTeams(campgroundId, req.user.id);
   }
@@ -468,7 +468,7 @@ export class OpTasksController {
   @Get(':campgroundId/gamification/my-stats')
   async getMyStats(
     @Param('campgroundId') campgroundId: string,
-    @Request() req: any,
+    @Request() req: Request,
   ) {
     return this.gamificationService.getStaffProfile(req.user.id, campgroundId);
   }

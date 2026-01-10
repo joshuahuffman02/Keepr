@@ -21,7 +21,7 @@ export class ReviewsController {
   }
 
   @Post("reviews/submit")
-  submit(@Body() dto: SubmitReviewDto, @Req() req: any) {
+  submit(@Body() dto: SubmitReviewDto, @Req() req: Request) {
     return this.reviewsService.submitReview(dto, req.ip);
   }
 
@@ -40,13 +40,13 @@ export class ReviewsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.owner, UserRole.manager, UserRole.marketing)
   @Post("reviews/moderate")
-  moderate(@Body() dto: ModerateReviewDto, @Req() req: any) {
+  moderate(@Body() dto: ModerateReviewDto, @Req() req: Request) {
     const actorId = req.user?.userId;
     return this.reviewsService.moderate(dto, actorId);
   }
 
   @Post("reviews/vote")
-  vote(@Body() dto: VoteReviewDto, @Req() req: any) {
+  vote(@Body() dto: VoteReviewDto, @Req() req: Request) {
     const guestId = req.user?.guestId ?? undefined;
     return this.reviewsService.vote(dto, req.ip, guestId);
   }

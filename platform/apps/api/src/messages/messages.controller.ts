@@ -48,7 +48,7 @@ export class MessagesController {
     @UseGuards(AuthGuard('guest-jwt'))
     async listGuestMessages(
         @Param('id') reservationId: string,
-        @Request() req: any,
+        @Request() req: Request,
     ) {
         // Verify the guest owns this reservation
         // For now, we trust the guard, but you could add additional checks
@@ -60,7 +60,7 @@ export class MessagesController {
     async createGuestMessage(
         @Param('id') reservationId: string,
         @Body() body: Omit<CreateMessageDto, 'senderType' | 'guestId'>,
-        @Request() req: any,
+        @Request() req: Request,
     ) {
         // Use the guest ID from the JWT token
         const guestId = req.user.id;

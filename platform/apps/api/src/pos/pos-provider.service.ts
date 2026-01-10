@@ -76,7 +76,7 @@ export class PosProviderService {
   }
 
   async listIntegrations(campgroundId: string) {
-    const records = await (this.prisma as any).posProviderIntegration.findMany({ where: { campgroundId } });
+    const records = await this.prisma.posProviderIntegration.findMany({ where: { campgroundId } });
     return records.map((r: any) => this.mapIntegration(r));
   }
 
@@ -86,7 +86,7 @@ export class PosProviderService {
     const status =
       dto.enabled === false ? PosIntegrationStatus.disabled : dto.enabled === true ? PosIntegrationStatus.enabled : undefined;
 
-    const integration = await (this.prisma as any).posProviderIntegration.upsert({
+    const integration = await this.prisma.posProviderIntegration.upsert({
       where: { campgroundId_provider: { campgroundId, provider } },
       create: {
         campgroundId,
@@ -141,7 +141,7 @@ export class PosProviderService {
 
     const result: ProviderValidationResult = await adapter.validateCredentials(integration);
 
-    await (this.prisma as any).posProviderIntegration.updateMany({
+    await this.prisma.posProviderIntegration.updateMany({
       where: { campgroundId, provider },
       data: {
         lastValidatedAt: new Date(),
@@ -154,7 +154,7 @@ export class PosProviderService {
 
   async syncIntegration(campgroundId: string, providerInput: string, target: PosSyncTarget) {
     const provider = this.normalizeProvider(providerInput);
-    const integration = await (this.prisma as any).posProviderIntegration.findUnique({
+    const integration = await this.prisma.posProviderIntegration.findUnique({
       where: { campgroundId_provider: { campgroundId, provider } }
     });
     if (!integration) throw new NotFoundException("Integration not configured");
@@ -172,7 +172,7 @@ export class PosProviderService {
       metadata: result.metadata ?? null
     };
 
-    await (this.prisma as any).posProviderSync.upsert({
+    await this.prisma.posProviderSync.upsert({
       where: { integrationId_type: { integrationId: integration.id, type: target } },
       create: {
         integrationId: integration.id,
@@ -187,7 +187,7 @@ export class PosProviderService {
 
   async syncStatus(campgroundId: string, providerInput?: string) {
     const provider = providerInput ? this.normalizeProvider(providerInput) : null;
-    return (this.prisma as any).posProviderSync.findMany({
+    return this.prisma.posProviderSync.findMany({
       where: {
         integration: {
           campgroundId,
@@ -206,7 +206,7 @@ export class PosProviderService {
     payment: ProviderPaymentRequest
   ): Promise<(ProviderPaymentResult & { provider: PosProviderType }) | null> {
     if (!campgroundId) return null;
-    const integration = await (this.prisma as any).posProviderIntegration.findFirst({
+    const integration = await this.prisma.posProviderIntegration.findFirst({
       where: {
         campgroundId,
         status: PosIntegrationStatus.enabled,
@@ -239,7 +239,7 @@ export class PosProviderService {
     rawBody?: string
   ): Promise<ProviderWebhookResult> {
     const provider = this.normalizeProvider(providerInput);
-    const integrationRecord = await (this.prisma as any).posProviderIntegration.findUnique({
+    const integrationRecord = await this.prisma.posProviderIntegration.findUnique({
       where: { campgroundId_provider: { campgroundId, provider } }
     });
     if (!integrationRecord) throw new NotFoundException("Integration not configured");

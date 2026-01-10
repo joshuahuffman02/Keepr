@@ -35,7 +35,7 @@ export class HoldsController {
 
   @Post()
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
-  create(@Body() dto: CreateHoldDto, @Req() req: any) {
+  create(@Body() dto: CreateHoldDto, @Req() req: Request) {
     const requiredCampgroundId = this.requireCampgroundId(req, dto.campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
     return this.holds.create({ ...dto, campgroundId: requiredCampgroundId });
@@ -43,7 +43,7 @@ export class HoldsController {
 
   @Get("campgrounds/:campgroundId")
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
-  list(@Param("campgroundId") campgroundId: string, @Req() req: any) {
+  list(@Param("campgroundId") campgroundId: string, @Req() req: Request) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
     return this.holds.listByCampground(requiredCampgroundId);
@@ -54,7 +54,7 @@ export class HoldsController {
   release(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -65,7 +65,7 @@ export class HoldsController {
   @Roles(UserRole.owner, UserRole.manager)
   expireStale(
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);

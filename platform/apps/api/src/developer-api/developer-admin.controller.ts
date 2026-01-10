@@ -61,7 +61,7 @@ export class DeveloperAdminController {
   @ApiOperation({ summary: "List API clients", description: "List all API clients for a campground" })
   @ApiQuery({ name: "campgroundId", required: true, description: "Campground ID" })
   @ApiResponse({ status: 200, description: "List of API clients" })
-  list(@Query("campgroundId") campgroundId: string, @Req() req: any) {
+  list(@Query("campgroundId") campgroundId: string, @Req() req: Request) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.apiAuth.listClients(requiredCampgroundId);
   }
@@ -70,7 +70,7 @@ export class DeveloperAdminController {
   @ApiOperation({ summary: "Create API client", description: "Create a new API client for a campground" })
   @ApiBody({ type: CreateClientDto })
   @ApiResponse({ status: 201, description: "API client created successfully" })
-  async create(@Body() body: CreateClientDto, @Req() req: any) {
+  async create(@Body() body: CreateClientDto, @Req() req: Request) {
     const requiredCampgroundId = this.requireCampgroundId(req, body.campgroundId);
     return this.apiAuth.createClient({ ...body, campgroundId: requiredCampgroundId });
   }
@@ -81,7 +81,7 @@ export class DeveloperAdminController {
   rotate(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.apiAuth.rotateSecret(requiredCampgroundId, id);
@@ -95,7 +95,7 @@ export class DeveloperAdminController {
     @Param("id") id: string,
     @Body() body: ToggleClientDto,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.apiAuth.setClientActive(requiredCampgroundId, id, body.isActive);
@@ -109,7 +109,7 @@ export class DeveloperAdminController {
     @Param("id") id: string,
     @Body() body: UpdateTierDto,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.apiAuth.updateClientTier(requiredCampgroundId, id, body.tier);
@@ -121,7 +121,7 @@ export class DeveloperAdminController {
   revokeToken(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.apiAuth.revokeToken(requiredCampgroundId, id);
@@ -133,7 +133,7 @@ export class DeveloperAdminController {
   remove(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.apiAuth.deleteClient(requiredCampgroundId, id);

@@ -124,7 +124,7 @@ export class IntegrationsController {
     @Headers("x-hmac-signature") altSignature?: string,
     @Headers("x-campground-id") campgroundId?: string
   ) {
-    const raw = (req as any).rawBody ? (req as any).rawBody.toString() : JSON.stringify(body);
+    const raw = req.rawBody ? req.rawBody.toString() : JSON.stringify(body);
     const providedSignature = signature || altSignature || (req.headers["x-hub-signature"] as string | undefined);
     return this.integrations.handleWebhook(provider, body, raw, providedSignature, campgroundId as any);
   }

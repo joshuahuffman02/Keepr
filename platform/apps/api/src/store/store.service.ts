@@ -62,7 +62,7 @@ export class StoreService {
     }
 
     private async requireOrder(campgroundId: string, id: string) {
-        const order = await (this.prisma as any).storeOrder.findFirst({
+        const order = await this.prisma.storeOrder.findFirst({
             where: { id, campgroundId }
         });
         if (!order) {
@@ -101,7 +101,7 @@ export class StoreService {
             data.completedAt = now;
             if (userId) data.completedById = userId;
         }
-        return (this.prisma as any).storeOrder.update({ where: { id }, data });
+        return this.prisma.storeOrder.update({ where: { id }, data });
     }
 
     createCategory(data: CreateProductCategoryDto) {
@@ -252,7 +252,7 @@ export class StoreService {
         campgroundId: string,
         options?: { status?: string; reservationId?: string }
     ) {
-        const orders = await (this.prisma as any).storeOrder.findMany({
+        const orders = await this.prisma.storeOrder.findMany({
             where: {
                 campgroundId,
                 ...(options?.status ? { status: options.status as any } : {}),
@@ -286,7 +286,7 @@ export class StoreService {
      * Get unseen pending orders
      */
     async listUnseenOrders(campgroundId: string) {
-        return (this.prisma as any).storeOrder.findMany({
+        return this.prisma.storeOrder.findMany({
             where: {
                 campgroundId,
                 status: "pending",
@@ -301,7 +301,7 @@ export class StoreService {
      */
     async markOrderSeen(campgroundId: string, id: string) {
         await this.requireOrder(campgroundId, id);
-        return (this.prisma as any).storeOrder.update({
+        return this.prisma.storeOrder.update({
             where: { id },
             data: { seenAt: new Date() }
         });
@@ -317,19 +317,19 @@ export class StoreService {
         }
 
         const [byChannel, byFulfillment, byStatus] = await Promise.all([
-            (this.prisma as any).storeOrder.groupBy({
+            this.prisma.storeOrder.groupBy({
                 by: ["channel"],
                 where,
                 _count: { _all: true },
                 _sum: { totalCents: true }
             }),
-            (this.prisma as any).storeOrder.groupBy({
+            this.prisma.storeOrder.groupBy({
                 by: ["fulfillmentType"],
                 where,
                 _count: { _all: true },
                 _sum: { totalCents: true }
             }),
-            (this.prisma as any).storeOrder.groupBy({
+            this.prisma.storeOrder.groupBy({
                 by: ["status"],
                 where,
                 _count: { _all: true },
@@ -337,7 +337,7 @@ export class StoreService {
             })
         ]);
 
-        const prepSamples = await (this.prisma as any).storeOrder.findMany({
+        const prepSamples = await this.prisma.storeOrder.findMany({
             where,
             select: { createdAt: true, readyAt: true, prepTimeMinutes: true, fulfillmentType: true }
         });
@@ -418,7 +418,7 @@ export class StoreService {
     }
 
     async createOrder(data: CreateOrderDto, actorUserId?: string) {
-        const campground = await (this.prisma as any).campground.findUnique({
+        const campground = await this.prisma.campground.findUnique({
             where: { id: data.campgroundId },
             select: { storeOpenHour: true, storeCloseHour: true, email: true, name: true }
         });
@@ -681,7 +681,7 @@ export class StoreService {
      */
     async getOrderAdjustments(orderId: string, campgroundId: string) {
         await this.requireOrder(campgroundId, orderId);
-        return (this.prisma as any).storeOrderAdjustment.findMany({
+        return this.prisma.storeOrderAdjustment.findMany({
             where: { orderId },
             orderBy: { createdAt: "desc" },
             include: {
@@ -722,7 +722,7 @@ export class StoreService {
         },
         user?: any
     ) {
-        const order = await (this.prisma as any).storeOrder.findFirst({
+        const order = await this.prisma.storeOrder.findFirst({
             where: { id: orderId, campgroundId },
             include: {
                 items: true,
@@ -819,7 +819,7 @@ export class StoreService {
         }
 
         // Create database record for the adjustment
-        const adjustment = await (this.prisma as any).storeOrderAdjustment.create({
+        const adjustment = await this.prisma.storeOrderAdjustment.create({
             data: {
                 orderId,
                 type: adjustmentType,
@@ -904,7 +904,7 @@ export class StoreService {
                 notificationSent = true;
 
                 // Update adjustment with notification status
-                await (this.prisma as any).storeOrderAdjustment.update({
+                await this.prisma.storeOrderAdjustment.update({
                     where: { id: adjustment.id },
                     data: { notificationSent: true }
                 });

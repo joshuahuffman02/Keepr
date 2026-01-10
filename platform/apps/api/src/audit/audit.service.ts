@@ -13,7 +13,7 @@ export class AuditService {
     userAgent?: string | null
   ) {
     const privacy = await this.getPrivacy(params.campgroundId);
-    const rows = await (this.prisma as any).auditLog.findMany({
+    const rows = await this.prisma.auditLog.findMany({
       where: {
         campgroundId: params.campgroundId,
         action: params.action || undefined,
@@ -39,12 +39,12 @@ export class AuditService {
     const privacy = await this.getPrivacy(params.campgroundId);
 
     const [piiTagCount, piiTags, auditEventsRaw] = await Promise.all([
-      (this.prisma as any).piiFieldTag.count(),
-      (this.prisma as any).piiFieldTag.findMany({
+      this.prisma.piiFieldTag.count(),
+      this.prisma.piiFieldTag.findMany({
         orderBy: [{ resource: "asc" }, { field: "asc" }],
         take: 8
       }),
-      (this.prisma as any).auditLog.findMany({
+      this.prisma.auditLog.findMany({
         where: { campgroundId: params.campgroundId },
         include: {
           actor: { select: { id: true, email: true, firstName: true, lastName: true } }
@@ -112,7 +112,7 @@ export class AuditService {
     limit?: number;
   }) {
     const privacy = await this.getPrivacy(params.campgroundId);
-    const rows = await (this.prisma as any).auditLog.findMany({
+    const rows = await this.prisma.auditLog.findMany({
       where: {
         campgroundId: params.campgroundId,
         entity: params.entity,
@@ -142,7 +142,7 @@ export class AuditService {
     retentionDays?: number | null;
   }) {
     const now = new Date();
-    const prev = await (this.prisma as any).auditLog.findFirst({
+    const prev = await this.prisma.auditLog.findFirst({
       where: { campgroundId: event.campgroundId },
       orderBy: { createdAt: "desc" },
       select: { chainHash: true }
@@ -164,7 +164,7 @@ export class AuditService {
     const chainHash = createHash("sha256").update(JSON.stringify(payload)).digest("hex");
     const retentionAt = event.retentionDays ? new Date(now.getTime() + event.retentionDays * 24 * 60 * 60 * 1000) : null;
 
-    return (this.prisma as any).auditLog.create({
+    return this.prisma.auditLog.create({
       data: {
         ...payload,
         createdAt: now,
@@ -176,7 +176,7 @@ export class AuditService {
   }
 
   async recordExport(params: { campgroundId: string; requestedById: string; format: "csv" | "json"; filters?: Record<string, any>; recordCount: number }) {
-    return (this.prisma as any).auditExport.create({
+    return this.prisma.auditExport.create({
       data: {
         campgroundId: params.campgroundId,
         requestedById: params.requestedById,
@@ -188,7 +188,7 @@ export class AuditService {
   }
 
   async listExports(campgroundId: string) {
-    return (this.prisma as any).auditExport.findMany({
+    return this.prisma.auditExport.findMany({
       where: { campgroundId },
       orderBy: { createdAt: "desc" },
       take: 50
@@ -196,9 +196,9 @@ export class AuditService {
   }
 
   private async getPrivacy(campgroundId: string) {
-    const existing = await (this.prisma as any).privacySetting.findUnique({ where: { campgroundId } });
+    const existing = await this.prisma.privacySetting.findUnique({ where: { campgroundId } });
     if (existing) return existing;
-    return (this.prisma as any).privacySetting.create({
+    return this.prisma.privacySetting.create({
       data: {
         campgroundId,
         redactPII: true,

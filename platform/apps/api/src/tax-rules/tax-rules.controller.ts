@@ -54,13 +54,13 @@ export class TaxRulesController {
         maxNights?: number;
         requiresWaiver?: boolean;
         waiverText?: string;
-    }, @Req() req: any) {
+    }, @Req() req: Request) {
         this.assertCampgroundAccess(body.campgroundId, req.user);
         return this.taxRulesService.create(body);
     }
 
     @Get('campground/:campgroundId')
-    findAllByCampground(@Param('campgroundId') campgroundId: string, @Req() req: any) {
+    findAllByCampground(@Param('campgroundId') campgroundId: string, @Req() req: Request) {
         this.assertCampgroundAccess(campgroundId, req.user);
         return this.taxRulesService.findAllByCampground(campgroundId);
     }
@@ -69,7 +69,7 @@ export class TaxRulesController {
     findOne(
         @Param('id') id: string,
         @Query("campgroundId") campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -90,7 +90,7 @@ export class TaxRulesController {
             isActive: boolean;
         }>,
         @Query("campgroundId") campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -101,7 +101,7 @@ export class TaxRulesController {
     remove(
         @Param('id') id: string,
         @Query("campgroundId") campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         this.assertCampgroundAccess(requiredCampgroundId, req.user);

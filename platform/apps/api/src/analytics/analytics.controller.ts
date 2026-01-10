@@ -12,19 +12,19 @@ export class AnalyticsController {
   constructor(private readonly analyticsService: AnalyticsService) {}
 
   @Post("events")
-  async ingestEvent(@Body() dto: IngestAnalyticsEventDto, @Req() req: any) {
+  async ingestEvent(@Body() dto: IngestAnalyticsEventDto, @Req() req: Request) {
     const scope = {
-      campgroundId: (req as any)?.campgroundId || null,
-      organizationId: (req as any)?.organizationId || null,
-      userId: (req as any)?.user?.id || null,
+      campgroundId: req?.campgroundId || null,
+      organizationId: req?.organizationId || null,
+      userId: req?.user?.id || null,
     };
     return this.analyticsService.ingest(dto, scope);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get("recommendations")
-  async listRecommendations(@Query("campgroundId") campgroundId: string, @Req() req: any) {
-    const cgId = campgroundId || (req as any)?.campgroundId || (req.headers as any)["x-campground-id"];
+  async listRecommendations(@Query("campgroundId") campgroundId: string, @Req() req: Request) {
+    const cgId = campgroundId || req?.campgroundId || (req.headers as any)["x-campground-id"];
     return this.analyticsService.getRecommendations(cgId);
   }
 
@@ -32,60 +32,60 @@ export class AnalyticsController {
   @Roles(UserRole.owner, UserRole.manager)
   @Post("recommendations/apply")
   async applyRecommendation(@Body() dto: ApplyRecommendationDto, @Req() req: Request & { user?: any; campgroundId?: string }) {
-    const user = (req as any).user;
+    const user = req.user;
     if (!user) throw new UnauthorizedException("Unauthorized");
-    const campId = dto.campgroundId || (req as any)?.campgroundId || (req.headers as any)["x-campground-id"];
+    const campId = dto.campgroundId || req?.campgroundId || (req.headers as any)["x-campground-id"];
     if (!campId) throw new BadRequestException("campgroundId required");
     return this.analyticsService.applyRecommendation(dto, req?.user, {
       campgroundId: campId,
-      organizationId: (req as any)?.organizationId || null,
-      userId: (req as any)?.user?.id || null,
+      organizationId: req?.organizationId || null,
+      userId: req?.user?.id || null,
     });
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.owner, UserRole.manager, UserRole.marketing, UserRole.front_desk)
   @Post("recommendations/propose")
-  async proposeRecommendation(@Body() dto: ProposeRecommendationDto, @Req() req: any) {
+  async proposeRecommendation(@Body() dto: ProposeRecommendationDto, @Req() req: Request) {
     return this.analyticsService.proposeRecommendation(dto, req?.user, {
-      campgroundId: (req as any)?.campgroundId || null,
-      organizationId: (req as any)?.organizationId || null,
-      userId: (req as any)?.user?.id || null,
+      campgroundId: req?.campgroundId || null,
+      organizationId: req?.organizationId || null,
+      userId: req?.user?.id || null,
     });
   }
 
   @UseGuards(JwtAuthGuard)
   @Get("reports/funnel")
-  async getFunnel(@Query("campgroundId") campgroundId: string, @Query("days") days: string, @Req() req: any) {
-    const cgId = campgroundId || (req as any)?.campgroundId || (req.headers as any)["x-campground-id"];
+  async getFunnel(@Query("campgroundId") campgroundId: string, @Query("days") days: string, @Req() req: Request) {
+    const cgId = campgroundId || req?.campgroundId || (req.headers as any)["x-campground-id"];
     return this.analyticsService.getFunnel(cgId, days ? parseInt(days, 10) : 30);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get("reports/images")
-  async getImagePerformance(@Query("campgroundId") campgroundId: string, @Query("days") days: string, @Req() req: any) {
-    const cgId = campgroundId || (req as any)?.campgroundId || (req.headers as any)["x-campground-id"];
+  async getImagePerformance(@Query("campgroundId") campgroundId: string, @Query("days") days: string, @Req() req: Request) {
+    const cgId = campgroundId || req?.campgroundId || (req.headers as any)["x-campground-id"];
     return this.analyticsService.getImagePerformance(cgId, days ? parseInt(days, 10) : 30);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get("reports/deals")
-  async getDealPerformance(@Query("campgroundId") campgroundId: string, @Query("days") days: string, @Req() req: any) {
-    const cgId = campgroundId || (req as any)?.campgroundId || (req.headers as any)["x-campground-id"];
+  async getDealPerformance(@Query("campgroundId") campgroundId: string, @Query("days") days: string, @Req() req: Request) {
+    const cgId = campgroundId || req?.campgroundId || (req.headers as any)["x-campground-id"];
     return this.analyticsService.getDealPerformance(cgId, days ? parseInt(days, 10) : 30);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get("reports/attribution")
-  async getAttribution(@Query("campgroundId") campgroundId: string, @Query("days") days: string, @Req() req: any) {
-    const cgId = campgroundId || (req as any)?.campgroundId || (req.headers as any)["x-campground-id"];
+  async getAttribution(@Query("campgroundId") campgroundId: string, @Query("days") days: string, @Req() req: Request) {
+    const cgId = campgroundId || req?.campgroundId || (req.headers as any)["x-campground-id"];
     return this.analyticsService.getAttribution(cgId, days ? parseInt(days, 10) : 30);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get("reports/pricing")
-  async getPricingSignals(@Query("campgroundId") campgroundId: string, @Query("days") days: string, @Req() req: any) {
-    const cgId = campgroundId || (req as any)?.campgroundId || (req.headers as any)["x-campground-id"];
+  async getPricingSignals(@Query("campgroundId") campgroundId: string, @Query("days") days: string, @Req() req: Request) {
+    const cgId = campgroundId || req?.campgroundId || (req.headers as any)["x-campground-id"];
     return this.analyticsService.getPricingSignals(cgId, days ? parseInt(days, 10) : 30);
   }
 
@@ -95,9 +95,9 @@ export class AnalyticsController {
     @Query("campgroundId") campgroundId: string,
     @Query("year") year: string,
     @Query("format") format: string,
-    @Req() req: any
+    @Req() req: Request
   ) {
-    const cgId = campgroundId || (req as any)?.campgroundId || (req.headers as any)["x-campground-id"];
+    const cgId = campgroundId || req?.campgroundId || (req.headers as any)["x-campground-id"];
     const yr = year ? parseInt(year, 10) : undefined;
     return this.analyticsService.getAnnualReport(cgId, yr, format);
   }
@@ -107,9 +107,9 @@ export class AnalyticsController {
   async getDeviceBreakdown(
     @Query("campgroundId") campgroundId: string,
     @Query("days") days: string,
-    @Req() req: any
+    @Req() req: Request
   ) {
-    const cgId = campgroundId || (req as any)?.campgroundId || (req.headers as any)["x-campground-id"];
+    const cgId = campgroundId || req?.campgroundId || (req.headers as any)["x-campground-id"];
     return this.analyticsService.getDeviceBreakdown(cgId, days ? parseInt(days, 10) : 30);
   }
 }

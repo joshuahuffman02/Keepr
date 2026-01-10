@@ -192,7 +192,7 @@ export class ReviewsService {
   }
 
   async listPublic(campgroundId: string) {
-    return (this.prisma as any).review.findMany({
+    return this.prisma.review.findMany({
       where: { campgroundId, status: { not: "removed" } },
       orderBy: { createdAt: "desc" },
       select: {
@@ -231,7 +231,7 @@ export class ReviewsService {
   }
 
   async moderate(dto: ModerateReviewDto, actorId?: string) {
-    const prisma = this.prisma as any;
+    const prisma = this.prisma;
     const review = await prisma.review.findUnique({ where: { id: dto.reviewId } });
     if (!review) throw new NotFoundException("Review not found");
     await prisma.review.update({

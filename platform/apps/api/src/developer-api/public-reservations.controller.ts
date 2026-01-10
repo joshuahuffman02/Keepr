@@ -83,7 +83,7 @@ export class PublicReservationsController {
   @ApiScopes("reservations:read")
   @ApiOperation({ summary: "List reservations" })
   @ApiResponse({ status: 200, description: "List of reservations" })
-  list(@Req() req: any) {
+  list(@Req() req: Request) {
     const campgroundId = req.apiPrincipal.campgroundId;
     return this.api.listReservations(campgroundId);
   }
@@ -93,7 +93,7 @@ export class PublicReservationsController {
   @ApiOperation({ summary: "Get a reservation" })
   @ApiResponse({ status: 200, description: "Reservation details" })
   @ApiResponse({ status: 404, description: "Reservation not found" })
-  get(@Req() req: any, @Param("id") id: string) {
+  get(@Req() req: Request, @Param("id") id: string) {
     const campgroundId = req.apiPrincipal.campgroundId;
     return this.api.getReservation(campgroundId, id);
   }
@@ -102,7 +102,7 @@ export class PublicReservationsController {
   @ApiScopes("reservations:write")
   @ApiOperation({ summary: "Create a reservation" })
   @ApiResponse({ status: 201, description: "Reservation created" })
-  create(@Req() req: any, @Body() body: CreateReservationBody) {
+  create(@Req() req: Request, @Body() body: CreateReservationBody) {
     const campgroundId = req.apiPrincipal.campgroundId;
     return this.api.createReservation(campgroundId, body);
   }
@@ -111,7 +111,7 @@ export class PublicReservationsController {
   @ApiScopes("reservations:write")
   @ApiOperation({ summary: "Update a reservation" })
   @ApiResponse({ status: 200, description: "Reservation updated" })
-  update(@Req() req: any, @Param("id") id: string, @Body() body: UpdateReservationBody) {
+  update(@Req() req: Request, @Param("id") id: string, @Body() body: UpdateReservationBody) {
     const campgroundId = req.apiPrincipal.campgroundId;
     return this.api.updateReservation(campgroundId, id, body);
   }
@@ -120,7 +120,7 @@ export class PublicReservationsController {
   @ApiScopes("reservations:write")
   @ApiOperation({ summary: "Delete a reservation" })
   @ApiResponse({ status: 200, description: "Reservation deleted" })
-  remove(@Req() req: any, @Param("id") id: string) {
+  remove(@Req() req: Request, @Param("id") id: string) {
     const campgroundId = req.apiPrincipal.campgroundId;
     return this.api.deleteReservation(campgroundId, id);
   }
@@ -129,7 +129,7 @@ export class PublicReservationsController {
   @ApiScopes("reservations:write")
   @ApiOperation({ summary: "Record a payment" })
   @ApiResponse({ status: 201, description: "Payment recorded" })
-  pay(@Req() req: any, @Param("id") id: string, @Body() body: PaymentBody) {
+  pay(@Req() req: Request, @Param("id") id: string, @Body() body: PaymentBody) {
     const campgroundId = req.apiPrincipal.campgroundId;
     return this.api.recordPayment(campgroundId, id, body.amountCents, body.method);
   }

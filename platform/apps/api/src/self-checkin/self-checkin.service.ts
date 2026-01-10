@@ -40,7 +40,7 @@ export class SelfCheckinService {
 
     if (evidence.request && (!evidence.request.reservationId || !evidence.request.guestId)) {
       ops.push(
-        (this.prisma as any).signatureRequest?.update?.({
+        this.prisma.signatureRequest?.update?.({
           where: { id: evidence.request.id },
           data: {
             reservationId: evidence.request.reservationId ?? reservationId,
@@ -52,7 +52,7 @@ export class SelfCheckinService {
 
     if (evidence.artifact && (!evidence.artifact.reservationId || !evidence.artifact.guestId)) {
       ops.push(
-        (this.prisma as any).signatureArtifact?.update?.({
+        this.prisma.signatureArtifact?.update?.({
           where: { id: evidence.artifact.id },
           data: {
             reservationId: evidence.artifact.reservationId ?? reservationId,
@@ -64,7 +64,7 @@ export class SelfCheckinService {
 
     if (evidence.digital && (!evidence.digital.reservationId || !evidence.digital.guestId)) {
       ops.push(
-        (this.prisma as any).digitalWaiver?.update?.({
+        this.prisma.digitalWaiver?.update?.({
           where: { id: evidence.digital.id },
           data: {
             reservationId: evidence.digital.reservationId ?? reservationId,
@@ -85,7 +85,7 @@ export class SelfCheckinService {
 
   private async hasSignedWaiver(reservationId: string, guestId: string) {
     const [signedRequest, digitalWaiver] = await Promise.all([
-      (this.prisma as any).signatureRequest.findFirst?.({
+      this.prisma.signatureRequest.findFirst?.({
         where: {
           documentType: "waiver",
           status: "signed",
@@ -94,7 +94,7 @@ export class SelfCheckinService {
         include: { artifact: true },
         orderBy: { signedAt: "desc" }
       }),
-      (this.prisma as any).digitalWaiver.findFirst?.({
+      this.prisma.digitalWaiver.findFirst?.({
         where: {
           OR: [{ reservationId }, { reservationId: null, guestId }],
           status: "signed"
@@ -105,7 +105,7 @@ export class SelfCheckinService {
 
     const signedArtifact =
       signedRequest?.artifact ??
-      (await (this.prisma as any).signatureArtifact?.findFirst?.({
+      (await this.prisma.signatureArtifact?.findFirst?.({
         where: {
           pdfUrl: { not: null },
           OR: [{ reservationId }, { reservationId: null, guestId }]
@@ -128,7 +128,7 @@ export class SelfCheckinService {
   private async attachIdVerification(reservationId: string, guestId: string, match: any) {
     if (!match || (match.reservationId && match.guestId)) return;
     try {
-      await (this.prisma as any).idVerification?.update?.({
+      await this.prisma.idVerification?.update?.({
         where: { id: match.id },
         data: {
           reservationId: match.reservationId ?? reservationId,
@@ -142,7 +142,7 @@ export class SelfCheckinService {
 
   private async hasVerifiedId(reservationId: string, guestId: string) {
     const now = new Date();
-    const match = await (this.prisma as any).idVerification.findFirst?.({
+    const match = await this.prisma.idVerification.findFirst?.({
       where: {
         status: "verified",
         OR: [

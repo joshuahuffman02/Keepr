@@ -154,7 +154,7 @@ export class AccountingConfidenceService {
     const { start, end } = this.getMonthBounds(month);
 
     // Check if month is closed
-    const closeRecord = await (this.prisma as any).monthEndClose?.findFirst?.({
+    const closeRecord = await this.prisma.monthEndClose?.findFirst?.({
       where: { campgroundId, month },
     });
 
@@ -232,17 +232,17 @@ export class AccountingConfidenceService {
     }
 
     // Create or update close record
-    const existing = await (this.prisma as any).monthEndClose?.findFirst?.({
+    const existing = await this.prisma.monthEndClose?.findFirst?.({
       where: { campgroundId, month },
     });
 
     if (existing) {
-      await (this.prisma as any).monthEndClose?.update?.({
+      await this.prisma.monthEndClose?.update?.({
         where: { id: existing.id },
         data: { status: "review", initiatedBy: userId, initiatedAt: new Date() },
       });
     } else {
-      await (this.prisma as any).monthEndClose?.create?.({
+      await this.prisma.monthEndClose?.create?.({
         data: {
           campgroundId,
           month,
@@ -260,7 +260,7 @@ export class AccountingConfidenceService {
    * Approve and finalize month-end close
    */
   async approveMonthEndClose(campgroundId: string, month: string, userId: string) {
-    const closeRecord = await (this.prisma as any).monthEndClose?.findFirst?.({
+    const closeRecord = await this.prisma.monthEndClose?.findFirst?.({
       where: { campgroundId, month },
     });
 
@@ -268,7 +268,7 @@ export class AccountingConfidenceService {
       return { success: false, message: "Month must be in review status to approve" };
     }
 
-    await (this.prisma as any).monthEndClose?.update?.({
+    await this.prisma.monthEndClose?.update?.({
       where: { id: closeRecord.id },
       data: {
         status: "closed",
@@ -455,7 +455,7 @@ export class AccountingConfidenceService {
   }
 
   private async checkMonthEndClose(campgroundId: string, month: string): Promise<ConfidenceScore["factors"][0]> {
-    const closeRecord = await (this.prisma as any).monthEndClose?.findFirst?.({
+    const closeRecord = await this.prisma.monthEndClose?.findFirst?.({
       where: { campgroundId, month },
     });
 

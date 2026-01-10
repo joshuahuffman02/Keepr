@@ -26,21 +26,21 @@ export class FormsController {
 
   @Post("forms")
   @Roles(UserRole.owner, UserRole.manager)
-  create(@Body() body: CreateFormTemplateDto, @Req() req: any) {
+  create(@Body() body: CreateFormTemplateDto, @Req() req: Request) {
     const campgroundId = this.requireCampgroundId(req, body.campgroundId);
     return this.forms.create(body, campgroundId);
   }
 
   @Patch("forms/:id")
   @Roles(UserRole.owner, UserRole.manager)
-  update(@Param("id") id: string, @Body() body: UpdateFormTemplateDto, @Req() req: any) {
+  update(@Param("id") id: string, @Body() body: UpdateFormTemplateDto, @Req() req: Request) {
     const campgroundId = this.requireCampgroundId(req);
     return this.forms.update(id, body, campgroundId);
   }
 
   @Delete("forms/:id")
   @Roles(UserRole.owner, UserRole.manager)
-  remove(@Param("id") id: string, @Req() req: any) {
+  remove(@Param("id") id: string, @Req() req: Request) {
     const campgroundId = this.requireCampgroundId(req);
     return this.forms.remove(id, campgroundId);
   }
@@ -50,7 +50,7 @@ export class FormsController {
   listForReservation(
     @Param("reservationId") reservationId: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.forms.listSubmissions({ reservationId, campgroundId: requiredCampgroundId });
@@ -61,7 +61,7 @@ export class FormsController {
   listForGuest(
     @Param("guestId") guestId: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.forms.listSubmissions({ guestId, campgroundId: requiredCampgroundId });
@@ -69,21 +69,21 @@ export class FormsController {
 
   @Post("forms/submissions")
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
-  createSubmission(@Body() body: CreateFormSubmissionDto, @Req() req: any) {
+  createSubmission(@Body() body: CreateFormSubmissionDto, @Req() req: Request) {
     const campgroundId = this.requireCampgroundId(req);
     return this.forms.createSubmission(body, campgroundId);
   }
 
   @Patch("forms/submissions/:id")
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk)
-  updateSubmission(@Param("id") id: string, @Body() body: UpdateFormSubmissionDto, @Req() req: any) {
+  updateSubmission(@Param("id") id: string, @Body() body: UpdateFormSubmissionDto, @Req() req: Request) {
     const campgroundId = this.requireCampgroundId(req);
     return this.forms.updateSubmission(id, body, campgroundId);
   }
 
   @Delete("forms/submissions/:id")
   @Roles(UserRole.owner, UserRole.manager)
-  deleteSubmission(@Param("id") id: string, @Req() req: any) {
+  deleteSubmission(@Param("id") id: string, @Req() req: Request) {
     const campgroundId = this.requireCampgroundId(req);
     return this.forms.deleteSubmission(id, campgroundId);
   }

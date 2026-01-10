@@ -3,6 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../../prisma/prisma.service';
+import type { AuthUser } from '../auth.types';
 
 export interface JwtPayload {
     sub: string;
@@ -43,7 +44,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         });
     }
 
-    async validate(payload: JwtPayload) {
+    async validate(payload: JwtPayload): Promise<AuthUser> {
         const user = await this.prisma.user.findUnique({
             where: { id: payload.sub },
             include: {
@@ -61,7 +62,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             id: m.id,
             campgroundId: m.campgroundId,
             role: m.role,
-            campground: m.Campground ? { id: m.Campground.id, name: m.Campground.name, slug: (m.Campground as any).slug } : undefined,
+            campground: m.Campground ? { id: m.Campground.id, name: m.Campground.name, slug: m.Campground.slug } : undefined,
         }));
 
         return {
@@ -70,9 +71,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             firstName: user.firstName,
             lastName: user.lastName,
             region: user.region ?? null,
-            platformRole: (user as any).platformRole ?? null,
-            platformRegion: (user as any).platformRegion ?? null,
-            platformActive: (user as any).platformActive ?? true,
+            platformRole: user.platformRole ?? null,
+            platformRegion: user.platformRegion ?? null,
+            platformActive: user.platformActive ?? true,
             ownershipRoles: user.ownershipRoles ?? [],
             role: memberships[0]?.role ?? null,
             memberships,

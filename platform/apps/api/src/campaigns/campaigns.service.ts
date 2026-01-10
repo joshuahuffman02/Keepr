@@ -58,7 +58,7 @@ export class CampaignsService {
   }
 
   createTemplate(dto: CreateTemplateDto) {
-    const templateClient = (this.prisma as any).campaignTemplate;
+    const templateClient = this.prisma.campaignTemplate;
     if (!templateClient?.create) return null;
     return templateClient.create({
       data: {
@@ -74,7 +74,7 @@ export class CampaignsService {
   }
 
   listTemplates(campgroundId: string) {
-    const templateClient = (this.prisma as any).campaignTemplate;
+    const templateClient = this.prisma.campaignTemplate;
     if (!templateClient?.findMany) return [];
     return templateClient.findMany({
       where: { campgroundId },
@@ -90,7 +90,7 @@ export class CampaignsService {
     html: string | null;
     textBody: string | null;
   }>) {
-    const templateClient = (this.prisma as any).campaignTemplate;
+    const templateClient = this.prisma.campaignTemplate;
     if (!templateClient?.update) throw new NotFoundException("Template model not available");
     const existing = await templateClient.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException("Template not found");
@@ -101,7 +101,7 @@ export class CampaignsService {
   }
 
   async deleteTemplate(id: string) {
-    const templateClient = (this.prisma as any).campaignTemplate;
+    const templateClient = this.prisma.campaignTemplate;
     if (!templateClient?.delete) throw new NotFoundException("Template model not available");
     const existing = await templateClient.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException("Template not found");
@@ -312,7 +312,7 @@ export class CampaignsService {
   }
 
   list(campgroundId?: string) {
-    const campaignClient = (this.prisma as any).campaign;
+    const campaignClient = this.prisma.campaign;
     if (!campaignClient?.findMany) return [];
     return campaignClient.findMany({
       where: campgroundId ? { campgroundId } : {},

@@ -43,7 +43,7 @@ export class SeasonalsController {
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk, UserRole.finance)
   @RequireScope({ resource: "reservations", action: "write" })
   @Post()
-  async createSeasonalGuest(@Req() req: any, @Body() dto: CreateSeasonalGuestDto) {
+  async createSeasonalGuest(@Req() req: Request, @Body() dto: CreateSeasonalGuestDto) {
     return this.seasonals.create(dto, req.user?.id);
   }
 
@@ -124,7 +124,7 @@ export class SeasonalsController {
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk, UserRole.finance)
   @RequireScope({ resource: "reservations", action: "write" })
   @Post("payments")
-  async recordPayment(@Req() req: any, @Body() dto: RecordPaymentDto) {
+  async recordPayment(@Req() req: Request, @Body() dto: RecordPaymentDto) {
     return this.seasonals.recordPayment(
       {
         ...dto,
@@ -237,7 +237,7 @@ export class SeasonalsController {
   @RequireScope({ resource: "reservations", action: "write" })
   @Post(":id/apply-pricing")
   async applyPricing(
-    @Req() req: any,
+    @Req() req: Request,
     @Param("id") id: string,
     @Body() dto: { rateCardId: string; seasonYear: number; manualAdjustment?: { amount: number; reason: string } }
   ) {
@@ -256,7 +256,7 @@ export class SeasonalsController {
   @Roles(UserRole.owner, UserRole.manager)
   @RequireScope({ resource: "reservations", action: "write" })
   @Post("messages/bulk")
-  async sendBulkMessage(@Req() req: any, @Body() dto: BulkMessageDto) {
+  async sendBulkMessage(@Req() req: Request, @Body() dto: BulkMessageDto) {
     return this.seasonals.sendBulkMessage(dto, req.user?.id);
   }
 
@@ -268,7 +268,7 @@ export class SeasonalsController {
   @RequireScope({ resource: "reservations", action: "write" })
   @Post("convert-from-reservation/:reservationId")
   async convertReservationToSeasonal(
-    @Req() req: any,
+    @Req() req: Request,
     @Param("reservationId") reservationId: string,
     @Body() dto: { rateCardId?: string; isMetered?: boolean; paysInFull?: boolean; notes?: string }
   ) {
@@ -284,7 +284,7 @@ export class SeasonalsController {
   @RequireScope({ resource: "reservations", action: "write" })
   @Post("link-reservation")
   async linkReservationToSeasonal(
-    @Req() req: any,
+    @Req() req: Request,
     @Body() dto: { reservationId: string; seasonalGuestId: string }
   ) {
     return this.seasonals.linkReservationToSeasonal(
@@ -323,7 +323,7 @@ export class SeasonalsController {
   @RequireScope({ resource: "reservations", action: "write" })
   @Post("contracts/bulk")
   async sendBulkContracts(
-    @Req() req: any,
+    @Req() req: Request,
     @Body() dto: { seasonalGuestIds: string[]; templateId?: string; campgroundId: string }
   ) {
     return this.seasonals.sendBulkContracts(dto, req.user?.id);
@@ -334,7 +334,7 @@ export class SeasonalsController {
   @RequireScope({ resource: "reservations", action: "write" })
   @Post("payments/bulk")
   async recordBulkPayments(
-    @Req() req: any,
+    @Req() req: Request,
     @Body() dto: { seasonalGuestIds: string[]; amountCents: number; method: string; note?: string }
   ) {
     return this.seasonals.recordBulkPayments(dto, req.user?.id);

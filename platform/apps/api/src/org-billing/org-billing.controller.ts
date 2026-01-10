@@ -80,7 +80,7 @@ export class OrgBillingController {
    * Get billing summary for current period
    */
   @Get("summary")
-  async getBillingSummary(@Param("organizationId") organizationId: string, @Req() req: any) {
+  async getBillingSummary(@Param("organizationId") organizationId: string, @Req() req: Request) {
     await this.validateOrgAccess(organizationId, req.user);
     return this.billingService.getBillingSummary(organizationId);
   }
@@ -89,7 +89,7 @@ export class OrgBillingController {
    * Get current billing period
    */
   @Get("current-period")
-  async getCurrentPeriod(@Param("organizationId") organizationId: string, @Req() req: any) {
+  async getCurrentPeriod(@Param("organizationId") organizationId: string, @Req() req: Request) {
     await this.validateOrgAccess(organizationId, req.user);
     return this.billingService.getCurrentPeriod(organizationId);
   }
@@ -172,7 +172,7 @@ export class OrgBillingController {
   async finalizePeriod(
     @Param("organizationId") organizationId: string,
     @Param("periodId") periodId: string,
-    @Req() req: any
+    @Req() req: Request
   ) {
     // Validate period ownership to prevent cross-org manipulation
     await this.validatePeriodOwnership(periodId, organizationId);
@@ -193,7 +193,7 @@ export class OrgBillingController {
     @Param("organizationId") organizationId: string,
     @Param("periodId") periodId: string,
     @Body() body: { stripePaymentIntentId?: string },
-    @Req() req: any
+    @Req() req: Request
   ) {
     // Validate period ownership to prevent cross-org manipulation
     await this.validatePeriodOwnership(periodId, organizationId);
@@ -212,7 +212,7 @@ export class OrgBillingController {
    * Get Stripe subscription details
    */
   @Get("subscription")
-  async getSubscription(@Param("organizationId") organizationId: string, @Req() req: any) {
+  async getSubscription(@Param("organizationId") organizationId: string, @Req() req: Request) {
     await this.validateOrgAccess(organizationId, req.user);
     const subscription = await this.subscriptionService.getSubscription(organizationId);
     if (!subscription) {
@@ -242,7 +242,7 @@ export class OrgBillingController {
   async createSubscription(
     @Param("organizationId") organizationId: string,
     @Body() body: { tier?: string },
-    @Req() req: any
+    @Req() req: Request
   ) {
     await this.validateOrgAccess(organizationId, req.user);
     return this.subscriptionService.createSubscription(
@@ -274,7 +274,7 @@ export class OrgBillingController {
   async getBillingPortal(
     @Param("organizationId") organizationId: string,
     @Body() body: { returnUrl: string },
-    @Req() req: any
+    @Req() req: Request
   ) {
     await this.validateOrgAccess(organizationId, req.user);
     const url = await this.subscriptionService.getBillingPortalUrl(
@@ -288,7 +288,7 @@ export class OrgBillingController {
    * Get current Stripe usage (metered billing)
    */
   @Get("stripe-usage")
-  async getStripeUsage(@Param("organizationId") organizationId: string, @Req() req: any) {
+  async getStripeUsage(@Param("organizationId") organizationId: string, @Req() req: Request) {
     await this.validateOrgAccess(organizationId, req.user);
     return this.subscriptionService.getCurrentUsage(organizationId);
   }
@@ -300,7 +300,7 @@ export class OrgBillingController {
   async changeTier(
     @Param("organizationId") organizationId: string,
     @Body() body: { tier: string },
-    @Req() req: any
+    @Req() req: Request
   ) {
     await this.validateOrgAccess(organizationId, req.user);
     return this.subscriptionService.changeTier(organizationId, body.tier);

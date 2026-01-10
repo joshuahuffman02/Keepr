@@ -37,7 +37,7 @@ export class GuestSegmentController {
     constructor(private readonly segmentService: GuestSegmentService) { }
 
     @Post()
-    async create(@Body() body: CreateSegmentBody, @Req() req: any) {
+    async create(@Body() body: CreateSegmentBody, @Req() req: Request) {
         return this.segmentService.create({
             ...body,
             createdById: req.user.id,
@@ -83,7 +83,7 @@ export class GuestSegmentController {
     }
 
     @Post(":id/duplicate")
-    async duplicate(@Param("id") id: string, @Req() req: any) {
+    async duplicate(@Param("id") id: string, @Req() req: Request) {
         return this.segmentService.duplicate(id, req.user.id, req.user.email);
     }
 

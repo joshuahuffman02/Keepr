@@ -153,7 +153,7 @@ export class BackupService {
   }
 
   private async resolveRetentionDays(campgroundId: string) {
-    const privacySetting = await (this.prisma as any).privacySetting?.findUnique?.({
+    const privacySetting = await this.prisma.privacySetting?.findUnique?.({
       where: { campgroundId }
     });
     return privacySetting?.backupRetentionDays ?? 30;

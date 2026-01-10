@@ -38,7 +38,7 @@ export class AnnouncementController {
     }
 
     @Post()
-    async create(@Body() dto: CreateAnnouncementDto, @Req() req: any) {
+    async create(@Body() dto: CreateAnnouncementDto, @Req() req: Request) {
         return this.announcements.create({
             ...dto,
             scheduledAt: dto.scheduledAt ? new Date(dto.scheduledAt) : undefined,

@@ -113,7 +113,7 @@ export class ReportsService {
       });
       if (!reservations.length) return 0;
       const reservationIds = reservations.map((r) => r.id);
-      const withUpsell = await (this.prisma as any).reservationUpsell.count({
+      const withUpsell = await this.prisma.reservationUpsell.count({
         where: { reservationId: { in: reservationIds } },
         distinct: ["reservationId"]
       });
@@ -345,7 +345,7 @@ export class ReportsService {
         const programIds = Array.from(new Set(reservations.map((r: any) => r.referralProgramId).filter(Boolean)));
         const programMap: Record<string, any> = {};
         if (programIds.length) {
-            const programs = await (this.prisma as any).referralProgram.findMany({
+            const programs = await this.prisma.referralProgram.findMany({
                 where: { id: { in: programIds } }
             });
             for (const p of programs as any[]) {

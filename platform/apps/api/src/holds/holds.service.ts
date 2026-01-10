@@ -133,7 +133,7 @@ export class HoldsService implements OnModuleInit, OnModuleDestroy {
     const where = campgroundId
       ? { status: "active", expiresAt: { lte: now }, campgroundId }
       : { status: "active", expiresAt: { lte: now } };
-    const expired = await (this.prisma as any).siteHold.findMany({
+    const expired = await this.prisma.siteHold.findMany({
       where,
       include: { Site: { select: { id: true, siteClassId: true } } }
     });
@@ -142,7 +142,7 @@ export class HoldsService implements OnModuleInit, OnModuleDestroy {
 
     await Promise.all(
       expired.map((hold: any) =>
-        (this.prisma as any).siteHold.update({
+        this.prisma.siteHold.update({
           where: { id: hold.id },
           data: { status: "expired" }
         })

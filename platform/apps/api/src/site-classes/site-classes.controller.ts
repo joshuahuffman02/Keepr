@@ -45,7 +45,7 @@ export class SiteClassesController {
   }
 
   @Get("campgrounds/:campgroundId/site-classes")
-  list(@Param("campgroundId") campgroundId: string, @Req() req: any) {
+  list(@Param("campgroundId") campgroundId: string, @Req() req: Request) {
     this.assertCampgroundAccess(campgroundId, req.user);
     return this.siteClasses.listByCampground(campgroundId);
   }
@@ -54,7 +54,7 @@ export class SiteClassesController {
   getById(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -65,7 +65,7 @@ export class SiteClassesController {
   create(
     @Param("campgroundId") campgroundId: string,
     @Body() body: Omit<CreateSiteClassDto, "campgroundId">,
-    @Req() req: any
+    @Req() req: Request
   ) {
     this.assertCampgroundAccess(campgroundId, req.user);
     return this.siteClasses.create({ campgroundId, ...body });
@@ -76,7 +76,7 @@ export class SiteClassesController {
     @Param("id") id: string,
     @Body() body: Partial<CreateSiteClassDto>,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -87,7 +87,7 @@ export class SiteClassesController {
   remove(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);

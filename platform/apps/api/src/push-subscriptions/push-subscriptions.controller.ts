@@ -28,7 +28,7 @@ export class PushSubscriptionsController {
   // =========================================================================
 
   @Post("subscribe")
-  async subscribe(@Body() body: SubscribeRequest, @Req() req: any) {
+  async subscribe(@Body() body: SubscribeRequest, @Req() req: Request) {
     const subscription = (body as any).subscription ?? (body as any);
     const campgroundId = (body as any).campgroundId;
 
@@ -45,7 +45,7 @@ export class PushSubscriptionsController {
   // =========================================================================
 
   @Post("mobile/register")
-  async registerMobileDevice(@Body() dto: RegisterDeviceDto, @Req() req: any) {
+  async registerMobileDevice(@Body() dto: RegisterDeviceDto, @Req() req: Request) {
     return this.mobilePush.registerDevice(req.user.id, dto);
   }
 
@@ -56,13 +56,13 @@ export class PushSubscriptionsController {
   }
 
   @Get("mobile/devices")
-  async getMobileDevices(@Req() req: any) {
+  async getMobileDevices(@Req() req: Request) {
     return this.mobilePush.getUserDevices(req.user.id);
   }
 
   @Delete("mobile/devices")
   @HttpCode(HttpStatus.OK)
-  async unregisterAllMobileDevices(@Req() req: any) {
+  async unregisterAllMobileDevices(@Req() req: Request) {
     return this.mobilePush.unregisterAllDevices(req.user.id);
   }
 }

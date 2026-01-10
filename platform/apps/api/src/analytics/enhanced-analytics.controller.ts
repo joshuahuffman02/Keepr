@@ -33,11 +33,11 @@ export class EnhancedAnalyticsController {
    * Public endpoint - no auth required for anonymous tracking
    */
   @Post("session/start")
-  async startSession(@Body() dto: TrackSessionDto, @Req() req: any) {
+  async startSession(@Body() dto: TrackSessionDto, @Req() req: Request) {
     const scope = {
-      campgroundId: (req as any)?.campgroundId || null,
-      organizationId: (req as any)?.organizationId || null,
-      userId: (req as any)?.user?.id || null,
+      campgroundId: req?.campgroundId || null,
+      organizationId: req?.organizationId || null,
+      userId: req?.user?.id || null,
     };
     return this.service.startSession(dto, scope);
   }
@@ -71,11 +71,11 @@ export class EnhancedAnalyticsController {
    * Public endpoint for frontend tracking
    */
   @Post("event")
-  async trackEvent(@Body() dto: TrackAdminEventDto, @Req() req: any) {
+  async trackEvent(@Body() dto: TrackAdminEventDto, @Req() req: Request) {
     const scope = {
-      campgroundId: (req as any)?.campgroundId || (req.headers as any)["x-campground-id"] || null,
-      organizationId: (req as any)?.organizationId || (req.headers as any)["x-organization-id"] || null,
-      userId: (req as any)?.user?.id || null,
+      campgroundId: req?.campgroundId || (req.headers as any)["x-campground-id"] || null,
+      organizationId: req?.organizationId || (req.headers as any)["x-organization-id"] || null,
+      userId: req?.user?.id || null,
     };
     return this.service.trackAdminEvent(dto, scope);
   }
@@ -89,11 +89,11 @@ export class EnhancedAnalyticsController {
    * Public endpoint for frontend tracking
    */
   @Post("funnel/step")
-  async trackFunnelStep(@Body() dto: TrackFunnelDto, @Req() req: any) {
+  async trackFunnelStep(@Body() dto: TrackFunnelDto, @Req() req: Request) {
     const scope = {
-      campgroundId: (req as any)?.campgroundId || (req.headers as any)["x-campground-id"] || null,
-      organizationId: (req as any)?.organizationId || (req.headers as any)["x-organization-id"] || null,
-      userId: (req as any)?.user?.id || null,
+      campgroundId: req?.campgroundId || (req.headers as any)["x-campground-id"] || null,
+      organizationId: req?.organizationId || (req.headers as any)["x-organization-id"] || null,
+      userId: req?.user?.id || null,
     };
     return this.service.trackFunnelStep(dto, scope);
   }
@@ -103,11 +103,11 @@ export class EnhancedAnalyticsController {
    * Public endpoint
    */
   @Post("funnel/complete")
-  async completeFunnel(@Body() dto: CompleteFunnelDto, @Req() req: any) {
+  async completeFunnel(@Body() dto: CompleteFunnelDto, @Req() req: Request) {
     const scope = {
-      campgroundId: (req as any)?.campgroundId || (req.headers as any)["x-campground-id"] || null,
-      organizationId: (req as any)?.organizationId || (req.headers as any)["x-organization-id"] || null,
-      userId: (req as any)?.user?.id || null,
+      campgroundId: req?.campgroundId || (req.headers as any)["x-campground-id"] || null,
+      organizationId: req?.organizationId || (req.headers as any)["x-organization-id"] || null,
+      userId: req?.user?.id || null,
     };
     return this.service.completeFunnel(dto, scope);
   }
@@ -121,11 +121,11 @@ export class EnhancedAnalyticsController {
    * Public endpoint
    */
   @Post("feature")
-  async trackFeature(@Body() dto: TrackFeatureUsageDto, @Req() req: any) {
+  async trackFeature(@Body() dto: TrackFeatureUsageDto, @Req() req: Request) {
     const scope = {
-      campgroundId: (req as any)?.campgroundId || (req.headers as any)["x-campground-id"] || null,
-      organizationId: (req as any)?.organizationId || (req.headers as any)["x-organization-id"] || null,
-      userId: (req as any)?.user?.id || null,
+      campgroundId: req?.campgroundId || (req.headers as any)["x-campground-id"] || null,
+      organizationId: req?.organizationId || (req.headers as any)["x-organization-id"] || null,
+      userId: req?.user?.id || null,
     };
     return this.service.trackFeatureUsage(dto, scope);
   }
@@ -142,9 +142,9 @@ export class EnhancedAnalyticsController {
   async getPageStats(
     @Query("campgroundId") campgroundId: string,
     @Query("days") days: string,
-    @Req() req: any
+    @Req() req: Request
   ) {
-    const cgId = campgroundId || (req as any)?.campgroundId || (req.headers as any)["x-campground-id"];
+    const cgId = campgroundId || req?.campgroundId || (req.headers as any)["x-campground-id"];
     if (!cgId) throw new BadRequestException("campgroundId required");
     return this.service.getPageStats(cgId, days ? parseInt(days, 10) : 30);
   }
@@ -157,9 +157,9 @@ export class EnhancedAnalyticsController {
   async getFeatureUsage(
     @Query("campgroundId") campgroundId: string,
     @Query("days") days: string,
-    @Req() req: any
+    @Req() req: Request
   ) {
-    const cgId = campgroundId || (req as any)?.campgroundId || (req.headers as any)["x-campground-id"];
+    const cgId = campgroundId || req?.campgroundId || (req.headers as any)["x-campground-id"];
     if (!cgId) throw new BadRequestException("campgroundId required");
     return this.service.getFeatureUsage(cgId, days ? parseInt(days, 10) : 30);
   }
@@ -173,9 +173,9 @@ export class EnhancedAnalyticsController {
     @Query("campgroundId") campgroundId: string,
     @Query("funnelName") funnelName: string,
     @Query("days") days: string,
-    @Req() req: any
+    @Req() req: Request
   ) {
-    const cgId = campgroundId || (req as any)?.campgroundId || (req.headers as any)["x-campground-id"];
+    const cgId = campgroundId || req?.campgroundId || (req.headers as any)["x-campground-id"];
     if (!cgId) throw new BadRequestException("campgroundId required");
     if (!funnelName) throw new BadRequestException("funnelName required");
     return this.service.getFunnelAnalysis(cgId, funnelName, days ? parseInt(days, 10) : 30);
@@ -189,9 +189,9 @@ export class EnhancedAnalyticsController {
   async getSessionStats(
     @Query("campgroundId") campgroundId: string,
     @Query("days") days: string,
-    @Req() req: any
+    @Req() req: Request
   ) {
-    const cgId = campgroundId || (req as any)?.campgroundId || (req.headers as any)["x-campground-id"];
+    const cgId = campgroundId || req?.campgroundId || (req.headers as any)["x-campground-id"];
     if (!cgId) throw new BadRequestException("campgroundId required");
     return this.service.getSessionStats(cgId, days ? parseInt(days, 10) : 30);
   }
@@ -205,9 +205,9 @@ export class EnhancedAnalyticsController {
   async getStaffMetrics(
     @Query("campgroundId") campgroundId: string,
     @Query("days") days: string,
-    @Req() req: any
+    @Req() req: Request
   ) {
-    const cgId = campgroundId || (req as any)?.campgroundId || (req.headers as any)["x-campground-id"];
+    const cgId = campgroundId || req?.campgroundId || (req.headers as any)["x-campground-id"];
     if (!cgId) throw new BadRequestException("campgroundId required");
     return this.service.getStaffMetrics(cgId, days ? parseInt(days, 10) : 30);
   }
@@ -220,9 +220,9 @@ export class EnhancedAnalyticsController {
   async getLiveEvents(
     @Query("campgroundId") campgroundId: string,
     @Query("limit") limit: string,
-    @Req() req: any
+    @Req() req: Request
   ) {
-    const cgId = campgroundId || (req as any)?.campgroundId || (req.headers as any)["x-campground-id"];
+    const cgId = campgroundId || req?.campgroundId || (req.headers as any)["x-campground-id"];
     if (!cgId) throw new BadRequestException("campgroundId required");
     return this.service.getLiveEvents(cgId, limit ? parseInt(limit, 10) : 50);
   }

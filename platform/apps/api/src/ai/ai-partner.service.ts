@@ -1523,7 +1523,7 @@ User request: "${params.anonymizedText}"${historyBlock}`;
     }
 
     try {
-      const communication = await (this.prisma as any).communication.create({
+      const communication = await this.prisma.communication.create({
         data: {
           campgroundId: campground.id,
           organizationId,

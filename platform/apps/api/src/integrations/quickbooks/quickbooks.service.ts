@@ -111,7 +111,7 @@ export class QuickBooksService {
     }
 
     // Check if already synced
-    const existingSync = await (this.prisma as any).quickbooksSyncLog?.findFirst?.({
+    const existingSync = await this.prisma.quickbooksSyncLog?.findFirst?.({
       where: { reservationId, entityType: "invoice", status: "success" },
     });
 
@@ -170,7 +170,7 @@ export class QuickBooksService {
     }
 
     // Check if already synced
-    const existingSync = await (this.prisma as any).quickbooksSyncLog?.findFirst?.({
+    const existingSync = await this.prisma.quickbooksSyncLog?.findFirst?.({
       where: { paymentId, entityType: "payment", status: "success" },
     });
 
@@ -207,7 +207,7 @@ export class QuickBooksService {
       where.createdAt = { gte: startDate, lte: endDate };
     }
 
-    const syncs = await (this.prisma as any).quickbooksSyncLog?.findMany?.({
+    const syncs = await this.prisma.quickbooksSyncLog?.findMany?.({
       where,
       orderBy: { createdAt: "desc" },
       take: 100,

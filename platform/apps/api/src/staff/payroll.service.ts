@@ -197,7 +197,7 @@ export class PayrollService {
     const provider = params.provider ?? "onpay";
     const format = params.format ?? "csv";
 
-    const exportRecord = await (this.prisma as any).payrollExport.create({
+    const exportRecord = await this.prisma.payrollExport.create({
       data: {
         campgroundId: params.campgroundId,
         periodStart: params.periodStart,
@@ -211,7 +211,7 @@ export class PayrollService {
 
     try {
       const [entries, earningCodes] = await Promise.all([
-        (this.prisma as any).staffTimeEntry.findMany({
+        this.prisma.staffTimeEntry.findMany({
           where: {
             campgroundId: params.campgroundId,
             clockInAt: { gte: params.periodStart },
@@ -222,7 +222,7 @@ export class PayrollService {
             shift: { select: { id: true, role: true, roleRef: true, roleId: true } }
           }
         }),
-        (this.prisma as any).payrollEarningCode.findMany({
+        this.prisma.payrollEarningCode.findMany({
           where: { campgroundId: params.campgroundId, provider }
         })
       ]);
@@ -233,7 +233,7 @@ export class PayrollService {
 
       const csv = format === "csv" ? getFormatterForProvider(provider)(rows) : undefined;
 
-      await (this.prisma as any).payrollExportLine.createMany({
+      await this.prisma.payrollExportLine.createMany({
         data: rows.map((row) => ({
           exportId: exportRecord.id,
           userId: row.userId,
@@ -247,7 +247,7 @@ export class PayrollService {
         }))
       });
 
-      await (this.prisma as any).payrollExport.update({
+      await this.prisma.payrollExport.update({
         where: { id: exportRecord.id },
         data: {
           status: "generated",
@@ -265,7 +265,7 @@ export class PayrollService {
         csv
       };
     } catch (err) {
-      await (this.prisma as any).payrollExport.update({
+      await this.prisma.payrollExport.update({
         where: { id: exportRecord.id },
         data: { status: "failed", failureReason: (err as Error).message }
       });
@@ -277,7 +277,7 @@ export class PayrollService {
    * List all payroll exports for a campground
    */
   async listExports(campgroundId: string, limit = 20) {
-    return (this.prisma as any).payrollExport.findMany({
+    return this.prisma.payrollExport.findMany({
       where: { campgroundId },
       orderBy: { createdAt: "desc" },
       take: limit,
@@ -291,7 +291,7 @@ export class PayrollService {
    * Get a single export with its lines
    */
   async getExport(exportId: string) {
-    const exportRecord = await (this.prisma as any).payrollExport.findUnique({
+    const exportRecord = await this.prisma.payrollExport.findUnique({
       where: { id: exportId },
       include: {
         requestedBy: { select: { id: true, email: true, firstName: true, lastName: true } },
@@ -334,7 +334,7 @@ export class PayrollService {
     const provider = params.provider ?? "generic";
 
     const [entries, earningCodes] = await Promise.all([
-      (this.prisma as any).staffTimeEntry.findMany({
+      this.prisma.staffTimeEntry.findMany({
         where: {
           campgroundId: params.campgroundId,
           clockInAt: { gte: params.periodStart },
@@ -346,7 +346,7 @@ export class PayrollService {
           user: { select: { id: true, email: true, firstName: true, lastName: true } }
         }
       }),
-      (this.prisma as any).payrollEarningCode.findMany({
+      this.prisma.payrollEarningCode.findMany({
         where: { campgroundId: params.campgroundId, provider }
       })
     ]);
@@ -382,7 +382,7 @@ export class PayrollService {
    * Get or create payroll config for a campground
    */
   async getConfig(campgroundId: string) {
-    const config = await (this.prisma as any).payrollConfig.findUnique({
+    const config = await this.prisma.payrollConfig.findUnique({
       where: { campgroundId }
     });
 
@@ -397,7 +397,7 @@ export class PayrollService {
     provider: Provider;
     companyId?: string;
   }) {
-    return (this.prisma as any).payrollConfig.upsert({
+    return this.prisma.payrollConfig.upsert({
       where: { campgroundId: params.campgroundId },
       update: {
         provider: params.provider,

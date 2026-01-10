@@ -48,7 +48,7 @@ export class PoliciesController {
 
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk, UserRole.finance, UserRole.readonly)
   @Get("campgrounds/:campgroundId/policy-templates")
-  list(@Param("campgroundId") campgroundId: string, @Req() req: any) {
+  list(@Param("campgroundId") campgroundId: string, @Req() req: Request) {
     this.assertCampgroundAccess(campgroundId, req.user);
     return this.policies.listTemplates(campgroundId);
   }
@@ -58,7 +58,7 @@ export class PoliciesController {
   create(
     @Param("campgroundId") campgroundId: string,
     @Body() dto: CreatePolicyTemplateDto,
-    @Req() req: any
+    @Req() req: Request
   ) {
     this.assertCampgroundAccess(campgroundId, req.user);
     return this.policies.createTemplate(campgroundId, dto);
@@ -70,7 +70,7 @@ export class PoliciesController {
     @Param("id") id: string,
     @Body() dto: UpdatePolicyTemplateDto,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -82,7 +82,7 @@ export class PoliciesController {
   remove(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);

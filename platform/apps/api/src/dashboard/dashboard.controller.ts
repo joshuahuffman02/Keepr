@@ -10,7 +10,7 @@ export class DashboardController {
 
   @Get("campgrounds/:campgroundId/summary")
   summary(@Param("campgroundId") campgroundId: string, @Req() req: Request) {
-    const org = (req as any).organizationId || undefined;
+    const org = req.organizationId || undefined;
     return this.dashboard.summary(campgroundId, org);
   }
 }

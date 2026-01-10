@@ -25,7 +25,7 @@ export class AccessControlController {
   getStatus(
     @Param("reservationId") reservationId: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.service.getAccessStatus(reservationId, requiredCampgroundId);
@@ -38,7 +38,7 @@ export class AccessControlController {
     @Param("reservationId") reservationId: string,
     @Body() dto: UpsertVehicleDto,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.service.upsertVehicle(reservationId, dto, requiredCampgroundId);
@@ -51,7 +51,7 @@ export class AccessControlController {
     @Param("reservationId") reservationId: string,
     @Body() dto: GrantAccessDto,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.service.grantAccess(reservationId, dto, requiredCampgroundId);
@@ -64,7 +64,7 @@ export class AccessControlController {
     @Param("reservationId") reservationId: string,
     @Body() dto: RevokeAccessDto,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.service.revokeAccess(reservationId, dto, requiredCampgroundId);
@@ -75,7 +75,7 @@ export class AccessControlController {
   @Roles(UserRole.owner, UserRole.manager)
   listProviders(
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.service.listIntegrations(requiredCampgroundId);
@@ -88,7 +88,7 @@ export class AccessControlController {
     @Param("provider") provider: AccessProviderType,
     @Body() dto: UpsertAccessIntegrationDto,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.service.upsertIntegration(requiredCampgroundId, {
@@ -103,7 +103,7 @@ export class AccessControlController {
     @Param("provider") provider: AccessProviderType,
     @Body() body: any,
     @Headers("x-signature") signature: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const rawBody = req.rawBody ? req.rawBody.toString() : JSON.stringify(body ?? {});
     const acknowledged = await this.service.verifyWebhook(

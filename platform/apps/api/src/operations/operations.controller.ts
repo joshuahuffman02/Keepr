@@ -23,7 +23,7 @@ export class OperationsController {
 
     @RequireScope({ resource: 'operations', action: 'write' })
     @Post('tasks')
-    createTask(@Body() createTaskDto: CreateTaskDto, @Req() req: any) {
+    createTask(@Body() createTaskDto: CreateTaskDto, @Req() req: Request) {
         const { campgroundId, ...data } = createTaskDto;
         if (!campgroundId) throw new ForbiddenException("campgroundId is required");
         return this.operationsService.createTask(campgroundId, data, req?.user);
@@ -31,13 +31,13 @@ export class OperationsController {
 
     @RequireScope({ resource: 'operations', action: 'write' })
     @Patch('tasks/:id')
-    updateTask(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto, @Req() req: any) {
+    updateTask(@Param('id') id: string, @Body() updateTaskDto: UpdateTaskDto, @Req() req: Request) {
         return this.operationsService.updateTask(id, updateTaskDto, req?.user);
     }
 
     @RequireScope({ resource: 'operations', action: 'write' })
     @Patch('sites/:id/housekeeping')
-    updateSiteHousekeeping(@Param('id') id: string, @Body('status') status: string, @Req() req: any) {
+    updateSiteHousekeeping(@Param('id') id: string, @Body('status') status: string, @Req() req: Request) {
         return this.operationsService.updateSiteHousekeeping(id, status, req?.user);
     }
 
@@ -55,7 +55,7 @@ export class OperationsController {
 
     @RequireScope({ resource: 'operations', action: 'write' })
     @Post('auto-tasking/trigger')
-    triggerAutoTask(@Body() body: { campgroundId: string; trigger: string }, @Req() req: any) {
+    triggerAutoTask(@Body() body: { campgroundId: string; trigger: string }, @Req() req: Request) {
         if (!body.campgroundId) throw new ForbiddenException("campgroundId is required");
         return this.operationsService.triggerAutoTask(body.campgroundId, body.trigger, req?.user);
     }
@@ -88,7 +88,7 @@ export class OperationsController {
     @Post('ops-health/alert')
     sendOpsHealthAlert(
         @Body() body: { campgroundId: string; channel?: string; target?: string; message?: string },
-        @Req() req: any,
+        @Req() req: Request,
     ) {
         if (!body.campgroundId) throw new ForbiddenException("campgroundId is required");
         return this.operationsService.sendOpsHealthAlert(

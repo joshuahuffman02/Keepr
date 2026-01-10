@@ -63,7 +63,7 @@ export class OtaController {
     @Param("id") id: string,
     @Body() body: UpdateOtaChannelDto,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.ota.updateChannel(id, requiredCampgroundId, body);
@@ -75,7 +75,7 @@ export class OtaController {
   listMappings(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.ota.listMappings(id, requiredCampgroundId);
@@ -88,7 +88,7 @@ export class OtaController {
     @Param("id") id: string,
     @Body() body: UpsertOtaMappingDto,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.ota.upsertMapping(id, requiredCampgroundId, body);
@@ -100,7 +100,7 @@ export class OtaController {
   ensureIcalToken(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.ota.ensureIcalToken(id, requiredCampgroundId);
@@ -112,7 +112,7 @@ export class OtaController {
   rotateIcalToken(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.ota.rotateIcalToken(id, requiredCampgroundId);
@@ -125,7 +125,7 @@ export class OtaController {
     @Param("id") id: string,
     @Body() body: { url: string },
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.ota.setIcalUrl(id, requiredCampgroundId, body?.url || "");
@@ -137,7 +137,7 @@ export class OtaController {
   importIcal(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.ota.importIcal(id, requiredCampgroundId);
@@ -149,7 +149,7 @@ export class OtaController {
   listLogs(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return (this.ota as any).listSyncLogs?.(id, requiredCampgroundId) ?? [];
@@ -161,7 +161,7 @@ export class OtaController {
   pushAvailability(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.ota.pushAvailability(id, requiredCampgroundId);
@@ -173,7 +173,7 @@ export class OtaController {
   listImports(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return (this.ota as any).listImports?.(id, requiredCampgroundId) ?? [];
@@ -188,7 +188,7 @@ export class OtaController {
     @Headers("x-ota-signature") signature?: string,
     @Headers("x-ota-timestamp") timestamp?: string,
   ) {
-    const raw = (req as any).rawBody ? (req as any).rawBody.toString() : JSON.stringify(body);
+    const raw = req.rawBody ? req.rawBody.toString() : JSON.stringify(body);
     return this.ota.handleWebhook(provider, body, raw, signature, timestamp);
   }
 

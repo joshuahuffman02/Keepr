@@ -67,13 +67,13 @@ export class PublicReservationsService {
 
     private async hasSignedWaiver(reservationId: string, guestId: string) {
         const [signedSignature, signedArtifact, digitalWaiver] = await Promise.all([
-            (this.prisma as any).signatureRequest.findFirst?.({
+            this.prisma.signatureRequest.findFirst?.({
                 where: { reservationId, documentType: "waiver", status: "signed" }
             }),
-            (this.prisma as any).signatureArtifact.findFirst?.({
+            this.prisma.signatureArtifact.findFirst?.({
                 where: { reservationId, pdfUrl: { not: null } }
             }),
-            (this.prisma as any).digitalWaiver.findFirst?.({
+            this.prisma.digitalWaiver.findFirst?.({
                 where: {
                     OR: [{ reservationId }, { reservationId: null, guestId }],
                     status: "signed"
@@ -85,7 +85,7 @@ export class PublicReservationsService {
 
     private async hasVerifiedId(reservationId: string, guestId: string) {
         const now = new Date();
-        const match = await (this.prisma as any).idVerification.findFirst?.({
+        const match = await this.prisma.idVerification.findFirst?.({
             where: {
                 OR: [
                     { reservationId, status: "verified" },
@@ -143,11 +143,11 @@ export class PublicReservationsService {
     }
 
     private async enqueueAbandonedCartPlaybooks(campgroundId: string, guestId?: string | null, reservationId?: string | null) {
-        const playbooks = await (this.prisma as any).communicationPlaybook.findMany({
+        const playbooks = await this.prisma.communicationPlaybook.findMany({
             where: { campgroundId, type: "abandoned_cart", enabled: true, templateId: { not: null } }
         });
         for (const pb of playbooks as any[]) {
-            const tpl = await (this.prisma as any).communicationTemplate.findFirst({
+            const tpl = await this.prisma.communicationTemplate.findFirst({
                 where: { id: pb.templateId, status: "approved" }
             });
             if (!tpl) continue;
@@ -155,7 +155,7 @@ export class PublicReservationsService {
             if (pb.offsetMinutes && Number.isFinite(pb.offsetMinutes)) {
                 scheduledAt.setMinutes(scheduledAt.getMinutes() + pb.offsetMinutes);
             }
-            await (this.prisma as any).communicationPlaybookJob.create({
+            await this.prisma.communicationPlaybookJob.create({
                 data: {
                     playbookId: pb.id,
                     campgroundId,
@@ -194,7 +194,7 @@ export class PublicReservationsService {
             return { program: null, discountCents: 0, type: null, value: 0, source: null, channel: null };
         }
 
-        const program = await (this.prisma as any).referralProgram.findFirst({
+        const program = await this.prisma.referralProgram.findFirst({
             where: {
                 campgroundId,
                 isActive: true,
@@ -434,7 +434,7 @@ export class PublicReservationsService {
 
         // Active holds
         const now = new Date();
-        const holds = await (this.prisma as any).siteHold.findMany({
+        const holds = await this.prisma.siteHold.findMany({
             where: {
                 campgroundId: campground.id,
                 status: "active",
@@ -961,7 +961,7 @@ export class PublicReservationsService {
             try {
                 // Validate hold if provided
                 if (dto.holdId) {
-                    const hold = await (this.prisma as any).siteHold.findUnique({ where: { id: dto.holdId } });
+                    const hold = await this.prisma.siteHold.findUnique({ where: { id: dto.holdId } });
                     const now = new Date();
                     if (!hold) {
                         throw new NotFoundException("Hold not found");
@@ -1137,7 +1137,7 @@ export class PublicReservationsService {
                 });
 
                 // Enqueue abandoned_cart playbooks (recording guest/reservation context)
-                const playbooks = await (this.prisma as any).communicationPlaybook.findMany({
+                const playbooks = await this.prisma.communicationPlaybook.findMany({
                     where: {
                         campgroundId: campground.id,
                         type: "abandoned_cart",
@@ -1146,7 +1146,7 @@ export class PublicReservationsService {
                     }
                 });
                 for (const pb of playbooks as any[]) {
-                    const tpl = await (this.prisma as any).communicationTemplate.findFirst({
+                    const tpl = await this.prisma.communicationTemplate.findFirst({
                         where: { id: pb.templateId, status: "approved" }
                     });
                     if (!tpl) continue;
@@ -1154,7 +1154,7 @@ export class PublicReservationsService {
                     if (pb.offsetMinutes && Number.isFinite(pb.offsetMinutes)) {
                         scheduledAt.setMinutes(scheduledAt.getMinutes() + pb.offsetMinutes);
                     }
-                    await (this.prisma as any).communicationPlaybookJob.create({
+                    await this.prisma.communicationPlaybookJob.create({
                         data: {
                             playbookId: pb.id,
                             campgroundId: reservation.campgroundId,
@@ -1328,7 +1328,7 @@ export class PublicReservationsService {
                 }
 
                 if (dto.holdId) {
-                    await (this.prisma as any).siteHold.update({
+                    await this.prisma.siteHold.update({
                         where: { id: dto.holdId },
                         data: { status: "released", expiresAt: new Date() }
                     });

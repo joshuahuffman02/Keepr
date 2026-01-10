@@ -34,7 +34,7 @@ export class DynamicPricingController {
 
   @Post('rules')
   @Roles(UserRole.owner, UserRole.manager)
-  createRule(@Body() dto: any, @Req() req: any) {
+  createRule(@Body() dto: any, @Req() req: Request) {
     const requiredCampgroundId = this.requireCampgroundId(req, dto.campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
     return this.service.createRule({ ...dto, campgroundId: requiredCampgroundId });
@@ -45,7 +45,7 @@ export class DynamicPricingController {
   listRules(
     @Query('campgroundId') campgroundId: string,
     @Query('includeInactive') includeInactive?: string,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -57,7 +57,7 @@ export class DynamicPricingController {
   getRule(
     @Param('id') id: string,
     @Query('campgroundId') campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -70,7 +70,7 @@ export class DynamicPricingController {
     @Param('id') id: string,
     @Body() dto: any,
     @Query('campgroundId') campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -82,7 +82,7 @@ export class DynamicPricingController {
   deleteRule(
     @Param('id') id: string,
     @Query('campgroundId') campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -96,7 +96,7 @@ export class DynamicPricingController {
     @Query('siteClassId') siteClassId: string | null,
     @Query('date') date: string,
     @Query('basePrice') basePrice: string,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -112,7 +112,7 @@ export class DynamicPricingController {
   @Roles(UserRole.owner, UserRole.manager)
   recordOccupancySnapshot(
     @Body() dto: { campgroundId: string; date: string },
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, dto.campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -124,7 +124,7 @@ export class DynamicPricingController {
   getOccupancy(
     @Query('campgroundId') campgroundId: string,
     @Query('date') date: string,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -135,7 +135,7 @@ export class DynamicPricingController {
   @Roles(UserRole.owner, UserRole.manager)
   generateForecast(
     @Body() dto: { campgroundId: string; daysAhead?: number },
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, dto.campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -148,7 +148,7 @@ export class DynamicPricingController {
     @Query('campgroundId') campgroundId: string,
     @Query('startDate') startDate: string,
     @Query('endDate') endDate: string,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);

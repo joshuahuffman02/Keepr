@@ -66,7 +66,7 @@ export class ReservationsController {
     @Query("status") status?: string,
     @Query("fromDate") fromDate?: string,
     @Query("toDate") toDate?: string,
-    @Req() req: any
+    @Req() req: Request
   ) {
     // SECURITY: Verify user has access to this campground
     this.assertCampgroundAccess(campgroundId, req.user);
@@ -85,7 +85,7 @@ export class ReservationsController {
     @Param("campgroundId") campgroundId: string,
     @Query("q") query: string,
     @Query("activeOnly") activeOnly?: string,
-    @Req() req: any
+    @Req() req: Request
   ) {
     // SECURITY: Verify user has access to this campground
     this.assertCampgroundAccess(campgroundId, req.user);
@@ -102,7 +102,7 @@ export class ReservationsController {
   async importReservations(
     @Param("campgroundId") campgroundId: string,
     @Body() body: { format?: "csv" | "json"; payload: string | any[]; dryRun?: boolean; idempotencyKey?: string; filename?: string },
-    @Req() req: any
+    @Req() req: Request
   ) {
     const format = body.format ?? "json";
     return this.importExport.startImport({
@@ -153,7 +153,7 @@ export class ReservationsController {
   queueReservationExport(
     @Param("campgroundId") campgroundId: string,
     @Body() body: { format?: "json" | "csv"; filters?: Record<string, any> },
-    @Req() req: any
+    @Req() req: Request
   ) {
     return this.importExport.queueExport(campgroundId, body.filters, body.format ?? "json", req?.user?.id ?? null);
   }
@@ -195,13 +195,13 @@ export class ReservationsController {
   }
 
   @Get("reservations/:id")
-  async getById(@Param("id") id: string, @Req() req: any) {
+  async getById(@Param("id") id: string, @Req() req: Request) {
     await this.assertReservationAccess(id, req.user);
     return this.reservations.findOne(id);
   }
 
   @Get("reservations/:id/calculate-deposit")
-  async calculateDeposit(@Param("id") id: string, @Req() req: any) {
+  async calculateDeposit(@Param("id") id: string, @Req() req: Request) {
     await this.assertReservationAccess(id, req.user);
     return this.reservations.calculateDeposit(id);
   }
@@ -212,7 +212,7 @@ export class ReservationsController {
   }
 
   @Patch("reservations/:id")
-  async update(@Param("id") id: string, @Body() body: Partial<CreateReservationDto>, @Req() req: any) {
+  async update(@Param("id") id: string, @Body() body: Partial<CreateReservationDto>, @Req() req: Request) {
     await this.assertReservationAccess(id, req.user);
     return this.reservations.update(id, body);
   }
@@ -221,7 +221,7 @@ export class ReservationsController {
   async updateGroup(
     @Param("id") id: string,
     @Body() body: { groupId: string | null; role?: "primary" | "member" | null },
-    @Req() req: any
+    @Req() req: Request
   ) {
     await this.assertReservationAccess(id, req.user);
     return this.reservations.updateGroupAssignment(id, body);
@@ -238,7 +238,7 @@ export class ReservationsController {
   }
 
   @Post("reservations/:id/payments")
-  async pay(@Param("id") id: string, @Body() body: RecordPaymentDto, @Req() req: any) {
+  async pay(@Param("id") id: string, @Body() body: RecordPaymentDto, @Req() req: Request) {
     await this.assertReservationAccess(id, req.user);
     return this.reservations.recordPayment(id, body.amountCents, {
       tenders: body.tenders,
@@ -247,7 +247,7 @@ export class ReservationsController {
   }
 
   @Post("reservations/:id/refunds")
-  async refund(@Param("id") id: string, @Body() body: RefundPaymentDto, @Req() req: any) {
+  async refund(@Param("id") id: string, @Body() body: RefundPaymentDto, @Req() req: Request) {
     await this.assertReservationAccess(id, req.user);
     return this.reservations.refundPayment(id, body.amountCents, {
       destination: body.destination,
@@ -256,7 +256,7 @@ export class ReservationsController {
   }
 
   @Delete("reservations/:id")
-  async remove(@Param("id") id: string, @Req() req: any) {
+  async remove(@Param("id") id: string, @Req() req: Request) {
     await this.assertReservationAccess(id, req.user);
     return this.reservations.remove(id);
   }
@@ -265,7 +265,7 @@ export class ReservationsController {
   async kioskCheckIn(
     @Param("id") id: string,
     @Body() body: { upsellTotalCents: number; override?: boolean; overrideReason?: string; actorId?: string | null },
-    @Req() req: any
+    @Req() req: Request
   ) {
     await this.assertReservationAccess(id, req.user);
     return this.reservations.kioskCheckIn(id, body.upsellTotalCents || 0, {
@@ -283,7 +283,7 @@ export class ReservationsController {
   async checkIn(
     @Param("id") id: string,
     @Body() body: { force?: boolean } = {},
-    @Req() req: any
+    @Req() req: Request
   ) {
     await this.assertReservationAccess(id, req.user);
     return this.reservations.staffCheckIn(id, {
@@ -299,7 +299,7 @@ export class ReservationsController {
   async checkOut(
     @Param("id") id: string,
     @Body() body: { force?: boolean } = {},
-    @Req() req: any
+    @Req() req: Request
   ) {
     await this.assertReservationAccess(id, req.user);
     return this.reservations.staffCheckOut(id, {
@@ -323,7 +323,7 @@ export class ReservationsController {
       segments: Array<{ siteId: string; startDate: string; endDate: string }>;
       sendNotification?: boolean;
     },
-    @Req() req: any
+    @Req() req: Request
   ) {
     await this.assertReservationAccess(id, req.user);
     return this.reservations.splitReservation(id, body.segments, {
@@ -333,7 +333,7 @@ export class ReservationsController {
   }
 
   @Get("reservations/:id/segments")
-  async getSegments(@Param("id") id: string, @Req() req: any) {
+  async getSegments(@Param("id") id: string, @Req() req: Request) {
     await this.assertReservationAccess(id, req.user);
     return this.reservations.getReservationSegments(id);
   }

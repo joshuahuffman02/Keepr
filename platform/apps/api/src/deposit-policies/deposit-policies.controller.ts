@@ -48,7 +48,7 @@ export class DepositPoliciesController {
 
   @Roles(UserRole.owner, UserRole.manager, UserRole.finance)
   @Get("campgrounds/:campgroundId/deposit-policies")
-  list(@Param("campgroundId") campgroundId: string, @Req() req: any) {
+  list(@Param("campgroundId") campgroundId: string, @Req() req: Request) {
     this.assertCampgroundAccess(campgroundId, req.user);
     return this.depositPolicies.list(campgroundId);
   }
@@ -58,7 +58,7 @@ export class DepositPoliciesController {
   create(
     @Param("campgroundId") campgroundId: string,
     @Body() dto: CreateDepositPolicyDto,
-    @Req() req: any
+    @Req() req: Request
   ) {
     this.assertCampgroundAccess(campgroundId, req.user);
     return this.depositPolicies.create(campgroundId, dto);
@@ -70,7 +70,7 @@ export class DepositPoliciesController {
     @Param("id") id: string,
     @Body() dto: UpdateDepositPolicyDto,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -82,7 +82,7 @@ export class DepositPoliciesController {
   remove(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);

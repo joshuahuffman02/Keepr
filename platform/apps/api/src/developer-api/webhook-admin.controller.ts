@@ -124,13 +124,13 @@ export class WebhookAdminController {
   // ============================================
 
   @Get()
-  list(@Query("campgroundId") campgroundId: string, @Req() req: any) {
+  list(@Query("campgroundId") campgroundId: string, @Req() req: Request) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.webhookService.listEndpoints(requiredCampgroundId);
   }
 
   @Post()
-  create(@Body() body: CreateWebhookDto, @Req() req: any) {
+  create(@Body() body: CreateWebhookDto, @Req() req: Request) {
     const requiredCampgroundId = this.requireCampgroundId(req, body.campgroundId);
     return this.webhookService.createEndpoint({ ...body, campgroundId: requiredCampgroundId });
   }
@@ -140,7 +140,7 @@ export class WebhookAdminController {
     @Param("id") id: string,
     @Body() body: ToggleWebhookDto,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.webhookService.toggleEndpoint(id, requiredCampgroundId, body.isActive);
@@ -151,7 +151,7 @@ export class WebhookAdminController {
   // ============================================
 
   @Get("deliveries")
-  listDeliveries(@Query("campgroundId") campgroundId: string, @Req() req: any) {
+  listDeliveries(@Query("campgroundId") campgroundId: string, @Req() req: Request) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.webhookService.listDeliveries(requiredCampgroundId);
   }
@@ -160,7 +160,7 @@ export class WebhookAdminController {
   replay(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.webhookService.replay(id, requiredCampgroundId);
@@ -193,7 +193,7 @@ export class WebhookAdminController {
   retryDeadLetter(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.webhookService.retryDeadLetter(id, requiredCampgroundId);
@@ -211,7 +211,7 @@ export class WebhookAdminController {
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string,
     @Body() dto: TestWebhookDto,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     // Get the endpoint
@@ -356,7 +356,7 @@ export class WebhookAdminController {
   // ============================================
 
   @Get("stats")
-  getStats(@Query("campgroundId") campgroundId: string, @Req() req: any) {
+  getStats(@Query("campgroundId") campgroundId: string, @Req() req: Request) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.webhookService.getStats(requiredCampgroundId);
   }

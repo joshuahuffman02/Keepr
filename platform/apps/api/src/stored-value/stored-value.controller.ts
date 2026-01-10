@@ -46,7 +46,7 @@ export class StoredValueController {
 
   @Post("issue")
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk, UserRole.finance)
-  issue(@Body() dto: IssueStoredValueDto, @Req() req: any) {
+  issue(@Body() dto: IssueStoredValueDto, @Req() req: Request) {
     const requiredCampgroundId = this.requireCampgroundId(req);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
     const actor = { ...req.user, campgroundId: requiredCampgroundId };
@@ -55,7 +55,7 @@ export class StoredValueController {
 
   @Post("redeem")
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk, UserRole.finance)
-  redeem(@Body() dto: RedeemStoredValueDto, @Req() req: any) {
+  redeem(@Body() dto: RedeemStoredValueDto, @Req() req: Request) {
     const requiredCampgroundId = this.requireCampgroundId(req, dto.redeemCampgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
     const actor = { ...req.user, campgroundId: requiredCampgroundId };
@@ -64,7 +64,7 @@ export class StoredValueController {
 
   @Post("holds/:id/capture")
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk, UserRole.finance)
-  capture(@Param("id") id: string, @Req() req: any) {
+  capture(@Param("id") id: string, @Req() req: Request) {
     const requiredCampgroundId = this.requireCampgroundId(req);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
     const actor = { ...req.user, campgroundId: requiredCampgroundId };
@@ -73,7 +73,7 @@ export class StoredValueController {
 
   @Post("holds/:id/release")
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk, UserRole.finance)
-  release(@Param("id") id: string, @Req() req: any) {
+  release(@Param("id") id: string, @Req() req: Request) {
     const requiredCampgroundId = this.requireCampgroundId(req);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
     const actor = { ...req.user, campgroundId: requiredCampgroundId };
@@ -82,7 +82,7 @@ export class StoredValueController {
 
   @Post("adjust")
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk, UserRole.finance)
-  adjust(@Body() dto: AdjustStoredValueDto, @Req() req: any) {
+  adjust(@Body() dto: AdjustStoredValueDto, @Req() req: Request) {
     const requiredCampgroundId = this.requireCampgroundId(req);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
     const actor = { ...req.user, campgroundId: requiredCampgroundId };
@@ -91,14 +91,14 @@ export class StoredValueController {
 
   @Get("campgrounds/:campgroundId/accounts")
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk, UserRole.finance)
-  listAccounts(@Param("campgroundId") campgroundId: string, @Req() req: any) {
+  listAccounts(@Param("campgroundId") campgroundId: string, @Req() req: Request) {
     this.assertCampgroundAccess(campgroundId, req.user);
     return this.service.listAccounts(campgroundId);
   }
 
   @Get("campgrounds/:campgroundId/ledger")
   @Roles(UserRole.owner, UserRole.manager, UserRole.front_desk, UserRole.finance)
-  listLedger(@Param("campgroundId") campgroundId: string, @Req() req: any) {
+  listLedger(@Param("campgroundId") campgroundId: string, @Req() req: Request) {
     this.assertCampgroundAccess(campgroundId, req.user);
     return this.service.listLedger(campgroundId);
   }
@@ -108,7 +108,7 @@ export class StoredValueController {
   balance(
     @Param("id") id: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -120,7 +120,7 @@ export class StoredValueController {
   balanceByCode(
     @Param("code") code: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     this.assertCampgroundAccess(requiredCampgroundId, req.user);

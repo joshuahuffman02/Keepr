@@ -21,7 +21,7 @@ export class FeatureProgressController {
    * Get all feature progress for the current user
    */
   @Get()
-  async getProgress(@Request() req: any) {
+  async getProgress(@Request() req: Request) {
     return this.featureProgressService.getProgress(req.user.id);
   }
 
@@ -29,7 +29,7 @@ export class FeatureProgressController {
    * Get completion statistics
    */
   @Get("stats")
-  async getStats(@Request() req: any) {
+  async getStats(@Request() req: Request) {
     return this.featureProgressService.getStats(req.user.id);
   }
 
@@ -38,7 +38,7 @@ export class FeatureProgressController {
    */
   @Get(":featureKey")
   async getFeatureProgress(
-    @Request() req: any,
+    @Request() req: Request,
     @Param("featureKey") featureKey: string
   ) {
     return this.featureProgressService.getFeatureProgress(req.user.id, featureKey);
@@ -49,7 +49,7 @@ export class FeatureProgressController {
    */
   @Post(":featureKey/toggle")
   async toggleFeature(
-    @Request() req: any,
+    @Request() req: Request,
     @Param("featureKey") featureKey: string
   ) {
     return this.featureProgressService.toggleFeature(req.user.id, featureKey);
@@ -60,7 +60,7 @@ export class FeatureProgressController {
    */
   @Post(":featureKey/complete")
   async markCompleted(
-    @Request() req: any,
+    @Request() req: Request,
     @Param("featureKey") featureKey: string,
     @Body() body: { notes?: string }
   ) {
@@ -76,7 +76,7 @@ export class FeatureProgressController {
    */
   @Delete(":featureKey/complete")
   async markIncomplete(
-    @Request() req: any,
+    @Request() req: Request,
     @Param("featureKey") featureKey: string
   ) {
     return this.featureProgressService.markIncomplete(req.user.id, featureKey);
@@ -87,7 +87,7 @@ export class FeatureProgressController {
    */
   @Patch("bulk")
   async bulkUpdate(
-    @Request() req: any,
+    @Request() req: Request,
     @Body() body: { updates: Array<{ featureKey: string; completed: boolean }> }
   ) {
     return this.featureProgressService.bulkUpdate(req.user.id, body.updates);
@@ -97,7 +97,7 @@ export class FeatureProgressController {
    * Reset all feature progress
    */
   @Delete("reset")
-  async resetProgress(@Request() req: any) {
+  async resetProgress(@Request() req: Request) {
     return this.featureProgressService.resetProgress(req.user.id);
   }
 }

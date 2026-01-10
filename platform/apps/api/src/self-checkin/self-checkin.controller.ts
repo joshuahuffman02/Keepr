@@ -16,7 +16,7 @@ export class SelfCheckinController {
   constructor(private readonly selfCheckinService: SelfCheckinService) {}
 
   @Get('checkin-status')
-  getStatus(@Param('id') id: string, @Request() req: any) {
+  getStatus(@Param('id') id: string, @Request() req: Request) {
     // Validate that the guest owns this reservation
     const guestId = req.user.id;
     return this.selfCheckinService.getStatus(id, guestId);
@@ -26,7 +26,7 @@ export class SelfCheckinController {
   selfCheckin(
     @Param('id') id: string,
     @Body() body: { lateArrival?: boolean; override?: boolean },
-    @Request() req: any,
+    @Request() req: Request,
   ) {
     // Pass the guest ID to track who performed the action
     const guestId = req.user.id;
@@ -45,7 +45,7 @@ export class SelfCheckinController {
       damagePhotos?: string[];
       override?: boolean;
     },
-    @Request() req: any,
+    @Request() req: Request,
   ) {
     // Pass the guest ID to track who performed the action
     const guestId = req.user.id;

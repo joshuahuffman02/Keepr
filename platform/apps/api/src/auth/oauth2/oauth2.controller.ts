@@ -28,6 +28,7 @@ import {
 import { OAuth2GrantType, OAuth2ResponseType, parseScopes } from "./oauth2.types";
 import { JwtAuthGuard } from "../guards/jwt-auth.guard";
 import { CurrentUser } from "../decorators/current-user.decorator";
+import type { AuthUser } from "../auth.types";
 
 /**
  * OAuth2 Controller
@@ -138,7 +139,7 @@ export class OAuth2Controller {
   @ApiResponse({ status: 400, description: "Invalid request" })
   async authorize(
     @Query() query: OAuth2AuthorizeRequestDto,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthUser,
     @Res() res: Response
   ) {
     // Per RFC 6749 Section 4.1.2.1: MUST validate client_id and redirect_uri BEFORE

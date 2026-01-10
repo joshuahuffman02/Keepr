@@ -174,7 +174,7 @@ export class LedgerService {
   }
 
   private async resolvePeriodId(campgroundId: string, occurredAt: Date, allowAdjustment: boolean) {
-    const period = await (this.prisma as any).glPeriod.findFirst({
+    const period = await this.prisma.glPeriod.findFirst({
       where: { campgroundId, startDate: { lte: occurredAt }, endDate: { gte: occurredAt } },
       orderBy: { startDate: "desc" }
     });
@@ -265,14 +265,14 @@ export class LedgerService {
   }
 
   async listPeriods(campgroundId: string) {
-    return (this.prisma as any).glPeriod.findMany({
+    return this.prisma.glPeriod.findMany({
       where: { campgroundId },
       orderBy: [{ startDate: "asc" }, { endDate: "asc" }]
     });
   }
 
   private async assertNoOverlap(campgroundId: string, startDate: Date, endDate: Date) {
-    const overlap = await (this.prisma as any).glPeriod.findFirst({
+    const overlap = await this.prisma.glPeriod.findFirst({
       where: {
         campgroundId,
         startDate: { lte: endDate },
@@ -292,7 +292,7 @@ export class LedgerService {
       throw new BadRequestException("endDate must be after startDate");
     }
     await this.assertNoOverlap(campgroundId, startDate, endDate);
-    return (this.prisma as any).glPeriod.create({
+    return this.prisma.glPeriod.create({
       data: {
         campgroundId,
         startDate,
@@ -304,23 +304,23 @@ export class LedgerService {
   }
 
   async closePeriod(campgroundId: string, id: string, actorId?: string) {
-    const period = await (this.prisma as any).glPeriod.findFirst({ where: { id, campgroundId } });
+    const period = await this.prisma.glPeriod.findFirst({ where: { id, campgroundId } });
     if (!period) throw new NotFoundException("GL period not found");
     if (period.status === "locked") {
       throw new BadRequestException("GL period is locked");
     }
     if (period.status === "closed") return period;
-    return (this.prisma as any).glPeriod.update({
+    return this.prisma.glPeriod.update({
       where: { id },
       data: { status: "closed", closedAt: new Date(), closedBy: actorId ?? null }
     });
   }
 
   async lockPeriod(campgroundId: string, id: string, actorId?: string) {
-    const period = await (this.prisma as any).glPeriod.findFirst({ where: { id, campgroundId } });
+    const period = await this.prisma.glPeriod.findFirst({ where: { id, campgroundId } });
     if (!period) throw new NotFoundException("GL period not found");
     if (period.status === "locked") return period;
-    return (this.prisma as any).glPeriod.update({
+    return this.prisma.glPeriod.update({
       where: { id },
       data: {
         status: "locked",

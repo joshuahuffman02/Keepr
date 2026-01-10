@@ -72,7 +72,7 @@ export class FulfillmentController {
      * Get count of orders in each fulfillment status
      */
     @Get("campgrounds/:campgroundId/store/orders/fulfillment-counts")
-    getFulfillmentCounts(@Param("campgroundId") campgroundId: string, @Req() req: any) {
+    getFulfillmentCounts(@Param("campgroundId") campgroundId: string, @Req() req: Request) {
         this.assertCampgroundAccess(campgroundId, req.user);
         return this.fulfillmentService.getFulfillmentCounts(campgroundId);
     }
@@ -86,7 +86,7 @@ export class FulfillmentController {
         @Param("id") orderId: string,
         @Body() body: { locationId: string },
         @Query("campgroundId") campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const userId = req.user?.id || req.user?.userId;
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
@@ -108,7 +108,7 @@ export class FulfillmentController {
         @Param("id") orderId: string,
         @Body() body: { status: FulfillmentAssignmentStatus },
         @Query("campgroundId") campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const userId = req.user?.id || req.user?.userId;
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
@@ -149,7 +149,7 @@ export class FulfillmentController {
     bulkAssignToLocation(
         @Param("campgroundId") campgroundId: string,
         @Body() body: { orderIds: string[]; locationId: string },
-        @Req() req: any
+        @Req() req: Request
     ) {
         const userId = req.user?.id || req.user?.userId;
         this.assertCampgroundAccess(campgroundId, req.user);

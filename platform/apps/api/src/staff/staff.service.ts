@@ -127,7 +127,7 @@ export class StaffService {
     if (!shift) throw new NotFoundException("Shift not found");
 
     const now = new Date();
-    const entry = await (this.prisma as any).staffTimeEntry.create({
+    const entry = await this.prisma.staffTimeEntry.create({
       data: {
         shiftId,
         campgroundId: shift.campgroundId,
@@ -154,19 +154,19 @@ export class StaffService {
     const shift = await this.prisma.staffShift.findUnique({ where: { id: shiftId } });
     if (!shift) throw new NotFoundException("Shift not found");
 
-    const openEntry = await (this.prisma as any).staffTimeEntry.findFirst({
+    const openEntry = await this.prisma.staffTimeEntry.findFirst({
       where: { shiftId, status: { in: ["open", "submitted"] }, clockOutAt: null },
       orderBy: { clockInAt: "desc" }
     });
     if (!openEntry) throw new BadRequestException("No open time entry for shift");
 
     const now = new Date();
-    const updatedEntry = await (this.prisma as any).staffTimeEntry.update({
+    const updatedEntry = await this.prisma.staffTimeEntry.update({
       where: { id: openEntry.id },
       data: { clockOutAt: now, status: "submitted", note: note ?? openEntry.note }
     });
 
-    const entries = await (this.prisma as any).staffTimeEntry.findMany({
+    const entries = await this.prisma.staffTimeEntry.findMany({
       where: { shiftId },
       orderBy: { clockInAt: "asc" }
     });
@@ -195,7 +195,7 @@ export class StaffService {
     const minutes = this.calculateTotalMinutes(shift.timeEntries);
     const approvedAt = new Date();
 
-    const approval = await (this.prisma as any).shiftApproval.create({
+    const approval = await this.prisma.shiftApproval.create({
       data: {
         shiftId,
         approverId,
@@ -216,7 +216,7 @@ export class StaffService {
       }
     });
 
-    await (this.prisma as any).staffTimeEntry.updateMany({
+    await this.prisma.staffTimeEntry.updateMany({
       where: { shiftId },
       data: { status: "approved", approvedAt, approvedById: approverId }
     });
@@ -229,7 +229,7 @@ export class StaffService {
     if (!shift) throw new NotFoundException("Shift not found");
 
     const rejectedAt = new Date();
-    const approval = await (this.prisma as any).shiftApproval.create({
+    const approval = await this.prisma.shiftApproval.create({
       data: { shiftId, approverId, status: "rejected", note, approvedAt: rejectedAt }
     });
 
@@ -238,7 +238,7 @@ export class StaffService {
       data: { status: "rejected", approvedAt: rejectedAt, approvedById: approverId, approvalNote: note }
     });
 
-    await (this.prisma as any).staffTimeEntry.updateMany({
+    await this.prisma.staffTimeEntry.updateMany({
       where: { shiftId },
       data: { status: "rejected", approvedAt: rejectedAt, approvedById: approverId }
     });
@@ -256,7 +256,7 @@ export class StaffService {
   // ---- Roles ----
 
   async upsertRole(dto: { campgroundId: string; code: string; name: string; hourlyRate?: number; earningCode?: string; isActive?: boolean }) {
-    return (this.prisma as any).staffRole.upsert({
+    return this.prisma.staffRole.upsert({
       where: {
         campgroundId_code: {
           campgroundId: dto.campgroundId,
@@ -281,7 +281,7 @@ export class StaffService {
   }
 
   async listRoles(campgroundId: string) {
-    return (this.prisma as any).staffRole.findMany({
+    return this.prisma.staffRole.findMany({
       where: { campgroundId, isActive: true },
       orderBy: { code: "asc" }
     });
@@ -290,7 +290,7 @@ export class StaffService {
   // ---- Overrides ----
 
   async requestOverride(dto: OverrideRequestDto) {
-    const record = await (this.prisma as any).overrideRequest.create({
+    const record = await this.prisma.overrideRequest.create({
       data: {
         campgroundId: dto.campgroundId,
         userId: dto.userId,
@@ -317,11 +317,11 @@ export class StaffService {
   }
 
   async decideOverride(id: string, approverId: string, status: "approved" | "rejected" | "cancelled", note?: string) {
-    const existing = await (this.prisma as any).overrideRequest.findUnique({ where: { id } });
+    const existing = await this.prisma.overrideRequest.findUnique({ where: { id } });
     if (!existing) throw new NotFoundException("Override not found");
 
     const now = new Date();
-    const updated = await (this.prisma as any).overrideRequest.update({
+    const updated = await this.prisma.overrideRequest.update({
       where: { id },
       data: {
         approverId,
@@ -346,7 +346,7 @@ export class StaffService {
   }
 
   async listOverrides(campgroundId: string, status?: string) {
-    return (this.prisma as any).overrideRequest.findMany({
+    return this.prisma.overrideRequest.findMany({
       where: { campgroundId, status: status ?? undefined },
       orderBy: { createdAt: "desc" },
       take: 200

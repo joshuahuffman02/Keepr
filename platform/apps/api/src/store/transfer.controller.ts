@@ -62,7 +62,7 @@ export class TransferController {
     getTransfer(
         @Param("id") id: string,
         @Query("campgroundId") campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -73,7 +73,7 @@ export class TransferController {
     createTransfer(
         @Param("campgroundId") campgroundId: string,
         @Body() body: Omit<CreateTransferDto, "campgroundId">,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const userId = req.user?.id || req.user?.userId;
         this.assertCampgroundAccess(campgroundId, req.user);
@@ -84,7 +84,7 @@ export class TransferController {
     approveTransfer(
         @Param("id") id: string,
         @Query("campgroundId") campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const userId = req.user?.id || req.user?.userId;
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
@@ -96,7 +96,7 @@ export class TransferController {
     completeTransfer(
         @Param("id") id: string,
         @Query("campgroundId") campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const userId = req.user?.id || req.user?.userId;
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
@@ -108,7 +108,7 @@ export class TransferController {
     cancelTransfer(
         @Param("id") id: string,
         @Query("campgroundId") campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const userId = req.user?.id || req.user?.userId;
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);

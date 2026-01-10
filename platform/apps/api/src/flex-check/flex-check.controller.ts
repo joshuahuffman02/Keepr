@@ -11,6 +11,18 @@ import {
 import { FlexCheckService } from './flex-check.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import type { AuthUser } from '../auth/auth.types';
+
+type FlexCheckPolicyBody = {
+  earlyCheckInEnabled?: boolean;
+  earlyCheckInMinHours?: number;
+  earlyCheckInPricing?: unknown;
+  earlyCheckInAutoApprove?: boolean;
+  lateCheckoutEnabled?: boolean;
+  lateCheckoutMaxHours?: number;
+  lateCheckoutPricing?: unknown;
+  lateCheckoutAutoApprove?: boolean;
+};
 
 @Controller('flex-check')
 @UseGuards(JwtAuthGuard)
@@ -27,16 +39,7 @@ export class FlexCheckController {
   @Patch('policy')
   updatePolicy(
     @Query('campgroundId') campgroundId: string,
-    @Body() body: {
-      earlyCheckInEnabled?: boolean;
-      earlyCheckInMinHours?: number;
-      earlyCheckInPricing?: any;
-      earlyCheckInAutoApprove?: boolean;
-      lateCheckoutEnabled?: boolean;
-      lateCheckoutMaxHours?: number;
-      lateCheckoutPricing?: any;
-      lateCheckoutAutoApprove?: boolean;
-    },
+    @Body() body: FlexCheckPolicyBody,
   ) {
     return this.flexCheckService.upsertPolicy(campgroundId, body);
   }
@@ -57,7 +60,7 @@ export class FlexCheckController {
   @Post('early-checkin/:reservationId/approve')
   approveEarlyCheckIn(
     @Param('reservationId') reservationId: string,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthUser,
   ) {
     return this.flexCheckService.approveEarlyCheckIn(reservationId, user.id);
   }
@@ -83,7 +86,7 @@ export class FlexCheckController {
   @Post('late-checkout/:reservationId/approve')
   approveLateCheckout(
     @Param('reservationId') reservationId: string,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthUser,
   ) {
     return this.flexCheckService.approveLateCheckout(reservationId, user.id);
   }

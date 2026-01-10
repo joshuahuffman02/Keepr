@@ -200,8 +200,8 @@ export async function createApp(): Promise<INestApplication> {
         const headers = req.headers as Record<string, any>;
         const cgHeader = headers["x-campground-id"];
         const orgHeader = headers["x-organization-id"];
-        (req as any).campgroundId = Array.isArray(cgHeader) ? cgHeader[0] : cgHeader || null;
-        (req as any).organizationId = Array.isArray(orgHeader) ? orgHeader[0] : orgHeader || null;
+        req.campgroundId = Array.isArray(cgHeader) ? cgHeader[0] : cgHeader || null;
+        req.organizationId = Array.isArray(orgHeader) ? orgHeader[0] : orgHeader || null;
         next();
     });
 

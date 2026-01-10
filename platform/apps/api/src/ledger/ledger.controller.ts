@@ -77,7 +77,7 @@ export class LedgerController {
   listByReservation(
     @Param("id") reservationId: string,
     @Query("campgroundId") campgroundId: string | undefined,
-    @Req() req: any
+    @Req() req: Request
   ) {
     const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
     return this.ledger.listByReservation(reservationId, requiredCampgroundId);

@@ -1115,7 +1115,7 @@ export class CampgroundsService {
     });
 
     const userIds = memberships.map((m) => m.userId);
-    const invites = await (this.prisma as any).inviteToken.findMany({
+    const invites = await this.prisma.inviteToken.findMany({
       where: { campgroundId: id, userId: { in: userIds } },
       orderBy: { createdAt: "desc" }
     });
@@ -1228,7 +1228,7 @@ export class CampgroundsService {
     let inviteToken: string | null = null;
     if (user && (!user.isActive || existingUser == null)) {
       inviteToken = this.generateInviteToken();
-      await (this.prisma as any).inviteToken.create({
+      await this.prisma.inviteToken.create({
         data: {
           token: inviteToken,
           userId,
@@ -1301,7 +1301,7 @@ export class CampgroundsService {
       throw new NotFoundException("Membership not found");
     }
     // Rate-limit resends
-    const latestInvite = await (this.prisma as any).inviteToken.findFirst({
+    const latestInvite = await this.prisma.inviteToken.findFirst({
       where: { campgroundId, userId: membership.userId },
       orderBy: { createdAt: "desc" }
     });
@@ -1316,7 +1316,7 @@ export class CampgroundsService {
     }
 
     const token = this.generateInviteToken();
-    await (this.prisma as any).inviteToken.create({
+    await this.prisma.inviteToken.create({
       data: {
         token,
         userId: membership.userId,

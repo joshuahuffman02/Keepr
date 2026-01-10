@@ -22,7 +22,7 @@ export class GatewayConfigController {
   @RequireScope({ resource: "payments", action: "read" })
   @Roles(UserRole.owner, UserRole.manager, UserRole.finance)
   @Get("campgrounds/:campgroundId/payment-gateway")
-  async getGatewayConfig(@Param("campgroundId") campgroundId: string, @Req() req: any) {
+  async getGatewayConfig(@Param("campgroundId") campgroundId: string, @Req() req: Request) {
     this.ensureCampgroundMembership(req?.user, campgroundId);
     return this.gatewayConfig.getConfig(campgroundId);
   }
@@ -34,7 +34,7 @@ export class GatewayConfigController {
   async upsertGatewayConfig(
     @Param("campgroundId") campgroundId: string,
     @Body() body: UpsertPaymentGatewayConfigDto,
-    @Req() req: any
+    @Req() req: Request
   ) {
     this.ensureCampgroundMembership(req?.user, campgroundId);
     return this.gatewayConfig.upsertConfig(campgroundId, body, {

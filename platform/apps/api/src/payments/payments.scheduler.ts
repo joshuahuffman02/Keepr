@@ -18,7 +18,7 @@ export class PaymentsScheduler {
 
   @Cron("0 * * * *") // hourly
   async reconcilePayouts() {
-    const accounts = await (this.prisma as any).campground.findMany({
+    const accounts = await this.prisma.campground.findMany({
       where: { stripeAccountId: { not: null } },
       select: { stripeAccountId: true }
     } as any);
@@ -41,7 +41,7 @@ export class PaymentsScheduler {
     const horizonHours = Number(process.env.DISPUTE_DUE_HOURS_ALERT ?? 48);
     const now = new Date();
     const cutoff = new Date(now.getTime() + horizonHours * 60 * 60 * 1000);
-    const disputes = await (this.prisma as any).dispute.findMany({
+    const disputes = await this.prisma.dispute.findMany({
       where: {
         status: { notIn: ["won", "lost", "charge_refunded"] },
         evidenceDueBy: { lte: cutoff, gte: now }
@@ -63,7 +63,7 @@ export class PaymentsScheduler {
     }
 
     const cutoff = new Date(Date.now() - this.capabilitiesTtlMs);
-    const campgrounds = await (this.prisma as any).campground.findMany({
+    const campgrounds = await this.prisma.campground.findMany({
       where: {
         stripeAccountId: { not: null },
         OR: [
@@ -78,7 +78,7 @@ export class PaymentsScheduler {
       try {
         const capabilities = await this.stripe.retrieveAccountCapabilities(cg.stripeAccountId);
         if (!capabilities) continue;
-        await (this.prisma as any).campground.update({
+        await this.prisma.campground.update({
           where: { id: cg.id },
           data: {
             stripeCapabilities: capabilities as any,

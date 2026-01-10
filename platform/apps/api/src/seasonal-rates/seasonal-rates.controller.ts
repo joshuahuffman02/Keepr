@@ -60,14 +60,14 @@ export class SeasonalRatesController {
         offseasonInterval?: number;
         offseasonAmount?: number;
         prorateExcess?: boolean;
-    }, @Req() req: any) {
+    }, @Req() req: Request) {
         this.assertCampgroundAccess(body.campgroundId, req.user);
         return this.seasonalRatesService.create(body);
     }
 
     @Roles(UserRole.owner, UserRole.manager)
     @Get('campground/:campgroundId')
-    findAllByCampground(@Param('campgroundId') campgroundId: string, @Req() req: any) {
+    findAllByCampground(@Param('campgroundId') campgroundId: string, @Req() req: Request) {
         this.assertCampgroundAccess(campgroundId, req.user);
         return this.seasonalRatesService.findAllByCampground(campgroundId);
     }
@@ -77,7 +77,7 @@ export class SeasonalRatesController {
     findOne(
         @Param('id') id: string,
         @Query('campgroundId') campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -103,7 +103,7 @@ export class SeasonalRatesController {
             prorateExcess: boolean;
         }>,
         @Query('campgroundId') campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         this.assertCampgroundAccess(requiredCampgroundId, req.user);
@@ -115,7 +115,7 @@ export class SeasonalRatesController {
     remove(
         @Param('id') id: string,
         @Query('campgroundId') campgroundId: string | undefined,
-        @Req() req: any
+        @Req() req: Request
     ) {
         const requiredCampgroundId = this.requireCampgroundId(req, campgroundId);
         this.assertCampgroundAccess(requiredCampgroundId, req.user);

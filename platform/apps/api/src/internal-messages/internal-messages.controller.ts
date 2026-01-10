@@ -8,7 +8,7 @@ export class InternalMessagesController {
     constructor(private readonly internalMessagesService: InternalMessagesService) { }
 
     @Post()
-    create(@Request() req: any, @Body() body: { content: string; conversationId: string }) {
+    create(@Request() req: Request, @Body() body: { content: string; conversationId: string }) {
         return this.internalMessagesService.create(body.content, req.user.id, body.conversationId);
     }
 

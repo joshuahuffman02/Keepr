@@ -50,7 +50,7 @@ export class PublicSitesController {
   @ApiScopes("sites:read")
   @ApiOperation({ summary: "List sites" })
   @ApiResponse({ status: 200, description: "List of sites" })
-  list(@Req() req: any) {
+  list(@Req() req: Request) {
     const campgroundId = req.apiPrincipal.campgroundId;
     return this.api.listSites(campgroundId);
   }
@@ -60,7 +60,7 @@ export class PublicSitesController {
   @ApiOperation({ summary: "Get a site" })
   @ApiResponse({ status: 200, description: "Site details" })
   @ApiResponse({ status: 404, description: "Site not found" })
-  get(@Req() req: any, @Param("id") id: string) {
+  get(@Req() req: Request, @Param("id") id: string) {
     const campgroundId = req.apiPrincipal.campgroundId;
     return this.api.getSite(campgroundId, id);
   }
@@ -69,7 +69,7 @@ export class PublicSitesController {
   @ApiScopes("sites:write")
   @ApiOperation({ summary: "Create a site" })
   @ApiResponse({ status: 201, description: "Site created" })
-  create(@Req() req: any, @Body() body: CreateSiteBody) {
+  create(@Req() req: Request, @Body() body: CreateSiteBody) {
     const campgroundId = req.apiPrincipal.campgroundId;
     return this.api.createSite(campgroundId, body);
   }
@@ -78,7 +78,7 @@ export class PublicSitesController {
   @ApiScopes("sites:write")
   @ApiOperation({ summary: "Update a site" })
   @ApiResponse({ status: 200, description: "Site updated" })
-  update(@Req() req: any, @Param("id") id: string, @Body() body: UpdateSiteBody) {
+  update(@Req() req: Request, @Param("id") id: string, @Body() body: UpdateSiteBody) {
     const campgroundId = req.apiPrincipal.campgroundId;
     return this.api.updateSite(campgroundId, id, body);
   }
@@ -87,7 +87,7 @@ export class PublicSitesController {
   @ApiScopes("sites:write")
   @ApiOperation({ summary: "Delete a site" })
   @ApiResponse({ status: 200, description: "Site deleted" })
-  remove(@Req() req: any, @Param("id") id: string) {
+  remove(@Req() req: Request, @Param("id") id: string) {
     const campgroundId = req.apiPrincipal.campgroundId;
     return this.api.deleteSite(campgroundId, id);
   }

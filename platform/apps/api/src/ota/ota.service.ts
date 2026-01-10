@@ -47,7 +47,7 @@ export class OtaService {
   constructor(private readonly prisma: PrismaService) { }
 
   private async requireChannel(campgroundId: string, channelId: string, select?: Record<string, boolean>) {
-    const channel = await (this.prisma as any).otaChannel.findFirst({
+    const channel = await this.prisma.otaChannel.findFirst({
       where: { id: channelId, campgroundId },
       ...(select ? { select } : {})
     });
@@ -56,7 +56,7 @@ export class OtaService {
   }
 
   private async requireMapping(campgroundId: string, mappingId: string, select?: Record<string, boolean>) {
-    const mapping = await (this.prisma as any).otaListingMapping.findFirst({
+    const mapping = await this.prisma.otaListingMapping.findFirst({
       where: { id: mappingId, channel: { campgroundId } },
       ...(select ? { select } : {})
     });
@@ -116,7 +116,7 @@ export class OtaService {
   }
 
   listChannels(campgroundId: string) {
-    return (this.prisma as any).otaChannel.findMany({
+    return this.prisma.otaChannel.findMany({
       where: { campgroundId },
       include: { mappings: true },
       orderBy: { createdAt: "desc" },
@@ -124,7 +124,7 @@ export class OtaService {
   }
 
   createChannel(campgroundId: string, data: CreateOtaChannelDto) {
-    return (this.prisma as any).otaChannel.create({
+    return this.prisma.otaChannel.create({
       data: {
         campgroundId,
         name: data.name,
@@ -143,7 +143,7 @@ export class OtaService {
 
   async updateChannel(id: string, campgroundId: string, data: UpdateOtaChannelDto) {
     await this.requireChannel(campgroundId, id, { id: true });
-    return (this.prisma as any).otaChannel.update({
+    return this.prisma.otaChannel.update({
       where: { id },
       data,
     });
@@ -151,7 +151,7 @@ export class OtaService {
 
   async listMappings(channelId: string, campgroundId: string) {
     await this.requireChannel(campgroundId, channelId, { id: true });
-    return (this.prisma as any).otaListingMapping.findMany({
+    return this.prisma.otaListingMapping.findMany({
       where: { channelId },
       include: {
         site: { select: { id: true, name: true } },
@@ -163,7 +163,7 @@ export class OtaService {
 
   async upsertMapping(channelId: string, campgroundId: string, body: UpsertOtaMappingDto) {
     await this.requireChannel(campgroundId, channelId, { id: true });
-    return (this.prisma as any).otaListingMapping.upsert({
+    return this.prisma.otaListingMapping.upsert({
       where: { channelId_externalId: { channelId, externalId: body.externalId } },
       create: {
         channelId,
@@ -183,7 +183,7 @@ export class OtaService {
 
   async listImports(channelId: string, campgroundId: string) {
     await this.requireChannel(campgroundId, channelId, { id: true });
-    return (this.prisma as any).otaReservationImport.findMany({
+    return this.prisma.otaReservationImport.findMany({
       where: { channelId },
       orderBy: { createdAt: "desc" },
       take: 200,
@@ -192,7 +192,7 @@ export class OtaService {
 
   async listSyncLogs(channelId: string, campgroundId: string) {
     await this.requireChannel(campgroundId, channelId, { id: true });
-    return (this.prisma as any).otaSyncLog.findMany({
+    return this.prisma.otaSyncLog.findMany({
       where: { channelId },
       orderBy: { createdAt: "desc" },
       take: 200,
@@ -200,7 +200,7 @@ export class OtaService {
   }
 
   logSync(channelId: string, payload: unknown, direction: string, eventType: string, status: string, message?: string) {
-    return (this.prisma as any).otaSyncLog.create({
+    return this.prisma.otaSyncLog.create({
       data: {
         channelId,
         direction,
@@ -246,7 +246,7 @@ export class OtaService {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + this.ICAL_TOKEN_EXPIRY_DAYS);
 
-    await (this.prisma as any).otaListingMapping.update({
+    await this.prisma.otaListingMapping.update({
       where: { id: mappingId },
       data: { icalToken: token, icalTokenExpiresAt: expiresAt },
     });
@@ -260,7 +260,7 @@ export class OtaService {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + this.ICAL_TOKEN_EXPIRY_DAYS);
 
-    await (this.prisma as any).otaListingMapping.update({
+    await this.prisma.otaListingMapping.update({
       where: { id: mappingId },
       data: { icalToken: token, icalTokenExpiresAt: expiresAt },
     });
@@ -271,7 +271,7 @@ export class OtaService {
 
   async setIcalUrl(mappingId: string, campgroundId: string, url: string) {
     await this.ensureIcalToken(mappingId, campgroundId);
-    await (this.prisma as any).otaListingMapping.update({
+    await this.prisma.otaListingMapping.update({
       where: { id: mappingId },
       data: { icalUrl: url || null },
     });
@@ -293,7 +293,7 @@ export class OtaService {
   }
 
   async getIcsFeed(token: string) {
-    const mapping = await (this.prisma as any).otaListingMapping.findFirst({
+    const mapping = await this.prisma.otaListingMapping.findFirst({
       where: { icalToken: token },
       select: { id: true, siteId: true, channelId: true, icalTokenExpiresAt: true },
     });
@@ -306,14 +306,14 @@ export class OtaService {
 
     if (!mapping.siteId) throw new BadRequestException("Mapping is not linked to a site");
 
-    const reservations = await (this.prisma as any).reservation.findMany({
+    const reservations = await this.prisma.reservation.findMany({
       where: { siteId: mapping.siteId, status: { not: "cancelled" } },
       select: { id: true, arrivalDate: true, departureDate: true, guestId: true, bookedAt: true },
       orderBy: { arrivalDate: "asc" },
       take: 500,
     });
 
-    const blackouts = await (this.prisma as any).blackoutDate.findMany({
+    const blackouts = await this.prisma.blackoutDate.findMany({
       where: {
         OR: [{ siteId: mapping.siteId }, { siteId: null }],
       },
@@ -358,7 +358,7 @@ export class OtaService {
   }
 
   async importIcal(mappingId: string, campgroundId: string) {
-    const mapping = await (this.prisma as any).otaListingMapping.findFirst({
+    const mapping = await this.prisma.otaListingMapping.findFirst({
       where: { id: mappingId, channel: { campgroundId } },
       select: { id: true, icalUrl: true, siteId: true, channelId: true },
     });
@@ -385,12 +385,12 @@ export class OtaService {
     }
 
     // Clear previous imported blocks for this mapping
-    await (this.prisma as any).blackoutDate.deleteMany({
+    await this.prisma.blackoutDate.deleteMany({
       where: { siteId: mapping.siteId, reason: { contains: `[ical:${mapping.id}]` } },
     });
 
     if (events.length > 0) {
-      await (this.prisma as any).blackoutDate.createMany({
+      await this.prisma.blackoutDate.createMany({
         data: events.map((e) => ({
           campgroundId,
           siteId: mapping.siteId,
@@ -408,7 +408,7 @@ export class OtaService {
   }
 
   async handleWebhook(provider: string, body: any, rawBody: string, signature?: string, timestamp?: string) {
-    const channel = await (this.prisma as any).otaChannel.findFirst({
+    const channel = await this.prisma.otaChannel.findFirst({
       where: { provider },
       select: { id: true, webhookSecret: true, campgroundId: true, defaultStatus: true, rateMultiplier: true, feeMode: true },
     });
@@ -422,7 +422,7 @@ export class OtaService {
 
     // Idempotent import record
     const externalReservationId = body?.id || body?.reservationId || body?.externalId || "unknown";
-    const importRecord = await (this.prisma as any).otaReservationImport.upsert({
+    const importRecord = await this.prisma.otaReservationImport.upsert({
       where: { channelId_externalReservationId: { channelId: channel.id, externalReservationId } },
       create: {
         channelId: channel.id,
@@ -440,19 +440,19 @@ export class OtaService {
     // Basic mapping check to surface quick failures
     const externalListingId = body?.listingId || body?.siteId || body?.siteExternalId || body?.listingExternalId || null;
     if (externalListingId) {
-      const mapping = await (this.prisma as any).otaListingMapping.findFirst({
+      const mapping = await this.prisma.otaListingMapping.findFirst({
         where: { channelId: channel.id, externalId: String(externalListingId) },
         select: { id: true, siteId: true, siteClassId: true },
       });
       if (!mapping) {
-        await (this.prisma as any).otaReservationImport.update({
+        await this.prisma.otaReservationImport.update({
           where: { id: importRecord.id },
           data: { status: "failed", message: "No mapping found for listing", updatedAt: new Date() },
         });
         await this.logSync(channel.id, body, "pull", "reservation", "failed", "No mapping found");
         return { ok: false, reason: "no_mapping" };
       }
-      await (this.prisma as any).otaReservationImport.update({
+      await this.prisma.otaReservationImport.update({
         where: { id: importRecord.id },
         data: { message: "Mapping found; pending processing", status: "pending", updatedAt: new Date() },
       });
@@ -461,11 +461,11 @@ export class OtaService {
       const normalizedStatus = this.mapExternalStatus(body?.status || body?.reservationStatus || body?.state);
       if (normalizedStatus === "cancelled") {
         if (importRecord.reservationId) {
-          await (this.prisma as any).reservation.update({
+          await this.prisma.reservation.update({
             where: { id: importRecord.reservationId },
             data: { status: "cancelled" },
           });
-          await (this.prisma as any).otaReservationImport.update({
+          await this.prisma.otaReservationImport.update({
             where: { id: importRecord.id },
             data: { status: "imported", message: "Cancelled", updatedAt: new Date() },
           });
@@ -473,7 +473,7 @@ export class OtaService {
           this.recordSync(provider, channel.campgroundId, true, "pull");
           return { ok: true, importId: importRecord.id, reservationId: importRecord.reservationId, cancelled: true };
         } else {
-          await (this.prisma as any).otaReservationImport.update({
+          await this.prisma.otaReservationImport.update({
             where: { id: importRecord.id },
             data: { status: "failed", message: "Cancellation received but reservation not found", updatedAt: new Date() },
           });
@@ -496,14 +496,14 @@ export class OtaService {
           feeMode: channel.feeMode ?? "absorb",
         });
 
-        await (this.prisma as any).otaReservationImport.update({
+        await this.prisma.otaReservationImport.update({
           where: { id: importRecord.id },
           data: { status: "imported", message: "Imported", reservationId: result.reservationId, updatedAt: new Date() },
         });
         await this.logSync(channel.id, body, "pull", "reservation", "success", "Imported");
         return { ok: true, importId: importRecord.id, reservationId: result.reservationId };
       } catch (err: any) {
-        await (this.prisma as any).otaReservationImport.update({
+        await this.prisma.otaReservationImport.update({
           where: { id: importRecord.id },
           data: { status: "failed", message: err?.message || "Import failed", updatedAt: new Date() },
         });
@@ -544,13 +544,13 @@ export class OtaService {
     const totalAmount = Math.max(0, baseSubtotal + feesAmount + taxesAmount);
 
     // Find or create guest
-    const existingGuest = await (this.prisma as any).guest.findFirst({
+    const existingGuest = await this.prisma.guest.findFirst({
       where: { email: guestEmail, campgroundId: opts.campgroundId },
       select: { id: true },
     });
     let guestId = existingGuest?.id;
     if (!guestId) {
-      const guest = await (this.prisma as any).guest.create({
+      const guest = await this.prisma.guest.create({
         data: {
           campgroundId: opts.campgroundId,
           firstName: guestFirst,
@@ -570,7 +570,7 @@ export class OtaService {
 
     const status = this.mapExternalStatus(payload?.status || payload?.reservationStatus || payload?.state) || (opts.channelDefaultStatus ?? "pending");
 
-    const reservation = await (this.prisma as any).reservation.create({
+    const reservation = await this.prisma.reservation.create({
       data: {
         campgroundId: opts.campgroundId,
         siteId,
@@ -613,7 +613,7 @@ export class OtaService {
       });
     }
     if (entries.length > 0) {
-      await (this.prisma as any).ledgerEntry.createMany({ data: entries });
+      await this.prisma.ledgerEntry.createMany({ data: entries });
     }
 
     return { reservationId: reservation.id };
@@ -631,14 +631,14 @@ export class OtaService {
    * Find an available site within a site class for the given date range.
    */
   private async findAvailableSiteInClass(campgroundId: string, siteClassId: string, arrival: Date, departure: Date): Promise<string | null> {
-    const sites = await (this.prisma as any).site.findMany({
+    const sites = await this.prisma.site.findMany({
       where: { campgroundId, siteClassId, isActive: true },
       select: { id: true },
     });
     if (!sites?.length) return null;
 
     for (const s of sites) {
-      const overlap = await (this.prisma as any).$queryRaw<{ count: number }[]>`
+      const overlap = await this.prisma.$queryRaw<{ count: number }[]>`
         SELECT COUNT(*)::int as count
         FROM "Reservation" r
         WHERE r."siteId" = ${s.id}
@@ -648,7 +648,7 @@ export class OtaService {
       const count = overlap?.[0]?.count ?? 0;
       if (count > 0) continue;
 
-      const blackoutCount = await (this.prisma as any).blackoutDate.count({
+      const blackoutCount = await this.prisma.blackoutDate.count({
         where: {
           campgroundId,
           OR: [{ siteId: s.id }, { siteId: null }],
@@ -668,7 +668,7 @@ export class OtaService {
    * This method orchestrates the sync process, handles errors, and updates sync status.
    */
   async pushAvailability(channelId: string, campgroundId: string) {
-    const channel = await (this.prisma as any).otaChannel.findFirst({
+    const channel = await this.prisma.otaChannel.findFirst({
       where: { id: channelId, campgroundId },
       select: { id: true, campgroundId: true, name: true, status: true, provider: true },
     });
@@ -681,7 +681,7 @@ export class OtaService {
       throw new BadRequestException(message);
     }
 
-    const mappings = await (this.prisma as any).otaListingMapping.findMany({
+    const mappings = await this.prisma.otaListingMapping.findMany({
       where: { channelId },
       select: { id: true, externalId: true, siteId: true, siteClassId: true, status: true },
     });
@@ -715,7 +715,7 @@ export class OtaService {
       if (m.status === "disabled") {
         errorCount++;
         errors.push(`Mapping ${m.externalId}: disabled`);
-        await (this.prisma as any).otaListingMapping.update({
+        await this.prisma.otaListingMapping.update({
           where: { id: m.id },
           data: { lastSyncAt: now, lastError: "Mapping disabled" },
         });
@@ -726,7 +726,7 @@ export class OtaService {
       if (!m.siteId) {
         errorCount++;
         errors.push(`Mapping ${m.externalId}: missing site assignment`);
-        await (this.prisma as any).otaListingMapping.update({
+        await this.prisma.otaListingMapping.update({
           where: { id: m.id },
           data: { lastSyncAt: now, lastError: "Missing site mapping" },
         });
@@ -767,7 +767,7 @@ export class OtaService {
         })}`);
 
         // Update mapping sync status
-        await (this.prisma as any).otaListingMapping.update({
+        await this.prisma.otaListingMapping.update({
           where: { id: m.id },
           data: { lastSyncAt: now, lastError: null },
         });
@@ -781,7 +781,7 @@ export class OtaService {
         this.logger.error(`Error pushing listing ${m.externalId}: ${errorMsg}`);
 
         // Update mapping with error
-        await (this.prisma as any).otaListingMapping.update({
+        await this.prisma.otaListingMapping.update({
           where: { id: m.id },
           data: { lastSyncAt: now, lastError: errorMsg },
         });
@@ -799,7 +799,7 @@ export class OtaService {
     }
 
     // Update channel sync timestamp
-    await (this.prisma as any).otaChannel.update({
+    await this.prisma.otaChannel.update({
       where: { id: channelId },
       data: { lastSyncAt: now },
     });
@@ -850,7 +850,7 @@ export class OtaService {
     endDate.setDate(endDate.getDate() + 90);
 
     // Get existing reservations for this site
-    const reservations = await (this.prisma as any).reservation.findMany({
+    const reservations = await this.prisma.reservation.findMany({
       where: {
         siteId,
         status: { not: "cancelled" },
@@ -861,7 +861,7 @@ export class OtaService {
     });
 
     // Get blackout dates
-    const blackouts = await (this.prisma as any).blackoutDate.findMany({
+    const blackouts = await this.prisma.blackoutDate.findMany({
       where: {
         campgroundId,
         OR: [{ siteId }, { siteId: null }],
