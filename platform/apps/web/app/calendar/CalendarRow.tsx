@@ -4,7 +4,7 @@ import { RowSelectionOverlay } from "./RowSelectionOverlay";
 import { cn } from "../../lib/utils";
 import type { CalendarSite, CalendarReservation, CalendarSelection, GanttSelection, DayMeta, ReservationDragMode, CalendarBlackout } from "./types";
 import { Wrench, Sparkles, AlertTriangle, Calendar, Tent, Ban } from "lucide-react";
-import { diffInDays, parseLocalDateInput } from "./utils";
+import { diffInDays, parseLocalDateInput, toLocalDate } from "./utils";
 
 interface CalendarRowProps {
     site: CalendarSite;
@@ -138,8 +138,8 @@ export const CalendarRow = memo(function CalendarRow({
                     {/* Blackouts */}
                     {blackouts.map((blackout) => {
                         const start = days[0].date;
-                        const blackoutStart = parseLocalDateInput(blackout.startDate);
-                        const blackoutEnd = parseLocalDateInput(blackout.endDate);
+                        const blackoutStart = toLocalDate(blackout.startDate);
+                        const blackoutEnd = toLocalDate(blackout.endDate);
                         const startIdx = Math.max(0, diffInDays(blackoutStart, start));
                         const endIdx = Math.min(dayCount, diffInDays(blackoutEnd, start) + 1); // +1 because end is inclusive
 
