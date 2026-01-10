@@ -71,7 +71,7 @@ export const CampgroundSchema = z.object({
   dataSource: z.string().nullish(),
   dataSourceId: z.string().nullish(),
   dataSourceUpdatedAt: z.string().nullish(),
-  provenance: z.record(z.any()).optional().nullable(),
+  provenance: z.record(z.unknown()).optional().nullable(),
 
   // Public listing
   description: z.string().nullish(),
@@ -79,11 +79,11 @@ export const CampgroundSchema = z.object({
   pricePerNight: numberish(z.number().optional()),
   amenities: z.array(z.string()).optional(),
   photos: z.array(z.string()).optional(),
-  photosMeta: z.any().optional().nullable(),
+  photosMeta: z.unknown().optional().nullable(),
   reviews: z.array(z.lazy(() => ReviewSchema)).optional(),
   heroImageUrl: z.string().url().nullish(),
   isPublished: z.boolean().optional(),
-  amenitySummary: z.record(z.any()).optional().nullable(),
+  amenitySummary: z.record(z.unknown()).optional().nullable(),
   importedAt: z.string().nullish(),
 
   // Operations
@@ -146,7 +146,7 @@ export const CampgroundSchema = z.object({
   npsSchedule: z.array(NpsScheduleEntrySchema).optional(),
   reviewScore: numberish(z.number().optional()).nullish(),
   reviewCount: z.number().int().optional().default(0),
-  reviewSources: z.record(z.any()).optional().nullable(),
+  reviewSources: z.record(z.unknown()).optional().nullable(),
   reviewsUpdatedAt: z.string().nullish()
 });
 export type Campground = z.infer<typeof CampgroundSchema>;
@@ -157,7 +157,7 @@ export const FormTemplateSchema = z.object({
   title: z.string(),
   type: z.enum(["waiver", "vehicle", "intake", "custom"]),
   description: z.string().nullish(),
-  fields: z.record(z.any()).optional().nullable(),
+  fields: z.record(z.unknown()).optional().nullable(),
   isActive: z.boolean().default(true).optional(),
   version: z.number().int(),
   // Auto-attach settings
@@ -190,7 +190,7 @@ export const FormSubmissionSchema = z.object({
   reservationId: z.string().nullish(),
   guestId: z.string().nullish(),
   status: z.enum(["pending", "completed", "skipped", "void"]),
-  responses: z.record(z.any()).optional().nullable(),
+  responses: z.record(z.unknown()).optional().nullable(),
   skipNote: z.string().nullish(),
   signedAt: z.string().nullish(),
   createdAt: z.string(),
@@ -237,7 +237,7 @@ export const SiteClassSchema = z.object({
   petFriendly: z.boolean().optional(),
   accessible: z.boolean().optional(),
   photos: z.array(z.string()).optional(),
-  photoAttributions: z.any().optional().nullable(),
+  photoAttributions: z.unknown().optional().nullable(),
   policyVersion: z.string().nullish(),
   isActive: z.boolean().optional().default(true)
 });
@@ -261,7 +261,7 @@ export const SiteSchema = z.object({
   minNights: z.number().int().optional().nullable(),
   maxNights: z.number().int().optional().nullable(),
   photos: z.array(z.string()).optional(),
-  photoAttributions: z.any().optional().nullable(),
+  photoAttributions: z.unknown().optional().nullable(),
   description: z.string().optional().nullable(),
   tags: z.array(z.string()).optional(),
   vibeTags: z.array(z.string()).optional(),
@@ -298,8 +298,8 @@ export const GuestSchema = z.object({
   marketingOptIn: z.boolean().optional(),
   repeatStays: z.number().int().optional(),
   notes: z.string().nullish(),
-  preferences: z.record(z.any()).optional().nullable(),
-  insights: z.record(z.any()).optional().nullable(),
+  preferences: z.record(z.unknown()).optional().nullable(),
+  insights: z.record(z.unknown()).optional().nullable(),
   loyaltyProfile: z.object({
     tier: z.string(),
     pointsBalance: z.number()
@@ -744,13 +744,15 @@ const eventShape = {
   updatedAt: z.string().optional()
 };
 
-export const EventSchema: z.ZodType<any> = z.lazy(() =>
-  z.object({
-    ...eventShape,
+const EventBaseSchema = z.object(eventShape);
+type EventBase = z.infer<typeof EventBaseSchema>;
+export type Event = EventBase & { children?: Event[] };
+
+export const EventSchema: z.ZodType<Event> = z.lazy(() =>
+  EventBaseSchema.extend({
     children: z.array(EventSchema).optional()
   })
 );
-export type Event = z.infer<typeof EventSchema>;
 
 export const CreateEventSchema = z.object(eventShape).omit({
   id: true,
@@ -1106,7 +1108,7 @@ export const CommunicationTemplateSchema = z.object({
   version: z.number().int(),
   approvedById: z.string().nullish(),
   approvedAt: z.string().nullish(),
-  auditLog: z.record(z.any()).optional().nullable(),
+  auditLog: z.record(z.unknown()).optional().nullable(),
   createdAt: z.string(),
   updatedAt: z.string()
 });
@@ -1139,7 +1141,7 @@ export const CommunicationPlaybookJobSchema = z.object({
   scheduledAt: z.string(),
   attempts: z.number().int(),
   lastError: z.string().nullish(),
-  metadata: z.record(z.any()).optional().nullable(),
+  metadata: z.record(z.unknown()).optional().nullable(),
   createdAt: z.string(),
   updatedAt: z.string()
 });

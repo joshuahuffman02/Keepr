@@ -83,8 +83,9 @@ export const computeDepositDue = (input: DepositInput) => {
     if (scopeMatch) rule = scopeMatch.rule;
 
     if (depositConfig.seasons && ctx.arrivalDate) {
+      const arrivalDate = ctx.arrivalDate; // Narrow type for closure
       const seasonMatch = depositConfig.seasons.find((s) =>
-        isBetweenMonthDay(ctx.arrivalDate, s.startMonthDay, s.endMonthDay)
+        isBetweenMonthDay(arrivalDate, s.startMonthDay, s.endMonthDay)
       );
       if (seasonMatch) rule = seasonMatch.rule;
     }

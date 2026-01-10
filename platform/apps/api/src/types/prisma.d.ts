@@ -1681,12 +1681,12 @@ declare module "@prisma/client" {
 
   // Prisma namespace augmentations for transaction client
   export namespace Prisma {
-    export type TransactionClient = any;
-    export type InputJsonValue = any;
+    export type TransactionClient = import("@prisma/client").PrismaClient;
+    export type InputJsonValue = import("@prisma/client/runtime/client").InputJsonValue;
   }
 
   // Re-export PrismaClient for compatibility
   export class PrismaClient {
-    [key: string]: any;
+    [key: string]: unknown;
   }
 }
