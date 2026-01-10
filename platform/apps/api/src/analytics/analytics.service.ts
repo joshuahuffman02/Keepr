@@ -34,21 +34,21 @@ export class AnalyticsService {
       region: dto.region,
       metadata: dto.metadata,
       createdAt: new Date(),
-      campground: dto.campgroundId
+      Campground: dto.campgroundId
         ? { connect: { id: dto.campgroundId } }
         : scope.campgroundId
         ? { connect: { id: scope.campgroundId } }
         : undefined,
-      organization: dto.organizationId
+      Organization: dto.organizationId
         ? { connect: { id: dto.organizationId } }
         : scope.organizationId
         ? { connect: { id: scope.organizationId } }
         : undefined,
-      reservation: dto.reservationId ? { connect: { id: dto.reservationId } } : undefined,
-      site: dto.siteId ? { connect: { id: dto.siteId } } : undefined,
-      siteClass: dto.siteClassId ? { connect: { id: dto.siteClassId } } : undefined,
-      promotion: dto.promotionId ? { connect: { id: dto.promotionId } } : undefined,
-      abVariant: dto.abVariantId ? { connect: { id: dto.abVariantId } } : undefined,
+      Reservation: dto.reservationId ? { connect: { id: dto.reservationId } } : undefined,
+      Site: dto.siteId ? { connect: { id: dto.siteId } } : undefined,
+      SiteClass: dto.siteClassId ? { connect: { id: dto.siteClassId } } : undefined,
+      Promotion: dto.promotionId ? { connect: { id: dto.promotionId } } : undefined,
+      AbVariant: dto.abVariantId ? { connect: { id: dto.abVariantId } } : undefined,
       imageId: dto.imageId,
     };
 
