@@ -770,7 +770,7 @@ export class SeasonalsService {
         id: { in: dto.seasonalGuestIds },
         campgroundId: dto.campgroundId,
       },
-      include: { guest: true },
+      include: { Guest: true },
     });
 
     const communications: Prisma.SeasonalCommunicationCreateManyInput[] = [];
@@ -1123,7 +1123,7 @@ export class SeasonalsService {
   ) {
     const seasonals = await this.prisma.seasonalGuest.findMany({
       where: { id: { in: dto.seasonalGuestIds } },
-      include: { guest: true, site: true },
+      include: { Guest: true, site: true },
     });
 
     if (seasonals.length === 0) {

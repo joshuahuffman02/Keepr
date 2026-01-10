@@ -236,7 +236,7 @@ export class ChatToolsService {
         // Try to find the site by ID first
         let site = await prisma.site.findFirst({
           where: { id: siteId, campgroundId: context.campgroundId },
-          include: { siteClass: true },
+          include: { SiteClass: true },
         });
 
         // If not found by ID, try to find by name
@@ -250,7 +250,7 @@ export class ChatToolsService {
                 { name: { contains: siteId, mode: 'insensitive' } },
               ],
             },
-            include: { siteClass: true },
+            include: { SiteClass: true },
           });
         }
 
@@ -281,7 +281,7 @@ export class ChatToolsService {
         // Use pre-resolved site if available, otherwise query
         const site = _resolvedSite || await prisma.site.findFirst({
           where: { id: siteId, campgroundId: context.campgroundId },
-          include: { siteClass: true },
+          include: { SiteClass: true },
         });
 
         if (!site) {
@@ -1751,7 +1751,7 @@ export class ChatToolsService {
 
         const reservation = await prisma.reservation.findFirst({
           where: { id: reservationId, campgroundId: context.campgroundId },
-          include: { Site: { include: { siteClass: true } } },
+          include: { Site: { include: { SiteClass: true } } },
         });
 
         if (!reservation) {

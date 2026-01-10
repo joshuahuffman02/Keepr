@@ -97,7 +97,7 @@ export class GuestAuthService {
     async verifyToken(token: string) {
         const account = await this.prisma.guestAccount.findUnique({
             where: { magicLinkToken: token },
-            include: { guest: true },
+            include: { Guest: true },
         });
 
         if (!account || !account.tokenExpiry || account.tokenExpiry < new Date()) {

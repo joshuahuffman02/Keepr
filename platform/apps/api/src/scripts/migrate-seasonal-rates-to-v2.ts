@@ -35,7 +35,7 @@ async function main() {
       isActive: true,
       ...(campgroundId ? { campgroundId } : {})
     },
-    include: { siteClass: true }
+    include: { SiteClass: true }
   });
 
   if (!seasonalRates.length) {

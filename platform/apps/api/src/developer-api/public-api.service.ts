@@ -302,7 +302,7 @@ export class PublicApiService {
       // Get site class for GL code mapping
       const site = await tx.site.findUnique({
         where: { id: lockedReservation.siteId },
-        include: { siteClass: true }
+        include: { SiteClass: true }
       });
 
       const revenueGl = site?.siteClass?.glCode ?? "REVENUE_UNMAPPED";
@@ -399,7 +399,7 @@ export class PublicApiService {
         reservations: {
           where: { campgroundId },
           orderBy: { arrivalDate: "desc" },
-          include: { site: { select: { id: true, name: true, siteNumber: true } } }
+          include: { Site: { select: { id: true, name: true, siteNumber: true } } }
         }
       }
     });

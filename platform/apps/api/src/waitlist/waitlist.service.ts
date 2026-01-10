@@ -174,7 +174,7 @@ export class WaitlistService {
                 flexibleDates: dto.flexibleDates ?? false,
                 flexibleDays: dto.flexibleDays ?? 0,
             },
-            include: { site: true, siteClass: true },
+            include: { Site: true, SiteClass: true },
         });
 
         if (idempotencyKey) await this.idempotency.complete(idempotencyKey, result);
@@ -209,7 +209,7 @@ export class WaitlistService {
                 ...(updates.flexibleDates !== undefined && { flexibleDates: updates.flexibleDates }),
                 ...(updates.flexibleDays !== undefined && { flexibleDays: updates.flexibleDays }),
             },
-            include: { site: true, siteClass: true, guest: true },
+            include: { Site: true, SiteClass: true, Guest: true },
         });
     }
 
@@ -260,7 +260,7 @@ export class WaitlistService {
                 campgroundId,
                 ...(type && type !== 'all' ? { type: type as WaitlistType } : {}),
             },
-            include: { guest: true, site: true, siteClass: true },
+            include: { Guest: true, Site: true, SiteClass: true },
             orderBy: { createdAt: 'desc' },
             take: limit,
             skip: offset,
@@ -357,7 +357,7 @@ export class WaitlistService {
                     }
                     : {})
             },
-            include: { guest: true }
+            include: { Guest: true }
         });
 
         // Calculate priority scores and sort

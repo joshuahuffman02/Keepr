@@ -37,7 +37,7 @@ export class SiteMapService {
     const [assignments, shapes, config] = await this.prisma.$transaction([
       this.prisma.siteMapAssignment.findMany({
         where: { campgroundId },
-        include: { site: true, shape: true }
+        include: { Site: true, shape: true }
       }),
       this.prisma.siteMapShape.findMany({ where: { campgroundId } }),
       this.prisma.campgroundMapConfig.findUnique({ where: { campgroundId } })
@@ -353,7 +353,7 @@ export class SiteMapService {
 
     const layouts = await this.prisma.siteMapLayout.findMany({
       where: { campgroundId },
-      include: { site: true }
+      include: { Site: true }
     });
 
     if (!layouts.length) return;

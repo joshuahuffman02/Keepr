@@ -33,7 +33,7 @@ export class SeasonalRatesService {
     async findAllByCampground(campgroundId: string) {
         return this.prisma.seasonalRate.findMany({
             where: { campgroundId },
-            include: { siteClass: true },
+            include: { SiteClass: true },
             orderBy: { minNights: 'desc' },
         });
     }
@@ -41,7 +41,7 @@ export class SeasonalRatesService {
     async findOne(campgroundId: string, id: string) {
         const rate = await this.prisma.seasonalRate.findFirst({
             where: { id, campgroundId },
-            include: { siteClass: true },
+            include: { SiteClass: true },
         });
         if (!rate) throw new NotFoundException('Seasonal rate not found');
         return rate;

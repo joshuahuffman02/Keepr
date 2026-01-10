@@ -104,7 +104,7 @@ export class AiPredictiveMaintenanceService {
         ],
       },
       include: {
-        reservation: { include: { site: true } },
+        reservation: { include: { Site: true } },
       },
     });
 

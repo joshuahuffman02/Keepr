@@ -184,7 +184,7 @@ export class SignaturesService {
 
   async createAndSend(dto: CreateSignatureRequestDto, actorId: string | null) {
     const reservation = dto.reservationId
-      ? await this.prisma.reservation.findUnique({ where: { id: dto.reservationId }, include: { guest: true } })
+      ? await this.prisma.reservation.findUnique({ where: { id: dto.reservationId }, include: { Guest: true } })
       : null;
     const campgroundId = dto.campgroundId || reservation?.campgroundId;
     if (!campgroundId) {
@@ -332,7 +332,7 @@ export class SignaturesService {
     });
 
     const reservation = updated.reservationId
-      ? await this.prisma.reservation.findUnique({ where: { id: updated.reservationId }, include: { guest: true } })
+      ? await this.prisma.reservation.findUnique({ where: { id: updated.reservationId }, include: { Guest: true } })
       : null;
 
     await this.deliverRequest(updated, { reservation, guest: reservation?.guest });

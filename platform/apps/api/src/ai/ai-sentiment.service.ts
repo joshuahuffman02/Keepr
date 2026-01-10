@@ -70,7 +70,7 @@ export class AiSentimentService {
   async analyzeCommunication(communicationId: string): Promise<SentimentAnalysis | null> {
     const communication = await this.prisma.communication.findUnique({
       where: { id: communicationId },
-      include: { guest: true, reservation: true },
+      include: { Guest: true, reservation: true },
     });
 
     if (!communication) {
@@ -118,7 +118,7 @@ export class AiSentimentService {
   async analyzeGuestMessage(messageId: string): Promise<SentimentAnalysis | null> {
     const message = await this.prisma.message.findUnique({
       where: { id: messageId },
-      include: { guest: true, reservation: true },
+      include: { Guest: true, reservation: true },
     });
 
     if (!message) {

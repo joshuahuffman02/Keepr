@@ -900,7 +900,7 @@ export class ReservationImportService {
       if (siteId) {
         const site = await this.prisma.site.findUnique({
           where: { id: siteId },
-          include: { siteClass: true },
+          include: { SiteClass: true },
         });
         if (site?.siteClass?.defaultRate) {
           const nights = Math.ceil(

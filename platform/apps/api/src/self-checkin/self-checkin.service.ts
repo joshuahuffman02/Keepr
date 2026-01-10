@@ -175,7 +175,7 @@ export class SelfCheckinService {
   }> {
     const reservation = await this.prisma.reservation.findUnique({
       where: { id: reservationId },
-      include: { site: true, guest: true, campground: true },
+      include: { Site: true, guest: true, campground: true },
     });
 
     if (!reservation) {

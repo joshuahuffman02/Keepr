@@ -111,8 +111,8 @@ export class HousekeepingService {
     return this.prisma.cleaningZone.findMany({
       where: { campgroundId },
       include: {
-        childZones: true,
-        parentZone: true,
+        other_CleaningZone: true,
+        CleaningZone: true,
       },
       orderBy: { name: 'asc' },
     });
@@ -121,7 +121,7 @@ export class HousekeepingService {
   async findZoneById(id: string) {
     const zone = await this.prisma.cleaningZone.findUnique({
       where: { id },
-      include: { childZones: true, parentZone: true },
+      include: { other_CleaningZone: true, CleaningZone: true },
     });
     if (!zone) throw new NotFoundException('Zone not found');
     return zone;

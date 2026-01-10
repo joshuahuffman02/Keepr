@@ -160,7 +160,7 @@ export class QuickBooksService {
       where: { id: paymentId },
       include: {
         reservation: {
-          include: { guest: true },
+          include: { Guest: true },
         },
       },
     });

@@ -899,7 +899,7 @@ export class CommunicationsController {
     }
 
     const reservation = job.reservationId
-      ? await (this.prisma as any).reservation.findUnique({ where: { id: job.reservationId }, include: { guest: true } })
+      ? await (this.prisma as any).reservation.findUnique({ where: { id: job.reservationId }, include: { Guest: true } })
       : null;
     const guest = reservation?.guest || (job.guestId ? await (this.prisma as any).guest.findUnique({ where: { id: job.guestId } }) : null);
 

@@ -603,7 +603,7 @@ export class PublicReservationsService {
 
         const site = await this.prisma.site.findUnique({
             where: { id: dto.siteId },
-            include: { siteClass: true }
+            include: { SiteClass: true }
         });
 
         if (!site || site.campgroundId !== campground.id) {
@@ -855,7 +855,7 @@ export class PublicReservationsService {
 
         const site = await this.prisma.site.findUnique({
             where: { id: siteId },
-            include: { siteClass: true }
+            include: { SiteClass: true }
         });
 
         if (!site || site.campgroundId !== campground.id) {

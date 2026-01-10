@@ -271,7 +271,7 @@ export class PaymentsReconciliationService {
     const reservation = await this.prisma.reservation.findUnique({
       where: { id: reservationId },
       include: {
-        site: { include: { siteClass: true } }
+        Site: { include: { SiteClass: true } }
       }
     });
 

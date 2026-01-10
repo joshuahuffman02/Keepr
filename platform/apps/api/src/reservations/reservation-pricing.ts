@@ -22,7 +22,7 @@ export async function evaluatePricingV2(
 ): Promise<PricingV2Result> {
   const site = await prisma.site.findUnique({
     where: { id: siteId },
-    include: { siteClass: true }
+    include: { SiteClass: true }
   });
   if (!site) throw new NotFoundException("Site not found");
 

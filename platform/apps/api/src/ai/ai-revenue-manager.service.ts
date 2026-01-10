@@ -138,7 +138,7 @@ export class AiRevenueManagerService {
         status: { in: ["confirmed", "pending"] },
         arrivalDate: { gte: today, lte: nextMonth },
       },
-      include: { site: { include: { siteClass: true } } },
+      include: { Site: { include: { SiteClass: true } } },
       orderBy: [{ siteId: "asc" }, { arrivalDate: "asc" }],
     });
 

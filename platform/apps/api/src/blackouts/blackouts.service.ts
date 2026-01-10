@@ -74,7 +74,7 @@ export class BlackoutsService {
     async findAll(campgroundId: string) {
         return this.prisma.blackoutDate.findMany({
             where: { campgroundId },
-            include: { site: true },
+            include: { Site: true },
             orderBy: { startDate: "asc" }
         });
     }
@@ -82,7 +82,7 @@ export class BlackoutsService {
     async findOne(campgroundId: string, id: string) {
         const blackout = await this.prisma.blackoutDate.findFirst({
             where: { id, campgroundId },
-            include: { site: true }
+            include: { Site: true }
         });
         if (!blackout) throw new NotFoundException("Blackout date not found");
         return blackout;

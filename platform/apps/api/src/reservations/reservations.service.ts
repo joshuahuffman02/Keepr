@@ -83,7 +83,7 @@ export class ReservationsService {
 
     const sites = await this.prisma.site.findMany({
       where: { campgroundId, isActive: true },
-      include: { siteClass: true }
+      include: { SiteClass: true }
     });
 
     const matches = sites.map(site => {
@@ -471,7 +471,7 @@ export class ReservationsService {
     // Fetch full site details only for available sites
     const sites = await this.prisma.site.findMany({
       where: { id: { in: availableIds } },
-      include: { siteClass: true }
+      include: { SiteClass: true }
     });
 
     if (!sites.length) {
@@ -1067,7 +1067,7 @@ export class ReservationsService {
       where: { id },
       include: {
         Guest: true,
-        Site: { include: { siteClass: true } },
+        Site: { include: { SiteClass: true } },
         Campground: true,
         Payment: true
       }
@@ -2162,7 +2162,7 @@ export class ReservationsService {
       // Get related data for ledger entries (these don't need locking)
       const site = await tx.site.findUnique({
         where: { id: lockedReservation.siteId },
-        include: { siteClass: true }
+        include: { SiteClass: true }
       });
       const guest = await tx.guest.findUnique({ where: { id: lockedReservation.guestId } });
       const campground = await tx.campground.findUnique({
@@ -2468,7 +2468,7 @@ export class ReservationsService {
       // Get related data for ledger entries
       const site = await tx.site.findUnique({
         where: { id: lockedReservation.siteId },
-        include: { siteClass: true }
+        include: { SiteClass: true }
       });
       const guest = await tx.guest.findUnique({ where: { id: lockedReservation.guestId } });
       const campground = await tx.campground.findUnique({
@@ -2628,7 +2628,7 @@ export class ReservationsService {
       const reservation = await tx.reservation.findUnique({
         where: { id },
         include: {
-          site: { include: { siteClass: true } },
+          site: { include: { SiteClass: true } },
           guest: true,
           campground: { select: { name: true } }
         }

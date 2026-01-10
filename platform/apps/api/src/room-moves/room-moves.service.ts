@@ -36,7 +36,7 @@ export class RoomMovesService {
 
     const toSite = await this.prisma.site.findUnique({
       where: { id: data.toSiteId },
-      include: { siteClass: true },
+      include: { SiteClass: true },
     });
 
     if (!toSite) {
@@ -104,7 +104,7 @@ export class RoomMovesService {
   async approveMoveRequest(id: string, approvedById: string) {
     const moveRequest = await this.prisma.roomMoveRequest.findUnique({
       where: { id },
-      include: { reservation: true },
+      include: { Reservation: true },
     });
 
     if (!moveRequest) {
@@ -127,7 +127,7 @@ export class RoomMovesService {
   async completeMoveRequest(id: string, completedById: string) {
     const moveRequest = await this.prisma.roomMoveRequest.findUnique({
       where: { id },
-      include: { reservation: true, toSite: true },
+      include: { Reservation: true, toSite: true },
     });
 
     if (!moveRequest) {

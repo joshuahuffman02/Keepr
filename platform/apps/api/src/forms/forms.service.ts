@@ -184,7 +184,7 @@ export class FormsService {
         guestId: data.guestId ?? null,
         responses: data.responses ?? Prisma.DbNull
       },
-      include: { formTemplate: { select: { id: true, title: true, type: true } } }
+      include: { FormTemplate: { select: { id: true, title: true, type: true } } }
     });
   }
 
@@ -198,7 +198,7 @@ export class FormsService {
         responses: data.responses ?? undefined,
         signedAt: data.status === "completed" ? new Date() : undefined
       },
-      include: { formTemplate: { select: { id: true, title: true, type: true } } }
+      include: { FormTemplate: { select: { id: true, title: true, type: true } } }
     });
   }
 
@@ -343,7 +343,7 @@ export class FormsService {
         status: "completed",
         signedAt: new Date()
       },
-      include: { formTemplate: { select: { id: true, title: true, type: true } } }
+      include: { FormTemplate: { select: { id: true, title: true, type: true } } }
     });
   }
 

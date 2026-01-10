@@ -172,7 +172,7 @@ export class AccessControlService {
   async grantAccess(reservationId: string, dto: GrantAccessDto, campgroundId: string) {
     const reservation = await this.prisma.reservation.findUnique({
       where: { id: reservationId },
-      include: { guest: true, site: true }
+      include: { Guest: true, site: true }
     });
     if (!reservation || reservation.campgroundId !== campgroundId) {
       throw new NotFoundException("Reservation not found");
@@ -419,7 +419,7 @@ export class AccessControlService {
   async autoGrantForReservation(reservationId: string, actorId?: string | null) {
     const reservation = await this.prisma.reservation.findUnique({
       where: { id: reservationId },
-      include: { site: true, guest: true }
+      include: { Site: true, guest: true }
     });
     if (!reservation) throw new NotFoundException("Reservation not found");
     const integrations = await this.integrationsRepo()?.findMany?.({

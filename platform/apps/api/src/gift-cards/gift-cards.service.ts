@@ -129,7 +129,7 @@ export class GiftCardsService {
       // 7. Get site info for GL codes
       const site = await tx.site.findUnique({
         where: { id: lockedReservation.siteId },
-        include: { siteClass: true }
+        include: { SiteClass: true }
       });
 
       const revenueGl = site?.siteClass?.glCode ?? "REVENUE_UNMAPPED";

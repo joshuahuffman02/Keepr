@@ -55,7 +55,7 @@ export class FlexCheckService {
   async requestEarlyCheckIn(reservationId: string, requestedTime: Date) {
     const reservation = await this.prisma.reservation.findUnique({
       where: { id: reservationId },
-      include: { campground: true },
+      include: { Campground: true },
     });
 
     if (!reservation) {
@@ -160,7 +160,7 @@ export class FlexCheckService {
   async requestLateCheckout(reservationId: string, requestedTime: Date) {
     const reservation = await this.prisma.reservation.findUnique({
       where: { id: reservationId },
-      include: { campground: true, site: true },
+      include: { Campground: true, Site: true },
     });
 
     if (!reservation) {

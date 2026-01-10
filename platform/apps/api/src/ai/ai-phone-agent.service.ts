@@ -473,7 +473,7 @@ export class AiPhoneAgentService {
             ? { name: { contains: args.siteType, mode: "insensitive" } }
             : undefined,
         },
-        include: { siteClass: true },
+        include: { SiteClass: true },
       });
 
       // Check for conflicting reservations

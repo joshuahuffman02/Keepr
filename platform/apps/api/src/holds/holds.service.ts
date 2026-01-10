@@ -123,7 +123,7 @@ export class HoldsService implements OnModuleInit, OnModuleDestroy {
         status: "active",
         OR: [{ expiresAt: null }, { expiresAt: { gt: now } }]
       },
-      include: { site: { select: { id: true, name: true, siteNumber: true } } },
+      include: { Site: { select: { id: true, name: true, siteNumber: true } } },
       orderBy: { arrivalDate: "asc" }
     });
   }
@@ -135,7 +135,7 @@ export class HoldsService implements OnModuleInit, OnModuleDestroy {
       : { status: "active", expiresAt: { lte: now } };
     const expired = await (this.prisma as any).siteHold.findMany({
       where,
-      include: { site: { select: { id: true, siteClassId: true } } }
+      include: { Site: { select: { id: true, siteClassId: true } } }
     });
 
     if (expired.length === 0) return 0;
