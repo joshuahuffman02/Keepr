@@ -1297,37 +1297,55 @@ export class ChatToolsService {
       execute: async (args, context, prisma) => {
         const { siteId, reason, startDate, endDate, _siteName } = args;
 
+        this.logger.log(`block_site: Starting execution for site ${siteId}, campground ${context.campgroundId}`);
+
         const site = await prisma.site.findFirst({
           where: { id: siteId, campgroundId: context.campgroundId },
         });
 
         if (!site) {
+          this.logger.warn(`block_site: Site ${siteId} not found in campground ${context.campgroundId}`);
           return { success: false, message: 'Site not found' };
         }
 
-        // Create a blackout/block
-        const block = await prisma.blackoutDate.create({
-          data: {
-            id: randomUUID(),
-            campgroundId: context.campgroundId,
-            siteId: siteId,
-            startDate: startDate ? new Date(startDate) : new Date(),
-            endDate: endDate ? new Date(endDate) : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
-            reason: reason,
-          },
-        });
+        this.logger.log(`block_site: Found site ${site.name} (${site.id})`);
 
-        return {
-          success: true,
-          message: `Site ${site.name} has been blocked: ${reason}`,
-          block: {
-            id: block.id,
-            siteId,
-            reason,
-            startDate: block.startDate.toISOString().split('T')[0],
-            endDate: block.endDate.toISOString().split('T')[0],
-          },
-        };
+        try {
+          // Create a blackout/block
+          const blockId = randomUUID();
+          const blockStartDate = startDate ? new Date(startDate) : new Date();
+          const blockEndDate = endDate ? new Date(endDate) : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+
+          this.logger.log(`block_site: Creating blackout with id=${blockId}, startDate=${blockStartDate.toISOString()}, endDate=${blockEndDate.toISOString()}`);
+
+          const block = await prisma.blackoutDate.create({
+            data: {
+              id: blockId,
+              campgroundId: context.campgroundId,
+              siteId: siteId,
+              startDate: blockStartDate,
+              endDate: blockEndDate,
+              reason: reason,
+            },
+          });
+
+          this.logger.log(`block_site: Successfully created blackout ${block.id}`);
+
+          return {
+            success: true,
+            message: `Site ${site.name} has been blocked: ${reason}`,
+            block: {
+              id: block.id,
+              siteId,
+              reason,
+              startDate: block.startDate.toISOString().split('T')[0],
+              endDate: block.endDate.toISOString().split('T')[0],
+            },
+          };
+        } catch (error) {
+          this.logger.error(`block_site: Failed to create blackout - ${error instanceof Error ? error.message : 'Unknown error'}`, error instanceof Error ? error.stack : '');
+          return { success: false, message: `Failed to block site: ${error instanceof Error ? error.message : 'Unknown error'}` };
+        }
       },
     });
 
