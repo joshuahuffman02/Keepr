@@ -1,7 +1,6 @@
 import { Injectable, ConflictException, UnauthorizedException, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import * as bcrypt from 'bcryptjs';
 import { createHash, randomBytes, randomUUID } from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import { PlatformRole, Prisma } from '@prisma/client';
@@ -9,6 +8,7 @@ import { RegisterDto, LoginDto, MobileLoginDto } from './dto';
 import { AcceptInviteDto } from './dto/accept-invite.dto';
 import { AccountLockoutService } from '../security/account-lockout.service';
 import { SecurityEventsService, SecurityEventType, SecurityEventSeverity } from '../security/security-events.service';
+import { RustAuthClientService } from './rust-auth-client.service';
 
 interface MobileTokenPair {
     accessToken: string;
@@ -35,7 +35,8 @@ export class AuthService {
         private readonly jwtService: JwtService,
         private readonly accountLockout: AccountLockoutService,
         private readonly securityEvents: SecurityEventsService,
-        private readonly config: ConfigService
+        private readonly config: ConfigService,
+        private readonly rustAuth: RustAuthClientService
     ) {
         // Mobile access tokens: 15 minutes, refresh tokens: 30 days
         this.accessTokenTtl = this.config.get<number>('MOBILE_ACCESS_TOKEN_TTL', 900); // 15 min
@@ -53,8 +54,8 @@ export class AuthService {
             throw new ConflictException('Email already registered');
         }
 
-        // Hash password
-        const passwordHash = await bcrypt.hash(dto.password, 12);
+        // Hash password via Rust service (with local fallback)
+        const passwordHash = await this.rustAuth.hashPassword(dto.password, 12);
 
         // Create user
         const user = await this.prisma.user.create({
@@ -127,7 +128,7 @@ export class AuthService {
                     }
 
                     this.logger.warn(`SECURITY: Bootstrapping first admin user: ${this.sanitizeEmail(normalizedEmail)}`);
-                    const passwordHash = await bcrypt.hash(dto.password, 12);
+                    const passwordHash = await this.rustAuth.hashPassword(dto.password, 12);
                     user = await this.prisma.user.create({
                         data: {
                             id: randomUUID(),
@@ -180,7 +181,7 @@ export class AuthService {
             }
 
             this.logger.log(`User found, comparing password hash for ${user.id}`);
-            const passwordValid = await bcrypt.compare(dto.password, user.passwordHash);
+            const passwordValid = await this.rustAuth.verifyPassword(dto.password, user.passwordHash);
             if (!passwordValid) {
                 this.logger.log(`Invalid password for ${this.sanitizeEmail(normalizedEmail)}`);
                 // Record failed attempt and check if now locked
@@ -268,7 +269,7 @@ export class AuthService {
             throw new UnauthorizedException("Invite has expired");
         }
 
-        const passwordHash = await bcrypt.hash(dto.password, 12);
+        const passwordHash = await this.rustAuth.hashPassword(dto.password, 12);
 
         const user = await this.prisma.user.update({
             where: { id: invite.userId },
@@ -343,7 +344,7 @@ export class AuthService {
                 throw new UnauthorizedException('Invalid credentials');
             }
 
-            const passwordValid = await bcrypt.compare(dto.password, user.passwordHash);
+            const passwordValid = await this.rustAuth.verifyPassword(dto.password, user.passwordHash);
             if (!passwordValid) {
                 const lockStatus = await this.accountLockout.handleFailedLogin(normalizedEmail);
                 await this.securityEvents.logLoginAttempt(false, normalizedEmail, ipAddress, userAgent, user.id, "invalid_password");

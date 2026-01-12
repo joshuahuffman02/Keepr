@@ -1,6 +1,7 @@
-import { Injectable, Logger, BadRequestException, NotFoundException } from "@nestjs/common";
+import { Injectable, Logger, BadRequestException, NotFoundException, Inject, Optional } from "@nestjs/common";
 import Stripe from "stripe";
 import { isRecord } from "../utils/type-guards";
+import { RustPaymentClientService } from "./rust-payment-client.service";
 
 const normalizeCapabilities = (
     capabilities: Stripe.Account.Capabilities | null | undefined
@@ -21,7 +22,10 @@ export class StripeService {
     private stripe: Stripe | null = null;
     private readonly configured: boolean;
 
-    constructor() {
+    constructor(
+        @Optional() @Inject(RustPaymentClientService)
+        private readonly rustPayment?: RustPaymentClientService
+    ) {
         const secretKey = process.env.STRIPE_SECRET_KEY;
 
         // Check if key is valid (not empty, not a placeholder)
@@ -51,6 +55,57 @@ export class StripeService {
 
     isConfigured() {
         return this.configured;
+    }
+
+    /**
+     * Check if Rust payment service is available for optimized operations
+     */
+    isRustAvailable(): boolean {
+        return this.rustPayment?.healthy ?? false;
+    }
+
+    /**
+     * Calculate fees using Rust service (falls back to local calculation)
+     * This ensures consistent fee math across TypeScript and Rust
+     */
+    async calculateFees(amountCents: number): Promise<{
+        baseAmountCents: number;
+        platformFeeCents: number;
+        gatewayFeeCents: number;
+        applicationFeeCents: number;
+        chargeAmountCents: number;
+    }> {
+        // Try Rust service first
+        if (this.rustPayment) {
+            const rustResult = await this.rustPayment.calculateFees(amountCents);
+            if (rustResult) {
+                return {
+                    baseAmountCents: rustResult.base_amount_cents,
+                    platformFeeCents: rustResult.platform_fee_cents,
+                    gatewayFeeCents: rustResult.gateway_fee_cents,
+                    applicationFeeCents: rustResult.application_fee_cents,
+                    chargeAmountCents: rustResult.charge_amount_cents,
+                };
+            }
+        }
+
+        // Local fallback: simple fee calculation
+        // Platform fee: $3.00 per booking (configurable)
+        const platformFeeCents = parseInt(process.env.PAYMENT_PLATFORM_FEE_CENTS || "300", 10);
+        // Gateway fee: 2.9% + $0.30 (Stripe standard)
+        const gatewayFeeCents = Math.round(amountCents * 0.029) + 30;
+        // Application fee = platform fee only (gateway fees paid by Stripe)
+        const applicationFeeCents = platformFeeCents;
+        // Charge amount = base amount (fees are deducted from transfer)
+        const chargeAmountCents = amountCents;
+
+        return {
+            baseAmountCents: amountCents,
+            platformFeeCents,
+            gatewayFeeCents,
+            applicationFeeCents,
+            chargeAmountCents,
+        };
     }
 
     private assertConfigured(action: string): Stripe {

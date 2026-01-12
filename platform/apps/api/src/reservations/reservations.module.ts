@@ -1,4 +1,5 @@
 import { Module, forwardRef } from "@nestjs/common";
+import { ConfigModule } from "@nestjs/config";
 import { ReservationsService } from "./reservations.service";
 import { ReservationsController } from "./reservations.controller";
 import { PrismaService } from "../prisma/prisma.service";
@@ -29,9 +30,10 @@ import { PoliciesModule } from "../policies/policies.module";
 import { GuestWalletModule } from "../guest-wallet/guest-wallet.module";
 import { PaymentsModule } from "../payments/payments.module";
 import { PermissionsModule } from "../permissions/permissions.module";
+import { RustAvailabilityClientService } from "./rust-availability-client.service";
 
 @Module({
-  imports: [WaitlistModule, LoyaltyModule, SeasonalRatesModule, TaxRulesModule, GamificationModule, AuditModule, AccessControlModule, SignaturesModule, PoliciesModule, ApprovalsModule, UsageTrackerModule, RepeatChargesModule, GuestWalletModule, IdempotencyModule, PermissionsModule, forwardRef(() => PaymentsModule)],
+  imports: [WaitlistModule, LoyaltyModule, SeasonalRatesModule, TaxRulesModule, GamificationModule, AuditModule, AccessControlModule, SignaturesModule, PoliciesModule, ApprovalsModule, UsageTrackerModule, RepeatChargesModule, GuestWalletModule, IdempotencyModule, PermissionsModule, ConfigModule, forwardRef(() => PaymentsModule)],
   controllers: [ReservationsController],
   providers: [
     ReservationsService,
@@ -44,7 +46,8 @@ import { PermissionsModule } from "../permissions/permissions.module";
     MatchScoreService,
     PricingV2Service,
     DepositPoliciesService,
+    RustAvailabilityClientService,
   ],
-  exports: [ReservationsService, MatchScoreService]
+  exports: [ReservationsService, MatchScoreService, RustAvailabilityClientService]
 })
 export class ReservationsModule { }
