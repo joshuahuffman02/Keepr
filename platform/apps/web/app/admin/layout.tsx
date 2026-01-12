@@ -181,7 +181,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         );
     }
 
-    // @ts-ignore - platformRole might not be in types
+    // @ts-ignore - platformRole not in NextAuth v5 beta types (works at runtime)
     const isPlatformAdmin = session?.user?.platformRole === "platform_admin";
 
     // Not logged in - show login prompt

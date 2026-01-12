@@ -36,7 +36,7 @@ export default function PaymentsSettingsPage() {
   const [feeSaveSuccess, setFeeSaveSuccess] = useState(false);
   const [stripeSaveSuccess, setStripeSaveSuccess] = useState(false);
 
-  // @ts-ignore - platformRole might not be in types
+  // @ts-ignore - platformRole not in NextAuth v5 beta types (works at runtime)
   const isPlatformAdmin = session?.user?.platformRole === "platform_admin";
 
   // Get campground ID from localStorage
