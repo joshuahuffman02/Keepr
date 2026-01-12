@@ -4,6 +4,34 @@ import { PrismaService } from '../prisma/prisma.service';
 import { EmailService } from '../email/email.service';
 import { SmsService } from '../sms/sms.service';
 import { Prisma } from '@prisma/client';
+import { randomUUID } from "crypto";
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const isJsonValue = (value: unknown): value is Prisma.InputJsonValue => {
+  if (value === null) return true;
+  if (value instanceof Date) return true;
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+    return true;
+  }
+  if (Array.isArray(value)) {
+    return value.every(isJsonValue);
+  }
+  if (isRecord(value)) {
+    return Object.values(value).every(isJsonValue);
+  }
+  return false;
+};
+
+const toNullableJsonInput = (
+  value: unknown
+): Prisma.InputJsonValue | typeof Prisma.JsonNull | undefined => {
+  if (value === undefined) return undefined;
+  if (value === null) return Prisma.JsonNull;
+  if (value instanceof Date) return value.toISOString();
+  return isJsonValue(value) ? value : undefined;
+};
 
 export type TriggerEvent = 
   | 'reservation_created'
@@ -18,6 +46,24 @@ export type TriggerEvent =
   | 'review_request'
   | 'waitlist_match'
   | 'group_update';
+
+const TRIGGER_EVENTS: ReadonlyArray<TriggerEvent> = [
+  'reservation_created',
+  'reservation_confirmed',
+  'reservation_cancelled',
+  'payment_received',
+  'payment_failed',
+  'checkin_reminder',
+  'checkout_reminder',
+  'site_ready',
+  'balance_due',
+  'review_request',
+  'waitlist_match',
+  'group_update',
+];
+
+const isTriggerEvent = (value: string): value is TriggerEvent =>
+  TRIGGER_EVENTS.some((event) => event === value);
 
 export interface NotificationTrigger {
   id: string;
@@ -45,6 +91,66 @@ export interface TriggerPayload {
   customData?: Record<string, unknown>;
 }
 
+const toDateValue = (value: unknown): Date | undefined => {
+  if (value instanceof Date) return value;
+  if (typeof value === 'string') {
+    const parsed = new Date(value);
+    if (!Number.isNaN(parsed.getTime())) return parsed;
+  }
+  return undefined;
+};
+
+const parseTriggerPayload = (value: Prisma.JsonValue | null): TriggerPayload | null => {
+  if (!isRecord(value)) return null;
+  if (typeof value.campgroundId !== 'string') return null;
+
+  return {
+    campgroundId: value.campgroundId,
+    reservationId: typeof value.reservationId === 'string' ? value.reservationId : undefined,
+    guestId: typeof value.guestId === 'string' ? value.guestId : undefined,
+    guestEmail: typeof value.guestEmail === 'string' ? value.guestEmail : undefined,
+    guestName: typeof value.guestName === 'string' ? value.guestName : undefined,
+    siteNumber: typeof value.siteNumber === 'string' ? value.siteNumber : undefined,
+    arrivalDate: toDateValue(value.arrivalDate),
+    departureDate: toDateValue(value.departureDate),
+    amountCents: typeof value.amountCents === 'number' ? value.amountCents : undefined,
+    customData: isRecord(value.customData) ? value.customData : undefined,
+  };
+};
+
+type TriggerWithTemplate = Prisma.NotificationTriggerGetPayload<{
+  include: { CampaignTemplate: true };
+}>;
+
+type TriggerWithTemplateAndCampground = Prisma.NotificationTriggerGetPayload<{
+  include: { CampaignTemplate: true; Campground: { select: { name: true } } };
+}>;
+
+type NotificationTriggersStore = {
+  notificationTrigger: {
+    findMany: (args: Prisma.NotificationTriggerFindManyArgs) => Promise<TriggerWithTemplate[]>;
+    findUnique: (args: Prisma.NotificationTriggerFindUniqueArgs) => Promise<TriggerWithTemplateAndCampground | null>;
+    create: (args: Prisma.NotificationTriggerCreateArgs) => Promise<unknown>;
+    update: (args: Prisma.NotificationTriggerUpdateArgs) => Promise<unknown>;
+    delete: (args: Prisma.NotificationTriggerDeleteArgs) => Promise<unknown>;
+  };
+  scheduledNotification: {
+    create: (args: Prisma.ScheduledNotificationCreateArgs) => Promise<unknown>;
+    findMany: (args: Prisma.ScheduledNotificationFindManyArgs) => Promise<Array<{
+      id: string;
+      payload: Prisma.JsonValue | null;
+      NotificationTrigger: TriggerWithTemplate;
+    }>>;
+    update: (args: Prisma.ScheduledNotificationUpdateArgs) => Promise<unknown>;
+  };
+  campground: {
+    findUnique: (args: Prisma.CampgroundFindUniqueArgs) => Promise<{ name: string } | null>;
+  };
+};
+
+type EmailSender = Pick<EmailService, 'sendEmail'>;
+type SmsSender = Pick<SmsService, 'sendSms'>;
+
 @Injectable()
 export class NotificationTriggersService {
   private readonly logger = new Logger(NotificationTriggersService.name);
@@ -62,7 +168,7 @@ export class NotificationTriggersService {
     return this.prisma.notificationTrigger.findMany({
       where: { campgroundId },
       orderBy: [{ event: 'asc' }, { createdAt: 'desc' }],
-      include: { template: true }
+      include: { CampaignTemplate: true }
     });
   }
 
@@ -77,15 +183,18 @@ export class NotificationTriggersService {
     delayMinutes?: number;
     conditions?: Record<string, unknown>;
   }) {
+    const conditions = toNullableJsonInput(data.conditions);
     return this.prisma.notificationTrigger.create({
       data: {
+        id: randomUUID(),
         campgroundId,
         event: data.event,
         channel: data.channel,
         enabled: data.enabled ?? true,
         templateId: data.templateId ?? null,
         delayMinutes: data.delayMinutes ?? 0,
-        conditions: (data.conditions ?? null) as Prisma.InputJsonValue
+        ...(conditions === undefined ? {} : { conditions }),
+        updatedAt: new Date()
       }
     });
   }
@@ -96,7 +205,7 @@ export class NotificationTriggersService {
   private async validateTriggerOwnership(id: string, campgroundId: string): Promise<void> {
     const trigger = await this.prisma.notificationTrigger.findUnique({
       where: { id },
-      select: { campgroundId: true }
+      include: { CampaignTemplate: true, Campground: { select: { name: true } } }
     });
 
     if (!trigger) {
@@ -125,11 +234,14 @@ export class NotificationTriggersService {
     // Always validate ownership for multi-tenant isolation
     await this.validateTriggerOwnership(id, campgroundId);
 
+    const { conditions, ...rest } = data;
+    const normalizedConditions = conditions === undefined ? undefined : toNullableJsonInput(conditions);
+
     return this.prisma.notificationTrigger.update({
       where: { id },
       data: {
-        ...data,
-        conditions: data.conditions as Prisma.InputJsonValue | undefined
+        ...rest,
+        ...(normalizedConditions === undefined ? {} : { conditions: normalizedConditions })
       }
     });
   }
@@ -161,7 +273,7 @@ export class NotificationTriggersService {
         event,
         enabled: true
       },
-      include: { template: true }
+      include: { CampaignTemplate: true }
     });
 
     if (triggers.length === 0) {
@@ -172,7 +284,8 @@ export class NotificationTriggersService {
     let fired = 0;
     for (const trigger of triggers) {
       // Check conditions
-      if (trigger.conditions && !this.matchesConditions(trigger.conditions as Record<string, unknown>, payload)) {
+      const conditions = isRecord(trigger.conditions) ? trigger.conditions : null;
+      if (conditions && !this.matchesConditions(conditions, payload)) {
         continue;
       }
 
@@ -191,16 +304,35 @@ export class NotificationTriggersService {
   /**
    * Check if payload matches trigger conditions
    */
-  private matchesConditions(conditions: Record<string, unknown>, payload: TriggerPayload): boolean {
+  public matchesConditions(conditions: Record<string, unknown>, payload: TriggerPayload): boolean {
+    const payloadRecord: Record<string, unknown> = {
+      campgroundId: payload.campgroundId,
+      reservationId: payload.reservationId,
+      guestId: payload.guestId,
+      guestEmail: payload.guestEmail,
+      guestName: payload.guestName,
+      siteNumber: payload.siteNumber,
+      arrivalDate: payload.arrivalDate,
+      departureDate: payload.departureDate,
+      amountCents: payload.amountCents,
+      customData: payload.customData,
+    };
+
     for (const [key, value] of Object.entries(conditions)) {
-      const payloadValue = (payload as any)[key] ?? payload.customData?.[key];
+      const payloadValue = payloadRecord[key] ?? payload.customData?.[key];
       
-      if (typeof value === 'object' && value !== null) {
+      if (isRecord(value)) {
         // Handle operators like { gt: 100, lt: 1000 }
-        if (value.gt !== undefined && !(payloadValue > value.gt)) return false;
-        if (value.lt !== undefined && !(payloadValue < value.lt)) return false;
+        const gt = value.gt;
+        if (gt !== undefined) {
+          if (typeof gt !== "number" || typeof payloadValue !== "number" || payloadValue <= gt) return false;
+        }
+        const lt = value.lt;
+        if (lt !== undefined) {
+          if (typeof lt !== "number" || typeof payloadValue !== "number" || payloadValue >= lt) return false;
+        }
         if (value.eq !== undefined && payloadValue !== value.eq) return false;
-        if (value.in !== undefined && !value.in.includes(payloadValue)) return false;
+        if (Array.isArray(value.in) && !value.in.includes(payloadValue)) return false;
       } else if (payloadValue !== value) {
         return false;
       }
@@ -211,18 +343,25 @@ export class NotificationTriggersService {
   /**
    * Schedule a notification for later
    */
-  private async scheduleNotification(trigger: any, payload: TriggerPayload) {
+  private async scheduleNotification(trigger: TriggerWithTemplate, payload: TriggerPayload) {
     const sendAt = new Date(Date.now() + trigger.delayMinutes * 60 * 1000);
+    const payloadJson = toNullableJsonInput(payload);
+    const payloadValue =
+      payloadJson === undefined || payloadJson === Prisma.JsonNull
+        ? Prisma.JsonNull
+        : payloadJson;
     
     await this.prisma.scheduledNotification.create({
       data: {
+        id: randomUUID(),
         campgroundId: payload.campgroundId,
         triggerId: trigger.id,
         event: trigger.event,
         channel: trigger.channel,
-        payload: payload as any,
+        payload: payloadValue,
         sendAt,
-        status: 'pending'
+        status: 'pending',
+        updatedAt: new Date()
       }
     });
 
@@ -232,8 +371,8 @@ export class NotificationTriggersService {
   /**
    * Send a notification immediately
    */
-  private async sendNotification(trigger: any, payload: TriggerPayload) {
-    const template = trigger.template;
+  private async sendNotification(trigger: TriggerWithTemplate, payload: TriggerPayload) {
+    const template = trigger.CampaignTemplate;
     
     if (!payload.guestEmail) {
       this.logger.warn(`Cannot send notification: no guest email provided`);
@@ -247,13 +386,14 @@ export class NotificationTriggersService {
     });
 
     // Build email content
+    const safeEvent = isTriggerEvent(trigger.event) ? trigger.event : 'reservation_created';
     const subject = template?.subject 
       ? this.interpolate(template.subject, payload, campground)
-      : this.getDefaultSubject(trigger.event, campground?.name);
+      : this.getDefaultSubject(safeEvent, campground?.name);
 
     const html = template?.html 
       ? this.interpolate(template.html, payload, campground)
-      : this.getDefaultHtml(trigger.event, payload, campground?.name);
+      : this.getDefaultHtml(safeEvent, payload, campground?.name);
 
     if (trigger.channel === 'email' || trigger.channel === 'both') {
       await this.emailService.sendEmail({
@@ -267,10 +407,11 @@ export class NotificationTriggersService {
     }
 
     // SMS handling with feature flag
-    if ((trigger.channel === 'sms' || trigger.channel === 'both') && payload.customData?.phone) {
+    const phone = payload.customData?.phone;
+    if ((trigger.channel === 'sms' || trigger.channel === 'both') && typeof phone === 'string') {
       const smsBody = this.stripHtml(html).substring(0, 160); // SMS length limit
       const result = await this.smsService.sendSms({
-        to: payload.customData.phone,
+        to: phone,
         body: smsBody,
         campgroundId: payload.campgroundId,
         reservationId: payload.reservationId
@@ -286,7 +427,7 @@ export class NotificationTriggersService {
   /**
    * Strip HTML tags for SMS
    */
-  private stripHtml(html: string): string {
+  public stripHtml(html: string): string {
     return html
       .replace(/<[^>]*>/g, '')
       .replace(/\s+/g, ' ')
@@ -296,7 +437,7 @@ export class NotificationTriggersService {
   /**
    * Interpolate template variables
    */
-  private interpolate(template: string, payload: TriggerPayload, campground?: { name: string } | null): string {
+  public interpolate(template: string, payload: TriggerPayload, campground?: { name: string } | null): string {
     const vars: Record<string, string> = {
       '{{guest_name}}': payload.guestName || 'Guest',
       '{{campground_name}}': campground?.name || 'our campground',
@@ -317,7 +458,7 @@ export class NotificationTriggersService {
   /**
    * Get default subject for event
    */
-  private getDefaultSubject(event: TriggerEvent, campgroundName?: string): string {
+  public getDefaultSubject(event: string, campgroundName?: string): string {
     const name = campgroundName || 'our campground';
     const subjects: Record<TriggerEvent, string> = {
       reservation_created: `Reservation Confirmed at ${name}`,
@@ -333,13 +474,16 @@ export class NotificationTriggersService {
       waitlist_match: `Good News! A site is available at ${name}`,
       group_update: `Group Booking Update - ${name}`,
     };
-    return subjects[event] || `Update from ${name}`;
+    if (isTriggerEvent(event)) {
+      return subjects[event];
+    }
+    return `Update from ${name}`;
   }
 
   /**
    * Get default HTML for event
    */
-  private getDefaultHtml(event: TriggerEvent, payload: TriggerPayload, campgroundName?: string): string {
+  public getDefaultHtml(event: string, payload: TriggerPayload, campgroundName?: string): string {
     const name = campgroundName || 'our campground';
     const guestName = payload.guestName || 'Guest';
 
@@ -413,7 +557,10 @@ export class NotificationTriggersService {
       `,
     };
 
-    return templates[event] || `<p>Update from ${name}</p>`;
+    if (isTriggerEvent(event)) {
+      return templates[event];
+    }
+    return `<p>Update from ${name}</p>`;
   }
 
   /**
@@ -431,7 +578,7 @@ export class NotificationTriggersService {
     // Get the trigger with its template
     const trigger = await this.prisma.notificationTrigger.findUnique({
       where: { id: triggerId },
-      include: { template: true, campground: { select: { name: true } } }
+      include: { CampaignTemplate: true, Campground: { select: { name: true } } }
     });
 
     if (!trigger) {
@@ -450,17 +597,18 @@ export class NotificationTriggersService {
       amountCents: 15000, // $150.00
     };
 
-    const template = trigger.template;
-    const campgroundName = (trigger as any).campground?.name || 'Sample Campground';
+    const template = trigger.CampaignTemplate;
+    const campgroundName = trigger.Campground?.name || 'Sample Campground';
+    const safeEvent = isTriggerEvent(trigger.event) ? trigger.event : 'reservation_created';
 
     // Build email content using template or defaults
     const subject = template?.subject
       ? this.interpolate(template.subject, samplePayload, { name: campgroundName })
-      : `[TEST] ${this.getDefaultSubject(trigger.event as TriggerEvent, campgroundName)}`;
+      : `[TEST] ${this.getDefaultSubject(safeEvent, campgroundName)}`;
 
     const html = template?.html
       ? this.interpolate(template.html, samplePayload, { name: campgroundName })
-      : this.getDefaultHtml(trigger.event as TriggerEvent, samplePayload, campgroundName);
+      : this.getDefaultHtml(safeEvent, samplePayload, campgroundName);
 
     // Add test notice banner
     const testBanner = `
@@ -507,13 +655,23 @@ export class NotificationTriggersService {
         status: 'pending',
         sendAt: { lte: now }
       },
-      include: { trigger: { include: { template: true } } },
+      include: { NotificationTrigger: { include: { CampaignTemplate: true } } },
       take: 50
     });
 
     for (const notification of pending) {
       try {
-        await this.sendNotification(notification.trigger, notification.payload as unknown as TriggerPayload);
+        const payload = parseTriggerPayload(notification.payload);
+        if (!payload) {
+          this.logger.warn(`Skipping scheduled notification ${notification.id}: invalid payload`);
+          await this.prisma.scheduledNotification.update({
+            where: { id: notification.id },
+            data: { status: 'failed' }
+          });
+          continue;
+        }
+
+        await this.sendNotification(notification.NotificationTrigger, payload);
         await this.prisma.scheduledNotification.update({
           where: { id: notification.id },
           data: { status: 'sent', sentAt: new Date() }
@@ -530,4 +688,3 @@ export class NotificationTriggersService {
     return { processed: pending.length };
   }
 }
-

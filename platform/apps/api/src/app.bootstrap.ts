@@ -16,7 +16,12 @@ import { RedactingLogger } from "./logger/redacting.logger";
 import { AllExceptionsFilter } from "./common/filters/all-exceptions.filter";
 import type { Request, Response, NextFunction } from "express";
 import { DeveloperApiModule } from "./developer-api/developer-api.module";
-import type { Request } from "express";
+
+type RawBodyRequest = Request & { rawBody?: Buffer };
+type ScopedRequest = Request & {
+  campgroundId?: string | null;
+  organizationId?: string | null;
+};
 
 const logger = new Logger('AppBootstrap');
 
@@ -137,8 +142,7 @@ export async function createApp(): Promise<INestApplication> {
     app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
     // Cookie parser for CSRF and session handling
-    const cookieParserFn = (cookieParser as any).default || cookieParser;
-    app.use(cookieParserFn(process.env.COOKIE_SECRET || process.env.JWT_SECRET));
+    app.use(cookieParser(process.env.COOKIE_SECRET || process.env.JWT_SECRET));
 
     // Security headers via helmet
     const frontendUrl = frontendOrigin;
@@ -197,10 +201,9 @@ export async function createApp(): Promise<INestApplication> {
     logger.log("Security headers (helmet) enabled");
 
     // Scope middleware
-    app.use((req: Request, _res: Response, next: NextFunction) => {
-        const headers = req.headers as Record<string, unknown>;
-        const cgHeader = headers["x-campground-id"];
-        const orgHeader = headers["x-organization-id"];
+    app.use((req: ScopedRequest, _res: Response, next: NextFunction) => {
+        const cgHeader = req.headers["x-campground-id"];
+        const orgHeader = req.headers["x-organization-id"];
         req.campgroundId = Array.isArray(cgHeader) ? cgHeader[0] : cgHeader || null;
         req.organizationId = Array.isArray(orgHeader) ? orgHeader[0] : orgHeader || null;
         next();
@@ -211,7 +214,7 @@ export async function createApp(): Promise<INestApplication> {
     app.use(
         express.json({
             limit: bodyLimit,
-            verify: (req: any, _res: any, buf: Buffer) => {
+            verify: (req: RawBodyRequest, _res: Response, buf: Buffer) => {
                 req.rawBody = buf;
             }
         })
@@ -220,7 +223,7 @@ export async function createApp(): Promise<INestApplication> {
         express.urlencoded({
             extended: true,
             limit: bodyLimit,
-            verify: (req: any, _res: any, buf: Buffer) => {
+            verify: (req: RawBodyRequest, _res: Response, buf: Buffer) => {
                 req.rawBody = buf;
             }
         })

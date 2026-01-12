@@ -1,9 +1,25 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
+import { randomUUID } from "crypto";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateDepositPolicyDto } from "./dto/create-deposit-policy.dto";
 import { UpdateDepositPolicyDto } from "./dto/update-deposit-policy.dto";
 import { DepositStrategy, DepositApplyTo } from "@prisma/client";
+import type { DepositPolicy } from "@prisma/client";
 import { AuditService } from "../audit/audit.service";
+
+type DepositPolicyStore = Pick<
+  PrismaService["depositPolicy"],
+  "findMany" | "findFirst" | "findUnique" | "create" | "update" | "delete"
+>;
+
+type CampgroundStore = Pick<PrismaService["campground"], "findUnique">;
+
+type DepositPoliciesStore = {
+  depositPolicy: DepositPolicyStore;
+  campground: CampgroundStore;
+};
+
+type DepositPoliciesAudit = Pick<AuditService, "record">;
 
 export interface DepositCalculation {
   depositAmountCents: number;
@@ -34,10 +50,12 @@ export class DepositPoliciesService {
   async create(campgroundId: string, dto: CreateDepositPolicyDto, actorId?: string | null) {
     const policy = await this.prisma.depositPolicy.create({
       data: {
+        id: randomUUID(),
         ...dto,
         campgroundId,
         siteClassId: dto.siteClassId ?? null,
-        retryPlanId: dto.retryPlanId ?? null
+        retryPlanId: dto.retryPlanId ?? null,
+        updatedAt: new Date()
       }
     });
 
@@ -57,8 +75,7 @@ export class DepositPoliciesService {
   async update(campgroundId: string, id: string, dto: UpdateDepositPolicyDto, actorId?: string | null) {
     const existing = await this.prisma.depositPolicy.findFirst({ where: { id, campgroundId } });
     if (!existing) throw new NotFoundException("Deposit policy not found");
-    const { campgroundId: _campgroundId, siteClassId, retryPlanId, ...rest } =
-      dto as UpdateDepositPolicyDto & { campgroundId?: string };
+    const { siteClassId, retryPlanId, ...rest } = dto;
     const updated = await this.prisma.depositPolicy.update({
       where: { id },
       data: {
@@ -103,7 +120,7 @@ export class DepositPoliciesService {
    * Resolve the applicable deposit policy for a reservation.
    * Priority: siteClass-specific > campground default > campground-wide policy
    */
-  async resolve(campgroundId: string, siteClassId: string | null): Promise<any | null> {
+  async resolve(campgroundId: string, siteClassId: string | null): Promise<DepositPolicy | null> {
     // 1. Try siteClass-specific policy
     if (siteClassId) {
       const siteClassPolicy = await this.prisma.depositPolicy.findFirst({
