@@ -6,7 +6,7 @@ import { AppModule } from "./app.module";
 import { PrismaService } from "./prisma/prisma.service";
 import * as dotenv from "dotenv";
 import helmet from "helmet";
-import * as cookieParser from "cookie-parser";
+import cookieParser from "cookie-parser";
 import { PerfInterceptor } from "./perf/perf.interceptor";
 import { RateLimitInterceptor } from "./perf/rate-limit.interceptor";
 import { PerfService } from "./perf/perf.service";
