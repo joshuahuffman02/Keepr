@@ -31,7 +31,29 @@ node /app/scripts/link-prisma-client.js || echo "Link script not found, skipping
 
 echo "=== Running database migrations ==="
 echo "DIRECT_URL set: $([ -n "$DIRECT_URL" ] && echo 'yes' || echo 'NO - migrations may hang!')"
-cd /app/platform/apps/api && timeout 60 npx prisma migrate deploy && echo "Migrations completed successfully" || echo "Migration failed, timed out, or no pending migrations"
+
+# Run migrations with 5-minute timeout (complex migrations can take time)
+# If migrations fail, we MUST NOT start the app (schema mismatch causes P2022 errors)
+cd /app/platform/apps/api
+if timeout 300 npx prisma migrate deploy; then
+    echo "Migrations completed successfully"
+else
+    MIGRATE_EXIT=$?
+    if [ $MIGRATE_EXIT -eq 124 ]; then
+        echo "ERROR: Migrations timed out after 5 minutes"
+    else
+        echo "Migrations exited with code $MIGRATE_EXIT (may be no pending migrations, which is OK)"
+    fi
+
+    # Check if there are pending migrations that didn't apply
+    echo "Checking migration status..."
+    if timeout 30 npx prisma migrate status 2>&1 | grep -q "have not yet been applied"; then
+        echo "FATAL: There are pending migrations that failed to apply. Cannot start app."
+        echo "Schema mismatch will cause P2022 errors. Exiting."
+        exit 1
+    fi
+    echo "No pending migrations - safe to start app"
+fi
 
 echo "=== Starting app ==="
 cd /app/platform/apps/api
