@@ -30,7 +30,8 @@ echo "=== Linking Prisma client for pnpm ==="
 node /app/scripts/link-prisma-client.js || echo "Link script not found, skipping"
 
 echo "=== Running database migrations ==="
-cd /app/platform/apps/api && npx prisma migrate deploy || echo "Migration failed or no pending migrations"
+echo "DIRECT_URL set: $([ -n "$DIRECT_URL" ] && echo 'yes' || echo 'NO - migrations may hang!')"
+cd /app/platform/apps/api && timeout 60 npx prisma migrate deploy && echo "Migrations completed successfully" || echo "Migration failed, timed out, or no pending migrations"
 
 echo "=== Starting app ==="
 cd /app/platform/apps/api
