@@ -40,22 +40,11 @@ echo "Latest migration: ${LAST_MIGRATION:-none}"
 
 # ONE-TIME FIX: Reset the SEO migration that was killed by timeout
 # This migration was marked as "applied" but didn't complete, causing P2022 errors
+# The migration is idempotent (uses ADD COLUMN IF NOT EXISTS), so safe to re-run
 # Remove this block after staging is fixed (around Jan 15, 2026)
 SEO_MIGRATION="20251231083410_add_seo_claims_infrastructure"
-echo "Checking if $SEO_MIGRATION needs to be reset..."
-if npx prisma migrate status 2>&1 | grep -q "$SEO_MIGRATION"; then
-    # Check if the claimStatus column exists (one of the first columns added by this migration)
-    CHECK_COL=$(echo "SELECT column_name FROM information_schema.columns WHERE table_name = 'Campground' AND column_name = 'claimStatus';" | timeout 10 npx prisma db execute --stdin 2>&1 || echo "")
-    if ! echo "$CHECK_COL" | grep -q "claimStatus"; then
-        echo "DETECTED: SEO migration is marked applied but columns are missing!"
-        echo "Marking migration as rolled-back to force re-apply..."
-        npx prisma migrate resolve --rolled-back "$SEO_MIGRATION" || echo "Could not rollback (may already be pending)"
-    else
-        echo "SEO migration columns verified - schema is complete"
-    fi
-else
-    echo "SEO migration status check skipped"
-fi
+echo "Unconditionally marking $SEO_MIGRATION as rolled-back to force re-apply..."
+npx prisma migrate resolve --rolled-back "$SEO_MIGRATION" 2>&1 || echo "Could not rollback (may already be pending or not applied)"
 
 # Run migrations with 10-minute timeout (large SEO migration needs time)
 if timeout 600 npx prisma migrate deploy; then
