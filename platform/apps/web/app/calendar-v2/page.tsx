@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import {
   ArrowRight,
+  Ban,
   CalendarDays,
   CalendarCheck,
   ChevronLeft,
@@ -48,7 +49,7 @@ import { cn } from "../../lib/utils";
 
 import { useCalendarData } from "../calendar/useCalendarData";
 import { diffInDays, formatLocalDateInput, parseLocalDateInput, toLocalDate } from "../calendar/utils";
-import type { CalendarReservation, CalendarSite, DayMeta, QuotePreview } from "../calendar/types";
+import type { CalendarBlackout, CalendarReservation, CalendarSite, DayMeta, QuotePreview } from "../calendar/types";
 
 const DAY_RANGES = [7, 14, 21, 30];
 const SITE_COL_WIDTH = 240;
@@ -196,6 +197,21 @@ export default function CalendarPage() {
     () => reservations.filter((res) => (res.siteId ? visibleSiteIds.has(res.siteId) : false)),
     [reservations, visibleSiteIds]
   );
+
+  // Get blackouts and group by site
+  const blackouts = queries.blackouts.data || [];
+  const blackoutsBySite = useMemo(() => {
+    const grouped: Record<string, CalendarBlackout[]> = {};
+    for (const blackout of blackouts) {
+      if (!blackout.siteId) continue;
+      if (!grouped[blackout.siteId]) {
+        grouped[blackout.siteId] = [];
+      }
+      grouped[blackout.siteId].push(blackout);
+    }
+    return grouped;
+  }, [blackouts]);
+
   const guestSearchStats = useMemo(() => {
     const search = state.guestSearch.trim().toLowerCase();
     if (!search) {
@@ -719,6 +735,7 @@ export default function CalendarPage() {
                 isLoading={queries.sites.isLoading || queries.reservations.isLoading}
                 sites={visibleSites}
                 reservationsBySite={derived.reservationsBySite}
+                blackoutsBySite={blackoutsBySite}
                 selectionDraft={bookingDraft}
                 onSelectionComplete={actions.selectRange}
                 onReservationClick={actions.setSelectedReservationId}
@@ -1021,6 +1038,7 @@ interface CalendarGridProps {
   isLoading: boolean;
   sites: CalendarSite[];
   reservationsBySite: Record<string, CalendarReservation[]>;
+  blackoutsBySite: Record<string, CalendarBlackout[]>;
   selectionDraft: QuotePreview | null;
   onSelectionComplete: (siteId: string, arrival: Date, departure: Date) => void;
   onReservationClick: (id: string) => void;
@@ -1033,6 +1051,7 @@ function CalendarGrid({
   isLoading,
   sites,
   reservationsBySite,
+  blackoutsBySite,
   selectionDraft,
   onSelectionComplete,
   onReservationClick,
@@ -1207,6 +1226,7 @@ function CalendarGrid({
               days={days}
               dayCount={dayCount}
               reservations={reservationsBySite[site.id] || []}
+              blackouts={blackoutsBySite[site.id] || []}
               gridTemplate={gridTemplate}
               zebra={idx % 2 === 0 ? "bg-card" : "bg-muted/30"}
               activeSelection={activeSelection}
@@ -1227,6 +1247,7 @@ interface CalendarRowProps {
   days: DayMeta[];
   dayCount: number;
   reservations: CalendarReservation[];
+  blackouts: CalendarBlackout[];
   gridTemplate: string;
   zebra: string;
   activeSelection: ActiveSelection | null;
@@ -1241,6 +1262,7 @@ function CalendarRow({
   days,
   dayCount,
   reservations,
+  blackouts,
   gridTemplate,
   zebra,
   activeSelection,
@@ -1333,6 +1355,52 @@ function CalendarRow({
               </div>
             );
           })()}
+
+          {/* Blackouts */}
+          {blackouts.map((blackout) => {
+            const start = days[0].date;
+            const blackoutStart = toLocalDate(blackout.startDate);
+            const blackoutEnd = toLocalDate(blackout.endDate);
+            const startIdx = Math.max(0, diffInDays(blackoutStart, start));
+            const endIdx = Math.min(dayCount, diffInDays(blackoutEnd, start) + 1); // +1 because end is inclusive
+
+            if (endIdx <= 0 || startIdx >= dayCount) return null;
+
+            const span = Math.max(1, endIdx - startIdx);
+
+            return (
+              <div
+                key={blackout.id}
+                className="relative h-full w-full pointer-events-none"
+                style={{
+                  gridColumn: `${startIdx + 1} / span ${span}`,
+                  zIndex: 15
+                }}
+                title={blackout.reason || "Blocked"}
+              >
+                <div className="absolute inset-0 mx-0.5 my-1 rounded-md bg-destructive/10 border border-destructive/30 flex items-center justify-center overflow-hidden">
+                  {/* Hatching pattern */}
+                  <div
+                    className="absolute inset-0 opacity-20"
+                    style={{
+                      backgroundImage: `repeating-linear-gradient(
+                        45deg,
+                        transparent,
+                        transparent 4px,
+                        currentColor 4px,
+                        currentColor 5px
+                      )`,
+                      color: 'hsl(var(--destructive))'
+                    }}
+                  />
+                  <div className="relative z-10 flex items-center gap-1 bg-card/90 px-2 py-0.5 rounded text-[10px] font-medium text-destructive">
+                    <Ban className="h-3 w-3" />
+                    <span className="truncate max-w-[80px]">{blackout.reason || "Blocked"}</span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
 
           {reservations.map((res) => {
             const start = days[0].date;
