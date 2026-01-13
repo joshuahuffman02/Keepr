@@ -29,6 +29,9 @@ fi
 echo "=== Linking Prisma client for pnpm ==="
 node /app/scripts/link-prisma-client.js || echo "Link script not found, skipping"
 
+echo "=== Running database migrations ==="
+cd /app/platform/apps/api && npx prisma migrate deploy || echo "Migration failed or no pending migrations"
+
 echo "=== Starting app ==="
 cd /app/platform/apps/api
 exec node dist/main.js
