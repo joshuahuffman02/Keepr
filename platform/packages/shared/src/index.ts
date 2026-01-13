@@ -245,9 +245,9 @@ export const SiteClassSchema = z.object({
 export type SiteClass = z.infer<typeof SiteClassSchema>;
 
 export const SiteSchema = z.object({
-  id: z.string().cuid(),
-  campgroundId: z.string().cuid(),
-  siteClassId: z.string().cuid().optional().nullable(),
+  id: z.string(),
+  campgroundId: z.string(),
+  siteClassId: z.string().optional().nullable(),
   name: z.string().min(1),
   siteNumber: z.string().min(1),
   siteType: z.enum(["rv", "tent", "cabin", "group", "glamping"]),
