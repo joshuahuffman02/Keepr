@@ -38,12 +38,19 @@ cd /app/platform/apps/api
 LAST_MIGRATION=$(ls -1 prisma/migrations/ 2>/dev/null | grep -E '^[0-9]+' | sort | tail -1)
 echo "Latest migration: ${LAST_MIGRATION:-none}"
 
-# NOTE: Database migration fix removed - must be done manually in Supabase dashboard
-# Run: DELETE FROM "_prisma_migrations" WHERE migration_name = '20251231083410_add_seo_claims_infrastructure';
-# Then redeploy this service
+# Quick check for pending migrations first (30s timeout)
+echo "Checking for pending migrations..."
+MIGRATE_STATUS=$(timeout 30 npx prisma migrate status 2>&1) || true
+if echo "$MIGRATE_STATUS" | grep -q "Database schema is up to date"; then
+    echo "No pending migrations - skipping migrate deploy"
+    SKIP_MIGRATE=true
+else
+    echo "Migration status: $MIGRATE_STATUS"
+    SKIP_MIGRATE=false
+fi
 
 # Run migrations with 10-minute timeout (large SEO migration needs time)
-if timeout 600 npx prisma migrate deploy; then
+if [ "$SKIP_MIGRATE" = "true" ] || timeout 600 npx prisma migrate deploy; then
     echo "Migrations completed successfully"
 else
     MIGRATE_EXIT=$?
