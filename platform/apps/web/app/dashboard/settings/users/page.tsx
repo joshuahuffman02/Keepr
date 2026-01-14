@@ -387,6 +387,7 @@ export default function UsersPage() {
                         <Button
                           variant="ghost"
                           size="icon"
+                          aria-label="Delete"
                           className="text-rose-600 hover:text-rose-700"
                           onClick={() => removeMember.mutate(member.id)}
                           disabled={removeMember.isPending}

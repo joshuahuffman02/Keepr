@@ -423,6 +423,7 @@ export default function LockCodesPage() {
           <Button
             variant="ghost"
             size="icon"
+            aria-label="Copy"
             className="h-7 w-7"
             onClick={() => handleCopyCode(item.id, item.code)}
           >
@@ -558,7 +559,7 @@ export default function LockCodesPage() {
         getRowActions={(item) => (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Button variant="ghost" size="icon" aria-label="More options" className="h-8 w-8">
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>

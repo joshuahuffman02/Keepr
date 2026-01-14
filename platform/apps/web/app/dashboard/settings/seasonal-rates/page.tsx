@@ -407,12 +407,12 @@ export default function SeasonalRatesSettingsPage() {
                                                 checked={rate.isActive}
                                                 onCheckedChange={() => toggleActive(rate)}
                                             />
-                                            <Button variant="ghost" size="icon" onClick={() => openEditModal(rate)}>
+                                            <Button variant="ghost" size="icon" aria-label="Edit" onClick={() => openEditModal(rate)}>
                                                 <Pencil className="h-4 w-4" />
                                             </Button>
                                             <ConfirmDialog
                                                 trigger={
-                                                    <Button variant="ghost" size="icon">
+                                                    <Button variant="ghost" size="icon" aria-label="Delete">
                                                         <Trash2 className="h-4 w-4 text-destructive" />
                                                     </Button>
                                                 }

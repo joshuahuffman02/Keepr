@@ -688,6 +688,7 @@ export function SiteLayoutEditor({
                   <Button
                     variant={activeTool === "select" ? "default" : "ghost"}
                     size="icon"
+                    aria-label="Select tool"
                     onClick={() => setActiveTool("select")}
                   >
                     <MousePointer className="h-4 w-4" />
@@ -701,6 +702,7 @@ export function SiteLayoutEditor({
                   <Button
                     variant={activeTool === "site" ? "default" : "ghost"}
                     size="icon"
+                    aria-label="Add site"
                     onClick={() => setActiveTool("site")}
                   >
                     <Tent className="h-4 w-4" />
@@ -714,6 +716,7 @@ export function SiteLayoutEditor({
                   <Button
                     variant={activeTool === "pan" ? "default" : "ghost"}
                     size="icon"
+                    aria-label="Pan"
                     onClick={() => setActiveTool("pan")}
                   >
                     <Move className="h-4 w-4" />
@@ -736,6 +739,7 @@ export function SiteLayoutEditor({
                           <Button
                             variant={selectedSiteType === type ? "default" : "ghost"}
                             size="icon"
+                            aria-label={`Select ${type} site type`}
                             onClick={() => setSelectedSiteType(type)}
                             style={{
                               backgroundColor: selectedSiteType === type ? SITE_TYPE_COLORS[type] : undefined,
@@ -755,7 +759,7 @@ export function SiteLayoutEditor({
             <div className="flex items-center gap-1 border-r pr-2">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" onClick={undo} disabled={historyIndex <= 0}>
+                  <Button variant="ghost" size="icon" aria-label="Undo" onClick={undo} disabled={historyIndex <= 0}>
                     <Undo className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
@@ -764,7 +768,7 @@ export function SiteLayoutEditor({
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" onClick={redo} disabled={historyIndex >= history.length - 1}>
+                  <Button variant="ghost" size="icon" aria-label="Redo" onClick={redo} disabled={historyIndex >= history.length - 1}>
                     <Redo className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
@@ -773,7 +777,7 @@ export function SiteLayoutEditor({
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" onClick={duplicateSelected} disabled={selectedIds.length === 0}>
+                  <Button variant="ghost" size="icon" aria-label="Duplicate" onClick={duplicateSelected} disabled={selectedIds.length === 0}>
                     <Copy className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
@@ -782,7 +786,7 @@ export function SiteLayoutEditor({
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" onClick={deleteSelected} disabled={selectedIds.length === 0}>
+                  <Button variant="ghost" size="icon" aria-label="Delete" onClick={deleteSelected} disabled={selectedIds.length === 0}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
@@ -794,7 +798,7 @@ export function SiteLayoutEditor({
             <div className="flex items-center gap-1 border-r pr-2">
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" onClick={() => setZoom((z) => Math.min(MAX_ZOOM, z * 1.2))}>
+                  <Button variant="ghost" size="icon" aria-label="Zoom in" onClick={() => setZoom((z) => Math.min(MAX_ZOOM, z * 1.2))}>
                     <ZoomIn className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
@@ -805,7 +809,7 @@ export function SiteLayoutEditor({
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" onClick={() => setZoom((z) => Math.max(MIN_ZOOM, z / 1.2))}>
+                  <Button variant="ghost" size="icon" aria-label="Zoom out" onClick={() => setZoom((z) => Math.max(MIN_ZOOM, z / 1.2))}>
                     <ZoomOut className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
@@ -817,6 +821,7 @@ export function SiteLayoutEditor({
                   <Button
                     variant="ghost"
                     size="icon"
+                    aria-label="Reset view"
                     onClick={() => {
                       setZoom(1);
                       setPan({ x: 0, y: 0 });
@@ -830,7 +835,7 @@ export function SiteLayoutEditor({
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant={showGrid ? "default" : "ghost"} size="icon" onClick={() => setShowGrid(!showGrid)}>
+                  <Button variant={showGrid ? "default" : "ghost"} size="icon" aria-label="Toggle grid" onClick={() => setShowGrid(!showGrid)}>
                     <Grid3X3 className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
@@ -857,6 +862,7 @@ export function SiteLayoutEditor({
                       <Button
                         variant={showBackgroundImage ? "default" : "ghost"}
                         size="icon"
+                        aria-label={showBackgroundImage ? "Hide background" : "Show background"}
                         onClick={() => setShowBackgroundImage(!showBackgroundImage)}
                       >
                         {showBackgroundImage ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}

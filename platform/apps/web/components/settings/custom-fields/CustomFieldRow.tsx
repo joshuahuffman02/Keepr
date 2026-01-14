@@ -156,6 +156,7 @@ export function CustomFieldRow({
           size="icon"
           onClick={onEdit}
           className="h-8 w-8"
+          aria-label="Edit"
         >
           <Pencil className="h-4 w-4" />
           <span className="sr-only">Edit</span>
@@ -165,6 +166,7 @@ export function CustomFieldRow({
           size="icon"
           onClick={onDelete}
           className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
+          aria-label="Delete"
         >
           <Trash2 className="h-4 w-4" />
           <span className="sr-only">Delete</span>

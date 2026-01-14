@@ -1429,7 +1429,7 @@ export default function MessagesPage() {
                                         <h3 className="text-sm font-semibold text-muted-foreground">Channels</h3>
                                         <Dialog open={isCreateChannelOpen} onOpenChange={setIsCreateChannelOpen}>
                                             <DialogTrigger asChild>
-                                                <Button variant="ghost" size="icon" className="h-6 w-6">
+                                                <Button variant="ghost" size="icon" className="h-6 w-6" aria-label="Add channel">
                                                     <Plus className="h-4 w-4" />
                                                 </Button>
                                             </DialogTrigger>
@@ -1500,7 +1500,7 @@ export default function MessagesPage() {
                                         <h3 className="text-sm font-semibold text-muted-foreground">Direct Messages</h3>
                                         <Dialog open={isCreateDMOpen} onOpenChange={setIsCreateDMOpen}>
                                             <DialogTrigger asChild>
-                                                <Button variant="ghost" size="icon" className="h-6 w-6">
+                                                <Button variant="ghost" size="icon" className="h-6 w-6" aria-label="Add message">
                                                     <Plus className="h-4 w-4" />
                                                 </Button>
                                             </DialogTrigger>
@@ -1919,6 +1919,7 @@ export default function MessagesPage() {
                                                         variant="ghost"
                                                         size="icon"
                                                         className="h-6 w-6"
+                                                        aria-label="Close guest details"
                                                         onClick={() => setShowGuestInfo(false)}
                                                     >
                                                         <X className="h-4 w-4" />
@@ -2142,6 +2143,7 @@ export default function MessagesPage() {
                                         variant="ghost"
                                         size="icon"
                                         className="h-8 w-8"
+                                        aria-label="Clear selected guest"
                                         onClick={() => {
                                             setComposeSelectedGuest(null);
                                             setComposeSelectedReservation(null);

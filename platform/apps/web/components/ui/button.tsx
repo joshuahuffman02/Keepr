@@ -28,11 +28,21 @@ const buttonVariants = cva(
   }
 );
 
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-  VariantProps<typeof buttonVariants> {
-  asChild?: boolean;
-}
+type BaseButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
+  Omit<VariantProps<typeof buttonVariants>, "size"> & {
+    asChild?: boolean;
+  };
+
+type IconButtonProps = BaseButtonProps & {
+  size: "icon";
+  "aria-label": string;
+};
+
+type StandardButtonProps = BaseButtonProps & {
+  size?: Exclude<VariantProps<typeof buttonVariants>["size"], "icon">;
+};
+
+export type ButtonProps = IconButtonProps | StandardButtonProps;
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ className, variant, size, asChild = false, ...props }, ref) => {
   const Comp = asChild ? Slot : "button";

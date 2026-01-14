@@ -95,6 +95,7 @@ export function RateGroupRow({
               variant="ghost"
               className="h-8 w-8"
               onClick={handleSaveName}
+              aria-label="Save"
             >
               <Check className="h-4 w-4 text-emerald-600" />
             </Button>
@@ -103,6 +104,7 @@ export function RateGroupRow({
               variant="ghost"
               className="h-8 w-8"
               onClick={handleCancelEdit}
+              aria-label="Cancel"
             >
               <X className="h-4 w-4 text-muted-foreground" />
             </Button>
@@ -159,6 +161,7 @@ export function RateGroupRow({
             variant="ghost"
             size="icon"
             className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+            aria-label="More options"
           >
             <MoreHorizontal className="h-4 w-4" />
             <span className="sr-only">Actions</span>

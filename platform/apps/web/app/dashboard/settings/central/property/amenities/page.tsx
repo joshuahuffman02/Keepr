@@ -82,7 +82,7 @@ export default function AmenitiesPage() {
                       </div>
                     </div>
                   </div>
-                  <Button variant="ghost" size="icon" asChild>
+                  <Button variant="ghost" size="icon" aria-label="Go to amenities" asChild>
                     <Link href="/dashboard/settings/amenities">
                       <ArrowRight className="h-5 w-5" />
                     </Link>

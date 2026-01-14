@@ -1383,10 +1383,10 @@ export default function ApprovalsPage() {
                             size="icon"
                             variant="ghost"
                             className="h-6 w-6"
+                            aria-label="Edit policy"
                             onClick={() => openPolicyEdit(policy)}
                           >
                             <Pencil className="h-3 w-3" />
-                            <span className="sr-only">Edit policy</span>
                           </Button>
                           <Popover open={deleteConfirmId === policy.id} onOpenChange={(open) => setDeleteConfirmId(open ? policy.id : null)}>
                             <PopoverTrigger asChild>
@@ -1394,9 +1394,9 @@ export default function ApprovalsPage() {
                                 size="icon"
                                 variant="ghost"
                                 className="h-6 w-6 text-destructive hover:text-destructive"
+                                aria-label="Delete policy"
                               >
                                 <Trash2 className="h-3 w-3" />
-                                <span className="sr-only">Delete policy</span>
                               </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-56 p-3" align="end">

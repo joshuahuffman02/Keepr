@@ -1061,6 +1061,7 @@ export default function GuestAnalyticsPage() {
                       size="icon"
                       onClick={copyShareLink}
                       className="border-border shrink-0"
+                      aria-label="Copy link"
                     >
                       {shareLinkCopied ? (
                         <Check className="h-4 w-4 text-emerald-500" />

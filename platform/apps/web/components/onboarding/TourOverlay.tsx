@@ -262,6 +262,7 @@ export function TourOverlay({
                 size="icon"
                 className="h-6 w-6 text-muted-foreground hover:text-muted-foreground"
                 onClick={onSkip}
+                aria-label="Close tour"
               >
                 <X className="h-4 w-4" />
               </Button>

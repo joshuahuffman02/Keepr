@@ -446,6 +446,7 @@ export default function GroupsPage() {
                   variant="ghost"
                   size="icon"
                   onClick={() => setShowBlockModal(false)}
+                  aria-label="Close"
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -584,6 +585,7 @@ export default function GroupsPage() {
                   variant="ghost"
                   size="icon"
                   onClick={() => setShowGroupModal(false)}
+                  aria-label="Close"
                 >
                   <X className="h-4 w-4" />
                 </Button>

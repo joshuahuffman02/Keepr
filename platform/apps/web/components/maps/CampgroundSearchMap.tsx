@@ -496,6 +496,7 @@ export function CampgroundSearchMap({
               onClick={handleLocateUser}
               disabled={isLocating}
               className="bg-card shadow-lg"
+              aria-label="Locate me"
             >
               {isLocating ? (
                 <Loader2 className="h-4 w-4 animate-spin" />

@@ -550,7 +550,7 @@ Type \`help\` to see all available commands, or just ask me anything!`,
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Link href="/ai">
-                <Button variant="ghost" size="icon" className="h-8 w-8">
+                <Button variant="ghost" size="icon" className="h-8 w-8" aria-label="Back">
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
               </Link>

@@ -5,14 +5,10 @@ import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import {
   ArrowRight,
-  Ban,
   CalendarDays,
   CalendarCheck,
   ChevronLeft,
   ChevronRight,
-  Lock,
-  Search,
-  Sparkles,
   Users,
   Wrench,
   User,
@@ -31,7 +27,9 @@ import {
   LayoutList,
   AlignJustify,
   Rows3,
-  Building2
+  Building2,
+  Sparkles,
+  Search,
 } from "lucide-react";
 
 import { DashboardShell } from "../../components/ui/layout/DashboardShell";
@@ -48,158 +46,66 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../componen
 import { cn } from "../../lib/utils";
 
 import { useCalendarData } from "../calendar/useCalendarData";
-import { diffInDays, formatLocalDateInput, parseLocalDateInput, toLocalDate } from "../calendar/utils";
-import type { CalendarBlackout, CalendarReservation, CalendarSite, DayMeta, QuotePreview } from "../calendar/types";
+import { formatLocalDateInput, parseLocalDateInput, toLocalDate } from "../calendar/utils";
+import type { CalendarBlackout } from "../calendar/types";
+
+import {
+  CalendarGrid,
+  StatusFilterChips,
+  StatCard,
+  type DensityMode,
+  DENSITY_CONFIG,
+} from "./components";
 
 const DAY_RANGES = [7, 14, 21, 30];
-const SITE_COL_WIDTH = 240;
-const DAY_MIN_WIDTH = 104;
 
-const SITE_TYPE_STYLES: Record<string, { label: string; badge: string; border: string }> = {
-  rv: { label: "RV", badge: "bg-status-success/15 text-status-success", border: "border-l-status-success" },
-  tent: { label: "Tent", badge: "bg-status-warning/15 text-status-warning", border: "border-l-status-warning" },
-  cabin: { label: "Cabin", badge: "bg-rose-100 text-rose-700", border: "border-l-rose-400" },
-  group: { label: "Group", badge: "bg-indigo-100 text-indigo-700", border: "border-l-indigo-400" },
-  glamping: { label: "Glamp", badge: "bg-cyan-100 text-cyan-700", border: "border-l-cyan-400" },
-  default: { label: "Site", badge: "bg-muted text-muted-foreground", border: "border-l-border" }
+const DENSITY_ICONS: Record<DensityMode, typeof LayoutList> = {
+  compact: LayoutList,
+  standard: AlignJustify,
+  expanded: Rows3,
 };
 
-// Density configuration for calendar grid
-type DensityMode = "compact" | "standard" | "expanded";
-
-const DENSITY_CONFIG: Record<DensityMode, {
-  rowHeight: number;
-  chipHeight: number;
-  padding: string;
-  fontSize: string;
-  showDetails: boolean;
-  icon: typeof LayoutList;
-  label: string;
-}> = {
-  compact: {
-    rowHeight: 40,
-    chipHeight: 28,
-    padding: "py-1",
-    fontSize: "text-[9px]",
-    showDetails: false,
-    icon: LayoutList,
-    label: "Compact"
-  },
-  standard: {
-    rowHeight: 64,
-    chipHeight: 48,
-    padding: "py-3",
-    fontSize: "text-[11px]",
-    showDetails: true,
-    icon: AlignJustify,
-    label: "Standard"
-  },
-  expanded: {
-    rowHeight: 88,
-    chipHeight: 72,
-    padding: "py-4",
-    fontSize: "text-xs",
-    showDetails: true,
-    icon: Rows3,
-    label: "Expanded"
-  }
+const DENSITY_LABELS: Record<DensityMode, string> = {
+  compact: "Compact",
+  standard: "Standard",
+  expanded: "Expanded",
 };
 
 const DENSITY_MODES: DensityMode[] = ["compact", "standard", "expanded"];
-
-// Status configuration for legend and chips
-const STATUS_CONFIG: Record<string, {
-  label: string;
-  color: string;
-  bgColor: string;
-  borderColor: string;
-  icon: typeof CheckCircle;
-  description: string;
-}> = {
-  confirmed: {
-    label: "Confirmed",
-    color: "text-status-success",
-    bgColor: "bg-status-success",
-    borderColor: "border-status-success",
-    icon: CheckCircle,
-    description: "Reservation is confirmed and ready"
-  },
-  checked_in: {
-    label: "Checked In",
-    color: "text-status-info",
-    bgColor: "bg-status-info",
-    borderColor: "border-status-info",
-    icon: Clock,
-    description: "Guest is currently on-site"
-  },
-  pending: {
-    label: "Pending",
-    color: "text-status-warning",
-    bgColor: "bg-status-warning",
-    borderColor: "border-status-warning",
-    icon: Clock,
-    description: "Awaiting confirmation or payment"
-  },
-  cancelled: {
-    label: "Cancelled",
-    color: "text-status-error",
-    bgColor: "bg-status-error",
-    borderColor: "border-status-error",
-    icon: XCircle,
-    description: "Reservation has been cancelled"
-  },
-  checked_out: {
-    label: "Checked Out",
-    color: "text-muted-foreground",
-    bgColor: "bg-muted",
-    borderColor: "border-muted",
-    icon: LogOut,
-    description: "Guest has departed"
-  }
-};
-
-interface ActiveSelection {
-  siteId: string;
-  startIdx: number;
-  endIdx: number;
-}
-
-interface DragState {
-  siteId: string | null;
-  startIdx: number | null;
-  endIdx: number | null;
-  isDragging: boolean;
-  pointerId: number | null;
-}
 
 export default function CalendarPage() {
   const router = useRouter();
   const data = useCalendarData();
   const { state, actions, queries, derived } = data;
 
-  const sites = queries.sites.data || [];
-  const guests = queries.guests.data || [];
+  const sites = queries.sites.data ?? [];
+  const guests = queries.guests.data ?? [];
   const reservations = derived.filteredReservations;
+
   const typeFilteredSites = useMemo(() => {
     if (state.siteTypeFilter === "all") return sites;
     return sites.filter((site) => site.siteType === state.siteTypeFilter);
   }, [sites, state.siteTypeFilter]);
+
   const searchFilteredSiteIds = useMemo(
     () => new Set(reservations.map((res) => res.siteId)),
     [reservations]
   );
+
   const visibleSites = useMemo(() => {
     if (!state.guestSearch.trim()) return typeFilteredSites;
     return typeFilteredSites.filter((site) => searchFilteredSiteIds.has(site.id));
   }, [typeFilteredSites, state.guestSearch, searchFilteredSiteIds]);
+
   const visibleSiteIds = useMemo(() => new Set(visibleSites.map((site) => site.id)), [visibleSites]);
+
   const visibleReservations = useMemo(
     () => reservations.filter((res) => (res.siteId ? visibleSiteIds.has(res.siteId) : false)),
     [reservations, visibleSiteIds]
   );
 
   // Get blackouts and group by site
-  const blackouts = queries.blackouts.data || [];
+  const blackouts = queries.blackouts.data ?? [];
   const blackoutsBySite = useMemo(() => {
     const grouped: Record<string, CalendarBlackout[]> = {};
     for (const blackout of blackouts) {
@@ -212,19 +118,18 @@ export default function CalendarPage() {
     return grouped;
   }, [blackouts]);
 
-  const guestSearchStats = useMemo(() => {
+  const guestSearchStats = useMemo((): { count: number; samples: string[] } => {
     const search = state.guestSearch.trim().toLowerCase();
     if (!search) {
-      const emptySamples: string[] = [];
-      return { count: 0, samples: emptySamples };
+      return { count: 0, samples: [] };
     }
     let count = 0;
     const samples: string[] = [];
     for (const guest of guests) {
-      const first = (guest.primaryFirstName || "").toLowerCase();
-      const last = (guest.primaryLastName || "").toLowerCase();
-      const email = (guest.email || "").toLowerCase();
-      const phone = (guest.phone || "").toLowerCase();
+      const first = (guest.primaryFirstName ?? "").toLowerCase();
+      const last = (guest.primaryLastName ?? "").toLowerCase();
+      const email = (guest.email ?? "").toLowerCase();
+      const phone = (guest.phone ?? "").toLowerCase();
       const fullName = `${first} ${last}`.trim();
       if (!first.includes(search) && !last.includes(search) && !email.includes(search) && !phone.includes(search) && !fullName.includes(search)) {
         continue;
@@ -240,20 +145,13 @@ export default function CalendarPage() {
   // Get the selected reservation for the popup
   const selectedReservation = useMemo(() => {
     if (!state.selectedReservationId) return null;
-    // Look in all reservations (not just filtered)
     const allReservations = queries.reservations.data ?? [];
-    return allReservations.find((reservation) => reservation.id === state.selectedReservationId) || null;
+    return allReservations.find((reservation) => reservation.id === state.selectedReservationId) ?? null;
   }, [state.selectedReservationId, queries.reservations.data]);
-  const visibleSiteTypes = useMemo(() => {
-    const types = new Set<string>();
-    visibleSites.forEach((site) => {
-      if (site.siteType) types.add(site.siteType);
-    });
-    return Array.from(types);
-  }, [visibleSites]);
 
-  // Count reservations by status for filter chips
+  // Count reservations by status for filter chips - stable reference
   const reservationCountsByStatus = useMemo(() => {
+    const allRes = queries.reservations.data ?? [];
     const counts: Record<string, number> = {
       confirmed: 0,
       checked_in: 0,
@@ -261,10 +159,8 @@ export default function CalendarPage() {
       cancelled: 0,
       checked_out: 0
     };
-    // Use all visible reservations (not status-filtered) for accurate counts
-    const allRes = queries.reservations.data || [];
     for (const res of allRes) {
-      const status = res.status || "pending";
+      const status = res.status ?? "pending";
       if (counts[status] !== undefined) {
         counts[status]++;
       }
@@ -285,7 +181,7 @@ export default function CalendarPage() {
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Get campgrounds list for the inline selector
-  const campgrounds = queries.campgrounds.data || [];
+  const campgrounds = queries.campgrounds.data ?? [];
   const selectedCampgroundDetails = derived.selectedCampgroundDetails;
 
   useEffect(() => {
@@ -295,11 +191,9 @@ export default function CalendarPage() {
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ignore if typing in an input
       const target = e.target;
       if (target instanceof HTMLElement) {
         if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
-          // Only handle Escape in inputs
           if (e.key === "Escape" && target instanceof HTMLInputElement) {
             target.blur();
             return;
@@ -308,7 +202,6 @@ export default function CalendarPage() {
         }
       }
 
-      // Arrow keys: navigate days
       if (e.key === "ArrowLeft") {
         e.preventDefault();
         const d = parseLocalDateInput(state.startDate);
@@ -324,21 +217,18 @@ export default function CalendarPage() {
         return;
       }
 
-      // T: Jump to today
       if (e.key === "t" || e.key === "T") {
         e.preventDefault();
         actions.setStartDate(formatLocalDateInput(new Date()));
         return;
       }
 
-      // N: New reservation (focus search or show message)
       if (e.key === "n" || e.key === "N") {
         e.preventDefault();
         router.push("/booking");
         return;
       }
 
-      // R: Refresh
       if (e.key === "r" || e.key === "R") {
         e.preventDefault();
         queries.sites.refetch();
@@ -346,14 +236,12 @@ export default function CalendarPage() {
         return;
       }
 
-      // /: Focus search
       if (e.key === "/") {
         e.preventDefault();
         searchInputRef.current?.focus();
         return;
       }
 
-      // Escape: Clear selection
       if (e.key === "Escape") {
         e.preventDefault();
         actions.setSelectedReservationId(null);
@@ -361,7 +249,6 @@ export default function CalendarPage() {
         return;
       }
 
-      // 1-9: Set day range
       if (e.key >= "1" && e.key <= "9") {
         e.preventDefault();
         const idx = parseInt(e.key, 10) - 1;
@@ -372,7 +259,6 @@ export default function CalendarPage() {
         return;
       }
 
-      // ?: Show shortcuts
       if (e.key === "?") {
         e.preventDefault();
         setShowShortcuts(true);
@@ -385,14 +271,17 @@ export default function CalendarPage() {
   }, [state.startDate, state.dayCount, actions, router, queries]);
 
   const todayDate = useMemo(() => (todayKey ? parseLocalDateInput(todayKey) : null), [todayKey]);
+
   const arrivalsToday = useMemo(() => {
     if (!todayKey) return 0;
     return visibleReservations.filter((res) => formatLocalDateInput(toLocalDate(res.arrivalDate)) === todayKey).length;
   }, [visibleReservations, todayKey]);
+
   const departuresToday = useMemo(() => {
     if (!todayKey) return 0;
     return visibleReservations.filter((res) => formatLocalDateInput(toLocalDate(res.departureDate)) === todayKey).length;
   }, [visibleReservations, todayKey]);
+
   const occupiedToday = useMemo(() => {
     if (!todayDate) return 0;
     return visibleReservations.filter((res) => {
@@ -401,6 +290,7 @@ export default function CalendarPage() {
       return arrival <= todayDate && departure > todayDate;
     }).length;
   }, [visibleReservations, todayDate]);
+
   const availableToday = Math.max(0, visibleSites.length - occupiedToday);
 
   const maintenanceCount = Array.isArray(queries.maintenance.data) ? queries.maintenance.data.length : 0;
@@ -419,9 +309,11 @@ export default function CalendarPage() {
   }, [state.startDate, state.dayCount, actions]);
 
   const bookingDraft = state.reservationDraft;
+
   const hasFilters = Boolean(
     state.guestSearch || state.statusFilter !== "all" || state.siteTypeFilter !== "all" || state.arrivalsNowOnly
   );
+
   const activeFilterCount =
     (state.guestSearch ? 1 : 0) +
     (state.statusFilter !== "all" ? 1 : 0) +
@@ -437,6 +329,19 @@ export default function CalendarPage() {
     });
     router.push(`/booking?${params.toString()}`);
   }, [bookingDraft, router]);
+
+  const handleClearFilters = useCallback(() => {
+    actions.setGuestSearch("");
+    actions.setStatusFilter("all");
+    actions.setSiteTypeFilter("all");
+    actions.setArrivalsNowOnly(false);
+  }, [actions]);
+
+  const handleCloseReservationDialog = useCallback((open: boolean) => {
+    if (!open) {
+      actions.setSelectedReservationId(null);
+    }
+  }, [actions]);
 
   return (
     <DashboardShell density="full">
@@ -516,8 +421,8 @@ export default function CalendarPage() {
               {/* Density Toggle */}
               <div className="flex items-center bg-card rounded-xl border border-border p-1">
                 {DENSITY_MODES.map((mode) => {
-                  const config = DENSITY_CONFIG[mode];
-                  const Icon = config.icon;
+                  const Icon = DENSITY_ICONS[mode];
+                  const label = DENSITY_LABELS[mode];
                   return (
                     <Button
                       key={mode}
@@ -528,12 +433,12 @@ export default function CalendarPage() {
                         density === mode ? "bg-status-success/10 text-status-success" : "text-muted-foreground"
                       )}
                       onClick={() => setDensity(mode)}
-                      title={`${config.label} view`}
+                      title={`${label} view`}
                       aria-pressed={density === mode}
                     >
                       <Icon className="h-4 w-4" />
                       <span className="text-[11px] font-semibold hidden sm:inline">
-                        {config.label}
+                        {label}
                       </span>
                     </Button>
                   );
@@ -541,18 +446,18 @@ export default function CalendarPage() {
               </div>
 
               {/* Inline Campground Selector */}
-              {campgrounds.length > 0 && (
+              {campgrounds.length > 0 ? (
                 <div className="flex items-center bg-card rounded-xl border border-border">
                   <div className="flex items-center gap-2 pl-3 pr-1">
                     <Building2 className="h-4 w-4 text-muted-foreground" />
                   </div>
                   <Select
-                    value={state.selectedCampground || ""}
+                    value={state.selectedCampground ?? ""}
                     onValueChange={(value) => actions.setSelectedCampground(value)}
                   >
                     <SelectTrigger className="h-9 min-w-[160px] border-0 shadow-none focus:ring-0 text-sm font-semibold">
                       <SelectValue placeholder="Select campground">
-                        {selectedCampgroundDetails?.name || "Select campground"}
+                        {selectedCampgroundDetails?.name ?? "Select campground"}
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent>
@@ -564,7 +469,7 @@ export default function CalendarPage() {
                     </SelectContent>
                   </Select>
                 </div>
-              )}
+              ) : null}
             </div>
           )}
         />
@@ -575,27 +480,22 @@ export default function CalendarPage() {
               <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
                 Filters
               </span>
-              {hasFilters && (
+              {hasFilters ? (
                 <span className="rounded-full border border-border bg-muted px-2 py-0.5 text-[11px] font-semibold text-muted-foreground">
                   {activeFilterCount} on
                 </span>
-              )}
+              ) : null}
             </div>
-            {hasFilters && (
+            {hasFilters ? (
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-7 px-2.5 text-[11px]"
-                onClick={() => {
-                  actions.setGuestSearch("");
-                  actions.setStatusFilter("all");
-                  actions.setSiteTypeFilter("all");
-                  actions.setArrivalsNowOnly(false);
-                }}
+                onClick={handleClearFilters}
               >
                 Clear filters
               </Button>
-            )}
+            ) : null}
           </div>
           <div className="flex flex-wrap items-center gap-2 px-4 py-3">
             <div className="relative flex-1 min-w-[220px]">
@@ -649,15 +549,15 @@ export default function CalendarPage() {
             </div>
 
             <div className="flex flex-wrap items-center gap-2 text-[11px] font-medium text-muted-foreground ml-auto">
-              {state.guestSearch && (
+              {state.guestSearch ? (
                 <span>
                   {queries.guests.isLoading
-                    ? "Searching guests..."
+                    ? "Searching guests…"
                     : guestSearchStats.count > 0
                       ? `Matches ${guestSearchStats.count} guests`
                       : "No guests found"}
                 </span>
-              )}
+              ) : null}
               <span>
                 {state.guestSearch || state.statusFilter !== "all" || state.siteTypeFilter !== "all" || state.arrivalsNowOnly
                   ? `${visibleReservations.length} stays match filters`
@@ -667,13 +567,11 @@ export default function CalendarPage() {
           </div>
         </Card>
 
-        {!state.selectedCampground && (
+        {!state.selectedCampground ? (
           <Card className="p-6 border-dashed border-border text-center text-muted-foreground">
             Choose a campground from the global selector to load the booking grid.
           </Card>
-        )}
-
-        {state.selectedCampground && (
+        ) : (
           <div className="space-y-4">
             {bookingDraft ? (
               <Card className="p-4 border-primary/20 shadow-sm">
@@ -747,171 +645,16 @@ export default function CalendarPage() {
       </div>
 
       {/* Reservation Detail Popup */}
-      <Dialog open={!!selectedReservation} onOpenChange={(open) => !open && actions.setSelectedReservationId(null)}>
+      <Dialog open={!!selectedReservation} onOpenChange={handleCloseReservationDialog}>
         <DialogContent className="sm:max-w-md">
-          {selectedReservation && (() => {
-            const res = selectedReservation;
-            const guestName = `${res.guest?.primaryFirstName || ""} ${res.guest?.primaryLastName || ""}`.trim() || "Guest";
-            const nights = Math.ceil((new Date(res.departureDate).getTime() - new Date(res.arrivalDate).getTime()) / (1000 * 60 * 60 * 24));
-            const total = res.totalAmount ?? 0;
-            const paid = res.paidAmount ?? 0;
-            const balance = total - paid;
-            const statusColors: Record<string, string> = {
-              confirmed: "bg-status-success/15 text-status-success border-status-success/30",
-              checked_in: "bg-status-info/15 text-status-info border-status-info/30",
-              checked_out: "bg-muted text-muted-foreground border-border",
-              cancelled: "bg-status-error/15 text-status-error border-status-error/30",
-              pending: "bg-status-warning/15 text-status-warning border-status-warning/30"
-            };
-            const statusIcons: Record<string, React.ReactNode> = {
-              confirmed: <CheckCircle className="h-3.5 w-3.5" />,
-              checked_in: <Clock className="h-3.5 w-3.5" />,
-              checked_out: <LogOut className="h-3.5 w-3.5" />,
-              cancelled: <XCircle className="h-3.5 w-3.5" />,
-              pending: <Clock className="h-3.5 w-3.5" />
-            };
-
-            return (
-              <>
-                <DialogHeader>
-                  <DialogTitle className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2">
-                      <User className="h-5 w-5 text-muted-foreground/70" />
-                      <span>{guestName}</span>
-                    </div>
-                    <div className={cn("flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium", statusColors[res.status] || statusColors.pending)}>
-                      {statusIcons[res.status] || statusIcons.pending}
-                      <span className="capitalize">{res.status?.replace(/_/g, " ") || "Pending"}</span>
-                    </div>
-                  </DialogTitle>
-                </DialogHeader>
-
-                <div className="space-y-4 py-4">
-                  {/* Site & Dates */}
-                  <div className="flex items-start gap-3">
-                    <Tent className="h-4 w-4 text-muted-foreground/70 mt-0.5" />
-                    <div className="flex-1">
-                      <div className="font-medium text-foreground">
-                        {res.site?.name || res.site?.siteNumber || "Unassigned"}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        {format(new Date(res.arrivalDate), "MMM d")} → {format(new Date(res.departureDate), "MMM d, yyyy")} • {nights} night{nights !== 1 ? "s" : ""}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Contact Info */}
-                  {(res.guest?.email || res.guest?.phone) && (
-                    <div className="space-y-2">
-                      {res.guest?.email && (
-                        <div className="flex items-center gap-3 text-sm">
-                          <Mail className="h-4 w-4 text-muted-foreground/70" />
-                          <span className="text-muted-foreground">{res.guest.email}</span>
-                        </div>
-                      )}
-                      {res.guest?.phone && (
-                        <div className="flex items-center gap-3 text-sm">
-                          <Phone className="h-4 w-4 text-muted-foreground/70" />
-                          <span className="text-muted-foreground">{res.guest.phone}</span>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Payment Summary */}
-                  <div className="flex items-start gap-3">
-                    <CreditCard className="h-4 w-4 text-muted-foreground/70 mt-0.5" />
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium text-foreground">${(total / 100).toFixed(2)}</span>
-                        {balance > 0 ? (
-                          <span className="text-xs font-medium text-status-warning">${(balance / 100).toFixed(2)} due</span>
-                        ) : paid > 0 ? (
-                          <span className="text-xs font-medium text-status-success">Paid in full</span>
-                        ) : null}
-                      </div>
-                      {paid > 0 && paid < total && (
-                        <div className="mt-2 h-1.5 bg-muted rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-status-success rounded-full"
-                            style={{ width: `${Math.min(100, (paid / total) * 100)}%` }}
-                          />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex flex-wrap gap-2 pt-2 border-t">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1"
-                    onClick={() => {
-                      router.push(`/reservations/${res.id}`);
-                      actions.setSelectedReservationId(null);
-                    }}
-                  >
-                    <ExternalLink className="h-4 w-4 mr-1.5" />
-                    View Details
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1"
-                    onClick={() => {
-                      router.push(`/campgrounds/${state.selectedCampground}/reservations/${res.id}`);
-                      actions.setSelectedReservationId(null);
-                    }}
-                  >
-                    <Pencil className="h-4 w-4 mr-1.5" />
-                    Edit
-                  </Button>
-                  {res.status === "confirmed" && (
-                    <Button
-                      size="sm"
-                      className="flex-1 bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover"
-                      onClick={() => {
-                        router.push(`/check-in-out?reservationId=${res.id}`);
-                        actions.setSelectedReservationId(null);
-                      }}
-                    >
-                      <LogIn className="h-4 w-4 mr-1.5" />
-                      Check In
-                    </Button>
-                  )}
-                  {res.status === "checked_in" && (
-                    <Button
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => {
-                        router.push(`/check-in-out?reservationId=${res.id}`);
-                        actions.setSelectedReservationId(null);
-                      }}
-                    >
-                      <LogOut className="h-4 w-4 mr-1.5" />
-                      Check Out
-                    </Button>
-                  )}
-                  {balance > 0 && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1"
-                      onClick={() => {
-                        router.push(`/reservations/${res.id}?action=payment`);
-                        actions.setSelectedReservationId(null);
-                      }}
-                    >
-                      <DollarSign className="h-4 w-4 mr-1.5" />
-                      Collect Payment
-                    </Button>
-                  )}
-                </div>
-              </>
-            );
-          })()}
+          {selectedReservation ? (
+            <ReservationDetailContent
+              reservation={selectedReservation}
+              selectedCampground={state.selectedCampground}
+              onClose={() => actions.setSelectedReservationId(null)}
+              router={router}
+            />
+          ) : null}
         </DialogContent>
       </Dialog>
 
@@ -943,6 +686,184 @@ export default function CalendarPage() {
   );
 }
 
+// Extracted to avoid inline function in JSX
+function ReservationDetailContent({
+  reservation,
+  selectedCampground,
+  onClose,
+  router
+}: {
+  reservation: NonNullable<ReturnType<typeof useCalendarData>["queries"]["reservations"]["data"]>[number];
+  selectedCampground: string | null;
+  onClose: () => void;
+  router: ReturnType<typeof useRouter>;
+}) {
+  const guestName = `${reservation.guest?.primaryFirstName ?? ""} ${reservation.guest?.primaryLastName ?? ""}`.trim() || "Guest";
+  const nights = Math.ceil((new Date(reservation.departureDate).getTime() - new Date(reservation.arrivalDate).getTime()) / (1000 * 60 * 60 * 24));
+  const total = reservation.totalAmount ?? 0;
+  const paid = reservation.paidAmount ?? 0;
+  const balance = total - paid;
+
+  const statusColors: Record<string, string> = {
+    confirmed: "bg-status-success/15 text-status-success border-status-success/30",
+    checked_in: "bg-status-info/15 text-status-info border-status-info/30",
+    checked_out: "bg-muted text-muted-foreground border-border",
+    cancelled: "bg-status-error/15 text-status-error border-status-error/30",
+    pending: "bg-status-warning/15 text-status-warning border-status-warning/30"
+  };
+
+  const statusIcons: Record<string, React.ReactNode> = {
+    confirmed: <CheckCircle className="h-3.5 w-3.5" />,
+    checked_in: <Clock className="h-3.5 w-3.5" />,
+    checked_out: <LogOut className="h-3.5 w-3.5" />,
+    cancelled: <XCircle className="h-3.5 w-3.5" />,
+    pending: <Clock className="h-3.5 w-3.5" />
+  };
+
+  const status = reservation.status ?? "pending";
+
+  return (
+    <>
+      <DialogHeader>
+        <DialogTitle className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <User className="h-5 w-5 text-muted-foreground/70" />
+            <span>{guestName}</span>
+          </div>
+          <div className={cn("flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-medium", statusColors[status] ?? statusColors.pending)}>
+            {statusIcons[status] ?? statusIcons.pending}
+            <span className="capitalize">{status.replace(/_/g, " ")}</span>
+          </div>
+        </DialogTitle>
+      </DialogHeader>
+
+      <div className="space-y-4 py-4">
+        {/* Site & Dates */}
+        <div className="flex items-start gap-3">
+          <Tent className="h-4 w-4 text-muted-foreground/70 mt-0.5" />
+          <div className="flex-1">
+            <div className="font-medium text-foreground">
+              {reservation.site?.name ?? reservation.site?.siteNumber ?? "Unassigned"}
+            </div>
+            <div className="text-sm text-muted-foreground">
+              {format(new Date(reservation.arrivalDate), "MMM d")} → {format(new Date(reservation.departureDate), "MMM d, yyyy")} • {nights} night{nights !== 1 ? "s" : ""}
+            </div>
+          </div>
+        </div>
+
+        {/* Contact Info */}
+        {(reservation.guest?.email || reservation.guest?.phone) ? (
+          <div className="space-y-2">
+            {reservation.guest?.email ? (
+              <div className="flex items-center gap-3 text-sm">
+                <Mail className="h-4 w-4 text-muted-foreground/70" />
+                <span className="text-muted-foreground">{reservation.guest.email}</span>
+              </div>
+            ) : null}
+            {reservation.guest?.phone ? (
+              <div className="flex items-center gap-3 text-sm">
+                <Phone className="h-4 w-4 text-muted-foreground/70" />
+                <span className="text-muted-foreground">{reservation.guest.phone}</span>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+
+        {/* Payment Summary */}
+        <div className="flex items-start gap-3">
+          <CreditCard className="h-4 w-4 text-muted-foreground/70 mt-0.5" />
+          <div className="flex-1">
+            <div className="flex items-center justify-between">
+              <span className="font-medium text-foreground">${(total / 100).toFixed(2)}</span>
+              {balance > 0 ? (
+                <span className="text-xs font-medium text-status-warning">${(balance / 100).toFixed(2)} due</span>
+              ) : paid > 0 ? (
+                <span className="text-xs font-medium text-status-success">Paid in full</span>
+              ) : null}
+            </div>
+            {paid > 0 && paid < total ? (
+              <div className="mt-2 h-1.5 bg-muted rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-status-success rounded-full"
+                  style={{ width: `${Math.min(100, (paid / total) * 100)}%` }}
+                />
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex flex-wrap gap-2 pt-2 border-t">
+        <Button
+          variant="outline"
+          size="sm"
+          className="flex-1"
+          onClick={() => {
+            router.push(`/reservations/${reservation.id}`);
+            onClose();
+          }}
+        >
+          <ExternalLink className="h-4 w-4 mr-1.5" />
+          View Details
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          className="flex-1"
+          onClick={() => {
+            router.push(`/campgrounds/${selectedCampground}/reservations/${reservation.id}`);
+            onClose();
+          }}
+        >
+          <Pencil className="h-4 w-4 mr-1.5" />
+          Edit
+        </Button>
+        {status === "confirmed" ? (
+          <Button
+            size="sm"
+            className="flex-1 bg-action-primary text-action-primary-foreground hover:bg-action-primary-hover"
+            onClick={() => {
+              router.push(`/check-in-out?reservationId=${reservation.id}`);
+              onClose();
+            }}
+          >
+            <LogIn className="h-4 w-4 mr-1.5" />
+            Check In
+          </Button>
+        ) : null}
+        {status === "checked_in" ? (
+          <Button
+            size="sm"
+            className="flex-1"
+            onClick={() => {
+              router.push(`/check-in-out?reservationId=${reservation.id}`);
+              onClose();
+            }}
+          >
+            <LogOut className="h-4 w-4 mr-1.5" />
+            Check Out
+          </Button>
+        ) : null}
+        {balance > 0 ? (
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1"
+            onClick={() => {
+              router.push(`/reservations/${reservation.id}?action=payment`);
+              onClose();
+            }}
+          >
+            <DollarSign className="h-4 w-4 mr-1.5" />
+            Collect Payment
+          </Button>
+        ) : null}
+      </div>
+    </>
+  );
+}
+
 function ShortcutItem({ keys, desc }: { keys: string[]; desc: string }) {
   return (
     <div className="flex items-center justify-between gap-2 py-1">
@@ -953,536 +874,6 @@ function ShortcutItem({ keys, desc }: { keys: string[]; desc: string }) {
             {k}
           </kbd>
         ))}
-      </div>
-    </div>
-  );
-}
-
-function StatCard({ label, value, sub, icon }: { label: string; value: string; sub: string; icon: React.ReactNode }) {
-  return (
-    <Card className="p-4 border-border shadow-sm flex items-center gap-3">
-      <div className="h-10 w-10 rounded-xl bg-muted text-foreground flex items-center justify-center">
-        {icon}
-      </div>
-      <div>
-        <div className="text-xs font-medium text-muted-foreground">{label}</div>
-        <div className="text-lg font-semibold text-foreground">{value}</div>
-        <div className="text-xs text-muted-foreground">{sub}</div>
-      </div>
-    </Card>
-  );
-}
-
-interface StatusFilterChipsProps {
-  activeFilter: string;
-  onFilterChange: (status: string) => void;
-  reservationCounts?: Record<string, number>;
-  className?: string;
-}
-
-function StatusFilterChips({ activeFilter, onFilterChange, reservationCounts = {}, className }: StatusFilterChipsProps) {
-  type StatusFilter = "all" | keyof typeof STATUS_CONFIG;
-  const statuses: StatusFilter[] = ["all", "confirmed", "checked_in", "pending", "cancelled"];
-
-  return (
-    <div className={cn("flex flex-wrap items-center gap-2", className)}>
-      {statuses.map((status) => {
-        const isActive = activeFilter === status;
-        const config = status === "all" ? null : STATUS_CONFIG[status];
-        const count = status === "all"
-          ? Object.values(reservationCounts).reduce((sum, n) => sum + n, 0)
-          : reservationCounts[status] || 0;
-
-        return (
-          <button
-            key={status}
-            type="button"
-            onClick={() => onFilterChange(status)}
-            className={cn(
-              "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold transition-all duration-200",
-              "border shadow-sm hover:shadow focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-ring",
-              isActive
-                ? config
-                  ? cn("text-white border-transparent", config.bgColor)
-                  : "bg-foreground text-background border-transparent"
-                : config
-                  ? cn("bg-card border-border hover:border-border", config.color)
-                  : "bg-card text-muted-foreground border-border hover:border-border"
-            )}
-          >
-            {config && (() => {
-              const Icon = config.icon;
-              return <Icon className="h-3 w-3" />;
-            })()}
-            <span className="capitalize">{status === "all" ? "All" : config?.label}</span>
-            {count > 0 && (
-              <span className={cn(
-                "px-1.5 py-0.5 rounded-full text-[10px] font-bold",
-                isActive
-                  ? "bg-card/20"
-                  : "bg-muted"
-              )}>
-                {count}
-              </span>
-            )}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-interface CalendarGridProps {
-  days: DayMeta[];
-  dayCount: number;
-  isLoading: boolean;
-  sites: CalendarSite[];
-  reservationsBySite: Record<string, CalendarReservation[]>;
-  blackoutsBySite: Record<string, CalendarBlackout[]>;
-  selectionDraft: QuotePreview | null;
-  onSelectionComplete: (siteId: string, arrival: Date, departure: Date) => void;
-  onReservationClick: (id: string) => void;
-  density: DensityMode;
-}
-
-function CalendarGrid({
-  days,
-  dayCount,
-  isLoading,
-  sites,
-  reservationsBySite,
-  blackoutsBySite,
-  selectionDraft,
-  onSelectionComplete,
-  onReservationClick,
-  density
-}: CalendarGridProps) {
-  const densityConfig = DENSITY_CONFIG[density];
-  const gridRef = useRef<HTMLDivElement>(null);
-  const [dragState, setDragState] = useState<DragState>({
-    siteId: null,
-    startIdx: null,
-    endIdx: null,
-    isDragging: false,
-    pointerId: null
-  });
-  const dragRef = useRef<DragState>(dragState);
-
-  const setDrag = useCallback((next: DragState) => {
-    dragRef.current = next;
-    setDragState(next);
-  }, []);
-
-  const clearDrag = useCallback(() => {
-    setDrag({ siteId: null, startIdx: null, endIdx: null, isDragging: false, pointerId: null });
-  }, [setDrag]);
-
-  const resolveDragTarget = useCallback(
-    (clientX: number, clientY: number) => {
-      const grid = gridRef.current;
-      if (!grid) return null;
-
-      const elements = typeof document.elementsFromPoint === "function"
-        ? document.elementsFromPoint(clientX, clientY)
-        : [document.elementFromPoint(clientX, clientY)].filter((el): el is Element => el !== null);
-
-      const cell = elements.find(
-        (el): el is HTMLElement => el instanceof HTMLElement && el.dataset.dayIdx !== undefined
-      );
-
-      if (cell) {
-        const dayIdx = Number(cell.dataset.dayIdx);
-        if (!Number.isNaN(dayIdx)) {
-          return { dayIdx };
-        }
-      }
-
-      const bounds = grid.getBoundingClientRect();
-      if (clientX < bounds.left + SITE_COL_WIDTH || clientX > bounds.right) return null;
-      const dayWidth = (bounds.width - SITE_COL_WIDTH) / dayCount;
-      const offset = Math.max(0, clientX - bounds.left - SITE_COL_WIDTH);
-      const idx = Math.floor(offset / Math.max(dayWidth, 1));
-      const dayIdx = Math.min(dayCount - 1, Math.max(0, idx));
-      return { dayIdx };
-    },
-    [dayCount]
-  );
-
-  const updateDragEnd = useCallback((dayIdx: number) => {
-    const current = dragRef.current;
-    if (!current.isDragging || current.endIdx === dayIdx) return;
-    setDrag({ ...current, endIdx: dayIdx });
-  }, [setDrag]);
-
-  const finishDrag = useCallback(() => {
-    const drag = dragRef.current;
-    if (drag.isDragging && drag.siteId && drag.startIdx !== null && drag.endIdx !== null) {
-      const startIdx = Math.min(drag.startIdx, drag.endIdx);
-      const endIdx = Math.max(drag.startIdx, drag.endIdx);
-
-      const arrivalDate = new Date(days[startIdx].date);
-      const departureDate = new Date(days[endIdx].date);
-      departureDate.setDate(departureDate.getDate() + 1);
-
-      onSelectionComplete(drag.siteId, arrivalDate, departureDate);
-    }
-    clearDrag();
-  }, [days, onSelectionComplete, clearDrag]);
-
-  useEffect(() => {
-    const handlePointerUp = () => {
-      if (dragRef.current.isDragging) {
-        finishDrag();
-      }
-    };
-
-    window.addEventListener("pointerup", handlePointerUp);
-    window.addEventListener("pointercancel", handlePointerUp);
-    return () => {
-      window.removeEventListener("pointerup", handlePointerUp);
-      window.removeEventListener("pointercancel", handlePointerUp);
-    };
-  }, [finishDrag]);
-
-  const handleCellPointerDown = useCallback((siteId: string, dayIdx: number, e: React.PointerEvent) => {
-    e.preventDefault();
-    const target = e.currentTarget;
-    if (target instanceof HTMLElement && target.setPointerCapture) {
-      try {
-        target.setPointerCapture(e.pointerId);
-      } catch {
-        // ignore capture errors
-      }
-    }
-    setDrag({ siteId, startIdx: dayIdx, endIdx: dayIdx, isDragging: true, pointerId: e.pointerId });
-  }, [setDrag]);
-
-  const handleGridPointerMove = useCallback((e: React.PointerEvent) => {
-    if (!dragRef.current.isDragging) return;
-    const target = resolveDragTarget(e.clientX, e.clientY);
-    if (!target) return;
-    updateDragEnd(target.dayIdx);
-  }, [resolveDragTarget, updateDragEnd]);
-
-  const activeSelection = useMemo<ActiveSelection | null>(() => {
-    if (!dragState.isDragging || !dragState.siteId || dragState.startIdx === null || dragState.endIdx === null) return null;
-    return { siteId: dragState.siteId, startIdx: dragState.startIdx, endIdx: dragState.endIdx };
-  }, [dragState]);
-
-  if (isLoading) {
-    return (
-      <div className="space-y-3">
-        {[1, 2, 3, 4].map((row) => (
-          <div key={row} className="h-16 rounded-xl bg-muted animate-pulse" />
-        ))}
-      </div>
-    );
-  }
-
-  if (!sites.length) {
-    return (
-      <Card className="p-6 border-dashed border-border text-center text-muted-foreground">
-        No sites match the current filters.
-      </Card>
-    );
-  }
-
-  const gridTemplate = `${SITE_COL_WIDTH}px repeat(${dayCount}, minmax(${DAY_MIN_WIDTH}px, 1fr))`;
-
-  return (
-    <div className="rounded-2xl border border-border bg-card shadow-sm overflow-hidden min-w-0 w-full">
-      <div className="overflow-x-auto">
-        <div
-          className="grid text-xs font-medium text-muted-foreground border-b border-border bg-muted/50"
-          style={{ gridTemplateColumns: gridTemplate }}
-        >
-          <div className="px-4 py-3 sticky left-0 z-20 bg-muted/40 border-r border-border">
-            Sites
-          </div>
-          {days.map((d, idx) => (
-            <div
-              key={idx}
-              className={cn(
-                "px-2 py-3 text-center border-r border-border/60 last:border-r-0",
-                d.isToday && "bg-primary/10 text-primary"
-              )}
-            >
-              <div>{d.label}</div>
-            </div>
-          ))}
-        </div>
-
-        <div
-          ref={gridRef}
-          className="divide-y divide-border/60"
-          onPointerMove={handleGridPointerMove}
-          onPointerUp={finishDrag}
-          onPointerCancel={finishDrag}
-        >
-          {sites.map((site, idx) => (
-            <CalendarRow
-              key={site.id}
-              site={site}
-              days={days}
-              dayCount={dayCount}
-              reservations={reservationsBySite[site.id] || []}
-              blackouts={blackoutsBySite[site.id] || []}
-              gridTemplate={gridTemplate}
-              zebra={idx % 2 === 0 ? "bg-card" : "bg-muted/30"}
-              activeSelection={activeSelection}
-              draftSelection={selectionDraft}
-              onCellPointerDown={handleCellPointerDown}
-              onReservationClick={onReservationClick}
-              densityConfig={densityConfig}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-interface CalendarRowProps {
-  site: CalendarSite;
-  days: DayMeta[];
-  dayCount: number;
-  reservations: CalendarReservation[];
-  blackouts: CalendarBlackout[];
-  gridTemplate: string;
-  zebra: string;
-  activeSelection: ActiveSelection | null;
-  draftSelection: QuotePreview | null;
-  onCellPointerDown: (siteId: string, dayIdx: number, e: React.PointerEvent) => void;
-  onReservationClick: (id: string) => void;
-  densityConfig: typeof DENSITY_CONFIG[DensityMode];
-}
-
-function CalendarRow({
-  site,
-  days,
-  dayCount,
-  reservations,
-  blackouts,
-  gridTemplate,
-  zebra,
-  activeSelection,
-  draftSelection,
-  onCellPointerDown,
-  onReservationClick,
-  densityConfig
-}: CalendarRowProps) {
-  const active = activeSelection && activeSelection.siteId === site.id ? activeSelection : null;
-  const typeKey = (site.siteType || "").toLowerCase();
-  const typeMeta = SITE_TYPE_STYLES[typeKey] || SITE_TYPE_STYLES.default;
-
-  const activeStart = active ? Math.min(active.startIdx, active.endIdx) : null;
-  const activeEnd = active ? Math.max(active.startIdx, active.endIdx) : null;
-  const activeSpan = activeStart !== null && activeEnd !== null ? activeEnd - activeStart + 1 : 0;
-  const activeLabel = activeSpan === 1 ? "night" : "nights";
-
-  // Calculate chip height based on density
-  const chipHeightClass = densityConfig.rowHeight === 40 ? "h-7" : densityConfig.rowHeight === 88 ? "h-[68px]" : "h-12";
-  const selectionHeightClass = densityConfig.rowHeight === 40 ? "h-6" : densityConfig.rowHeight === 88 ? "h-16" : "h-12";
-
-  return (
-    <div
-      className="grid relative group"
-      style={{ gridTemplateColumns: gridTemplate }}
-      data-site-id={site.id}
-    >
-      <div className={cn("px-4 sticky left-0 z-10 border-r border-l-4 border-border", zebra, typeMeta.border, densityConfig.padding)}>
-        <div className={cn("font-bold text-foreground truncate", densityConfig.rowHeight === 40 ? "text-xs" : "text-sm")} title={site.name}>{site.name}</div>
-        {densityConfig.showDetails && (
-          <div className="mt-1 flex flex-wrap items-center gap-2 text-[10px] font-semibold uppercase tracking-wider">
-            <span className={cn("px-2 py-0.5 rounded-full font-bold", typeMeta.badge)}>{typeMeta.label}</span>
-            {site.siteNumber && <span className="text-muted-foreground/70">#{site.siteNumber}</span>}
-          </div>
-        )}
-      </div>
-
-      <div className="relative" style={{ gridColumn: "2 / -1" }}>
-        <div className="grid h-full" style={{ gridTemplateColumns: `repeat(${dayCount}, minmax(${DAY_MIN_WIDTH}px, 1fr))` }}>
-          {days.map((d, i) => (
-            <div
-              key={i}
-              data-day-idx={i}
-              className={cn(
-                "border-r border-border/60 cursor-crosshair transition-colors select-none touch-none",
-                zebra,
-                d.weekend && "bg-muted/50",
-                d.isToday && "bg-primary/10",
-                "hover:bg-primary/10"
-              )}
-              style={{ height: `${densityConfig.rowHeight}px` }}
-              onPointerDown={(e) => onCellPointerDown(site.id, i, e)}
-            />
-          ))}
-        </div>
-
-        <div
-          className="grid absolute inset-0 items-center pointer-events-none"
-          style={{ gridTemplateColumns: `repeat(${dayCount}, minmax(${DAY_MIN_WIDTH}px, 1fr))` }}
-        >
-          {active && activeStart !== null && activeEnd !== null && (
-            <div
-              className={cn("my-1 mx-1 rounded-xl bg-primary/20 border border-primary/60 shadow-lg flex items-center justify-center z-20", selectionHeightClass)}
-              style={{ gridColumn: `${activeStart + 1} / span ${activeSpan}` }}
-            >
-              <div className={cn("px-3 py-1 rounded-full bg-action-primary text-action-primary-foreground font-black uppercase tracking-widest flex items-center gap-2", densityConfig.fontSize)}>
-                {densityConfig.showDetails && <span className="opacity-80">{site.name}</span>}
-                <span>{activeSpan} {activeLabel}</span>
-              </div>
-            </div>
-          )}
-
-          {draftSelection && draftSelection.siteId === site.id && (() => {
-            const start = days[0].date;
-            const resStart = parseLocalDateInput(draftSelection.arrival);
-            const resEnd = parseLocalDateInput(draftSelection.departure);
-            const startIdx = Math.max(0, diffInDays(resStart, start));
-            const endIdx = Math.min(dayCount, diffInDays(resEnd, start));
-            if (endIdx <= 0 || startIdx >= dayCount) return null;
-            const span = Math.max(1, endIdx - startIdx);
-            return (
-              <div
-                key="draft-selection"
-                className={cn("mx-1 rounded-lg bg-status-info/10 border-2 border-status-info/40 border-dashed flex items-center justify-center z-10", selectionHeightClass)}
-                style={{ gridColumn: `${startIdx + 1} / span ${span}` }}
-              >
-                <span className={cn("font-bold text-status-info bg-card/90 px-2 py-0.5 rounded", densityConfig.fontSize)}>
-                  Draft
-                </span>
-              </div>
-            );
-          })()}
-
-          {/* Blackouts */}
-          {blackouts.map((blackout) => {
-            const start = days[0].date;
-            const blackoutStart = toLocalDate(blackout.startDate);
-            const blackoutEnd = toLocalDate(blackout.endDate);
-            const startIdx = Math.max(0, diffInDays(blackoutStart, start));
-            const endIdx = Math.min(dayCount, diffInDays(blackoutEnd, start) + 1); // +1 because end is inclusive
-
-            if (endIdx <= 0 || startIdx >= dayCount) return null;
-
-            const span = Math.max(1, endIdx - startIdx);
-
-            return (
-              <div
-                key={blackout.id}
-                className="relative h-full w-full pointer-events-none"
-                style={{
-                  gridColumn: `${startIdx + 1} / span ${span}`,
-                  zIndex: 15
-                }}
-                title={blackout.reason || "Blocked"}
-              >
-                <div className="absolute inset-0 mx-0.5 my-1 rounded-md bg-destructive/10 border border-destructive/30 flex items-center justify-center overflow-hidden">
-                  {/* Hatching pattern */}
-                  <div
-                    className="absolute inset-0 opacity-20"
-                    style={{
-                      backgroundImage: `repeating-linear-gradient(
-                        45deg,
-                        transparent,
-                        transparent 4px,
-                        currentColor 4px,
-                        currentColor 5px
-                      )`,
-                      color: 'hsl(var(--destructive))'
-                    }}
-                  />
-                  <div className="relative z-10 flex items-center gap-1 bg-card/90 px-2 py-0.5 rounded text-[10px] font-medium text-destructive">
-                    <Ban className="h-3 w-3" />
-                    <span className="truncate max-w-[80px]">{blackout.reason || "Blocked"}</span>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-
-          {reservations.map((res) => {
-            const start = days[0].date;
-            const resStart = toLocalDate(res.arrivalDate);
-            const resEnd = toLocalDate(res.departureDate);
-            const startIdx = Math.max(0, diffInDays(resStart, start));
-            const endIdx = Math.min(dayCount, diffInDays(resEnd, start));
-            if (endIdx <= 0 || startIdx >= dayCount) return null;
-            const span = Math.max(1, endIdx - startIdx);
-
-            return (
-              <div
-                key={res.id}
-                className="relative h-full w-full pointer-events-auto z-10"
-                style={{ gridColumn: `${startIdx + 1} / span ${span}` }}
-              >
-                <ReservationChip
-                  reservation={res}
-                  onClick={() => onReservationClick(res.id)}
-                  densityConfig={densityConfig}
-                />
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-interface ReservationChipProps {
-  reservation: CalendarReservation;
-  onClick: () => void;
-  densityConfig: typeof DENSITY_CONFIG[DensityMode];
-}
-
-function ReservationChip({ reservation, onClick, densityConfig }: ReservationChipProps) {
-  const statusStyles: Record<string, string> = {
-    confirmed: "bg-status-success/90 border-status-success/40",
-    checked_in: "bg-status-info/90 border-status-info/40",
-    pending: "bg-status-warning/90 border-status-warning/40",
-    cancelled: "bg-status-error/90 border-status-error/40"
-  };
-
-  const guestName = `${reservation.guest?.primaryFirstName || ""} ${reservation.guest?.primaryLastName || ""}`.trim() || "Guest";
-  const status = reservation.status || "pending";
-  const statusClass = statusStyles[status] || statusStyles.pending;
-
-  // Compact mode uses smaller margins and simpler layout
-  const isCompact = densityConfig.rowHeight === 40;
-  const isExpanded = densityConfig.rowHeight === 88;
-
-  return (
-    <div
-      className={cn(
-        "absolute rounded-lg text-white flex items-center overflow-hidden border shadow-sm cursor-pointer transition-transform",
-        "hover:scale-[1.01] active:scale-[0.98]",
-        statusClass,
-        isCompact ? "top-1 bottom-1 left-1 right-1 px-2" : "top-1.5 bottom-1.5 left-1.5 right-1.5 px-2.5",
-        densityConfig.fontSize
-      )}
-      title={`${guestName} - ${reservation.status}`}
-      onClick={onClick}
-      onPointerDown={(e) => e.stopPropagation()}
-    >
-      <div className="flex items-center gap-2 min-w-0 w-full">
-        <div className={cn("flex min-w-0", isExpanded ? "flex-col gap-0.5" : isCompact ? "flex-row items-center" : "flex-col")}>
-          <span className="font-bold truncate tracking-tight">{guestName}</span>
-          {densityConfig.showDetails && (
-            <span className={cn("opacity-80 truncate uppercase tracking-wider", isCompact ? "hidden" : "block", isExpanded ? "text-[10px]" : "text-[9px]")}>
-              {status.replace("_", " ")}
-            </span>
-          )}
-          {isExpanded && reservation.guest?.phone && (
-            <span className="text-[9px] opacity-70 truncate">{reservation.guest.phone}</span>
-          )}
-        </div>
-        {reservation.siteLocked && (
-          <span className="ml-auto inline-flex items-center text-white/90">
-            <Lock className={isCompact ? "h-2.5 w-2.5" : "h-3 w-3"} aria-label="Site locked" />
-          </span>
-        )}
       </div>
     </div>
   );

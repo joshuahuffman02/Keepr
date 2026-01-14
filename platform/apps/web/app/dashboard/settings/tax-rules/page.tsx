@@ -356,10 +356,10 @@ export default function TaxRulesSettingsPage() {
                                                         checked={rule.isActive}
                                                         onCheckedChange={() => toggleActive(rule)}
                                                     />
-                                                    <Button variant="ghost" size="icon" onClick={() => openEditModal(rule)}>
+                                                    <Button variant="ghost" size="icon" aria-label="Edit" onClick={() => openEditModal(rule)}>
                                                         <Pencil className="h-4 w-4" />
                                                     </Button>
-                                                    <Button variant="ghost" size="icon" onClick={() => setDeleteConfirmId(rule.id)}>
+                                                    <Button variant="ghost" size="icon" aria-label="Delete" onClick={() => setDeleteConfirmId(rule.id)}>
                                                         <Trash2 className="h-4 w-4 text-destructive" />
                                                     </Button>
                                                 </div>

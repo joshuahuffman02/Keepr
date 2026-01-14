@@ -286,7 +286,7 @@ export default function ProductMappingsPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <Button asChild variant="ghost" size="icon">
+            <Button asChild variant="ghost" size="icon" aria-label="Back">
               <Link href={`/dashboard/settings/pos-integrations/${integrationId}`}>
                 <ArrowLeft className="h-4 w-4" />
               </Link>

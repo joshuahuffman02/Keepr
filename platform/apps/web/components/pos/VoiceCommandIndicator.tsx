@@ -138,7 +138,7 @@ export function VoiceCommandIndicator({
                 <Mic className="h-5 w-5 text-action-primary" />
                 <h2 className="font-semibold text-foreground">Voice Commands</h2>
               </div>
-                <Button variant="ghost" size="icon" onClick={() => setShowHelp(false)}>
+                <Button variant="ghost" size="icon" onClick={() => setShowHelp(false)} aria-label="Close">
                   <X className="h-4 w-4" />
                 </Button>
               </div>

@@ -758,6 +758,7 @@ export default function AICommandCenterPage() {
                                   className="h-7 w-7"
                                   onClick={() => reverseActionMutation.mutate(item.id)}
                                   disabled={reverseActionMutation.isPending}
+                                  aria-label="Undo action"
                                 >
                                   <RotateCcw className="h-3.5 w-3.5" />
                                 </Button>

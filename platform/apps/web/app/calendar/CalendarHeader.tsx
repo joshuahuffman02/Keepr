@@ -73,19 +73,20 @@ export function CalendarHeader({
                             size="icon"
                             className="h-8 w-8 text-muted-foreground hover:text-emerald-600"
                             title="Custom Range"
+                            aria-label="Custom range"
                         >
                             <CalendarRange className="h-3.5 w-3.5" />
                         </Button>
                     </div>
 
                     <div className="flex items-center bg-card rounded-lg border border-border shadow-sm p-1">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" onClick={handlePrev}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" onClick={handlePrev} aria-label="Previous">
                             <ChevronLeft className="h-4 w-4" />
                         </Button>
                         <Button variant="ghost" size="sm" className="px-3 h-8 text-xs font-bold uppercase tracking-tight" onClick={onToday}>
                             Today
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" onClick={handleNext}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground" onClick={handleNext} aria-label="Next">
                             <ChevronRight className="h-4 w-4" />
                         </Button>
                     </div>

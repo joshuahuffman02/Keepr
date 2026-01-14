@@ -471,7 +471,7 @@ export default function AiAutopilotPage() {
                         <p className="text-sm text-muted-foreground line-clamp-2">{item.answer}</p>
                       </div>
                       <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-                        <Button size="icon" variant="ghost" onClick={() => setEditingContext(item)}>
+                        <Button size="icon" variant="ghost" onClick={() => setEditingContext(item)} aria-label="Edit">
                           <Edit2 className="w-4 h-4" />
                         </Button>
                         <Button
@@ -479,6 +479,7 @@ export default function AiAutopilotPage() {
                           variant="ghost"
                           className="text-red-600"
                           onClick={() => deleteContext.mutate(item.id)}
+                          aria-label="Delete"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>

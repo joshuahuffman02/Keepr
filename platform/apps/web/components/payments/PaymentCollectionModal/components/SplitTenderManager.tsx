@@ -172,6 +172,7 @@ function TenderEntryRow({ entry, onRemove, disabled }: TenderEntryRowProps) {
             size="icon"
             onClick={onRemove}
             className="h-6 w-6 text-muted-foreground hover:text-red-500"
+            aria-label="Remove payment"
           >
             <X className="h-3.5 w-3.5" />
           </Button>

@@ -175,7 +175,7 @@ export function AiImportChat({
                 <Sparkles className="w-5 h-5 text-primary" />
                 <span className="font-medium">Import Assistant</span>
               </div>
-              <Button variant="ghost" size="icon" onClick={toggleOpen}>
+              <Button variant="ghost" size="icon" onClick={toggleOpen} aria-label="Minimize">
                 <ChevronDown className="w-5 h-5" />
               </Button>
             </div>
@@ -248,6 +248,7 @@ export function AiImportChat({
                   disabled={!input.trim() || isLoading}
                   size="icon"
                   className="shrink-0"
+                  aria-label="Send message"
                 >
                   <Send className="w-4 h-4" />
                 </Button>

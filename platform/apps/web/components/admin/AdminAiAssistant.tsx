@@ -313,6 +313,7 @@ export function AdminAiAssistant({
             className="text-action-primary-foreground/80 hover:text-action-primary-foreground hover:bg-card/10"
             onClick={handleClearChat}
             title="Clear chat"
+            aria-label="Clear chat"
           >
             <RefreshCw className="w-4 h-4" />
           </Button>
@@ -322,6 +323,7 @@ export function AdminAiAssistant({
             className="text-action-primary-foreground/80 hover:text-action-primary-foreground hover:bg-card/10"
             onClick={() => setIsExpanded(!isExpanded)}
             title={isExpanded ? "Minimize" : "Expand"}
+            aria-label={isExpanded ? "Minimize" : "Expand"}
           >
             {isExpanded ? (
               <Minimize2 className="w-4 h-4" />
@@ -334,6 +336,7 @@ export function AdminAiAssistant({
             size="icon"
             className="text-action-primary-foreground/80 hover:text-action-primary-foreground hover:bg-card/10"
             onClick={() => setIsOpen(false)}
+            aria-label="Close"
           >
             <X className="w-4 h-4" />
           </Button>

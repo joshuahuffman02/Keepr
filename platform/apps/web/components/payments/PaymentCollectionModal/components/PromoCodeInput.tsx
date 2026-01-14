@@ -85,6 +85,7 @@ export function PromoCodeInput({ disabled = false }: PromoCodeInputProps) {
                   onClick={() => actions.removeDiscount(discount.promoCodeId!)}
                   disabled={disabled || loading}
                   className="h-6 w-6 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-100"
+                  aria-label="Remove discount"
                 >
                   <X className="h-4 w-4" />
                 </Button>

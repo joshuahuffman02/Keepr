@@ -302,6 +302,7 @@ export function AiExtractionPreview({
                                   e.stopPropagation();
                                   saveEdit();
                                 }}
+                                aria-label="Save"
                               >
                                 <Check className="w-3 h-3" />
                               </Button>
@@ -313,6 +314,7 @@ export function AiExtractionPreview({
                                   e.stopPropagation();
                                   cancelEdit();
                                 }}
+                                aria-label="Cancel"
                               >
                                 <X className="w-3 h-3" />
                               </Button>

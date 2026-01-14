@@ -80,6 +80,7 @@ function PaymentModalContent() {
                 onClick={handleBack}
                 disabled={loading}
                 className="h-8 w-8"
+                aria-label="Go back"
               >
                 <ArrowLeft className="h-4 w-4" />
               </Button>

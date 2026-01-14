@@ -249,6 +249,7 @@ export function AdvancedExportDialog({
                           size="icon"
                           onClick={() => handleDeletePreset(preset.id)}
                           className="h-8 w-8 text-muted-foreground hover:text-red-600"
+                          aria-label="Delete preset"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -403,6 +404,7 @@ export function AdvancedExportDialog({
                       size="icon"
                       onClick={() => setShowSavePreset(false)}
                       className="h-6 w-6"
+                      aria-label="Close"
                     >
                       <X className="h-4 w-4" />
                     </Button>

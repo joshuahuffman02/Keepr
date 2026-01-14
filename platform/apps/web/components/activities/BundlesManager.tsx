@@ -304,6 +304,7 @@ export function BundlesManager({ campgroundId, activities }: BundlesManagerProps
                                             size="icon"
                                             className="text-muted-foreground hover:text-red-500"
                                             onClick={() => setDeleteConfirmId(bundle.id)}
+                                            aria-label="Delete bundle"
                                         >
                                             <Trash2 className="h-4 w-4" />
                                         </Button>

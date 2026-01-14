@@ -144,6 +144,7 @@ export default function GiftCardMethod({
                 size="icon"
                 onClick={clearGiftCard}
                 className="h-8 w-8 text-emerald-600 hover:text-emerald-700"
+                aria-label="Clear gift card"
               >
                 <X className="h-4 w-4" />
               </Button>

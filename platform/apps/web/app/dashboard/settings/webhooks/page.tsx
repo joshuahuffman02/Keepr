@@ -165,7 +165,7 @@ export default function WebhooksSettingsPage() {
                                             <div className="flex-1 rounded bg-yellow-50 p-2 font-mono text-sm text-yellow-900 break-all">
                                                 {createdSecret}
                                             </div>
-                                            <Button size="icon" variant="ghost" onClick={() => copyToClipboard(createdSecret!)}>
+                                            <Button size="icon" variant="ghost" aria-label="Copy" onClick={() => copyToClipboard(createdSecret!)}>
                                                 <Copy className="h-4 w-4" />
                                             </Button>
                                         </div>

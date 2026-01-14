@@ -419,6 +419,7 @@ export function CompactGuestForm({
                       updateField("adults", Math.max(1, data.adults - 1))
                     }
                     disabled={data.adults <= 1}
+                    aria-label="Decrease adults"
                   >
                     -
                   </Button>
@@ -431,6 +432,7 @@ export function CompactGuestForm({
                     size="icon"
                     className="h-10 w-10"
                     onClick={() => updateField("adults", data.adults + 1)}
+                    aria-label="Increase adults"
                   >
                     +
                   </Button>
@@ -449,6 +451,7 @@ export function CompactGuestForm({
                       updateField("children", Math.max(0, data.children - 1))
                     }
                     disabled={data.children <= 0}
+                    aria-label="Decrease children"
                   >
                     -
                   </Button>
@@ -461,6 +464,7 @@ export function CompactGuestForm({
                     size="icon"
                     className="h-10 w-10"
                     onClick={() => updateField("children", data.children + 1)}
+                    aria-label="Increase children"
                   >
                     +
                   </Button>
@@ -497,6 +501,7 @@ export function CompactGuestForm({
                       updateField("petCount", Math.max(0, data.petCount - 1))
                     }
                     disabled={data.petCount <= 0}
+                    aria-label="Decrease pets"
                   >
                     -
                   </Button>
@@ -509,6 +514,7 @@ export function CompactGuestForm({
                     size="icon"
                     className="h-10 w-10"
                     onClick={() => updateField("petCount", data.petCount + 1)}
+                    aria-label="Increase pets"
                   >
                     +
                   </Button>
