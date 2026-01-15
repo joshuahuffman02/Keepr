@@ -77,7 +77,7 @@ jobs:
         run: pnpm --dir platform/apps/api prisma:generate
 
       - name: Run migrations
-        run: pnpm --dir platform/apps/api npx prisma migrate deploy
+        run: cd platform/apps/api && npx prisma migrate deploy
 
       - name: Run smoke tests
         run: pnpm --dir platform/apps/api test:smoke
