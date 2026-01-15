@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { useWhoami } from "@/hooks/use-whoami";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -148,30 +148,51 @@ export default function TicketsPage() {
     loadTickets();
   }, []);
 
-  const openCount = tickets.filter((t) => t.status === "open").length;
-  const completedCount = tickets.filter((t) => t.status === "completed").length;
-  const issueCount = tickets.filter((t) => (t.category ?? "issue") === "issue").length;
-  const questionCount = tickets.filter((t) => t.category === "question").length;
-  const featureCount = tickets.filter((t) => t.category === "feature").length;
+  // Single pass for counts and unique areas - O(n) instead of O(6n)
+  const { openCount, completedCount, issueCount, questionCount, featureCount, areas } = useMemo(() => {
+    let open = 0, completed = 0, issue = 0, question = 0, feature = 0;
+    const areaSet = new Set<string>();
+    for (const t of tickets) {
+      if (t.status === "open") open++;
+      if (t.status === "completed") completed++;
+      const cat = t.category ?? "issue";
+      if (cat === "issue") issue++;
+      if (cat === "question") question++;
+      if (cat === "feature") feature++;
+      areaSet.add(t.area || "General");
+    }
+    return {
+      openCount: open,
+      completedCount: completed,
+      issueCount: issue,
+      questionCount: question,
+      featureCount: feature,
+      areas: ["all", ...Array.from(areaSet).sort()],
+    };
+  }, [tickets]);
 
-  // Get unique areas for filter
-  const areas = ["all", ...Array.from(new Set(tickets.map((t) => t.area || "General"))).sort()];
-
-  const filteredTickets = tickets
-    .filter((t) => (statusFilter === "all" ? true : t.status === statusFilter))
-    .filter((t) => (categoryFilter === "all" ? true : (t.category ?? "issue") === categoryFilter))
-    .filter((t) => (areaFilter === "all" ? true : (t.area || "General") === areaFilter))
-    .filter((t) => {
-      const q = search.trim().toLowerCase();
-      if (!q) return true;
-      return (
-        t.title.toLowerCase().includes(q) ||
-        (t.notes ?? "").toLowerCase().includes(q) ||
-        (t.pageTitle ?? "").toLowerCase().includes(q) ||
-        (t.path ?? "").toLowerCase().includes(q)
-      );
-    })
-    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  // Combined filter - O(n) instead of O(4n) + memoized
+  const filteredTickets = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return tickets
+      .filter((t) => {
+        // Status filter
+        if (statusFilter !== "all" && t.status !== statusFilter) return false;
+        // Category filter
+        if (categoryFilter !== "all" && (t.category ?? "issue") !== categoryFilter) return false;
+        // Area filter
+        if (areaFilter !== "all" && (t.area || "General") !== areaFilter) return false;
+        // Search filter
+        if (q && !(
+          t.title.toLowerCase().includes(q) ||
+          (t.notes ?? "").toLowerCase().includes(q) ||
+          (t.pageTitle ?? "").toLowerCase().includes(q) ||
+          (t.path ?? "").toLowerCase().includes(q)
+        )) return false;
+        return true;
+      })
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }, [tickets, statusFilter, categoryFilter, areaFilter, search]);
 
   const deviceLabel = (t: Ticket) => {
     const device = (t.client?.deviceType ?? "").toLowerCase();

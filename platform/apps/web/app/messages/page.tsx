@@ -734,20 +734,35 @@ export default function MessagesPage() {
         return Boolean(overdueMessage);
     };
 
-    const filteredConversations = conversations
-        .filter(conv => {
-        if (!searchTerm) return true;
-        const term = searchTerm.toLowerCase();
-        return conv.guestName.toLowerCase().includes(term) || conv.siteName.toLowerCase().includes(term);
-        })
-        .filter(conv => {
-            if (guestFilter === "overdue") return isConversationOverdue(conv);
-            return true;
-    });
+    // Pre-compute overdue conversations and counts in a single pass
+    const { overdueConversations, overdueCount, unreadCount } = useMemo(() => {
+        const overdue: typeof conversations = [];
+        let unread = 0;
+        for (const conv of conversations) {
+            if (isConversationOverdue(conv)) {
+                overdue.push(conv);
+            }
+            unread += conv.unreadCount || 0;
+        }
+        return { overdueConversations: overdue, overdueCount: overdue.length, unreadCount: unread };
+    }, [conversations]);
 
-    const overdueConversations = conversations.filter(isConversationOverdue);
-    const overdueCount = overdueConversations.length;
-    const unreadCount = conversations.reduce((acc, c) => acc + (c.unreadCount || 0), 0);
+    // Combined filter - O(n) instead of O(2n)
+    const filteredConversations = useMemo(() => {
+        const termLower = searchTerm?.toLowerCase();
+        return conversations.filter(conv => {
+            // Search filter
+            if (termLower && !conv.guestName.toLowerCase().includes(termLower) && !conv.siteName.toLowerCase().includes(termLower)) {
+                return false;
+            }
+            // Guest filter
+            if (guestFilter === "overdue" && !isConversationOverdue(conv)) {
+                return false;
+            }
+            return true;
+        });
+    }, [conversations, searchTerm, guestFilter]);
+
     const totalConversations = conversations.length;
 
     useEffect(() => {
@@ -764,18 +779,25 @@ export default function MessagesPage() {
         }
     }, [overdueCount, SLA_MINUTES, overdueNotified, toast]);
 
-    const filteredInternalConversations = internalConversations.filter(conv => {
-        if (!searchTerm) return true;
-        const term = searchTerm.toLowerCase();
-        if (conv.type === "channel") {
-            return conv.name?.toLowerCase().includes(term);
-        } else {
-            const participants = conv.participants.map(p => `${p.user.firstName} ${p.user.lastName}`).join(", ");
-            return participants.toLowerCase().includes(term);
-        }
-    });
+    // Memoize internal conversations filter and split into channels/DMs
+    const { filteredInternalConversations, channels, dms } = useMemo(() => {
+        const termLower = searchTerm?.toLowerCase();
+        const filtered = internalConversations.filter(conv => {
+            if (!termLower) return true;
+            if (conv.type === "channel") {
+                return conv.name?.toLowerCase().includes(termLower);
+            } else {
+                const participants = conv.participants.map(p => `${p.user.firstName} ${p.user.lastName}`).join(", ");
+                return participants.toLowerCase().includes(termLower);
+            }
+        });
+        return {
+            filteredInternalConversations: filtered,
+            channels: filtered.filter(c => c.type === "channel"),
+            dms: filtered.filter(c => c.type === "dm"),
+        };
+    }, [internalConversations, searchTerm]);
 
-    const totalUnread = conversations.reduce((acc, c) => acc + c.unreadCount, 0);
     const firstUnreadConversation = conversations.find((conv) => conv.unreadCount > 0);
     const firstOverdueConversation = overdueConversations[0];
     const isAllGuestView = activeTab === "guests" && guestFilter === "all";
@@ -1092,9 +1114,9 @@ export default function MessagesPage() {
                         <CardTitle className="flex items-center gap-2">
                             <MessageSquare className="h-5 w-5" />
                             Messages
-                            {totalUnread > 0 && (
+                            {unreadCount > 0 && (
                                 <Badge variant="destructive" className="ml-auto">
-                                    {totalUnread}
+                                    {unreadCount}
                                 </Badge>
                             )}
                         </CardTitle>
@@ -1478,7 +1500,7 @@ export default function MessagesPage() {
                                         </Dialog>
                                     </div>
                                     <div className="space-y-1">
-                                        {filteredInternalConversations.filter(c => c.type === "channel").map(conv => (
+                                        {channels.map(conv => (
                                             <button
                                                 key={conv.id}
                                                 onClick={() => setSelectedInternalConversationId(conv.id)}
@@ -1541,7 +1563,7 @@ export default function MessagesPage() {
                                         </Dialog>
                                     </div>
                                     <div className="space-y-1">
-                                        {filteredInternalConversations.filter(c => c.type === "dm").map(conv => {
+                                        {dms.map(conv => {
                                             const otherParticipants = conv.participants
                                                 .filter(p => p.user.id !== session?.user?.id)
                                                 .map(p => `${p.user.firstName} ${p.user.lastName}`)
@@ -2328,7 +2350,7 @@ export default function MessagesPage() {
               active="messages"
               items={[
                 { key: "tasks", label: "Tasks", href: "/operations#housekeeping", icon: <ClipboardList className="h-4 w-4" /> },
-                { key: "messages", label: "Messages", href: "#messages-shell", icon: <MessageSquare className="h-4 w-4" />, badge: totalUnread },
+                { key: "messages", label: "Messages", href: "#messages-shell", icon: <MessageSquare className="h-4 w-4" />, badge: unreadCount },
                 { key: "checklists", label: "Checklists", href: "/operations#checklists", icon: <ClipboardCheck className="h-4 w-4" /> },
                 { key: "ops-health", label: "Ops health", href: "/operations#ops-health", icon: <HeartPulse className="h-4 w-4" /> },
               ]}

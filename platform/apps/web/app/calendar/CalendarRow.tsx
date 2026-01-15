@@ -78,7 +78,7 @@ export const CalendarRow = memo(function CalendarRow({
                 <div className="grid h-full" style={{ gridTemplateColumns: `repeat(${dayCount}, minmax(94px, 1fr))` }}>
                     {days.map((d, i) => (
                         <div
-                            key={i}
+                            key={d.date.toISOString()}
                             data-day-idx={i}
                             className={cn(
                                 "border-r border-border cursor-crosshair transition-colors h-16 touch-none",

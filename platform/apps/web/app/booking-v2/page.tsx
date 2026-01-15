@@ -54,6 +54,21 @@ const SITE_TYPE_STYLES: Record<string, { label: string; badge: string; border: s
   default: { label: "Site", badge: "bg-muted text-muted-foreground", border: "border-l-border" }
 };
 
+// Cached regex patterns for label stripping - prevents recreation on every render
+const labelRegexCache = new Map<string, { start: RegExp; plain: RegExp; end: RegExp }>();
+function getLabelRegex(label: string) {
+  let cached = labelRegexCache.get(label);
+  if (!cached) {
+    cached = {
+      start: new RegExp(`^${label}\\s+`, "i"),
+      plain: new RegExp(`^${label}`, "i"),
+      end: new RegExp(`\\s+${label}$`, "i"),
+    };
+    labelRegexCache.set(label, cached);
+  }
+  return cached;
+}
+
 const RIG_TYPE_OPTIONS = [
   { value: "class-a", label: "Class A Motorhome" },
   { value: "class-b", label: "Class B Camper Van" },
@@ -1539,9 +1554,10 @@ function BookingPageInner() {
                             {filteredSites.map((site) => {
                               const typeKey = (site.siteType || "").toLowerCase();
                               const meta = SITE_TYPE_STYLES[typeKey] || SITE_TYPE_STYLES.default;
-                              const displayName = site.name.replace(new RegExp(`^${meta.label}\\s+`, "i"), "");
-                              const displayNum = site.siteNumber.replace(new RegExp(`^${meta.label}`, "i"), "");
-                              const displayClass = (site.siteClassName || "Class").replace(new RegExp(`\\s+${meta.label}$`, "i"), "");
+                              const regex = getLabelRegex(meta.label);
+                              const displayName = site.name.replace(regex.start, "");
+                              const displayNum = site.siteNumber.replace(regex.plain, "");
+                              const displayClass = (site.siteClassName || "Class").replace(regex.end, "");
                               const isSelected = formData.siteId === site.id;
                               const isDisabled = site.status !== "available";
 
