@@ -37,6 +37,14 @@ pnpm prisma:reset-seed
 - API smoke tests: `pnpm --dir platform/apps/api test:smoke`
 - Build all: `pnpm build`
 
+## Commands reference
+- Dev (API + web): `pnpm dev`
+- Build: `pnpm build`
+- Test (API): `pnpm --dir platform/apps/api test`
+- Lint: `pnpm lint:web`
+- Format/fix: `pnpm format`
+- E2E (web): `pnpm --dir platform/apps/web test:e2e`
+
 ## Notes
 - Prisma schema and seeds live in `platform/apps/api/prisma/`.
 - Prisma 7 uses Postgres driver adapters at runtime; follow existing `PrismaService` patterns for any new DB scripts.
@@ -54,4 +62,3 @@ pnpm prisma:reset-seed
 The root `vercel.json` handles:
 - `/api/*` routes → NestJS serverless function (`platform/apps/api/dist/serverless.js`)
 - All other routes → Next.js web app (`platform/apps/web`)
-

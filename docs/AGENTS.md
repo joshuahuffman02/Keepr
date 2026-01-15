@@ -29,3 +29,9 @@
 ## Run/test/lint discovery
 - Autodetect from package.json, README, and scripts/.
 - If still unclear, make a reasonable choice and note any testing gaps.
+
+## Live guidance links
+- `docs/repo_summary.md` – quick overview of stack, entry points, commands, and env requirements.
+- `docs/exec_plans.md` – execution planning template with verification anchors.
+- `docs/architecture.mmd` – high-level system diagram connecting API, web, shared packages, and Rust services.
+- `docs/frontend.mmd` – Next.js App Router conventions, lint/test expectations, and a structural diagram.

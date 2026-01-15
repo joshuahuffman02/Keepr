@@ -1,0 +1,32 @@
+# Architecture Overview
+
+Keepr blends several runtime environments. The diagram below shows how the NestJS API, Next.js frontend, shared TypeScript packages, and Rust services interact through databases and runtime bridges.
+
+```mermaid
+flowchart LR
+    Web[Next.js web (App Router)]
+    API[NestJS API (platform/apps/api)]
+    Shared[Shared SDK & packages (platform/packages/*)]
+    Rust[Rust microservices (platform/services/*)]
+    DB[(Postgres via Prisma)]
+    Redis[(Redis cache)]
+    Web -->|"REST/GraphQL/fetch()"| API
+    Web -->|"imports/types"| Shared
+    API -->|"imports/types"| Shared
+    API --> DB
+    API --> Redis
+    Rust -->|"HTTP/DB" | API
+    Rust --> DB
+    Rust --> Redis
+    Shared -->|"build artifacts"| Web
+    Shared -->|"build artifacts"| API
+```
+
+## Notes
+- **Web**: App Router routes under `platform/apps/web/app` are rendered server-side (and occasionally client-side) with shared UI components.
+- **API**: Built with NestJS and Prisma 7; production builds generate a serverless bundle (`platform/apps/api/dist/serverless.js`) that Vercel routes.
+- **Shared packages**: Provide shared types, Zod schemas, and SDK helpers that both apps import during build time.
+- **Rust services**: Self-contained binaries (availability, payment, auth) that keep complex domain problems isolated while exposing HTTP endpoints or integration hooks back to the API.
+- **Persistence**: Postgres (via Prisma schemas) is the canonical data store; Redis handles sessions, locks, and short-lived caches.
+
+Leverage this diagram when adding integrations or debugging cross-service flows so you can quickly see which layers could be affected.

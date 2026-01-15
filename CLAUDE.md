@@ -4,28 +4,27 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Campreserv: Multi-tenant SaaS for campground, RV park, and lodging reservations. pnpm monorepo with NestJS API and Next.js frontend.
+Campreserv (Keepr): Multi-tenant SaaS for campground, RV park, and lodging reservations. pnpm monorepo with NestJS API, Next.js frontend, and Rust microservices for critical paths.
 
-## Quick Start
+## Critical Rules (Never Violate)
 
-**Working on specific areas? Load the right skill:**
-- API/Backend (Node) → Use `nestjs-api` skill
-- API/Backend (Rust) → Reference `.claude/rules/rust.md`
-- Frontend/UI → Use `ui-development` skill
-- Database → Use `prisma-database` skill
-- Payments → Reference `.claude/rules/payments.md`
+1. **Verify your work**: Run `pnpm build` + tests after changes
+2. **Multi-tenant isolation**: Include `campgroundId` in ALL database queries
+3. **Money in cents**: Use integers (`9999` = $99.99), never floats
+4. **Validate everything**: Use Zod for user input, APIs, webhooks
+5. **No emojis**: Use Lucide SVG icons
+6. **No cron jobs**: Ask before adding `@Cron`/`@Interval` (Railway connection limits)
 
-**Critical rules (never violate these):**
-1. ✅ Always verify your work: Run `pnpm build` + tests after changes
-2. ✅ Use Plan mode (shift+tab 2x) for multi-file changes
-3. ✅ Multi-tenant: Include `campgroundId` in ALL queries
-4. ✅ Money: Use integers for cents (`9999` = $99.99), validate with Zod
-5. ✅ Icons: Use Lucide SVG, never emojis
-6. ✅ Validate all external data with Zod (user input, APIs, webhooks)
+**Area-specific rules** auto-load from `.claude/rules/`:
+- `api.md` - NestJS patterns, guards, DTOs, scheduled jobs
+- `web.md` - React components, TanStack Query, hydration
+- `prisma.md` - Schema, migrations, query patterns
+- `payments.md` - Money handling, Stripe, ledger
+- `rust.md` - Error handling, async, type safety
 
 ## Prerequisites
 
-- Node 22.x (required for Prisma 7)
+- Node 20+ (Prisma 7 requirement)
 - pnpm 7.33.6 (`npm install -g pnpm@7.33.6`)
 
 ## Essential Commands
@@ -63,11 +62,15 @@ pnpm lint:fix               # Auto-fix lint issues
 ```
 platform/
   apps/
-    api/          # NestJS backend (port 4000)
-    web/          # Next.js frontend (port 3000)
+    api/              # NestJS backend (port 4000)
+    web/              # Next.js frontend (port 3000)
+  services/
+    auth-service-rs/  # Rust: Authentication (critical)
+    payment-processor-rs/  # Rust: Payment processing
+    availability-rs/  # Rust: Availability calculator
   packages/
-    shared/       # Shared Zod schemas & types
-    sdk/          # Client SDK
+    shared/           # Shared Zod schemas & types
+    sdk/              # Client SDK
     integrations-sdk/
 ```
 
@@ -75,7 +78,8 @@ platform/
 
 | Layer | Technology |
 |-------|------------|
-| Backend | NestJS 10, Rust (critical services), Prisma 7, PostgreSQL |
+| Backend | NestJS 10, Prisma 7, PostgreSQL |
+| Rust Services | actix-web, sqlx, tokio (security-critical paths) |
 | Frontend | Next.js 14 (App Router), React 18, TailwindCSS |
 | Auth | NextAuth 5 (beta), JWT (7-day expiry) |
 | Payments | Stripe (connected accounts per campground) |
@@ -83,81 +87,26 @@ platform/
 | UI | Radix UI, shadcn/ui components |
 | Monorepo | pnpm workspaces |
 
-**Rust services (planned):**
-- Payment processing (security-critical)
-- Availability calculator (complex logic)
-- Authentication (critical)
-- Math-heavy features (pricing, calculations)
+**When to use Rust vs TypeScript:**
+- Rust: Payment processing, auth, availability, money calculations (if it compiles, it's correct)
+- TypeScript: CRUD, admin dashboards, business logic, integrations
 
-## CRITICAL GUARDRAILS
-
-**DO NOT modify these without explicit approval:**
+## Guardrails (Do Not Modify Without Approval)
 
 1. **Prisma 7 Generator** - Must stay as `prisma-client-js`, uses `PrismaPg` adapter at runtime
 2. **Build Tool** - API uses `tsup` (not `tsc`) - see `tsup.config.ts`
 3. **Multi-tenant isolation** - Always scope queries by `campgroundId`
-4. **Money in cents** - All amounts are integers (e.g., `9999` = $99.99)
-5. **No emojis** - Use Lucide SVG icons instead (professional and scalable)
 
-### Deployment Architecture
+## Deployment
 
 | Environment | Frontend | API | Database |
 |-------------|----------|-----|----------|
-| **Production** | Vercel (`keeprstay.com`) | Railway (`api.keeprstay.com`) | Supabase (main) |
-| **Staging** | Vercel (`staging.keeprstay.com`) | Railway (`api-staging.keeprstay.com`) | Supabase (staging branch) |
-| **Preview** | Vercel (auto PR previews) | N/A | N/A |
+| Production | Vercel (`keeprstay.com`) | Railway (`api.keeprstay.com`) | Supabase |
+| Staging | Vercel (`staging.keeprstay.com`) | Railway (`api-staging.keeprstay.com`) | Supabase (staging) |
 
-**Branch Strategy:**
-```
-feature/* ─→ PR to staging ─→ merge ─→ test on staging ─→ PR to main ─→ production
-```
+**Branch strategy:** `feature/*` → PR to `staging` → merge → test → PR to `main` → production
 
-### CI/CD Pipeline
-
-GitHub Actions runs automatically on PRs to `main` or `staging`:
-
-| Job | What it does |
-|-----|--------------|
-| `lint` | ESLint checks |
-| `test-api` | API smoke tests with PostgreSQL |
-| `test-sdk` | SDK unit tests |
-| `build` | Full build verification |
-| `e2e` | Playwright E2E tests (PRs only) |
-
-**Deployment triggers:**
-- Push to `staging` → deploys to staging environments
-- Push to `main` → deploys to production
-
-See `docs/DEVELOPER_WORKFLOW.md` for the complete workflow guide.
-
-### Environment-Based Configuration
-
-API URLs are configured via `NEXT_PUBLIC_API_BASE` environment variable:
-
-| Environment | NEXT_PUBLIC_API_BASE |
-|-------------|---------------------|
-| Local | `http://localhost:4000/api` |
-| Staging | `https://api-staging.keeprstay.com/api` |
-| Production | `https://api.keeprstay.com/api` |
-
-The centralized config is in `platform/apps/web/lib/api-config.ts`.
-
----
-
-## Area-Specific Rules
-
-Detailed patterns in `.claude/rules/` (auto-loaded by directory):
-- `.claude/rules/api.md` - NestJS services, controllers, DTOs, auth guards
-- `.claude/rules/rust.md` - Safety-critical code, error handling, async
-- `.claude/rules/web.md` - Components, queries, forms, accessibility
-- `.claude/rules/prisma.md` - Schema changes, migrations, query patterns
-- `.claude/rules/payments.md` - Money handling, Stripe, ledger entries
-
-**When to use Rust vs TypeScript:**
-- Rust → Payment processing, auth, availability calculator, money/security
-- TypeScript → CRUD, admin dashboards, business logic, integrations
-
----
+**CI/CD:** GitHub Actions runs lint, test-api, test-sdk, build, e2e on PRs. See `docs/DEVELOPER_WORKFLOW.md`.
 
 ## Key File Locations
 
@@ -207,39 +156,20 @@ cancelled
 
 ---
 
-## Important Documentation
+## Documentation
 
-**Development & Deployment:**
-- `docs/DEVELOPER_WORKFLOW.md` - Branch strategy, CI/CD, deployment process
-- `docs/AI_FIRST_DEVELOPMENT.md` - Complete guide to Zod, Sentry, Testing
-- `docs/RUST_MIGRATION_PLAN.md` - Plan for migrating to Rust
-- `docs/OPENAI_INTEGRATION.md` - OpenAI + pgvector semantic search
+| When doing... | Read... |
+|--------------|---------|
+| Building new features | `docs/AI_FIRST_DEVELOPMENT.md` |
+| Deploying / CI/CD | `docs/DEVELOPER_WORKFLOW.md` |
+| Adding AI features | `docs/OPENAI_INTEGRATION.md` |
+| Rust migration | `docs/RUST_MIGRATION_PLAN.md` |
 
-**Read these when:**
-- Deploying or setting up CI/CD → DEVELOPER_WORKFLOW.md
-- Building new features → AI_FIRST_DEVELOPMENT.md
-- After first customers → RUST_MIGRATION_PLAN.md
-- Adding AI features → OPENAI_INTEGRATION.md
+## Known Issues
 
-## Known Issues & Technical Debt
+**In-memory state (not distributed):** Account lockout, scope cache, idempotency counters use `Map<>` - needs Redis for multi-instance.
 
-### Pending External Integrations
-- **OTA providers** (Airbnb, Booking.com) - awaiting API credentials
-- **Currency/FX rates** - needs OpenExchangeRates or XE.com integration
-- **RV Life reviews** - API not yet documented
-- **SMS failover** - single Twilio provider only
-
-### In-Memory State (Not Distributed)
-- Account lockout uses `Map<>` (TODO: migrate to Redis)
-- Scope cache uses in-memory Map with 5000 entry limit
-- Idempotency counters use memory with expiry cleanup
-
-### Frontend TODOs
-- Gift card API integration stubbed in PaymentCollectionModal
-- Wallet debit API not implemented
-- Reminder email shows `alert("TODO")`
-
----
+**Stubbed features:** Gift card API, wallet debit, reminder email contain TODOs.
 
 ## Common Issues & Fixes
 
@@ -273,34 +203,8 @@ DATABASE_URL="..." npx prisma migrate resolve --applied "migration_name"
 | Frontend changes | `pnpm build:web` |
 | Schema changes | `pnpm --dir platform/apps/api prisma:generate` |
 | Shared types | `pnpm build:shared` |
+| Rust services | `cargo check && cargo clippy && cargo test` |
 | Everything | `pnpm build` |
-
-## Advanced Workflows
-
-**Parallel Execution:**
-- Run multiple Claude sessions in parallel for faster iteration
-- Use numbered terminal tabs (1-5) to track sessions
-- Hand off between local CLI and claude.ai/code using `&` or `--teleport`
-- Start sessions from mobile and check in later
-
-**Hooks for Auto-Verification:**
-Configure `.claude/hooks.json` to automatically verify work:
-```json
-{
-  "postToolUse": {
-    "Edit": "pnpm build",
-    "Write": "pnpm build"
-  }
-}
-```
-
-**Verification Subagent:**
-For long-running tasks, use a background agent to verify:
-- Create `.claude/agents/verify-app.md` with testing steps
-- Invoke with: `Task(subagent_type="verify-app")`
-- Or use a Stop hook to run verification automatically
-
----
 
 ## Code Patterns
 
@@ -310,21 +214,18 @@ For long-running tasks, use a background agent to verify:
 - Include `campgroundId` in tenant-scoped queries
 - Invalidate TanStack queries on mutation success
 - Check `typeof window !== 'undefined'` before localStorage
-- Use Zod for money, user input, external data validation
 - Use NestJS Logger (`this.logger.log()`), not console.log
-- Add guards to endpoints: `@UseGuards(JwtAuthGuard, RolesGuard)`
+- Add guards: `@UseGuards(JwtAuthGuard, RolesGuard)`
 - Use specific exceptions: `BadRequestException`, `NotFoundException`
 - Wrap risky ops in try/catch + `Sentry.captureException()`
 
 **Ask before:**
 - Adding new npm packages
-- Adding `@Cron` or `@Interval` decorators (Railway has limited DB connections)
-
----
+- Adding `@Cron` or `@Interval` decorators
 
 ## Environment Variables
 
-### API (.env)
+**API** (`platform/apps/api/.env`):
 ```
 DATABASE_URL=postgresql://...
 JWT_SECRET=...
@@ -332,38 +233,25 @@ STRIPE_SECRET_KEY=sk_...
 REDIS_URL=redis://... (optional)
 ```
 
-### Web (.env)
+**Web** (`platform/apps/web/.env`):
 ```
-NEXT_PUBLIC_API_BASE=http://localhost:4000
+NEXT_PUBLIC_API_BASE=http://localhost:4000/api
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=...
 ```
 
----
+## Browser Automation
 
-## Deployment
+Use `agent-browser` for headless web automation and testing. Skill: `.claude/skills/agent-browser/`.
 
-**Platforms:**
-- **Frontend**: Vercel (auto-deploy on push)
-- **API**: Railway (auto-deploy on push)
-- **Database**: Supabase PostgreSQL (with GitHub branching integration)
-- **DNS**: Cloudflare
+```bash
+# Core workflow
+agent-browser open <url>        # Navigate to page
+agent-browser snapshot -i       # Get interactive elements with refs (@e1, @e2)
+agent-browser click @e1         # Click by ref
+agent-browser fill @e2 "text"   # Fill input by ref
+agent-browser screenshot        # Capture page
+agent-browser close             # Close browser
+```
 
-**URLs:**
-| Environment | Frontend | API | Health Check |
-|-------------|----------|-----|--------------|
-| Production | https://keeprstay.com | https://api.keeprstay.com | `/api/health` |
-| Staging | https://staging.keeprstay.com | https://api-staging.keeprstay.com | `/api/health` |
-
-**Build tools:**
-- API: `tsup` (not `tsc`)
-- Web: `next build`
-
-**To deploy:**
-1. Create feature branch from `staging`
-2. Make changes, push, create PR to `staging`
-3. CI runs automatically - merge when green
-4. Test on staging environment
-5. Create PR from `staging` to `main` for production
-
-See `docs/DEVELOPER_WORKFLOW.md` for complete guide.
+Binary location: `/Users/josh/.npm-global/bin/agent-browser`

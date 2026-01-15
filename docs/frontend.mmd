@@ -1,0 +1,35 @@
+# Frontend Conventions
+
+This document captures the Next.js App Router conventions and tooling expectations for `platform/apps/web`.
+
+## App Router Surface
+Routes live under `platform/apps/web/app/`; each folder can contain `page.tsx`, `route.ts`, `layout.tsx`, and `loading.tsx`. Layouts are nested per folder, enabling shared UI across branches.
+
+## Shared UI & State
+- Components that must be reused across routes belong in `platform/apps/web/components/`.
+- Global state and helpers (auth, analytics, reservations) should rely on shared packages (`@keepr/shared`, `@keepr/sdk`) rather than ad-hoc duplication.
+- Client-side rendering is allowed only when necessary; prefer server components with `fetch` using API routes or direct DB by reusing the shared SDK.
+
+## Tooling & Expectations
+- ESLint forbids explicit `any` or type assertions; `pnpm lint:web` includes `scripts/check-no-any-no-assert.js`.
+- Vitest unit tests belong near the relevant component or hook and follow naming like `*.test.tsx`.
+- E2E tests live under `platform/apps/web/e2e/*.spec.ts` and run with `pnpm --dir platform/apps/web test:e2e`.
+
+## Diagram
+```mermaid
+graph TD
+    Root[platform/apps/web]
+    Root --> App[app/ (App Router)]
+    App --> Routes[Routes & layouts]
+    App --> Components[components/ shared UI]
+    App --> Hooks[hooks/ (optional)]
+    Root --> Public[public/ static assets]
+    Root --> Styles[styles/ (global styles)]
+    App --> SDK[shared types & SDKs]
+    SDK --> Shared[platform/packages/shared]
+```
+
+## Notes
+- Tests and linting run inside the web directory so cross-app imports must respect build-time aliasing.
+- Use strengths of the App Router (layouts, server components) when introducing new routes; avoid mixing in large client bundles without justification.
+- Keep this doc updated if the App Router structure evolves (e.g., new `/app` entry points or middleware).
