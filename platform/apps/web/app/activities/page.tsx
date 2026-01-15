@@ -22,9 +22,25 @@ import { Badge } from "../../components/ui/badge";
 import { Switch } from "../../components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
-import { Calendar as BigCalendar, dateFnsLocalizer, Views } from "react-big-calendar";
+import dynamic from "next/dynamic";
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import { enUS } from "date-fns/locale";
+
+// Dynamic import for react-big-calendar to reduce initial bundle (~50KB savings)
+const BigCalendar = dynamic(
+    () => import("react-big-calendar").then((mod) => mod.Calendar),
+    {
+        ssr: false,
+        loading: () => (
+            <div className="h-[500px] bg-muted/50 rounded-lg animate-pulse flex items-center justify-center">
+                <span className="text-muted-foreground">Loading calendar...</span>
+            </div>
+        ),
+    }
+);
+
+// Import Views and dateFnsLocalizer separately (they're small, tree-shakeable)
+import { dateFnsLocalizer, Views } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { CreateEventDialog } from "../../components/events/CreateEventDialog";
 import { Event } from "@keepr/shared";

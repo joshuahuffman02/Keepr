@@ -3,6 +3,34 @@ import { useCalendarContext } from "./CalendarContext";
 import { cn } from "../../lib/utils";
 import type { CalendarReservation, ReservationStatus, ReservationDragMode } from "./types";
 
+// Hoisted outside component to prevent recreation on every render
+const STATUS_CONFIG: Record<string, { bg: string; icon: typeof CheckCircle; border: string; shadow: string }> = {
+    confirmed: {
+        bg: "bg-emerald-500/90",
+        icon: CheckCircle,
+        border: "border-emerald-400/30",
+        shadow: "shadow-[0_2px_8px_-2px_rgba(16,185,129,0.4)]"
+    },
+    checked_in: {
+        bg: "bg-blue-500/90",
+        icon: Clock,
+        border: "border-blue-400/30",
+        shadow: "shadow-[0_2px_8px_-2px_rgba(59,130,246,0.4)]"
+    },
+    cancelled: {
+        bg: "bg-rose-500/90",
+        icon: XCircle,
+        border: "border-rose-400/30",
+        shadow: "shadow-[0_2px_8px_-2px_rgba(244,63,94,0.4)]"
+    },
+    pending: {
+        bg: "bg-amber-500/90",
+        icon: HelpCircle,
+        border: "border-amber-400/30",
+        shadow: "shadow-[0_2px_8px_-2px_rgba(245,158,11,0.4)]"
+    },
+};
+
 interface ReservationPillProps {
     reservation: CalendarReservation;
     style: React.CSSProperties;
@@ -90,37 +118,8 @@ export function ReservationPill({
         ? "border-status-warning/30"
         : "";
 
-    const statusConfig = {
-        confirmed: {
-            bg: "bg-emerald-500/90",
-            icon: CheckCircle,
-            border: "border-emerald-400/30",
-            shadow: "shadow-[0_2px_8px_-2px_rgba(16,185,129,0.4)]"
-        },
-        checked_in: {
-            bg: "bg-blue-500/90",
-            icon: Clock,
-            border: "border-blue-400/30",
-            shadow: "shadow-[0_2px_8px_-2px_rgba(59,130,246,0.4)]"
-        },
-        cancelled: {
-            bg: "bg-rose-500/90",
-            icon: XCircle,
-            border: "border-rose-400/30",
-            shadow: "shadow-[0_2px_8px_-2px_rgba(244,63,94,0.4)]"
-        },
-        pending: {
-            bg: "bg-amber-500/90",
-            icon: HelpCircle,
-            border: "border-amber-400/30",
-            shadow: "shadow-[0_2px_8px_-2px_rgba(245,158,11,0.4)]"
-        },
-    };
-
-    const isReservationStatus = (value: string): value is keyof typeof statusConfig =>
-        Object.prototype.hasOwnProperty.call(statusConfig, value);
-    const statusKey = isReservationStatus(reservation.status) ? reservation.status : "pending";
-    const config = statusConfig[statusKey];
+    const statusKey = reservation.status in STATUS_CONFIG ? reservation.status : "pending";
+    const config = STATUS_CONFIG[statusKey];
     const Icon = config.icon;
     const guestName = `${reservation.guest?.primaryFirstName || ""} ${reservation.guest?.primaryLastName || ""}`.trim() || "Guest";
     const total = (reservation.totalAmount ?? 0) / 100;

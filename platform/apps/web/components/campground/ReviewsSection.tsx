@@ -27,21 +27,19 @@ interface ReviewsSectionProps {
   className?: string;
 }
 
+// Hoisted outside component to prevent recreation on every render
+type FilterOption = "all" | "recent" | "highest" | "photos";
+const FILTER_OPTIONS: FilterOption[] = ["all", "recent", "highest", "photos"];
+
 export function ReviewsSection({
   reviews,
   averageRating,
   totalCount,
   className,
 }: ReviewsSectionProps) {
-  const filterOptions: Array<"all" | "recent" | "highest" | "photos"> = [
-    "all",
-    "recent",
-    "highest",
-    "photos",
-  ];
   const prefersReducedMotion = useReducedMotion();
   const [showAll, setShowAll] = useState(false);
-  const [filter, setFilter] = useState<"all" | "recent" | "highest" | "photos">("all");
+  const [filter, setFilter] = useState<FilterOption>("all");
 
   // Calculate rating distribution
   const distribution = useMemo(() => {
@@ -134,7 +132,7 @@ export function ReviewsSection({
 
         {/* Filter tabs */}
         <div className="flex gap-2 flex-wrap">
-          {filterOptions.map((f) => (
+          {FILTER_OPTIONS.map((f) => (
             <Button
               key={f}
               variant={filter === f ? "default" : "outline"}
