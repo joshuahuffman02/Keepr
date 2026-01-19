@@ -1,6 +1,5 @@
 # Ignore everything at root except what's needed
 /platform/apps/api
-/platform/packages/sdk
 /platform/packages/integrations-sdk
 
 # Node modules
