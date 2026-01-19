@@ -14,6 +14,8 @@ type ChatMessageListProps = {
   onRegenerate?: (messageId: string) => void;
   onFeedback?: (messageId: string, value: "up" | "down") => void;
   feedbackById?: Record<string, "up" | "down">;
+  onTicketAction?: () => void;
+  ticketHref?: string;
   emptyState?: ReactNode;
   bottomRef?: RefObject<HTMLDivElement>;
 };
@@ -28,6 +30,8 @@ export function ChatMessageList({
   onRegenerate,
   onFeedback,
   feedbackById,
+  onTicketAction,
+  ticketHref,
   emptyState,
   bottomRef,
 }: ChatMessageListProps) {
@@ -44,6 +48,8 @@ export function ChatMessageList({
           onRegenerate={onRegenerate}
           onFeedback={onFeedback}
           feedback={feedbackById?.[message.id]}
+          onTicketAction={onTicketAction}
+          ticketHref={ticketHref}
           {...message}
         />
       ))}

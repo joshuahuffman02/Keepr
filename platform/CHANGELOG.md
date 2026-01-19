@@ -20,6 +20,7 @@
 - Persist onboarding import system selection/override metadata on completion and highlight next exports to grab.
 - Draft-save onboarding import selections immediately and show import coverage metadata on Review/Launch.
 - Sync onboarding import draft coverage into wizard state and include checklist status in go-live warnings.
+- In-chat support ticket composer with severity, transcript toggle, attachments, and SLA/email fallback messaging.
 
 #### Phase 1: Pricing & Payments
 - **Dynamic Pricing Engine** (`/pricing-v2`)

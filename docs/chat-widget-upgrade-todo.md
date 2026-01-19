@@ -44,8 +44,8 @@ Goal: Bring Keepr's guest, portal, staff, and support chat experiences up to the
 ### 4) Staff -> Keepr Support (Owner Contact)
 - [x] Add "Contact Keepr" mode inside the staff chat.
 - [x] Add in-chat ticketing flow with severity and evidence links.
-- [ ] Attach transcripts and optional files to tickets.
-- [ ] Provide direct email fallback + expected response times.
+- [x] Attach transcripts and optional files to tickets.
+- [x] Provide direct email fallback + expected response times.
 
 ## Feature Parity Checklist (Vercel Chat SDK)
 - [x] Streaming responses with incremental rendering.
@@ -132,8 +132,8 @@ Phase 2 - Attachments + artifacts (2-4 weeks)
 - [x] Artifact sidecar for quotes, availability, and reports.
 
 Phase 3 - Support escalation (1-2 weeks)
-- [ ] In-chat ticketing with evidence links.
-- [ ] Direct email fallback and status updates.
+- [x] In-chat ticketing with evidence links.
+- [x] Direct email fallback and status updates.
 
 Phase 4 - Optimization + rollout (ongoing)
 - [ ] Performance tuning for streaming and rendering.
@@ -147,6 +147,7 @@ Phase 4 - Optimization + rollout (ongoing)
 - Staff history now supports search + time filters with auto-titled conversation summaries.
 - Artifact sidecar panel surfaces availability, quote, and report outputs from tool results.
 - Feedback/regenerate actions now emit analytics events when a session ID is available.
+- Support chat now includes an in-chat ticket composer with severity, transcripts, attachments, and SLA/email fallback messaging.
 
 ## Verification Commands
 - `pnpm lint:web`

@@ -19,6 +19,7 @@ export interface ChatMessageProps extends UnifiedChatMessage {
   onActionSelect?: (actionId: string, optionId: string) => void;
   onQuickReply?: (prompt: string) => void;
   ticketHref?: string;
+  onTicketAction?: () => void;
   onEditMessage?: (messageId: string, content: string) => void;
   onRegenerate?: (messageId: string) => void;
   onFeedback?: (messageId: string, value: "up" | "down") => void;
@@ -27,6 +28,9 @@ export interface ChatMessageProps extends UnifiedChatMessage {
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
+
+const SUPPORT_EMAIL = "support@keeprstay.com";
+const SUPPORT_SLA = "Typical response within 24 hours.";
 
 const getString = (value: unknown, fallback = ""): string =>
   typeof value === "string" ? value : fallback;
@@ -224,6 +228,7 @@ export function ChatMessage({
   onActionSelect,
   onQuickReply,
   ticketHref = "/dashboard/help/contact",
+  onTicketAction,
   onEditMessage,
   onRegenerate,
   onFeedback,
@@ -274,6 +279,8 @@ export function ChatMessage({
     !isSystem &&
     (onRegenerate || onFeedback) &&
     hasContent;
+  const shouldShowSupportTicketNote = showTicketPrompt && resolvedAccent === "support";
+  const ticketCtaLabel = resolvedAccent === "support" ? "Create ticket" : "Contact Support";
   const actionClass =
     "rounded-md p-1 text-muted-foreground transition hover:bg-muted hover:text-foreground";
 
@@ -468,13 +475,33 @@ export function ChatMessage({
         {showTicketPrompt && (
           <div className="mt-3 pt-3 border-t border-border">
             <p className="text-xs text-muted-foreground mb-2">Need more help?</p>
-            <Link
-              href={ticketHref}
-              className="inline-flex items-center gap-2 bg-status-info text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-status-info/80 transition-colors"
-            >
-              <ExternalLink className="w-4 h-4" />
-              Contact Support
-            </Link>
+            {resolvedAccent === "support" && onTicketAction ? (
+              <button
+                type="button"
+                onClick={onTicketAction}
+                className="inline-flex items-center gap-2 bg-status-info text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-status-info/80 transition-colors"
+              >
+                <ExternalLink className="w-4 h-4" />
+                {ticketCtaLabel}
+              </button>
+            ) : (
+              <Link
+                href={ticketHref}
+                className="inline-flex items-center gap-2 bg-status-info text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-status-info/80 transition-colors"
+              >
+                <ExternalLink className="w-4 h-4" />
+                {ticketCtaLabel}
+              </Link>
+            )}
+            {shouldShowSupportTicketNote && (
+              <p className="mt-2 text-[11px] text-muted-foreground">
+                {SUPPORT_SLA} Or email{" "}
+                <a className="underline" href={`mailto:${SUPPORT_EMAIL}`}>
+                  {SUPPORT_EMAIL}
+                </a>
+                .
+              </p>
+            )}
           </div>
         )}
       </div>
