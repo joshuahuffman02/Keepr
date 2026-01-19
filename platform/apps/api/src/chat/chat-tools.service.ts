@@ -152,6 +152,35 @@ interface PreValidateResult {
   [key: string]: unknown; // Additional data to pass to execute
 }
 
+type JsonRenderElement = {
+  key: string;
+  type: string;
+  props: Record<string, unknown>;
+  children?: string[];
+  parentKey?: string | null;
+  visible?: unknown;
+};
+
+type JsonRenderTree = {
+  root: string;
+  elements: Record<string, JsonRenderElement>;
+};
+
+type JsonRenderPayload = {
+  title: string;
+  summary?: string;
+  tree: JsonRenderTree;
+  data: Record<string, unknown>;
+};
+
+const buildJsonRenderTree = (root: string, elements: JsonRenderElement[]): JsonRenderTree => {
+  const elementMap: Record<string, JsonRenderElement> = {};
+  for (const element of elements) {
+    elementMap[element.key] = element;
+  }
+  return { root, elements: elementMap };
+};
+
 interface ToolDefinition {
   name: string;
   description: string;
@@ -1281,15 +1310,109 @@ export class ChatToolsService {
           ? Math.round(days.reduce((sum, d) => sum + d.percentage, 0) / days.length)
           : 0;
 
+        const dailyBreakdown = days.slice(0, 14);
+        const jsonRender: JsonRenderPayload = {
+          title: 'Occupancy Report',
+          summary: `Average occupancy ${avgOccupancy}%`,
+          tree: buildJsonRenderTree('root', [
+            {
+              key: 'root',
+              type: 'Stack',
+              props: { gap: 4 },
+              children: ['header', 'metrics', 'chart', 'table'],
+            },
+            {
+              key: 'header',
+              type: 'Section',
+              props: {
+                title: 'Occupancy report',
+                description: `${startDateInput} to ${endDateInput}`,
+              },
+            },
+            {
+              key: 'metrics',
+              type: 'Grid',
+              props: { columns: 3, gap: 3 },
+              children: ['metric-average', 'metric-sites', 'metric-days'],
+            },
+            {
+              key: 'metric-average',
+              type: 'Metric',
+              props: {
+                label: 'Average occupancy',
+                valuePath: '/occupancy/averagePercent',
+                format: 'percent',
+              },
+            },
+            {
+              key: 'metric-sites',
+              type: 'Metric',
+              props: {
+                label: 'Active sites',
+                valuePath: '/occupancy/totalSites',
+                format: 'number',
+              },
+            },
+            {
+              key: 'metric-days',
+              type: 'Metric',
+              props: {
+                label: 'Days covered',
+                valuePath: '/occupancy/days',
+                format: 'number',
+              },
+            },
+            {
+              key: 'chart',
+              type: 'TrendChart',
+              props: {
+                title: 'Daily occupancy',
+                description: 'Percent and occupied sites',
+                dataPath: '/dailyBreakdown',
+                xKey: 'date',
+                series: [
+                  { key: 'percentage', color: '#0ea5e9', label: 'Occupancy %' },
+                  { key: 'occupied', color: '#22c55e', label: 'Occupied' },
+                ],
+                chartType: 'line',
+                height: 220,
+              },
+            },
+            {
+              key: 'table',
+              type: 'Table',
+              props: {
+                title: 'Daily breakdown',
+                rowsPath: '/dailyBreakdown',
+                columns: [
+                  { key: 'date', label: 'Date' },
+                  { key: 'occupied', label: 'Occupied', format: 'number' },
+                  { key: 'percentage', label: 'Occupancy', format: 'percent' },
+                ],
+              },
+            },
+          ]),
+          data: {
+            occupancy: {
+              totalSites,
+              averagePercent: avgOccupancy,
+              days: dailyBreakdown.length,
+              dateRange: { start: startDateInput, end: endDateInput },
+            },
+            dailyBreakdown,
+          },
+        };
+
         return {
           success: true,
           occupancy: {
             totalSites,
             dateRange: { start: startDateInput, end: endDateInput },
             averageOccupancy: `${avgOccupancy}%`,
-            dailyBreakdown: days.slice(0, 14), // Limit to 14 days
+            dailyBreakdown, // Limit to 14 days
           },
           message: `Average occupancy: ${avgOccupancy}% (${totalSites} total sites)`,
+          jsonRender,
         };
       },
     });
@@ -1326,23 +1449,127 @@ export class ChatToolsService {
         });
 
         const totalRevenue = payments.reduce((sum, p) => sum + p.amountCents, 0);
-        const paymentsByMethod = payments.reduce<Record<string, number>>((acc, p) => {
-          const method = p.method || 'other';
-          acc[method] = (acc[method] || 0) + p.amountCents;
-          return acc;
-        }, {});
+        const paymentsByMethod: Record<string, number> = {};
+        const methodStats: Record<string, { amountCents: number; count: number }> = {};
+        for (const payment of payments) {
+          const method = payment.method || 'other';
+          paymentsByMethod[method] = (paymentsByMethod[method] || 0) + payment.amountCents;
+          const current = methodStats[method] ?? { amountCents: 0, count: 0 };
+          current.amountCents += payment.amountCents;
+          current.count += 1;
+          methodStats[method] = current;
+        }
+
+        const totalRevenueDollars = totalRevenue / 100;
+        const averageTransaction = payments.length > 0 ? totalRevenueDollars / payments.length : 0;
+        const byMethodRows = Object.entries(methodStats).map(([method, stats]) => ({
+          method,
+          amount: stats.amountCents / 100,
+          percent: totalRevenue > 0 ? stats.amountCents / totalRevenue : 0,
+          count: stats.count,
+        }));
+        const jsonRender: JsonRenderPayload = {
+          title: 'Revenue Report',
+          summary: `Total revenue $${totalRevenueDollars.toFixed(2)} (${payments.length} transactions)`,
+          tree: buildJsonRenderTree('root', [
+            {
+              key: 'root',
+              type: 'Stack',
+              props: { gap: 4 },
+              children: ['header', 'metrics', 'chart', 'table'],
+            },
+            {
+              key: 'header',
+              type: 'Section',
+              props: {
+                title: 'Revenue report',
+                description: `${startDateInput} to ${endDateInput}`,
+              },
+            },
+            {
+              key: 'metrics',
+              type: 'Grid',
+              props: { columns: 3, gap: 3 },
+              children: ['metric-total', 'metric-count', 'metric-average'],
+            },
+            {
+              key: 'metric-total',
+              type: 'Metric',
+              props: {
+                label: 'Total revenue',
+                valuePath: '/revenue/total',
+                format: 'currency',
+              },
+            },
+            {
+              key: 'metric-count',
+              type: 'Metric',
+              props: {
+                label: 'Transactions',
+                valuePath: '/revenue/transactionCount',
+                format: 'number',
+              },
+            },
+            {
+              key: 'metric-average',
+              type: 'Metric',
+              props: {
+                label: 'Avg. transaction',
+                valuePath: '/revenue/averageTransaction',
+                format: 'currency',
+              },
+            },
+            {
+              key: 'chart',
+              type: 'TrendChart',
+              props: {
+                title: 'Revenue by method',
+                description: 'Totals by payment method',
+                dataPath: '/byMethod',
+                xKey: 'method',
+                chartType: 'bar',
+                series: [{ key: 'amount', color: '#0ea5e9', label: 'Revenue' }],
+                height: 220,
+              },
+            },
+            {
+              key: 'table',
+              type: 'Table',
+              props: {
+                title: 'Payment method breakdown',
+                rowsPath: '/byMethod',
+                columns: [
+                  { key: 'method', label: 'Method' },
+                  { key: 'amount', label: 'Revenue', format: 'currency' },
+                  { key: 'percent', label: 'Share', format: 'percent' },
+                  { key: 'count', label: 'Count', format: 'number' },
+                ],
+              },
+            },
+          ]),
+          data: {
+            revenue: {
+              total: totalRevenueDollars,
+              transactionCount: payments.length,
+              averageTransaction,
+              dateRange: { start: startDateInput, end: endDateInput },
+            },
+            byMethod: byMethodRows,
+          },
+        };
 
         return {
           success: true,
           revenue: {
-            total: `$${(totalRevenue / 100).toFixed(2)}`,
+            total: `$${totalRevenueDollars.toFixed(2)}`,
             transactionCount: payments.length,
             byMethod: Object.fromEntries(
               Object.entries(paymentsByMethod).map(([k, v]) => [k, `$${(v / 100).toFixed(2)}`])
             ),
             dateRange: { start: startDateInput, end: endDateInput },
           },
-          message: `Total revenue: $${(totalRevenue / 100).toFixed(2)} from ${payments.length} transactions`,
+          message: `Total revenue: $${totalRevenueDollars.toFixed(2)} from ${payments.length} transactions`,
+          jsonRender,
         };
       },
     });

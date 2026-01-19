@@ -39,6 +39,7 @@ Goal: Bring Keepr's guest, portal, staff, and support chat experiences up to the
 - [x] Add staff quick actions: arrivals, departures, occupancy, maintenance.
 - [x] Add tool execution UI (confirmations, forms, selections).
 - [x] Add json-render-powered inline report/graph cards in staff chat (source: `/Users/josh/Documents/GitHub/github extra stuff/json-render-main`).
+- [x] Add json-render payloads to occupancy and revenue tool results for inline charts/tables.
 - [ ] Add structured results for tools (availability, balances, tasks).
 - [ ] Add audit trail for actions executed by AI.
 
@@ -149,6 +150,7 @@ Phase 4 - Optimization + rollout (ongoing)
 - Staff history now supports search + time filters with auto-titled conversation summaries.
 - Artifact sidecar panel surfaces availability, quote, and report outputs from tool results.
 - Json-render report/graph cards now render inside the staff artifact sidecar when tool results include a json-render tree.
+- Occupancy and revenue tools now include json-render payloads for inline charts and tables.
 - Feedback/regenerate actions now emit analytics events when a session ID is available.
 - Support chat now includes an in-chat ticket composer with severity, transcripts, attachments, and SLA/email fallback messaging.
 

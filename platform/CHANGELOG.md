@@ -22,6 +22,7 @@
 - Sync onboarding import draft coverage into wizard state and include checklist status in go-live warnings.
 - In-chat support ticket composer with severity, transcript toggle, attachments, and SLA/email fallback messaging.
 - Json-render report/graph cards inside the staff chat artifact panel.
+- Occupancy and revenue tools now return json-render payloads for inline report charts and tables.
 
 #### Phase 1: Pricing & Payments
 - **Dynamic Pricing Engine** (`/pricing-v2`)
