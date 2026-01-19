@@ -7,6 +7,8 @@ import { PrismaService } from "./prisma/prisma.service";
 import * as dotenv from "dotenv";
 import helmet from "helmet";
 import cookieParser = require("cookie-parser");
+import { randomUUID } from "node:crypto";
+import { runWithRequestContext } from "./common/request-context";
 import { PerfInterceptor } from "./perf/perf.interceptor";
 import { RateLimitInterceptor } from "./perf/rate-limit.interceptor";
 import { PerfService } from "./perf/perf.service";
@@ -22,6 +24,7 @@ type ScopedRequest = Request & {
   campgroundId?: string | null;
   organizationId?: string | null;
 };
+type RequestWithId = Request & { headers: Record<string, string | string[] | undefined> };
 
 const logger = new Logger('AppBootstrap');
 
@@ -128,12 +131,16 @@ export async function createApp(): Promise<INestApplication> {
             "X-Locale",
             "X-Currency",
             "X-Client",
+            "X-Request-Id",
+            "Traceparent",
+            "Tracestate",
             "Accept",
             "X-Requested-With",
             "X-Onboarding-Token",
             "X-Kiosk-Token",
             "Idempotency-Key",
         ],
+        exposedHeaders: ["X-Request-Id"],
         optionsSuccessStatus: 204,
         preflightContinue: false,
     });
@@ -199,6 +206,27 @@ export async function createApp(): Promise<INestApplication> {
         })
     );
     logger.log("Security headers (helmet) enabled");
+
+    // Request ID middleware
+    app.use((req: RequestWithId, res: Response, next: NextFunction) => {
+        const headerValue = req.headers["x-request-id"];
+        const existing = Array.isArray(headerValue) ? headerValue[0] : headerValue;
+        const requestId = existing && existing.trim() ? existing : `req_${randomUUID()}`;
+        const traceparentValue = req.headers["traceparent"];
+        const tracestateValue = req.headers["tracestate"];
+        const traceparent = Array.isArray(traceparentValue) ? traceparentValue[0] : traceparentValue;
+        const tracestate = Array.isArray(tracestateValue) ? tracestateValue[0] : tracestateValue;
+        req.headers["x-request-id"] = requestId;
+        res.setHeader("x-request-id", requestId);
+        runWithRequestContext(
+            {
+                requestId,
+                traceparent: traceparent || undefined,
+                tracestate: tracestate || undefined,
+            },
+            () => next()
+        );
+    });
 
     // Scope middleware
     app.use((req: ScopedRequest, _res: Response, next: NextFunction) => {

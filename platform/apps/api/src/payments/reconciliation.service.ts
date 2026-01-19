@@ -131,14 +131,27 @@ export class PaymentsReconciliationService {
       this.logger.warn(`Alert (no webhook configured): ${message}`);
       return;
     }
+    let webhookUrl: URL;
     try {
-      await fetch(webhook, {
+      webhookUrl = new URL(webhook);
+    } catch {
+      this.logger.warn(`Alert webhook URL invalid, skipping: ${webhook}`);
+      return;
+    }
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    timeoutId.unref?.();
+    try {
+      await fetch(webhookUrl.toString(), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: message })
+        body: JSON.stringify({ text: message }),
+        signal: controller.signal,
       });
     } catch (err) {
       this.logger.warn(`Failed to send alert: ${err instanceof Error ? err.message : err}`);
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
 

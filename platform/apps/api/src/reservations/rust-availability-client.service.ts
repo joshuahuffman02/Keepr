@@ -1,6 +1,7 @@
-import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
+import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { z } from "zod";
+import { getRequestHeaders } from "../common/request-context";
 
 /**
  * Rust Availability Client Service
@@ -148,12 +149,13 @@ const ForecastResponseSchema = z.object({
 type ForecastResponse = z.infer<typeof ForecastResponseSchema>;
 
 @Injectable()
-export class RustAvailabilityClientService implements OnModuleInit {
+export class RustAvailabilityClientService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(RustAvailabilityClientService.name);
   private readonly baseUrl: string;
   private readonly timeout: number;
   private isHealthy = false;
   private fallbackToLocal = false;
+  private healthCheckTimeout: NodeJS.Timeout | null = null;
 
   constructor(private readonly config: ConfigService) {
     this.baseUrl = this.config.get<string>("RUST_AVAILABILITY_SERVICE_URL", "http://localhost:8081");
@@ -162,6 +164,14 @@ export class RustAvailabilityClientService implements OnModuleInit {
 
   async onModuleInit(): Promise<void> {
     await this.checkHealth();
+  }
+
+  onModuleDestroy(): void {
+    if (this.healthCheckTimeout) {
+      clearTimeout(this.healthCheckTimeout);
+      this.healthCheckTimeout = null;
+    }
+    this.healthCheckScheduled = false;
   }
 
   /**
@@ -173,6 +183,7 @@ export class RustAvailabilityClientService implements OnModuleInit {
       const timeoutId = setTimeout(() => controller.abort(), 2000);
 
       const response = await fetch(`${this.baseUrl}/health`, {
+        headers: getRequestHeaders(),
         signal: controller.signal,
       });
       clearTimeout(timeoutId);
@@ -207,7 +218,7 @@ export class RustAvailabilityClientService implements OnModuleInit {
 
       const response = await fetch(`${this.baseUrl}/api/pricing/evaluate`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getRequestHeaders() },
         body: JSON.stringify(request),
         signal: controller.signal,
       });
@@ -240,7 +251,7 @@ export class RustAvailabilityClientService implements OnModuleInit {
 
       const response = await fetch(`${this.baseUrl}/api/availability/check`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getRequestHeaders() },
         body: JSON.stringify(request),
         signal: controller.signal,
       });
@@ -273,7 +284,7 @@ export class RustAvailabilityClientService implements OnModuleInit {
 
       const response = await fetch(`${this.baseUrl}/api/deposits/calculate`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getRequestHeaders() },
         body: JSON.stringify(request),
         signal: controller.signal,
       });
@@ -306,7 +317,7 @@ export class RustAvailabilityClientService implements OnModuleInit {
 
       const response = await fetch(`${this.baseUrl}/api/forecasting/generate`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getRequestHeaders() },
         body: JSON.stringify(request),
         signal: controller.signal,
       });
@@ -347,7 +358,7 @@ export class RustAvailabilityClientService implements OnModuleInit {
     if (this.healthCheckScheduled) return;
     this.healthCheckScheduled = true;
 
-    setTimeout(async () => {
+    this.healthCheckTimeout = setTimeout(async () => {
       this.healthCheckScheduled = false;
       const healthy = await this.checkHealth();
       if (healthy) {
@@ -355,5 +366,6 @@ export class RustAvailabilityClientService implements OnModuleInit {
         this.logger.log("Rust availability service recovered, resuming Rust operations");
       }
     }, 30000);
+    this.healthCheckTimeout.unref();
   }
 }

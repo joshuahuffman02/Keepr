@@ -109,6 +109,7 @@ import { ReferralsModule } from "./referrals/referrals.module";
 import { SignaturesModule } from "./signatures/signatures.module";
 import { TicketsModule } from "./tickets/tickets.module";
 import { AdminModule } from "./admin/admin.module";
+import { FeatureFlagsModule } from "./feature-flags/feature-flags.module";
 import { AnomaliesModule } from "./anomalies/anomalies.module";
 import { IotModule } from "./iot/iot.module";
 import { CharityModule } from "./charity/charity.module";
@@ -254,6 +255,7 @@ import { RustServicesModule } from "./rust-services/rust-services.module";
     ReferralsModule,
     TicketsModule,
     AdminModule,
+    FeatureFlagsModule,
     AnomaliesModule,
     IotModule,
     CharityModule,

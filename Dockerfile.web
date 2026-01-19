@@ -1,7 +1,7 @@
 FROM node:25.3.0-alpine AS base
 ARG CACHEBUST=3
 # Node 25 alpine doesn't include corepack by default, install it first
-RUN npm install -g --force corepack && corepack enable && corepack prepare pnpm@7.33.6 --activate
+RUN npm install -g --force corepack && corepack enable && corepack prepare pnpm@9.15.9 --activate
 WORKDIR /app
 ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 ENV NEXT_TELEMETRY_DISABLED=1

@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, Logger } from "@nestjs/common";
+import { Injectable, UnauthorizedException, Logger, OnModuleDestroy } from "@nestjs/common";
 import { RedisService } from "../redis/redis.service";
 
 /**
@@ -32,7 +32,7 @@ const isLockoutRecord = (value: unknown): value is LockoutRecord =>
     (typeof value.lockedUntil === "number" || value.lockedUntil === null);
 
 @Injectable()
-export class AccountLockoutService {
+export class AccountLockoutService implements OnModuleDestroy {
     private readonly logger = new Logger(AccountLockoutService.name);
     private readonly keyPrefix = "lockout:";
 
@@ -51,6 +51,7 @@ export class AccountLockoutService {
     constructor(private readonly redis: RedisService) {
         // Start cleanup interval for memory fallback
         this.cleanupInterval = setInterval(() => this.cleanupMemory(), 5 * 60 * 1000);
+        this.cleanupInterval.unref?.();
         const mode = this.redis.isEnabled ? "Redis" : "in-memory fallback";
         this.logger.log(`Account lockout enabled (${mode}): ${this.maxAttempts} attempts, ${this.lockDurationMs / 1000}s lock`);
     }
@@ -374,6 +375,7 @@ export class AccountLockoutService {
     onModuleDestroy(): void {
         if (this.cleanupInterval) {
             clearInterval(this.cleanupInterval);
+            this.cleanupInterval = null;
         }
     }
 }

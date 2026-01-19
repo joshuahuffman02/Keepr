@@ -4,6 +4,9 @@
  */
 
 export async function register() {
+  if (process.env.OTEL_ENABLED === "true" || process.env.OTEL_EXPORTER_OTLP_ENDPOINT) {
+    await import("./otel");
+  }
   if (process.env.NEXT_RUNTIME === 'nodejs') {
     // Server-side Sentry
     await import('./sentry.server.config');

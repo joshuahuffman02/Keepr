@@ -20,7 +20,7 @@ import {
   SeasonalDiscountCondition,
   SeasonalDiscountType,
   SeasonalIncentiveType,
-} from ".prisma/client";
+} from "@prisma/client";
 
 // ==================== SEASONAL GUEST DTOs ====================
 

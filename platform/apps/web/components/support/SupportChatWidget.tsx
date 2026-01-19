@@ -484,7 +484,7 @@ export function SupportChatWidget() {
           id: "welcome",
           role: "assistant",
           content:
-            "Hi! I'm here to help with any questions about Keepr. What can I help you with today?\n\nI can assist with:\n- Setting up your campground\n- Payment and billing questions\n- Managing reservations\n- Using specific features\n\nJust ask away!",
+            "Hi! I'm Keepr Support. Tell me what you need and I will guide you or open a ticket.\n\nI can help with:\n- Account setup and configuration\n- Billing and invoices\n- Reservations and operations\n- Troubleshooting features",
         },
       ]);
     }
@@ -497,7 +497,7 @@ export function SupportChatWidget() {
           id: "partner-welcome",
           role: "assistant",
           content:
-            "I can draft and run actions across availability, holds, maintenance, operations, and billing. Tell me what you want to do and I will draft the action (beta).",
+            "I can draft actions for availability, holds, maintenance, operations, and guest messaging. Tell me what you want to do and I will draft it for approval.",
         },
       ]);
     }
@@ -950,7 +950,7 @@ export function SupportChatWidget() {
       className="text-white hover:bg-white/15"
       onClick={openTicketComposer}
     >
-      New ticket
+      Create ticket
     </Button>
   ) : null;
 
@@ -960,9 +960,9 @@ export function SupportChatWidget() {
 
   const supportEmptyState = (
     <div className="text-center py-8">
-      <h3 className="font-semibold text-foreground mb-1">Support desk</h3>
+      <h3 className="font-semibold text-foreground mb-1">Keepr Support</h3>
       <p className="text-sm text-muted-foreground mb-6">
-        Ask about settings, billing, or day-to-day workflows.
+        Share the issue, impact, or question and we will route it.
       </p>
       <SuggestedPrompts prompts={PROMPTS.support} onSelect={handleSupportQuickReply} accent={accent} />
     </div>
@@ -970,9 +970,9 @@ export function SupportChatWidget() {
 
   const partnerEmptyState = (
     <div className="text-center py-8">
-      <h3 className="font-semibold text-foreground mb-1">Staff actions</h3>
+      <h3 className="font-semibold text-foreground mb-1">Keepr Actions</h3>
       <p className="text-sm text-muted-foreground mb-6">
-        Draft actions and approvals for operations, maintenance, and guest messaging.
+        Describe the action you want drafted and I will prepare the approval.
       </p>
       <SuggestedPrompts prompts={PROMPTS.partner} onSelect={handlePartnerQuickReply} accent={accent} />
     </div>
@@ -985,12 +985,12 @@ export function SupportChatWidget() {
       onClose={() => setIsOpen(false)}
       position="bottom-right"
       accent={accent}
-      title="Host"
-      subtitle={isSupportMode ? "Support desk" : "Staff actions and drafts"}
-      launcherLabel="Open Host assistant"
+      title={isSupportMode ? "Keepr Support" : "Keepr Actions"}
+      subtitle={isSupportMode ? "Owner help desk" : "Drafts + approvals"}
+      launcherLabel={isSupportMode ? "Open Keepr Support chat" : "Open Keepr Actions chat"}
       icon={isSupportMode ? <LifeBuoy className="w-6 h-6" /> : <ShieldCheck className="w-6 h-6" />}
       allowMinimize={false}
-      heightClassName="h-[540px]"
+      heightClassName="h-[calc(100vh-6rem)] sm:h-[540px] 2xl:h-[640px]"
       headerActions={headerActions}
     >
       <Dialog open={ticketComposerOpen} onOpenChange={setTicketComposerOpen}>
@@ -1462,8 +1462,8 @@ export function SupportChatWidget() {
             onKeyDown={handleKeyDown}
             placeholder={
               isSupportMode
-                ? "Ask a question..."
-                : "Ask for actions, maintenance, billing, messaging, or drafts..."
+                ? "Share the issue, impact, and desired outcome..."
+                : "Describe the action you want drafted..."
             }
             className={`flex-1 px-4 py-2 border border-border rounded-xl focus:outline-none focus:ring-2 text-sm ${
               isSupportMode

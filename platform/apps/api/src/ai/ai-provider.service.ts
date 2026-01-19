@@ -13,6 +13,7 @@ interface AiCompletionRequest {
     sessionId?: string;
     maxTokens?: number;
     temperature?: number;
+    persistLogs?: boolean;
 }
 
 interface AiCompletionResponse {
@@ -102,6 +103,7 @@ export class AiProviderService {
      */
     async getCompletion(request: AiCompletionRequest): Promise<AiCompletionResponse> {
         const startTime = Date.now();
+        const shouldPersist = request.persistLogs !== false;
 
         // Get campground AI configuration
         const campground = await this.prisma.campground.findUnique({
@@ -131,31 +133,33 @@ export class AiProviderService {
 
             const latencyMs = Date.now() - startTime;
 
-            // Log the interaction (with hashed content for privacy)
-            await this.logInteraction({
-                campgroundId: request.campgroundId,
-                featureType: request.featureType,
-                promptHash: this.privacy.hashForAudit(request.userPrompt),
-                responseHash: this.privacy.hashForAudit(response.content),
-                tokensUsed: response.tokensUsed,
-                inputTokens: response.inputTokens,
-                outputTokens: response.outputTokens,
-                latencyMs,
-                userId: request.userId,
-                sessionId: request.sessionId,
-                success: true,
-                provider,
-                modelUsed: response.model,
-                costCents: this.estimateCost(response.inputTokens, response.outputTokens, provider, response.model),
-            });
+            if (shouldPersist) {
+                // Log the interaction (with hashed content for privacy)
+                await this.logInteraction({
+                    campgroundId: request.campgroundId,
+                    featureType: request.featureType,
+                    promptHash: this.privacy.hashForAudit(request.userPrompt),
+                    responseHash: this.privacy.hashForAudit(response.content),
+                    tokensUsed: response.tokensUsed,
+                    inputTokens: response.inputTokens,
+                    outputTokens: response.outputTokens,
+                    latencyMs,
+                    userId: request.userId,
+                    sessionId: request.sessionId,
+                    success: true,
+                    provider,
+                    modelUsed: response.model,
+                    costCents: this.estimateCost(response.inputTokens, response.outputTokens, provider, response.model),
+                });
 
-            // Update campground usage stats
-            await this.prisma.campground.update({
-                where: { id: request.campgroundId },
-                data: {
-                    aiTotalTokensUsed: { increment: response.tokensUsed },
-                },
-            });
+                // Update campground usage stats
+                await this.prisma.campground.update({
+                    where: { id: request.campgroundId },
+                    data: {
+                        aiTotalTokensUsed: { increment: response.tokensUsed },
+                    },
+                });
+            }
 
             return {
                 content: response.content,
@@ -169,22 +173,24 @@ export class AiProviderService {
         } catch (error) {
             const latencyMs = Date.now() - startTime;
 
-            // Log failed interaction
-            await this.logInteraction({
-                campgroundId: request.campgroundId,
-                featureType: request.featureType,
-                promptHash: this.privacy.hashForAudit(request.userPrompt),
-                responseHash: '',
-                tokensUsed: 0,
-                inputTokens: 0,
-                outputTokens: 0,
-                latencyMs,
-                userId: request.userId,
-                sessionId: request.sessionId,
-                success: false,
-                errorType: error instanceof Error ? error.message : 'Unknown error',
-                provider,
-            });
+            if (shouldPersist) {
+                // Log failed interaction
+                await this.logInteraction({
+                    campgroundId: request.campgroundId,
+                    featureType: request.featureType,
+                    promptHash: this.privacy.hashForAudit(request.userPrompt),
+                    responseHash: '',
+                    tokensUsed: 0,
+                    inputTokens: 0,
+                    outputTokens: 0,
+                    latencyMs,
+                    userId: request.userId,
+                    sessionId: request.sessionId,
+                    success: false,
+                    errorType: error instanceof Error ? error.message : 'Unknown error',
+                    provider,
+                });
+            }
 
             throw error;
         }
@@ -195,6 +201,7 @@ export class AiProviderService {
      */
     async getToolCompletion(request: AiToolCompletionRequest): Promise<AiToolCompletionResponse> {
         const startTime = Date.now();
+        const shouldPersist = request.persistLogs !== false;
 
         const campground = await this.prisma.campground.findUnique({
             where: { id: request.campgroundId },
@@ -228,29 +235,31 @@ export class AiProviderService {
                 `${response.content || ''}${response.toolCalls ? JSON.stringify(response.toolCalls) : ''}`
             );
 
-            await this.logInteraction({
-                campgroundId: request.campgroundId,
-                featureType: request.featureType,
-                promptHash: this.privacy.hashForAudit(request.userPrompt),
-                responseHash,
-                tokensUsed: response.tokensUsed,
-                inputTokens: response.inputTokens,
-                outputTokens: response.outputTokens,
-                latencyMs,
-                userId: request.userId,
-                sessionId: request.sessionId,
-                success: true,
-                provider,
-                modelUsed: response.model,
-                costCents: this.estimateCost(response.inputTokens, response.outputTokens, provider, response.model),
-            });
+            if (shouldPersist) {
+                await this.logInteraction({
+                    campgroundId: request.campgroundId,
+                    featureType: request.featureType,
+                    promptHash: this.privacy.hashForAudit(request.userPrompt),
+                    responseHash,
+                    tokensUsed: response.tokensUsed,
+                    inputTokens: response.inputTokens,
+                    outputTokens: response.outputTokens,
+                    latencyMs,
+                    userId: request.userId,
+                    sessionId: request.sessionId,
+                    success: true,
+                    provider,
+                    modelUsed: response.model,
+                    costCents: this.estimateCost(response.inputTokens, response.outputTokens, provider, response.model),
+                });
 
-            await this.prisma.campground.update({
-                where: { id: request.campgroundId },
-                data: {
-                    aiTotalTokensUsed: { increment: response.tokensUsed },
-                },
-            });
+                await this.prisma.campground.update({
+                    where: { id: request.campgroundId },
+                    data: {
+                        aiTotalTokensUsed: { increment: response.tokensUsed },
+                    },
+                });
+            }
 
             return {
                 content: response.content,
@@ -265,21 +274,23 @@ export class AiProviderService {
         } catch (error) {
             const latencyMs = Date.now() - startTime;
 
-            await this.logInteraction({
-                campgroundId: request.campgroundId,
-                featureType: request.featureType,
-                promptHash: this.privacy.hashForAudit(request.userPrompt),
-                responseHash: '',
-                tokensUsed: 0,
-                inputTokens: 0,
-                outputTokens: 0,
-                latencyMs,
-                userId: request.userId,
-                sessionId: request.sessionId,
-                success: false,
-                errorType: error instanceof Error ? error.message : 'Unknown error',
-                provider,
-            });
+            if (shouldPersist) {
+                await this.logInteraction({
+                    campgroundId: request.campgroundId,
+                    featureType: request.featureType,
+                    promptHash: this.privacy.hashForAudit(request.userPrompt),
+                    responseHash: '',
+                    tokensUsed: 0,
+                    inputTokens: 0,
+                    outputTokens: 0,
+                    latencyMs,
+                    userId: request.userId,
+                    sessionId: request.sessionId,
+                    success: false,
+                    errorType: error instanceof Error ? error.message : 'Unknown error',
+                    provider,
+                });
+            }
 
             throw error;
         }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useMemo, useCallback } from "react";
-import { Send, MessageCircle, Wifi, WifiOff, History, Paperclip, X, Loader2, AlertTriangle, FileText, Sparkles, ArrowDown } from "lucide-react";
+import { Send, MessageCircle, Wifi, WifiOff, History, Paperclip, X, Loader2, AlertTriangle, FileText, Sparkles, ArrowDown, Lock } from "lucide-react";
 import { API_BASE } from "@/lib/api-config";
 import { cn } from "@/lib/utils";
 import { ChatShell } from "./ChatShell";
@@ -15,7 +15,7 @@ import { useChatStream } from "./hooks/useChatStream";
 import { useChatStreamSse } from "./hooks/useChatStreamSse";
 import { useChatHistory } from "./hooks/useChatHistory";
 import { useChatConversations } from "./hooks/useChatConversations";
-import type { ChatAccent, ChatAttachment } from "./types";
+import type { ChatAccent, ChatAttachment, ChatMessageVisibility } from "./types";
 
 const CHAT_ATTACHMENT_MAX_BYTES = 10 * 1024 * 1024;
 const CHAT_ATTACHMENT_ALLOWED_TYPES = new Set([
@@ -60,6 +60,17 @@ interface AttachmentItem {
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
+
+const hasJsonRenderPayload = (data: Record<string, unknown>) =>
+  [
+    data.jsonRender,
+    data.jsonRenderTree,
+    data.uiRender,
+    data.uiTree,
+    data.report,
+    data.layout,
+    data.tree,
+  ].some(isRecord);
 
 const getFileExtension = (filename: string) => {
   const index = filename.lastIndexOf(".");
@@ -134,12 +145,17 @@ export function ChatWidget({
   const [conversationFilterId, setConversationFilterId] = useState("all");
   const [showArtifacts, setShowArtifacts] = useState(false);
   const [showJumpToLatest, setShowJumpToLatest] = useState(false);
+  const [firstUnreadMessageId, setFirstUnreadMessageId] = useState<string | null>(null);
+  const [messageVisibility, setMessageVisibility] = useState<ChatMessageVisibility>("public");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isAtBottomRef = useRef(true);
   const inputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const attachmentsRef = useRef<AttachmentItem[]>([]);
+  const prevMessageCountRef = useRef(0);
+  const visibilityRef = useRef<ChatMessageVisibility>("public");
+  const lastAutoOpenedReportRef = useRef<string | null>(null);
 
   const streamingMode = isGuest ? "guest" : "staff";
   const streamingChatSse = useChatStreamSse({
@@ -186,6 +202,8 @@ export function ChatWidget({
   const isConnected = useStreaming ? streamingChat.isConnected : true;
 
   const canUploadAttachments = Boolean(authToken);
+  const showVisibilityToggle = !isGuest;
+  const isInternalNote = messageVisibility === "internal";
   const readyAttachments = useMemo(
     () =>
       attachmentItems.flatMap((item) => {
@@ -212,7 +230,8 @@ export function ChatWidget({
             (Array.isArray(data.availableSites) ||
               isRecord(data.quote) ||
               isRecord(data.revenue) ||
-              isRecord(data.occupancy))
+              isRecord(data.occupancy) ||
+              hasJsonRenderPayload(data))
           );
         })
       ),
@@ -231,6 +250,9 @@ export function ChatWidget({
     const atBottom = distanceFromBottom <= CHAT_SCROLL_BOTTOM_THRESHOLD;
     isAtBottomRef.current = atBottom;
     setShowJumpToLatest(!atBottom);
+    if (atBottom) {
+      setFirstUnreadMessageId(null);
+    }
   }, []);
 
   const handleMessageScroll = useCallback(() => {
@@ -243,6 +265,22 @@ export function ChatWidget({
     const frame = requestAnimationFrame(() => scrollToBottom("auto"));
     return () => cancelAnimationFrame(frame);
   }, [isOpen, isTyping, messages]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      prevMessageCountRef.current = 0;
+      setFirstUnreadMessageId(null);
+      return;
+    }
+    const previousCount = prevMessageCountRef.current;
+    if (messages.length < previousCount) {
+      setFirstUnreadMessageId(null);
+    } else if (messages.length > previousCount && !isAtBottomRef.current) {
+      const firstUnread = messages[previousCount]?.id ?? messages[0]?.id ?? null;
+      setFirstUnreadMessageId((current) => current ?? firstUnread);
+    }
+    prevMessageCountRef.current = messages.length;
+  }, [isOpen, messages]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -271,6 +309,10 @@ export function ChatWidget({
   useEffect(() => {
     attachmentsRef.current = attachmentItems;
   }, [attachmentItems]);
+
+  useEffect(() => {
+    visibilityRef.current = messageVisibility;
+  }, [messageVisibility]);
 
   useEffect(() => {
     return () => {
@@ -426,7 +468,11 @@ export function ChatWidget({
 
   const handleSend = () => {
     if (!canSend) return;
-    sendMessage(trimmedInput, { attachments: readyAttachments });
+    const visibility = showVisibilityToggle ? visibilityRef.current : undefined;
+    sendMessage(trimmedInput, {
+      attachments: readyAttachments,
+      visibility,
+    });
     setInput("");
     clearAttachments();
   };
@@ -439,10 +485,14 @@ export function ChatWidget({
   };
 
   const handleQuickAction = (action: string) => {
-    sendMessage(action);
+    visibilityRef.current = "public";
+    setMessageVisibility("public");
+    sendMessage(action, { visibility: "public" });
   };
 
   const handleQuickReply = (question: string) => {
+    visibilityRef.current = "public";
+    setMessageVisibility("public");
     setInput(question);
     inputRef.current?.focus();
   };
@@ -487,6 +537,24 @@ export function ChatWidget({
     });
   };
 
+  const handleShowArtifacts = () => {
+    setShowHistory(false);
+    setShowArtifacts(true);
+  };
+
+  const latestReportMessageId = useMemo(() => {
+    for (let index = messages.length - 1; index >= 0; index -= 1) {
+      const message = messages[index];
+      if (!message) continue;
+      const hasReport = (message.toolResults ?? []).some((result) => {
+        const data = result.result;
+        return isRecord(data) && hasJsonRenderPayload(data);
+      });
+      if (hasReport) return message.id;
+    }
+    return null;
+  }, [messages]);
+
   const handleSearchChange = (value: string) => {
     setConversationQuery(value);
     if (historyView !== "list") {
@@ -501,6 +569,14 @@ export function ChatWidget({
   const accent: ChatAccent = isGuest ? "guest" : "staff";
   const quickActions = isGuest ? PROMPTS.guest : PROMPTS.staff;
   const canShowConversations = Boolean(authToken);
+  const headerTitle = isGuest ? "Keepr Host" : "Keepr Ops";
+  const headerSubtitle = isGuest ? "Your stay assistant" : "Operations copilot";
+  const launcherLabel = isGuest ? "Open Keepr Host chat" : "Open Keepr Ops chat";
+  const inputPlaceholder = isInternalNote
+    ? "Internal note for staff..."
+    : isGuest
+      ? "Ask about dates, sites, or changes..."
+      : "Ask about arrivals, occupancy, tasks...";
   const conversationFilters = useMemo(
     () => [
       { id: "all", label: "All" },
@@ -531,12 +607,12 @@ export function ChatWidget({
         <MessageCircle className="w-8 h-8" />
       </div>
       <h3 className="font-semibold text-foreground mb-1">
-        {isGuest ? "Welcome to Keepr!" : "How can I help?"}
+        {isGuest ? "Plan your stay" : "What do you need right now?"}
       </h3>
       <p className="text-sm text-muted-foreground mb-6">
         {isGuest
-          ? "I can help you find sites, make reservations, and answer questions."
-          : "I can help with reservations, check-ins, reports, and more."}
+          ? "Share dates, guests, rig size, and must-have amenities."
+          : "Ask for arrivals, occupancy, tasks, or draft actions."}
       </p>
       <SuggestedPrompts
         prompts={quickActions}
@@ -597,6 +673,15 @@ export function ChatWidget({
   }, [hasArtifacts, showArtifacts]);
 
   useEffect(() => {
+    if (isGuest) return;
+    if (!latestReportMessageId) return;
+    if (lastAutoOpenedReportRef.current === latestReportMessageId) return;
+    lastAutoOpenedReportRef.current = latestReportMessageId;
+    setShowHistory(false);
+    setShowArtifacts(true);
+  }, [isGuest, latestReportMessageId]);
+
+  useEffect(() => {
     if (!resumeConversationId) return;
     if (history.conversationId !== resumeConversationId) return;
     if (history.messages.length === 0) return;
@@ -642,6 +727,7 @@ export function ChatWidget({
   const handleJumpToLatest = () => {
     scrollToBottom("smooth");
     setShowJumpToLatest(false);
+    setFirstUnreadMessageId(null);
   };
 
   return (
@@ -654,9 +740,9 @@ export function ChatWidget({
       onMaximize={() => setIsMinimized(false)}
       position={position}
       accent={accent}
-      title="Keepr AI"
-      subtitle={isGuest ? "Your camping assistant" : "Staff assistant"}
-      launcherLabel="Open chat"
+      title={headerTitle}
+      subtitle={headerSubtitle}
+      launcherLabel={launcherLabel}
       icon={<MessageCircle className="w-6 h-6" />}
       statusSlot={
         useStreaming ? (
@@ -707,9 +793,11 @@ export function ChatWidget({
           onFeedback={handleFeedback}
           feedbackById={feedbackById}
           emptyState={emptyState}
+          firstUnreadMessageId={firstUnreadMessageId}
           bottomRef={messagesEndRef}
           containerRef={scrollContainerRef}
           onScroll={handleMessageScroll}
+          onShowArtifacts={handleShowArtifacts}
         />
         {showJumpToLatest && (
           <div className="pointer-events-none absolute inset-x-0 bottom-4 flex justify-center">
@@ -762,6 +850,53 @@ export function ChatWidget({
       </div>
       <div className="p-4 border-t border-border">
         <div className="space-y-3">
+          {showVisibilityToggle && (
+            <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-muted-foreground">
+              <div className="inline-flex rounded-full border border-border bg-muted/40 p-0.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    visibilityRef.current = "public";
+                    setMessageVisibility("public");
+                  }}
+                  className={cn(
+                    "rounded-full px-2.5 py-1 font-medium transition",
+                    !isInternalNote
+                      ? "bg-white text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                  aria-pressed={!isInternalNote}
+                >
+                  Ask AI
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    visibilityRef.current = "internal";
+                    setMessageVisibility("internal");
+                  }}
+                  className={cn(
+                    "rounded-full px-2.5 py-1 font-medium transition",
+                    isInternalNote
+                      ? "bg-amber-100 text-amber-900 shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                  aria-pressed={isInternalNote}
+                >
+                  Internal note
+                </button>
+              </div>
+              <div
+                className={cn(
+                  "flex items-center gap-1",
+                  isInternalNote ? "text-amber-700" : "text-muted-foreground"
+                )}
+              >
+                <Lock className="h-3 w-3" />
+                {isInternalNote ? "Staff-only note." : "Shared with AI."}
+              </div>
+            </div>
+          )}
           {attachmentItems.length > 0 && (
             <div className="space-y-2">
               {attachmentItems.map((item) => (
@@ -848,11 +983,7 @@ export function ChatWidget({
               value={input}
               onChange={(event) => setInput(event.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={
-                isGuest
-                  ? "Ask about availability, reservations..."
-                  : "Ask about arrivals, reservations, reports..."
-              }
+              placeholder={inputPlaceholder}
               className={cn(
                 "flex-1 px-4 py-2.5 border border-border rounded-xl focus:outline-none focus:ring-2 text-sm",
                 isGuest

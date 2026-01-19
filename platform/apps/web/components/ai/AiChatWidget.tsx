@@ -124,9 +124,9 @@ export function AiChatWidget({ campgroundId, campgroundName }: AiChatWidgetProps
       <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center mb-4 bg-status-success-bg">
         <Sparkles className="w-8 h-8 text-status-success-text" />
       </div>
-      <h3 className="text-lg font-semibold text-foreground mb-2">Host</h3>
+      <h3 className="text-lg font-semibold text-foreground mb-2">Keepr Host</h3>
       <p className="text-sm text-muted-foreground mb-4">
-        I can help you find the perfect campsite. Just describe what you're looking for.
+        Share dates, guests, rig size, and must-have amenities. I will match you with the right site.
       </p>
       <SuggestedPrompts
         prompts={PROMPTS.public}
@@ -143,21 +143,21 @@ export function AiChatWidget({ campgroundId, campgroundName }: AiChatWidgetProps
       onClose={() => setIsOpen(false)}
       position="bottom-right"
       accent={accent}
-      title="Host"
-      subtitle="Booking guide"
-      launcherLabel="Open Host booking assistant"
+      title="Keepr Host"
+      subtitle="Booking + stay help"
+      launcherLabel="Open Keepr Host chat"
       icon={<Bot className="w-6 h-6" />}
       allowMinimize={false}
-      heightClassName="h-[500px]"
+      heightClassName="h-[calc(100vh-6rem)] sm:h-[500px] 2xl:h-[600px]"
     >
       {!hasConsented ? (
         <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
           <div className="w-16 h-16 bg-status-success-bg rounded-full flex items-center justify-center mb-4">
             <Sparkles className="w-8 h-8 text-status-success-text" />
           </div>
-          <h3 className="text-lg font-semibold text-foreground mb-2">Host</h3>
+          <h3 className="text-lg font-semibold text-foreground mb-2">Keepr Host</h3>
           <p className="text-sm text-muted-foreground mb-4">
-            I can help you find the perfect campsite. Just describe what you're looking for.
+            Share dates, guests, rig size, and must-have amenities. I will match you with the right site.
           </p>
           <div className="text-xs text-muted-foreground mb-6 p-3 bg-muted rounded-lg">
             <div className="flex items-center gap-2 mb-1">
@@ -194,7 +194,7 @@ export function AiChatWidget({ campgroundId, campgroundName }: AiChatWidgetProps
                   <polyline points="20 6 9 17 4 12" />
                 </svg>
               </span>
-              <span>No personal info shared with Host</span>
+              <span>No personal info shared with Keepr Host</span>
             </div>
           </div>
           <button
@@ -202,7 +202,7 @@ export function AiChatWidget({ campgroundId, campgroundName }: AiChatWidgetProps
             onClick={handleConsent}
             className="px-6 py-3 bg-action-primary text-action-primary-foreground font-medium rounded-xl hover:bg-action-primary-hover transition-all"
           >
-            Chat with Host
+            Chat with Keepr Host
           </button>
         </div>
       ) : (
@@ -222,7 +222,7 @@ export function AiChatWidget({ campgroundId, campgroundName }: AiChatWidgetProps
                 value={input}
                 onChange={(event) => setInput(event.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder={`Describe what you're looking for at ${campgroundName || "our park"}...`}
+                placeholder={`Share dates, guests, rig, and amenities for ${campgroundName || "our park"}...`}
                 className="flex-1 px-4 py-2 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-action-primary/20 focus:border-action-primary text-sm"
                 disabled={isSending}
                 ref={inputRef}

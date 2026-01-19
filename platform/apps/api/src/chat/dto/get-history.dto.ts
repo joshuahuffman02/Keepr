@@ -1,7 +1,13 @@
 import { IsString, IsOptional, IsInt, Min, Max, IsUUID } from 'class-validator';
 import { Type } from 'class-transformer';
 import { z } from 'zod';
-import type { ToolCall, ToolResult, ChatAttachment } from './send-message.dto';
+import type {
+  ToolCall,
+  ToolResult,
+  ChatAttachment,
+  ChatMessageVisibility,
+  ChatMessagePart,
+} from './send-message.dto';
 
 // Zod schema for validation
 export const getHistorySchema = z.object({
@@ -43,8 +49,10 @@ export interface MessageHistoryItem {
   id: string;
   role: 'user' | 'assistant' | 'tool' | 'system';
   content: string;
+  parts?: ChatMessagePart[];
   toolCalls?: ToolCall[];
   toolResults?: ToolResult[];
   attachments?: ChatAttachment[];
   createdAt: string;
+  visibility?: ChatMessageVisibility;
 }

@@ -299,10 +299,11 @@ export class WebhookAdminController {
     });
 
     // Attempt delivery
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+    timeoutId.unref?.();
 
+    try {
       const response = await fetch(endpoint.url, {
         method: "POST",
         headers: {
@@ -316,7 +317,6 @@ export class WebhookAdminController {
         body,
         signal: controller.signal,
       });
-      clearTimeout(timeoutId);
 
       const responseBody = await response.text();
 
@@ -375,6 +375,8 @@ export class WebhookAdminController {
           "X-Campreserv-Attempt": "1",
         },
       };
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
 

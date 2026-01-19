@@ -1,6 +1,7 @@
-import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
+import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { z } from "zod";
+import { getRequestHeaders } from "../common/request-context";
 
 /**
  * Rust Auth Client Service
@@ -34,12 +35,13 @@ const HealthResponseSchema = z.object({
 });
 
 @Injectable()
-export class RustAuthClientService implements OnModuleInit {
+export class RustAuthClientService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(RustAuthClientService.name);
   private readonly baseUrl: string;
   private readonly timeout: number;
   private isHealthy = false;
   private fallbackToLocal = false;
+  private healthCheckTimeout: NodeJS.Timeout | null = null;
 
   constructor(private readonly config: ConfigService) {
     this.baseUrl = this.config.get<string>("RUST_AUTH_SERVICE_URL", "http://localhost:8082");
@@ -48,6 +50,14 @@ export class RustAuthClientService implements OnModuleInit {
 
   async onModuleInit(): Promise<void> {
     await this.checkHealth();
+  }
+
+  onModuleDestroy(): void {
+    if (this.healthCheckTimeout) {
+      clearTimeout(this.healthCheckTimeout);
+      this.healthCheckTimeout = null;
+    }
+    this.healthCheckScheduled = false;
   }
 
   /**
@@ -59,6 +69,7 @@ export class RustAuthClientService implements OnModuleInit {
       const timeoutId = setTimeout(() => controller.abort(), 2000);
 
       const response = await fetch(`${this.baseUrl}/health`, {
+        headers: getRequestHeaders(),
         signal: controller.signal,
       });
       clearTimeout(timeoutId);
@@ -94,7 +105,7 @@ export class RustAuthClientService implements OnModuleInit {
 
       const response = await fetch(`${this.baseUrl}/api/auth/hash-password`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getRequestHeaders() },
         body: JSON.stringify({ password, cost }),
         signal: controller.signal,
       });
@@ -129,7 +140,7 @@ export class RustAuthClientService implements OnModuleInit {
 
       const response = await fetch(`${this.baseUrl}/api/auth/verify-password`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getRequestHeaders() },
         body: JSON.stringify({ password, hash }),
         signal: controller.signal,
       });
@@ -184,7 +195,7 @@ export class RustAuthClientService implements OnModuleInit {
     this.healthCheckScheduled = true;
 
     // Retry health check after 30 seconds
-    setTimeout(async () => {
+    this.healthCheckTimeout = setTimeout(async () => {
       this.healthCheckScheduled = false;
       const healthy = await this.checkHealth();
       if (healthy) {
@@ -192,5 +203,6 @@ export class RustAuthClientService implements OnModuleInit {
         this.logger.log("Rust auth service recovered, resuming Rust operations");
       }
     }, 30000);
+    this.healthCheckTimeout.unref();
   }
 }

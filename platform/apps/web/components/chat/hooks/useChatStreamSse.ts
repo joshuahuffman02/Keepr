@@ -5,6 +5,8 @@ import { API_BASE } from "@/lib/api-config";
 import type {
   ChatActionRequired,
   ChatAttachment,
+  ChatMessageVisibility,
+  ChatMessagePart,
   ChatRecommendation,
   ChatToolCall,
   ChatToolResult,
@@ -18,6 +20,7 @@ export type ChatStreamMeta = {
   conversationId?: string;
   messageId?: string;
   content?: string;
+  parts?: ChatMessagePart[];
   toolCalls?: ChatToolCall[];
   toolResults?: ChatToolResult[];
   actionRequired?: ChatActionRequired;
@@ -27,6 +30,7 @@ export type ChatStreamMeta = {
   showTicketPrompt?: boolean;
   action?: string;
   bookingDetails?: Record<string, unknown>;
+  visibility?: ChatMessageVisibility;
 };
 
 interface UseChatStreamSseOptions {
@@ -46,6 +50,9 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 const getString = (value: unknown): string | undefined =>
   typeof value === "string" ? value : undefined;
 
+const getVisibility = (value: unknown): ChatMessageVisibility | undefined =>
+  value === "internal" || value === "public" ? value : undefined;
+
 const isChatToolCall = (value: unknown): value is ChatToolCall =>
   isRecord(value) &&
   typeof value.id === "string" &&
@@ -56,6 +63,23 @@ const isChatToolResult = (value: unknown): value is ChatToolResult =>
   isRecord(value) &&
   typeof value.toolCallId === "string" &&
   "result" in value;
+
+const isChatAttachment = (value: unknown): value is ChatAttachment =>
+  isRecord(value) &&
+  typeof value.name === "string" &&
+  typeof value.contentType === "string" &&
+  typeof value.size === "number";
+
+const isChatMessagePart = (value: unknown): value is ChatMessagePart => {
+  if (!isRecord(value) || typeof value.type !== "string") return false;
+  if (value.type === "text") return typeof value.text === "string";
+  if (value.type === "tool") {
+    return typeof value.name === "string" && typeof value.callId === "string";
+  }
+  if (value.type === "file") return isChatAttachment(value.file);
+  if (value.type === "card") return true;
+  return false;
+};
 
 const isChatActionRequired = (value: unknown): value is ChatActionRequired =>
   isRecord(value) &&
@@ -77,10 +101,12 @@ type ChatMessageResponse = {
   conversationId: string;
   messageId: string;
   content: string;
+  parts?: ChatMessagePart[];
   toolCalls?: ChatToolCall[];
   toolResults?: ChatToolResult[];
   actionRequired?: ChatActionRequired;
   createdAt?: string;
+  visibility?: ChatMessageVisibility;
 };
 
 const toChatMessageResponse = (value: unknown): ChatMessageResponse | null => {
@@ -94,10 +120,12 @@ const toChatMessageResponse = (value: unknown): ChatMessageResponse | null => {
     conversationId,
     messageId,
     content,
+    parts: Array.isArray(value.parts) ? value.parts.filter(isChatMessagePart) : undefined,
     toolCalls: Array.isArray(value.toolCalls) ? value.toolCalls.filter(isChatToolCall) : undefined,
     toolResults: Array.isArray(value.toolResults) ? value.toolResults.filter(isChatToolResult) : undefined,
     actionRequired: isChatActionRequired(value.actionRequired) ? value.actionRequired : undefined,
     createdAt: getString(value.createdAt),
+    visibility: getVisibility(value.visibility),
   };
 };
 
@@ -110,6 +138,13 @@ const toChatStreamMeta = (value: unknown): ChatStreamMeta | null => {
   if (typeof value.content === "string") meta.content = value.content;
   if (typeof value.action === "string") meta.action = value.action;
   if (isRecord(value.bookingDetails)) meta.bookingDetails = value.bookingDetails;
+  const visibility = getVisibility(value.visibility);
+  if (visibility) meta.visibility = visibility;
+
+  if (Array.isArray(value.parts)) {
+    const parts = value.parts.filter(isChatMessagePart);
+    if (parts.length > 0) meta.parts = parts;
+  }
 
   if (Array.isArray(value.toolCalls)) {
     const toolCalls = value.toolCalls.filter(isChatToolCall);
@@ -202,6 +237,7 @@ export function useChatStreamSse({
           id,
           role: "assistant",
           content: meta?.content ?? "",
+          parts: meta?.parts,
           toolCalls: meta?.toolCalls,
           toolResults: meta?.toolResults,
           actionRequired: meta?.actionRequired,
@@ -209,6 +245,7 @@ export function useChatStreamSse({
           clarifyingQuestions: meta?.clarifyingQuestions,
           helpArticles: meta?.helpArticles,
           showTicketPrompt: meta?.showTicketPrompt,
+          visibility: meta?.visibility,
         },
       ]);
     },
@@ -231,6 +268,8 @@ export function useChatStreamSse({
         clarifyingQuestions: meta.clarifyingQuestions ?? message.clarifyingQuestions,
         helpArticles: meta.helpArticles ?? message.helpArticles,
         showTicketPrompt: meta.showTicketPrompt ?? message.showTicketPrompt,
+        visibility: meta.visibility ?? message.visibility,
+        parts: meta.parts ?? message.parts,
       }));
       onMeta?.(meta);
     },
@@ -249,7 +288,7 @@ export function useChatStreamSse({
   );
 
   const sendMessage = useCallback(
-    async (message: string, options?: { attachments?: ChatAttachment[] }) => {
+    async (message: string, options?: { attachments?: ChatAttachment[]; visibility?: ChatMessageVisibility }) => {
       const trimmed = message.trim();
       const attachments = options?.attachments;
       if ((!trimmed && (!attachments || attachments.length === 0)) || isSending) return;
@@ -263,6 +302,7 @@ export function useChatStreamSse({
         content: trimmed,
         attachments,
         createdAt: new Date().toISOString(),
+        visibility: options?.visibility,
       };
       setMessages((prev) => [...prev, userMessage]);
       setIsSending(true);
@@ -278,6 +318,7 @@ export function useChatStreamSse({
         context,
         message: trimmed,
         attachments,
+        visibility: options?.visibility,
       };
       if (mode === "public" || mode === "support") {
         body.history = history;
@@ -350,6 +391,10 @@ export function useChatStreamSse({
             }
           }
         }
+
+        setIsTyping(false);
+        setIsSending(false);
+        streamingMessageIdRef.current = null;
       } catch (error) {
         setIsConnected(false);
         setIsTyping(false);
@@ -511,10 +556,12 @@ export function useChatStreamSse({
           id: parsed.messageId,
           role: "assistant",
           content: parsed.content,
+          parts: parsed.parts,
           toolCalls: parsed.toolCalls,
           toolResults: parsed.toolResults,
           actionRequired: parsed.actionRequired,
           createdAt: parsed.createdAt,
+          visibility: parsed.visibility,
         };
         setMessages((prev) => [...prev, assistantMessage]);
       } catch (error) {

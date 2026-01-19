@@ -1,4 +1,5 @@
 import "reflect-metadata";
+import "./otel";
 import { Logger } from "@nestjs/common";
 import { createApp, initializePrismaShutdownHooks } from "./app.bootstrap";
 import { initializeSentry } from "./sentry";

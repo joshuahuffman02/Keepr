@@ -1,0 +1,18 @@
+{
+  "name": "@keepr/ralph",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Ralph loop iteration harness for Keepr",
+  "bin": {
+    "ralph": "dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "pnpm build && node --test dist/**/*.test.js"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.4",
+    "typescript": "^5.9.3"
+  }
+}

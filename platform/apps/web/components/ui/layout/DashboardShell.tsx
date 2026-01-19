@@ -127,7 +127,7 @@ type NavSection = {
 
 const Icon = ({ name, active }: { name: IconName; active?: boolean }) => {
   const stroke = active ? "hsl(var(--action-primary))" : "hsl(var(--muted-foreground))";
-  const common = { width: 18, height: 18, strokeWidth: 1.6, stroke, fill: "none", strokeLinecap: "round", strokeLinejoin: "round" } satisfies SVGProps<SVGSVGElement>;
+  const common = { width: 20, height: 20, strokeWidth: 1.6, stroke, fill: "none", strokeLinecap: "round", strokeLinejoin: "round" } satisfies SVGProps<SVGSVGElement>;
   switch (name) {
     case "dashboard":
       return (
@@ -751,7 +751,7 @@ export function DashboardShell({ children, className, title, subtitle, density =
     <button
       type="button"
       className={cn(
-        "ml-2 inline-flex h-6 w-6 items-center justify-center rounded border text-muted-foreground hover:text-foreground transition-colors",
+        "ml-2 inline-flex h-7 w-7 items-center justify-center rounded border text-muted-foreground hover:text-foreground transition-colors",
         pinned ? "border-amber-200 bg-amber-50 text-amber-700" : "border-border bg-muted/60 hover:bg-muted"
       )}
       aria-label={pinned ? "Unpin from menu" : "Pin to menu"}
@@ -796,7 +796,7 @@ export function DashboardShell({ children, className, title, subtitle, density =
       <div ref={setNodeRef} style={style}>
         <Link
           className={cn(
-            "flex items-center justify-between rounded-md px-3 py-2.5 text-sm md:text-[15px] text-muted-foreground hover:bg-muted hover:text-foreground transition-colors",
+            "flex items-center justify-between rounded-xl px-3 h-11 text-[15px] font-medium text-muted-foreground hover:bg-muted/80 hover:text-foreground transition-colors",
             isActive && "bg-muted text-foreground font-semibold",
             isDragging && "z-50"
           )}
@@ -805,13 +805,13 @@ export function DashboardShell({ children, className, title, subtitle, density =
           title={item.tooltip ?? item.label}
           data-tour={item.dataTour}
         >
-          <span className={cn("flex items-center gap-2", isCollapsed && "justify-center w-full")}>
+          <span className={cn("flex items-center gap-3", isCollapsed && "justify-center w-full")}>
             {/* Drag handle - only show in edit mode */}
             {showPin && !isCollapsed && (
               <span
                 {...attributes}
                 {...listeners}
-                className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground mr-1"
+                className="cursor-grab active:cursor-grabbing text-muted-foreground hover:text-foreground mr-2"
                 onClick={(e) => e.preventDefault()}
               >
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
@@ -918,15 +918,15 @@ export function DashboardShell({ children, className, title, subtitle, density =
               </svg>
             </button>
           </div>
-          <div className="h-full overflow-y-auto px-4 py-4 space-y-4">
+          <div className="h-full overflow-y-auto px-4 py-5 space-y-5">
             <div className="space-y-2">
-              <div className="text-[11px] uppercase tracking-wide text-muted-foreground">Menu</div>
+              <div className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground">Menu</div>
               {favoritesItems.length === 0 ? (
                 <div className="px-3 py-4 text-sm text-muted-foreground">
                   No pages pinned yet. Use "Customize Menu" below to add pages.
                 </div>
               ) : (
-                <div className="space-y-1">
+                <div className="space-y-2">
                   {favoritesItems.map((item) => {
                     const baseHref = item.href.split(/[?#]/)[0];
                     const isActive = currentPath === baseHref || currentPath.startsWith(baseHref + "/");
@@ -937,8 +937,10 @@ export function DashboardShell({ children, className, title, subtitle, density =
                         title={"tooltip" in item ? item.tooltip : item.label}
                         aria-current={isActive ? "page" : undefined}
                         className={cn(
-                          "flex items-center gap-3 rounded-lg px-3 py-3 text-base",
-                          isActive ? "bg-muted text-foreground font-semibold" : "bg-muted/60 text-foreground hover:bg-muted"
+                          "flex items-center gap-3 rounded-xl px-3 h-11 text-[15px] font-medium transition-colors",
+                          isActive
+                            ? "bg-muted text-foreground font-semibold"
+                            : "text-muted-foreground hover:bg-muted/80 hover:text-foreground"
                         )}
                         onClick={() => setMobileNavOpen(false)}
                       >
@@ -955,7 +957,7 @@ export function DashboardShell({ children, className, title, subtitle, density =
             <div className="mt-4 pt-4 border-t border-border">
               <Link
                 href="/all-pages"
-                className="flex items-center gap-3 rounded-lg px-3 py-3 text-base bg-muted/60 text-foreground hover:bg-muted"
+                className="flex items-center gap-3 rounded-xl px-3 h-11 text-[15px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors"
                 onClick={() => setMobileNavOpen(false)}
               >
                 <svg
@@ -981,10 +983,10 @@ export function DashboardShell({ children, className, title, subtitle, density =
         <aside
           className={cn(
             "hidden md:flex md:flex-col border-r border-border bg-card transition-all h-[calc(100vh-3.5rem)] sticky top-14",
-            collapsed ? "w-16 items-center" : "w-64"
+            collapsed ? "w-[72px] items-center" : "w-[280px]"
           )}
         >
-          <div className={cn("w-full border-b border-border flex items-center", collapsed ? "justify-center p-3" : "justify-end p-3")}>
+          <div className={cn("w-full border-b border-border flex items-center", collapsed ? "justify-center p-4" : "justify-end p-4")}>
             <button
               className="rounded-md border border-border bg-muted p-2 text-muted-foreground hover:bg-muted/80 hover:text-foreground"
               onClick={() => {
@@ -1035,10 +1037,10 @@ export function DashboardShell({ children, className, title, subtitle, density =
               </div>
             </div>
           )}
-          <nav className={cn("flex-1 px-3 py-4 space-y-4 overflow-y-auto", collapsed && "px-1")}>
+          <nav className={cn("flex-1 px-4 py-5 space-y-6 overflow-y-auto", collapsed && "px-2")}>
             {!collapsed && (
-              <div className="flex items-center justify-between px-1 pb-1 text-xs text-muted-foreground">
-                <span className="uppercase tracking-wide font-semibold">Navigation</span>
+              <div className="flex items-center justify-between px-1 pb-1 text-[11px] text-muted-foreground">
+                <span className="uppercase tracking-[0.12em] font-semibold">Navigation</span>
                 <button
                   type="button"
                   className={cn(
@@ -1055,9 +1057,9 @@ export function DashboardShell({ children, className, title, subtitle, density =
               </div>
             )}
             {/* Pinned pages with drag-and-drop reordering */}
-            <div className="space-y-1">
+            <div className="space-y-2">
               {!collapsed && (
-                <div className="px-3 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                <div className="px-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
                   Menu
                 </div>
               )}
@@ -1079,7 +1081,7 @@ export function DashboardShell({ children, className, title, subtitle, density =
                     items={pinnedPages}
                     strategy={verticalListSortingStrategy}
                   >
-                    <div className="space-y-1">
+                    <div className="space-y-2">
                       {favoritesItems.map((item) => {
                         const baseHref = item.href.split(/[?#]/)[0];
                         const isActive = currentPath === baseHref || currentPath.startsWith(baseHref + "/");
@@ -1106,7 +1108,7 @@ export function DashboardShell({ children, className, title, subtitle, density =
               <div className="mt-6 pt-4 border-t border-border">
                 <Link
                   href="/all-pages"
-                  className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-md transition-colors"
+                  className="flex items-center gap-3 px-3 h-11 text-[15px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/80 rounded-xl transition-colors"
                 >
                   <svg
                     width="18"

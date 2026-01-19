@@ -299,6 +299,7 @@ export class SelfCheckinService {
       // Emit check-in failed communication
       try {
         if (updatedReservation) {
+          const campgroundName = updatedReservation.Campground?.name ?? "your campground";
           await this.prisma.communication.create({
             data: {
               id: randomUUID(),
@@ -306,7 +307,7 @@ export class SelfCheckinService {
               guestId: updatedReservation.guestId,
               reservationId: updatedReservation.id,
               type: 'email',
-              subject: `Check-in issue at ${updatedReservation.Campground.name}`,
+              subject: `Check-in issue at ${campgroundName}`,
               body: `We couldn't complete your check-in. Reason: ${validation.reason?.replace('_', ' ')}. Please contact the front desk.`,
               status: 'queued',
               direction: 'outbound',
@@ -356,6 +357,8 @@ export class SelfCheckinService {
 
     // Emit check-in success communication
     try {
+      const campgroundName = reservation.Campground?.name ?? "our campground";
+      const siteLabel = reservation.Site?.siteNumber ?? "your site";
       await this.prisma.communication.create({
         data: {
           id: randomUUID(),
@@ -363,8 +366,8 @@ export class SelfCheckinService {
           guestId: reservation.guestId,
           reservationId: reservation.id,
           type: 'email',
-          subject: `Welcome to ${reservation.Campground.name}!`,
-          body: `You're all checked in to site ${reservation.Site.siteNumber}. Enjoy your stay!`,
+          subject: `Welcome to ${campgroundName}!`,
+          body: `You're all checked in to site ${siteLabel}. Enjoy your stay!`,
           status: 'queued',
           direction: 'outbound',
         },
@@ -437,6 +440,7 @@ export class SelfCheckinService {
 
     // Emit checkout success communication with receipt
     try {
+      const campgroundName = updatedReservation.Campground?.name ?? "your campground";
       await this.prisma.communication.create({
         data: {
           id: randomUUID(),
@@ -444,7 +448,7 @@ export class SelfCheckinService {
           guestId: updatedReservation.guestId,
           reservationId: updatedReservation.id,
           type: 'email',
-          subject: `Thank you for staying at ${updatedReservation.Campground.name}!`,
+          subject: `Thank you for staying at ${campgroundName}!`,
           body: `You've successfully checked out. Final charges: $${(updatedReservation.totalAmount / 100).toFixed(2)}. We hope to see you again!`,
           status: 'queued',
           direction: 'outbound',

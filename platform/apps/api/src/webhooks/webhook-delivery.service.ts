@@ -196,21 +196,17 @@ export class WebhookDeliveryService {
       attempt
     );
 
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(
-        () => controller.abort(),
-        DELIVERY_TIMEOUT_MS
-      );
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), DELIVERY_TIMEOUT_MS);
+    timeoutId.unref?.();
 
+    try {
       const response = await fetch(url, {
         method: "POST",
         headers,
         body,
         signal: controller.signal,
       });
-
-      clearTimeout(timeoutId);
 
       const responseBody = await response.text();
 
@@ -238,21 +234,23 @@ export class WebhookDeliveryService {
           responseBody: responseBody.slice(0, 2000),
           deliveredAt: new Date(),
         };
-      } else {
-        // HTTP error - schedule retry or mark as failed
-        return this.handleDeliveryFailure(
-          deliveryId,
-          response.status,
-          responseBody.slice(0, 2000),
-          attempt
-        );
       }
+
+      // HTTP error - schedule retry or mark as failed
+      return this.handleDeliveryFailure(
+        deliveryId,
+        response.status,
+        responseBody.slice(0, 2000),
+        attempt
+      );
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error ? err.message : "Webhook delivery failed";
 
       // Network error - schedule retry or mark as failed
       return this.handleDeliveryFailure(deliveryId, null, errorMessage, attempt);
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
 

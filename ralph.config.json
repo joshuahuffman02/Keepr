@@ -1,0 +1,25 @@
+{
+  "maxIterations": 10,
+  "checks": [
+    {
+      "name": "lint",
+      "command": "pnpm lint"
+    },
+    {
+      "name": "typecheck",
+      "command": "pnpm typecheck"
+    },
+    {
+      "name": "test",
+      "command": "pnpm test"
+    },
+    {
+      "name": "smoke",
+      "command": "pnpm smoke"
+    }
+  ],
+  "taskFile": "TASK.md",
+  "phasesFile": "PHASES.md",
+  "stateFile": ".ralph/state.json",
+  "stopOnFailure": true
+}

@@ -37,6 +37,10 @@ dotenvy = "0.15"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
 tracing-actix-web = "0.7"
+tracing-opentelemetry = "0.25"
+opentelemetry = { version = "0.24", features = ["trace"] }
+opentelemetry_sdk = { version = "0.24", features = ["rt-tokio"] }
+opentelemetry-otlp = { version = "0.17", features = ["http-proto", "reqwest-client"] }
 
 # Validation
 validator = { version = "0.18", features = ["derive"] }

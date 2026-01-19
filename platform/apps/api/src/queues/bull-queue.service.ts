@@ -72,6 +72,7 @@ export class BullQueueService implements OnModuleInit, OnModuleDestroy {
   async onModuleInit() {
     // Start background processing
     this.processingInterval = setInterval(() => this.processQueues(), 1000);
+    this.processingInterval.unref?.();
     this.logger.log("BullQueueService initialized");
   }
 

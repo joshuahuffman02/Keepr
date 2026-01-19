@@ -3,6 +3,7 @@ import { TaskBundlerService } from "./task-bundler.service";
 import { PrismaService } from "../prisma/prisma.service";
 
 describe("TaskBundlerService", () => {
+    let moduleRef: TestingModule;
     let service: TaskBundlerService;
     let prisma: PrismaService;
 
@@ -42,7 +43,7 @@ describe("TaskBundlerService", () => {
     ];
 
     beforeEach(async () => {
-        const module: TestingModule = await Test.createTestingModule({
+        moduleRef = await Test.createTestingModule({
             providers: [
                 TaskBundlerService,
                 {
@@ -59,8 +60,12 @@ describe("TaskBundlerService", () => {
             ],
         }).compile();
 
-        service = module.get<TaskBundlerService>(TaskBundlerService);
-        prisma = module.get<PrismaService>(PrismaService);
+        service = moduleRef.get<TaskBundlerService>(TaskBundlerService);
+        prisma = moduleRef.get<PrismaService>(PrismaService);
+    });
+
+    afterEach(async () => {
+        await moduleRef?.close();
     });
 
     it("should be defined", () => {

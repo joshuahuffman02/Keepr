@@ -11,6 +11,8 @@ import { AuthModule } from '../auth/auth.module';
 import { GuestAuthModule } from '../guest-auth/guest-auth.module';
 import { UploadsModule } from '../uploads/uploads.module';
 import { AnalyticsModule } from '../analytics/analytics.module';
+import { AuditModule } from '../audit/audit.module';
+import { HoldsModule } from '../holds/holds.module';
 
 @Module({
   imports: [
@@ -20,6 +22,8 @@ import { AnalyticsModule } from '../analytics/analytics.module';
     GuestAuthModule,
     UploadsModule,
     AnalyticsModule,
+    AuditModule,
+    HoldsModule,
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({

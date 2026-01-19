@@ -86,6 +86,7 @@ export class HttpBackupProvider implements BackupProvider {
     while (attempt <= this.retries) {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), this.timeoutMs);
+      timer.unref?.();
       try {
         const res = await fetchFn(url, { ...init, signal: controller.signal });
         clearTimeout(timer);

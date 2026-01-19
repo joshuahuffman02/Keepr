@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsObject, MaxLength, IsUUID, IsArray, ValidateNested, IsInt, Min, Max, ValidateIf, MinLength } from 'class-validator';
+import { IsString, IsOptional, IsObject, MaxLength, IsUUID, IsArray, ValidateNested, IsInt, Min, Max, ValidateIf, MinLength, IsIn } from 'class-validator';
 import { Type } from 'class-transformer';
 import { z } from 'zod';
 
@@ -15,6 +15,7 @@ export const sendMessageSchema = z.object({
   conversationId: z.string().optional(),
   message: z.string().max(4000).optional(),
   attachments: z.array(attachmentSchema).optional(),
+  visibility: z.enum(["public", "internal"]).optional(),
   context: z.object({
     reservationId: z.string().optional(),
     currentPage: z.string().optional(),
@@ -46,6 +47,11 @@ export class SendMessageDto {
   attachments?: ChatAttachmentDto[];
 
   @IsOptional()
+  @IsString()
+  @IsIn(["public", "internal"])
+  visibility?: ChatMessageVisibility;
+
+  @IsOptional()
   @IsObject()
   context?: {
     reservationId?: string;
@@ -54,15 +60,19 @@ export class SendMessageDto {
 }
 
 // Response types
+export type ChatMessageVisibility = 'public' | 'internal';
+
 export interface ChatMessageResponse {
   conversationId: string;
   messageId: string;
   role: 'assistant';
   content: string;
+  parts?: ChatMessagePart[];
   toolCalls?: ToolCall[];
   toolResults?: ToolResult[];
   actionRequired?: ActionRequired;
   createdAt: string;
+  visibility?: ChatMessageVisibility;
 }
 
 export interface ChatAttachment {
@@ -111,11 +121,25 @@ export interface ToolResult {
   error?: string;
 }
 
+export type ChatMessagePart =
+  | { type: 'text'; text: string }
+  | {
+      type: 'tool';
+      name: string;
+      callId: string;
+      args?: Record<string, unknown>;
+      result?: unknown;
+      error?: string;
+    }
+  | { type: 'file'; file: ChatAttachment }
+  | { type: 'card'; title?: string; summary?: string; payload?: Record<string, unknown> };
+
 export interface ActionRequired {
   type: 'confirmation' | 'form' | 'selection';
   actionId: string;
   title: string;
   description: string;
+  summary?: string;
   data?: Record<string, unknown>;
   options?: ActionOption[];
 }

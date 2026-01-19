@@ -7,6 +7,20 @@
 
 ### Fixed
 - Finalize campground onboarding launch by setting bookability and ensuring an owner membership is present.
+- Stabilize toolchain and tests by cleaning Jest config, closing test modules, and standardizing Prisma client imports.
+- Clear and unref synthetic check and job queue timeout timers to reduce lingering test handles.
+- Run API Jest tests in-band by default; set `JEST_RUN_IN_BAND=false` and/or `JEST_MAX_WORKERS` to override, plus undici teardown/debug hooks to prevent worker exit warnings.
+- Disable Turbo test task caching/outputs to prevent missing-output warnings in test pipelines.
+- Guard alert webhook URLs and ensure abort timeouts are cleared/unrefed for delivery paths.
+- Route lint/test/typecheck through Turbo and add per-package typecheck scripts.
+- Remove the duplicate web ESLint config so `.eslintrc.cjs` is the single source.
+- Align Vercel build config with the workspace web app output path and build commands.
+- Propagate `x-request-id` between web and API, exposing it in CORS responses.
+- Forward `x-request-id`/trace headers from API to Rust service calls.
+- Add API log context fields (request/trace IDs) via AsyncLocalStorage.
+- Add structured `http_request` access logs with method/path/status/duration.
+- Add request ID and trace span metadata to Rust service request handling.
+- Avoid Redis shutdown errors when the client never connected (e.g., OpenAPI generation).
 - Align onboarding step payloads for operational hours, booking rules, waivers, and communications.
 - Restrict onboarding invite creation/resend to authorized campground or organization members.
 - Sanitize onboarding AI import filenames before writing to disk.
@@ -15,10 +29,27 @@
 - Use consistent API base resolution for onboarding reservation import requests.
 - Normalize chat attachment content types and filter support/partner chat history roles for web build typing.
 - Fix staff chat message list scrolling so long KPI snapshots scroll inside the widget instead of the page.
+- Harden nested long-response scroll containment to reduce page scroll bleed when message content scrolls.
+- Capture non-passive wheel/touch scroll events in the chat message list to prevent page scroll bleed on trackpad/touch.
 - Guard staff chat autoscroll and surface a jump-to-latest control for long responses.
+- Stabilize analytics and gamification smoke tests by avoiding networkidle waits and aligning routes/UI selectors.
+- Align staff/admin dashboard navigation spacing, including admin mobile header controls, with the desktop sidebar spacing guide.
+- Chat tool cards now render availability/balance/task summaries even when tool outputs include a message string.
+- Fix API OpenTelemetry bootstrap to use resource helpers compatible with the current SDK and tighten chat task query typing.
 
 ### Added
 - Onboarding import checklist with system-specific export prompts, coverage tracking, and warning override.
+- Changesets config plus CI status check for shared package release notes/versioning.
+- Changesets usage guide and observability conventions documentation.
+- Documented Rust services on Railway in deployment tables.
+- OpenAPI-derived SDK types generated from the API spec via `openapi-typescript`.
+- Authenticated `/flags` endpoints to evaluate feature flags per campground.
+- Added `/ready` endpoints to Rust services for readiness checks.
+- Optional API OpenTelemetry bootstrap (OTLP exporter + auto-instrumentation).
+- Optional Rust OpenTelemetry exporters with OTLP trace propagation.
+- Optional web OpenTelemetry bootstrap via `@vercel/otel`.
+- OpenAPI contract test covering core platform paths.
+- Web type-level OpenAPI contract checks via `@keepr/sdk`.
 - Persist onboarding import system selection/override metadata on completion and highlight next exports to grab.
 - Draft-save onboarding import selections immediately and show import coverage metadata on Review/Launch.
 - Sync onboarding import draft coverage into wizard state and include checklist status in go-live warnings.
@@ -27,6 +58,21 @@
 - Occupancy and revenue tools now return json-render payloads for inline report charts and tables.
 - Staff chat tool calls now show input/output cards, with a Playwright regression test for scroll behavior.
 - Staff chat message rendering now supports markdown for richer KPI summaries.
+- Staff chat now supports GFM tables, code block copy buttons, internal notes, new message markers, and message-level animations/skeletons.
+- Staff chat now collapses long responses with a max-height scroll area and expand toggle.
+- Staff chat now highlights json-render report summaries with a quick open-report action.
+- Staff chat now auto-opens the artifact panel when a new report arrives and shows a KPI snapshot block for arrivals and occupancy trend.
+- Staff chat now surfaces scroll hints for long response blocks.
+- Staff chat now renders structured arrivals and occupancy tool cards instead of raw JSON output.
+- Chat shell now adapts for mobile/kiosk sizing and long responses include keyboard/touch scroll controls with updated microcopy.
+- Chat API now returns standardized message parts (text/tool/file/card) and supports transcript exports for staff and guest chats.
+- Chat conversations can now be deleted per conversation or per user via new API endpoints.
+- Chat tool execution endpoints now support direct staff/guest tool runs with pre-validation and optional conversation logging.
+- Public booking chat now skips AI interaction and consent persistence for session-only behavior.
+- Mode-specific chat system prompts now cover public guests, portal guests, staff ops, and support with PII guardrails.
+- Staff chat approvals now include short action summaries, and staff can manage site holds via chat tools.
+- Chat now supports reservation change requests for guests and open task summaries for staff.
+- Chat tool mutations now emit audit log entries for traceability.
 
 #### Phase 1: Pricing & Payments
 - **Dynamic Pricing Engine** (`/pricing-v2`)

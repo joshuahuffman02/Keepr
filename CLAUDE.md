@@ -25,7 +25,7 @@ Campreserv (Keepr): Multi-tenant SaaS for campground, RV park, and lodging reser
 ## Prerequisites
 
 - Node 20+ (Prisma 7 requirement)
-- pnpm 7.33.6 (`npm install -g pnpm@7.33.6`)
+- pnpm 9.15.9 (`npm install -g pnpm@9.15.9`)
 
 ## Essential Commands
 
@@ -36,7 +36,7 @@ pnpm api                    # API only
 pnpm web                    # Web only
 
 # Build (always run after changes)
-pnpm build                  # Build all: shared -> API -> Web
+pnpm build                  # Turbo build for shared, API, web, and packages
 
 # Testing
 pnpm test:api               # All API tests
@@ -99,10 +99,10 @@ platform/
 
 ## Deployment
 
-| Environment | Frontend | API | Database |
-|-------------|----------|-----|----------|
-| Production | Vercel (`keeprstay.com`) | Railway (`api.keeprstay.com`) | Supabase |
-| Staging | Vercel (`staging.keeprstay.com`) | Railway (`api-staging.keeprstay.com`) | Supabase (staging) |
+| Environment | Frontend | API | Rust Services | Database |
+|-------------|----------|-----|---------------|----------|
+| Production | Vercel (`keeprstay.com`) | Railway (`api.keeprstay.com`) | Railway | Supabase |
+| Staging | Vercel (`staging.keeprstay.com`) | Railway (`api-staging.keeprstay.com`) | Railway | Supabase (staging) |
 
 **Branch strategy:** `feature/*` → PR to `staging` → merge → test → PR to `main` → production
 

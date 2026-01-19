@@ -2,10 +2,10 @@
   "name": "keepr",
   "version": "0.1.0",
   "private": true,
-  "packageManager": "pnpm@7.33.6",
+  "packageManager": "pnpm@9.15.9",
   "engines": {
     "node": ">=20",
-    "pnpm": "7.33.6"
+    "pnpm": "9.15.9"
   },
   "scripts": {
     "format": "pnpm lint:fix",
@@ -15,28 +15,37 @@
     "prisma:reset-seed": "pnpm --dir platform/apps/api prisma migrate reset --force && pnpm --dir platform/apps/api prisma:generate && pnpm --dir platform/apps/api prisma:seed",
     "prisma:link": "node scripts/link-prisma-client.js",
     "postinstall": "node scripts/link-prisma-client.js || echo 'Skipping prisma:link (script not found)'",
+    "lint": "turbo run lint && node scripts/check-no-any-no-assert.js",
     "lint:web": "pnpm --dir platform/apps/web lint && node scripts/check-no-any-no-assert.js",
     "lint:fix": "pnpm --dir platform/apps/web exec eslint . --fix && node scripts/check-no-any-no-assert.js",
     "ci:e2e": "pnpm --dir platform/apps/web test:e2e",
     "ci:sdk": "pnpm --filter @keepr/sdk test && pnpm --filter @keepr/integrations-sdk test",
-    "ci": "pnpm lint:web && pnpm --dir platform/apps/api test:smoke && pnpm ci:sdk && pnpm build && pnpm --dir platform/apps/web budgets && pnpm ci:e2e",
+    "ci": "pnpm lint && pnpm --dir platform/apps/api test:smoke && pnpm ci:sdk && pnpm build && pnpm --dir platform/apps/web budgets && pnpm ci:e2e",
     "prepare": "simple-git-hooks",
     "build:shared": "pnpm --filter @keepr/shared build",
-    "build:api": "pnpm --dir platform/apps/api prisma:generate && pnpm --dir platform/apps/api build",
+    "build:api": "pnpm --dir platform/apps/api build",
     "build:web": "pnpm --dir platform/apps/web build",
-    "build": "pnpm build:shared && pnpm build:api && pnpm build:web",
-    "typecheck": "pnpm --dir platform/packages/shared exec tsc -p tsconfig.json --noEmit && pnpm --dir platform/packages/sdk exec tsc -p tsconfig.json --noEmit && pnpm --dir platform/packages/integrations-sdk exec tsc -p tsconfig.json --noEmit && pnpm --dir platform/apps/api exec tsc -p tsconfig.json --noEmit && pnpm --dir platform/apps/web exec tsc -p tsconfig.json --noEmit",
-    "test": "pnpm test:api",
+    "build": "turbo run build",
+    "build:legacy": "pnpm build:shared && pnpm build:api && pnpm build:web",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "changeset": "changeset",
+    "changeset:version": "changeset version",
+    "changeset:status": "changeset status --since origin/staging",
+    "smoke": "node scripts/smoke.js",
     "test:api": "pnpm --dir platform/apps/api test",
     "test:api:path": "pnpm --dir platform/apps/api test -- --runTestsByPath"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.29.8",
     "@jest/test-sequencer": "^29.7.0",
+    "@keepr/ralph": "workspace:*",
     "concurrently": "^8.2.2",
-    "simple-git-hooks": "^2.9.0"
+    "simple-git-hooks": "^2.9.0",
+    "turbo": "2.5.5"
   },
   "simple-git-hooks": {
-    "pre-commit": "pnpm lint:web"
+    "pre-commit": "pnpm lint"
   },
   "dependencies": {
     "@prisma/client-runtime-utils": "^7.1.0",

@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { isRecord } from '../utils/type-guards';
-import { Prisma } from ".prisma/client";
+import { Prisma } from "@prisma/client";
 import { randomUUID } from "crypto";
 
 type FlexCheckPolicyUpdate = {

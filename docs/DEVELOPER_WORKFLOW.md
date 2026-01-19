@@ -112,11 +112,11 @@ Jobs:
 
 ### Deployment Targets
 
-| Environment | Frontend | API | Database |
-|-------------|----------|-----|----------|
-| Production | Vercel (main) | Railway (production) | Supabase (main) |
-| Staging | Vercel (staging) | Railway (staging) | Supabase (staging branch) |
-| Preview | Vercel (auto) | N/A | N/A |
+| Environment | Frontend | API | Rust Services | Database |
+|-------------|----------|-----|---------------|----------|
+| Production | Vercel (main) | Railway (production) | Railway (production) | Supabase (main) |
+| Staging | Vercel (staging) | Railway (staging) | Railway (staging) | Supabase (staging branch) |
+| Preview | Vercel (auto) | N/A | N/A | N/A |
 
 ## Environment Variables
 

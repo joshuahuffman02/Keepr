@@ -2,6 +2,7 @@ import {
   Controller,
   Post,
   Get,
+  Delete,
   Body,
   Query,
   UseGuards,
@@ -19,8 +20,10 @@ import { ChatService } from './chat.service';
 import { UploadsService } from '../uploads/uploads.service';
 import { SendMessageDto, ChatMessageResponse } from './dto/send-message.dto';
 import { ExecuteActionDto, ExecuteActionResponse } from './dto/execute-action.dto';
+import { ExecuteToolDto, ExecuteToolResponse } from './dto/execute-tool.dto';
 import { GetHistoryDto, ConversationHistoryResponse } from './dto/get-history.dto';
 import { GetConversationsDto, ConversationListResponse } from './dto/get-conversations.dto';
+import { GetTranscriptDto, TranscriptResponse } from './dto/get-transcript.dto';
 import { SubmitFeedbackDto, SubmitFeedbackResponse } from './dto/submit-feedback.dto';
 import { RegenerateMessageDto } from './dto/regenerate-message.dto';
 import { SignChatAttachmentDto, SignChatAttachmentResponse } from './dto/sign-attachment.dto';
@@ -195,6 +198,27 @@ export class ChatController {
   }
 
   /**
+   * Staff tool execution endpoint
+   * POST /campgrounds/:campgroundId/chat/tools/execute
+   */
+  @Post('/campgrounds/:campgroundId/tools/execute')
+  @UseGuards(JwtAuthGuard, ScopeGuard)
+  @Throttle({ default: { limit: 30, ttl: 60000 } }) // 30 tool executions per minute
+  @HttpCode(HttpStatus.OK)
+  async executeStaffTool(
+    @Param('campgroundId') campgroundId: string,
+    @Body() dto: ExecuteToolDto,
+    @Req() req: StaffAuthenticatedRequest,
+  ): Promise<ExecuteToolResponse> {
+    return this.chatService.executeTool(dto, {
+      campgroundId,
+      participantType: ChatParticipantType.staff,
+      participantId: req.user.id,
+      role: this.getStaffRole(req, campgroundId),
+    });
+  }
+
+  /**
    * Staff chat history endpoint
    * GET /campgrounds/:campgroundId/chat/history
    */
@@ -267,6 +291,65 @@ export class ChatController {
     @Req() req: StaffAuthenticatedRequest,
   ): Promise<ConversationListResponse> {
     return this.chatService.getConversations(dto, {
+      campgroundId,
+      participantType: ChatParticipantType.staff,
+      participantId: req.user.id,
+      role: this.getStaffRole(req, campgroundId),
+    });
+  }
+
+  /**
+   * Staff conversation transcript export
+   * GET /campgrounds/:campgroundId/chat/conversations/:conversationId/transcript
+   */
+  @Get('/campgrounds/:campgroundId/conversations/:conversationId/transcript')
+  @UseGuards(JwtAuthGuard, ScopeGuard)
+  async getStaffTranscript(
+    @Param('campgroundId') campgroundId: string,
+    @Param('conversationId') conversationId: string,
+    @Query() dto: GetTranscriptDto,
+    @Req() req: StaffAuthenticatedRequest,
+  ): Promise<TranscriptResponse> {
+    return this.chatService.getTranscript(conversationId, dto, {
+      campgroundId,
+      participantType: ChatParticipantType.staff,
+      participantId: req.user.id,
+      role: this.getStaffRole(req, campgroundId),
+    });
+  }
+
+  /**
+   * Staff delete conversation
+   * DELETE /campgrounds/:campgroundId/chat/conversations/:conversationId
+   */
+  @Delete('/campgrounds/:campgroundId/conversations/:conversationId')
+  @UseGuards(JwtAuthGuard, ScopeGuard)
+  @HttpCode(HttpStatus.OK)
+  async deleteStaffConversation(
+    @Param('campgroundId') campgroundId: string,
+    @Param('conversationId') conversationId: string,
+    @Req() req: StaffAuthenticatedRequest,
+  ): Promise<{ success: true }> {
+    return this.chatService.deleteConversation(conversationId, {
+      campgroundId,
+      participantType: ChatParticipantType.staff,
+      participantId: req.user.id,
+      role: this.getStaffRole(req, campgroundId),
+    });
+  }
+
+  /**
+   * Staff delete all conversations (per-user)
+   * DELETE /campgrounds/:campgroundId/chat/conversations
+   */
+  @Delete('/campgrounds/:campgroundId/conversations')
+  @UseGuards(JwtAuthGuard, ScopeGuard)
+  @HttpCode(HttpStatus.OK)
+  async deleteStaffConversations(
+    @Param('campgroundId') campgroundId: string,
+    @Req() req: StaffAuthenticatedRequest,
+  ): Promise<{ success: true; deletedCount: number }> {
+    return this.chatService.deleteAllConversations({
       campgroundId,
       participantType: ChatParticipantType.staff,
       participantId: req.user.id,
@@ -391,6 +474,30 @@ export class ChatController {
   }
 
   /**
+   * Guest tool execution endpoint
+   * POST /portal/:campgroundId/chat/tools/execute
+   */
+  @Post('/portal/:campgroundId/tools/execute')
+  @UseGuards(AuthGuard('guest-jwt'))
+  @Throttle({ default: { limit: 15, ttl: 60000 } }) // 15 tool executions per minute
+  @HttpCode(HttpStatus.OK)
+  async executeGuestTool(
+    @Param('campgroundId') campgroundId: string,
+    @Body() dto: ExecuteToolDto,
+    @Req() req: GuestAuthenticatedRequest,
+  ): Promise<ExecuteToolResponse> {
+    const guest = req.user;
+
+    await this.chatService.assertGuestAccess(guest.id, campgroundId);
+
+    return this.chatService.executeTool(dto, {
+      campgroundId,
+      participantType: ChatParticipantType.guest,
+      participantId: guest.id,
+    });
+  }
+
+  /**
    * Guest chat history endpoint
    * GET /portal/:campgroundId/chat/history
    */
@@ -476,6 +583,74 @@ export class ChatController {
     await this.chatService.assertGuestAccess(guest.id, campgroundId);
 
     return this.chatService.getConversations(dto, {
+      campgroundId,
+      participantType: ChatParticipantType.guest,
+      participantId: guest.id,
+    });
+  }
+
+  /**
+   * Guest conversation transcript export
+   * GET /portal/:campgroundId/chat/conversations/:conversationId/transcript
+   */
+  @Get('/portal/:campgroundId/conversations/:conversationId/transcript')
+  @UseGuards(AuthGuard('guest-jwt'))
+  async getGuestTranscript(
+    @Param('campgroundId') campgroundId: string,
+    @Param('conversationId') conversationId: string,
+    @Query() dto: GetTranscriptDto,
+    @Req() req: GuestAuthenticatedRequest,
+  ): Promise<TranscriptResponse> {
+    const guest = req.user;
+
+    await this.chatService.assertGuestAccess(guest.id, campgroundId);
+
+    return this.chatService.getTranscript(conversationId, dto, {
+      campgroundId,
+      participantType: ChatParticipantType.guest,
+      participantId: guest.id,
+    });
+  }
+
+  /**
+   * Guest delete conversation
+   * DELETE /portal/:campgroundId/chat/conversations/:conversationId
+   */
+  @Delete('/portal/:campgroundId/conversations/:conversationId')
+  @UseGuards(AuthGuard('guest-jwt'))
+  @HttpCode(HttpStatus.OK)
+  async deleteGuestConversation(
+    @Param('campgroundId') campgroundId: string,
+    @Param('conversationId') conversationId: string,
+    @Req() req: GuestAuthenticatedRequest,
+  ): Promise<{ success: true }> {
+    const guest = req.user;
+
+    await this.chatService.assertGuestAccess(guest.id, campgroundId);
+
+    return this.chatService.deleteConversation(conversationId, {
+      campgroundId,
+      participantType: ChatParticipantType.guest,
+      participantId: guest.id,
+    });
+  }
+
+  /**
+   * Guest delete all conversations
+   * DELETE /portal/:campgroundId/chat/conversations
+   */
+  @Delete('/portal/:campgroundId/conversations')
+  @UseGuards(AuthGuard('guest-jwt'))
+  @HttpCode(HttpStatus.OK)
+  async deleteGuestConversations(
+    @Param('campgroundId') campgroundId: string,
+    @Req() req: GuestAuthenticatedRequest,
+  ): Promise<{ success: true; deletedCount: number }> {
+    const guest = req.user;
+
+    await this.chatService.assertGuestAccess(guest.id, campgroundId);
+
+    return this.chatService.deleteAllConversations({
       campgroundId,
       participantType: ChatParticipantType.guest,
       participantId: guest.id,

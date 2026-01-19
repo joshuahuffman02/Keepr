@@ -124,13 +124,21 @@ export class JobQueueService {
   }
 
   private async runWithTimeout<T>(fn: () => Promise<T>, timeoutMs: number): Promise<T> {
-    let timeoutHandle: NodeJS.Timeout;
+    let timeoutHandle: NodeJS.Timeout | null = null;
     const timeoutPromise = new Promise<never>((_, reject) => {
-      timeoutHandle = setTimeout(() => reject(new Error(`Job exceeded timeout ${timeoutMs}ms`)), timeoutMs);
+      timeoutHandle = setTimeout(
+        () => reject(new Error(`Job exceeded timeout ${timeoutMs}ms`)),
+        timeoutMs
+      );
+      timeoutHandle.unref();
     });
-    const result = await Promise.race<T>([fn(), timeoutPromise]);
-    clearTimeout(timeoutHandle!);
-    return result;
+    try {
+      return await Promise.race<T>([fn(), timeoutPromise]);
+    } finally {
+      if (timeoutHandle) {
+        clearTimeout(timeoutHandle);
+      }
+    }
   }
 
   /**

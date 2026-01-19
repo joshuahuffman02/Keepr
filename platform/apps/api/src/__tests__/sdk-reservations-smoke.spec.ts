@@ -72,7 +72,7 @@ describe("SDK OAuth + reservations CRUD (mocked)", () => {
 
     expect(fetchMock).toHaveBeenNthCalledWith(
       1,
-      `${baseUrl}/oauth/token`,
+      `${baseUrl}/developer/oauth/token`,
       expect.objectContaining({
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -87,7 +87,7 @@ describe("SDK OAuth + reservations CRUD (mocked)", () => {
 
     expect(fetchMock).toHaveBeenNthCalledWith(
       2,
-      `${baseUrl}/public/reservations`,
+      `${baseUrl}/developer/reservations`,
       expect.objectContaining({
         method: "POST",
         headers: expect.objectContaining({
@@ -100,7 +100,7 @@ describe("SDK OAuth + reservations CRUD (mocked)", () => {
 
     expect(fetchMock).toHaveBeenNthCalledWith(
       3,
-      `${baseUrl}/public/reservations/res-1`,
+      `${baseUrl}/developer/reservations/res-1`,
       expect.objectContaining({
         method: "PATCH",
         headers: expect.objectContaining({
@@ -113,7 +113,7 @@ describe("SDK OAuth + reservations CRUD (mocked)", () => {
 
     expect(fetchMock).toHaveBeenNthCalledWith(
       4,
-      `${baseUrl}/public/reservations/res-1`,
+      `${baseUrl}/developer/reservations/res-1`,
       expect.objectContaining({
         method: "DELETE",
         headers: expect.objectContaining({
@@ -124,7 +124,7 @@ describe("SDK OAuth + reservations CRUD (mocked)", () => {
 
     expect(fetchMock).toHaveBeenNthCalledWith(
       5,
-      `${baseUrl}/public/reservations`,
+      `${baseUrl}/developer/reservations`,
       expect.objectContaining({
         method: "GET",
         headers: expect.objectContaining({

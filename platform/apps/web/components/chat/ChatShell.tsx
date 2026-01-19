@@ -71,13 +71,16 @@ export function ChatShell({
   statusSlot,
   headerActions,
   allowMinimize = true,
-  widthClassName = "w-96",
-  heightClassName = "h-[600px]",
+  widthClassName = "w-[calc(100vw-2rem)] sm:w-96 2xl:w-[28rem]",
+  heightClassName = "h-[calc(100vh-6rem)] sm:h-[600px] 2xl:h-[720px]",
   className,
   children,
 }: ChatShellProps) {
   const styles = ACCENT_STYLES[accent];
-  const positionClass = position === "bottom-right" ? "bottom-6 right-6" : "bottom-6 left-6";
+  const positionClass =
+    position === "bottom-right"
+      ? "bottom-4 right-4 sm:bottom-6 sm:right-6"
+      : "bottom-4 left-4 sm:bottom-6 sm:left-6";
 
   if (!isOpen) {
     return (
@@ -146,7 +149,7 @@ export function ChatShell({
   return (
     <div
       className={cn(
-        "fixed bg-card rounded-2xl shadow-2xl flex flex-col overflow-hidden z-50 border border-border",
+        "fixed bg-card rounded-2xl shadow-2xl flex flex-col overflow-hidden z-50 border border-border max-h-[calc(100vh-2rem)] max-w-[calc(100vw-2rem)]",
         widthClassName,
         heightClassName,
         positionClass,

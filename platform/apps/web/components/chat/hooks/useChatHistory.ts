@@ -2,7 +2,7 @@
 
 import { useCallback, useState } from "react";
 import { API_BASE } from "@/lib/api-config";
-import type { ChatAttachment, UnifiedChatMessage } from "../types";
+import type { ChatAttachment, ChatMessageVisibility, UnifiedChatMessage } from "../types";
 
 type HistoryMode = "guest" | "staff";
 
@@ -24,6 +24,9 @@ interface HistoryResponse {
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
+
+const getVisibility = (value: unknown): ChatMessageVisibility | undefined =>
+  value === "internal" || value === "public" ? value : undefined;
 
 const toHistoryResponse = (value: unknown): HistoryResponse | null => {
   if (!isRecord(value)) return null;
@@ -61,6 +64,7 @@ const toHistoryResponse = (value: unknown): HistoryResponse | null => {
       ? message.attachments.filter(isAttachment)
       : undefined,
     createdAt: typeof message.createdAt === "string" ? message.createdAt : undefined,
+    visibility: getVisibility(message.visibility),
   }));
 
   return {

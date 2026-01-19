@@ -129,20 +129,24 @@ function NavItem({ item, pathname }: { item: typeof adminNavItems[0]; pathname: 
 
     if (item.children) {
         return (
-            <div className="space-y-1">
-                <div className={`flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg ${isActive ? "text-foreground" : "text-muted-foreground"
-                    }`}>
+            <div className="space-y-2">
+                <div
+                    className={`flex items-center gap-3 px-3 h-11 text-[15px] font-medium rounded-xl transition-colors ${isActive
+                        ? "bg-muted/60 text-foreground font-semibold"
+                        : "text-muted-foreground"
+                        }`}
+                >
                     <Icon className="h-5 w-5" />
                     {item.title}
                 </div>
-                <div className="ml-8 space-y-1">
+                <div className="ml-8 space-y-2">
                     {item.children.map((child) => (
                         <Link
                             key={child.href}
                             href={child.href}
-                            className={`flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg transition-colors ${pathname === child.href
+                            className={`flex items-center gap-2 px-3 h-10 text-[14px] font-medium rounded-xl transition-colors ${pathname === child.href
                                 ? "bg-muted text-foreground"
-                                : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                                : "text-muted-foreground hover:text-foreground hover:bg-muted/80"
                                 }`}
                         >
                             <ChevronRight className="h-3 w-3" />
@@ -157,9 +161,9 @@ function NavItem({ item, pathname }: { item: typeof adminNavItems[0]; pathname: 
     return (
         <Link
             href={item.href!}
-            className={`flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${pathname === item.href
+            className={`flex items-center gap-3 px-3 h-11 text-[15px] font-medium rounded-xl transition-colors ${pathname === item.href
                 ? "bg-muted text-foreground"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted/80"
                 }`}
         >
             <Icon className="h-5 w-5" />
@@ -251,7 +255,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     {/* Close button for mobile */}
                     <button
                         onClick={() => setMobileMenuOpen(false)}
-                        className="md:hidden p-2 text-muted-foreground hover:text-foreground"
+                        className="md:hidden inline-flex h-11 w-11 items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors"
                     >
                         <X className="h-5 w-5" />
                     </button>
@@ -259,24 +263,24 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+            <nav className="flex-1 px-4 py-5 space-y-6 overflow-y-auto">
                 {adminNavItems.map((item) => (
                     <NavItem key={item.title} item={item} pathname={pathname} />
                 ))}
             </nav>
 
             {/* Footer */}
-            <div className="p-4 border-t border-border space-y-2">
+            <div className="px-4 py-4 border-t border-border space-y-2">
                 <Link
                     href="/dashboard"
-                    className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+                    className="flex items-center gap-3 px-3 h-11 text-[15px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/80 rounded-xl transition-colors"
                 >
                     <ExternalLink className="h-4 w-4" />
                     Staff Dashboard
                 </Link>
                 <button
                     onClick={() => signOut({ callbackUrl: "/" })}
-                    className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors w-full"
+                    className="flex items-center gap-3 px-3 h-11 text-[15px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/80 rounded-xl transition-colors w-full"
                 >
                     <LogOut className="h-4 w-4" />
                     Sign Out
@@ -299,13 +303,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             )}
 
             {/* Sidebar - Desktop */}
-            <aside className="hidden md:flex w-64 bg-card border-r border-border flex-col">
+            <aside className="hidden md:flex w-[280px] bg-card border-r border-border flex-col">
                 {sidebarContent}
             </aside>
 
             {/* Sidebar - Mobile (Slide-in) */}
             <aside
-                className={`fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border flex flex-col transform transition-transform duration-200 ease-in-out md:hidden ${
+                className={`fixed inset-y-0 left-0 z-50 w-[280px] bg-card border-r border-border flex flex-col transform transition-transform duration-200 ease-in-out md:hidden ${
                     mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
                 }`}
             >
@@ -318,13 +322,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <div className="md:hidden sticky top-0 z-30 bg-card border-b border-border px-4 py-3 flex items-center gap-3">
                     <button
                         onClick={() => setMobileMenuOpen(true)}
-                        className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg"
+                        className="inline-flex h-11 w-11 items-center justify-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors"
                     >
                         <Menu className="h-5 w-5" />
                     </button>
                     <div className="flex items-center gap-2">
                         <Shield className="h-5 w-5 text-blue-500" />
-                        <span className="font-semibold text-foreground">Admin</span>
+                        <span className="text-[15px] font-semibold text-foreground">Admin</span>
                     </div>
                 </div>
 

@@ -1,13 +1,17 @@
 import { Injectable, Logger, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { ChatParticipantType, MaintenancePriority, ReservationStatus, SiteType } from '@prisma/client';
+import { ChatParticipantType, MaintenancePriority, ReservationStatus, SiteType, OpTaskPriority, OpTaskState } from '@prisma/client';
 import type { Prisma } from '@prisma/client';
 import { z } from 'zod';
 import { randomUUID } from 'crypto';
 import type { Request } from "express";
+import { AuditService } from '../audit/audit.service';
+import { HoldsService } from '../holds/holds.service';
 
 // Date string validation (YYYY-MM-DD format)
 const dateStringSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format. Use YYYY-MM-DD');
+const opTaskStateSchema = z.enum(['pending', 'assigned', 'in_progress', 'blocked', 'completed', 'verified', 'cancelled']);
+const opTaskPrioritySchema = z.enum(['low', 'medium', 'high', 'urgent']);
 
 // Helper to get today's start/end in a specific timezone
 function getTodayInTimezone(tz: string): { todayStart: Date; todayEnd: Date } {
@@ -30,6 +34,14 @@ const getNumber = (value: unknown): number | undefined =>
 const getBoolean = (value: unknown): boolean | undefined =>
   typeof value === "boolean" ? value : undefined;
 
+const formatCurrency = (amountCents?: number) => {
+  if (amountCents === undefined || !Number.isFinite(amountCents)) return undefined;
+  return `$${(amountCents / 100).toFixed(2)}`;
+};
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
 const isSiteType = (value: unknown): value is SiteType =>
   typeof value === "string" && value in SiteType;
 
@@ -47,6 +59,34 @@ const parseReservationStatus = (value: unknown): ReservationStatus | undefined =
     default:
       return undefined;
   }
+};
+
+const isOpTaskState = (value: unknown): value is OpTaskState =>
+  typeof value === "string" && value in OpTaskState;
+
+const parseOpTaskState = (value: unknown): OpTaskState | undefined =>
+  isOpTaskState(value) ? value : undefined;
+
+const isOpTaskPriority = (value: unknown): value is OpTaskPriority =>
+  typeof value === "string" && value in OpTaskPriority;
+
+const parseOpTaskPriority = (value: unknown): OpTaskPriority | undefined =>
+  isOpTaskPriority(value) ? value : undefined;
+
+const parseOpTaskStates = (value: unknown): OpTaskState[] | undefined => {
+  if (!Array.isArray(value)) return undefined;
+  const parsed = value
+    .map(parseOpTaskState)
+    .filter((state): state is OpTaskState => Boolean(state));
+  return parsed.length > 0 ? parsed : undefined;
+};
+
+const parseOpTaskPriorities = (value: unknown): OpTaskPriority[] | undefined => {
+  if (!Array.isArray(value)) return undefined;
+  const parsed = value
+    .map(parseOpTaskPriority)
+    .filter((priority): priority is OpTaskPriority => Boolean(priority));
+  return parsed.length > 0 ? parsed : undefined;
 };
 
 const normalizeMaintenancePriority = (value: unknown): MaintenancePriority => {
@@ -103,6 +143,17 @@ const toolArgSchemas: Record<string, z.ZodSchema> = {
     startDate: dateStringSchema,
     endDate: dateStringSchema,
   }),
+  create_hold: z.object({
+    siteId: z.string().min(1, 'Site ID is required'),
+    arrivalDate: dateStringSchema,
+    departureDate: dateStringSchema,
+    holdMinutes: z.number().int().positive().max(24 * 60).optional(),
+    note: z.string().optional(),
+  }),
+  release_hold: z.object({
+    holdId: z.string().min(1, 'Hold ID is required'),
+  }),
+  list_holds: z.object({}).optional(),
   block_site: z.object({
     siteId: z.string().min(1, 'Site ID is required'),
     reason: z.string().min(1, 'Reason is required'),
@@ -136,6 +187,25 @@ const toolArgSchemas: Record<string, z.ZodSchema> = {
     data => data.additionalNights || data.newDepartureDate,
     'Either additionalNights or newDepartureDate is required'
   ),
+  request_reservation_change: z.object({
+    reservationId: z.string().optional(),
+    changeType: z.string().optional(),
+    newArrivalDate: dateStringSchema.optional(),
+    newDepartureDate: dateStringSchema.optional(),
+    newSiteId: z.string().optional(),
+    newSiteType: z.string().optional(),
+    partySize: z.number().int().positive().optional(),
+    notes: z.string().optional(),
+  }),
+  get_tasks: z.object({
+    state: opTaskStateSchema.optional(),
+    states: z.array(opTaskStateSchema).optional(),
+    priority: opTaskPrioritySchema.optional(),
+    priorities: z.array(opTaskPrioritySchema).optional(),
+    siteId: z.string().optional(),
+    assignedToUserId: z.string().optional(),
+    limit: z.number().int().positive().max(50).optional(),
+  }),
 };
 
 interface ChatContext {
@@ -181,6 +251,123 @@ const buildJsonRenderTree = (root: string, elements: JsonRenderElement[]): JsonR
   return { root, elements: elementMap };
 };
 
+const AUDIT_REDACT_KEYS = new Set(['message', 'notes', 'description', 'content']);
+const sanitizeAuditValue = (value: unknown, depth = 0): unknown => {
+  if (depth > 4) return '[truncated]';
+  if (typeof value === 'string') {
+    return value.length > 180 ? `${value.slice(0, 180)}...` : value;
+  }
+  if (typeof value !== 'object' || value === null) return value;
+  if (Array.isArray(value)) {
+    return value.slice(0, 10).map((entry) => sanitizeAuditValue(entry, depth + 1));
+  }
+  const result: Record<string, unknown> = {};
+  for (const [key, entry] of Object.entries(value)) {
+    if (AUDIT_REDACT_KEYS.has(key)) {
+      result[key] = typeof entry === 'string' ? '[redacted]' : entry;
+      continue;
+    }
+    result[key] = sanitizeAuditValue(entry, depth + 1);
+  }
+  return result;
+};
+
+type AuditConfig = {
+  action: string;
+  entity: string;
+  resolveEntityId: (args: Record<string, unknown>, result: unknown) => string | undefined;
+};
+
+const AUDITED_TOOL_ACTIONS: Record<string, AuditConfig> = {
+  check_in_guest: {
+    action: 'reservation.check_in',
+    entity: 'reservation',
+    resolveEntityId: (args, result) => {
+      const reservation = isRecord(result) && isRecord(result.reservation) ? result.reservation : undefined;
+      return getString(reservation?.id) ?? getString(args.reservationId);
+    },
+  },
+  check_out_guest: {
+    action: 'reservation.check_out',
+    entity: 'reservation',
+    resolveEntityId: (args, result) => {
+      const reservation = isRecord(result) && isRecord(result.reservation) ? result.reservation : undefined;
+      return getString(reservation?.id) ?? getString(args.reservationId);
+    },
+  },
+  apply_discount: {
+    action: 'reservation.discount',
+    entity: 'reservation',
+    resolveEntityId: (args) => getString(args.reservationId),
+  },
+  add_charge: {
+    action: 'reservation.charge',
+    entity: 'reservation',
+    resolveEntityId: (args) => getString(args.reservationId),
+  },
+  move_reservation: {
+    action: 'reservation.move',
+    entity: 'reservation',
+    resolveEntityId: (args) => getString(args.reservationId),
+  },
+  extend_stay: {
+    action: 'reservation.extend',
+    entity: 'reservation',
+    resolveEntityId: (args) => getString(args.reservationId),
+  },
+  request_early_checkin: {
+    action: 'reservation.request_early_checkin',
+    entity: 'reservation',
+    resolveEntityId: (args, result) => {
+      const request = isRecord(result) && isRecord(result.request) ? result.request : undefined;
+      return getString(request?.reservationId) ?? getString(args.reservationId);
+    },
+  },
+  request_late_checkout: {
+    action: 'reservation.request_late_checkout',
+    entity: 'reservation',
+    resolveEntityId: (args, result) => {
+      const request = isRecord(result) && isRecord(result.request) ? result.request : undefined;
+      return getString(request?.reservationId) ?? getString(args.reservationId);
+    },
+  },
+  request_reservation_change: {
+    action: 'reservation.request_change',
+    entity: 'reservation',
+    resolveEntityId: (args, result) => {
+      const request = isRecord(result) && isRecord(result.request) ? result.request : undefined;
+      return getString(request?.reservationId) ?? getString(args.reservationId);
+    },
+  },
+  block_site: {
+    action: 'site.block',
+    entity: 'site',
+    resolveEntityId: (args) => getString(args.siteId),
+  },
+  unblock_site: {
+    action: 'site.unblock',
+    entity: 'site',
+    resolveEntityId: (args) => getString(args.siteId),
+  },
+  create_maintenance_ticket: {
+    action: 'maintenance_ticket.create',
+    entity: 'maintenance_ticket',
+    resolveEntityId: (args, result) => {
+      const ticket = isRecord(result) && isRecord(result.ticket) ? result.ticket : undefined;
+      return getString(ticket?.id) ?? getString(args.ticketId);
+    },
+  },
+  send_message_to_staff: {
+    action: 'message.send_staff',
+    entity: 'message',
+    resolveEntityId: (args, result) => getString(isRecord(result) ? result.messageId : undefined),
+  },
+  send_guest_message: {
+    action: 'message.send_guest',
+    entity: 'message',
+    resolveEntityId: (args, result) => getString(isRecord(result) ? result.messageId : undefined),
+  },
+};
 interface ToolDefinition {
   name: string;
   description: string;
@@ -200,7 +387,11 @@ export class ChatToolsService {
   private readonly logger = new Logger(ChatToolsService.name);
   private tools: Map<string, ToolDefinition> = new Map();
 
-  constructor(private readonly prisma: PrismaService) {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly audit: AuditService,
+    private readonly holds: HoldsService,
+  ) {
     this.registerTools();
   }
 
@@ -803,6 +994,95 @@ export class ChatToolsService {
       },
     });
 
+    // Get open tasks
+    this.tools.set('get_tasks', {
+      name: 'get_tasks',
+      description: 'Get a list of open operational tasks.',
+      parameters: {
+        type: 'object',
+        properties: {
+          state: { type: 'string', description: 'Task state filter (optional)' },
+          states: { type: 'array', items: { type: 'string' }, description: 'Task states filter (optional)' },
+          priority: { type: 'string', description: 'Priority filter (optional)' },
+          priorities: { type: 'array', items: { type: 'string' }, description: 'Priority filters (optional)' },
+          siteId: { type: 'string', description: 'Site ID filter (optional)' },
+          assignedToUserId: { type: 'string', description: 'Assigned user ID filter (optional)' },
+          limit: { type: 'number', description: 'Max tasks to return (optional, default 10)' },
+        },
+        required: [],
+      },
+      guestAllowed: false,
+      staffRoles: ['owner', 'manager', 'front_desk', 'maintenance'],
+      execute: async (args, context, prisma) => {
+        const limit = Math.min(getNumber(args.limit) ?? 10, 50);
+        const state = parseOpTaskState(args.state);
+        const states = parseOpTaskStates(args.states);
+        const priority = parseOpTaskPriority(args.priority);
+        const priorities = parseOpTaskPriorities(args.priorities);
+        const siteId = getString(args.siteId);
+        const assignedToUserId = getString(args.assignedToUserId);
+
+        const openStates = [
+          OpTaskState.pending,
+          OpTaskState.assigned,
+          OpTaskState.in_progress,
+          OpTaskState.blocked,
+        ];
+
+        const stateFilter: Prisma.OpTaskWhereInput["state"] = states
+          ? { in: states }
+          : state
+            ? state
+            : { in: openStates };
+        const priorityFilter: Prisma.OpTaskWhereInput["priority"] = priorities
+          ? { in: priorities }
+          : priority
+            ? priority
+            : undefined;
+
+        type OpTaskWithRelations = Prisma.OpTaskGetPayload<{
+          include: {
+            Site: { select: { name: true; siteNumber: true } };
+            User_OpTask_assignedToUserIdToUser: { select: { id: true; firstName: true; lastName: true } };
+          };
+        }>;
+
+        const tasks: OpTaskWithRelations[] = await prisma.opTask.findMany({
+          where: {
+            campgroundId: context.campgroundId,
+            state: stateFilter,
+            priority: priorityFilter,
+            siteId: siteId ?? undefined,
+            assignedToUserId: assignedToUserId ?? undefined,
+          },
+          include: {
+            Site: { select: { name: true, siteNumber: true } },
+            User_OpTask_assignedToUserIdToUser: { select: { id: true, firstName: true, lastName: true } },
+          },
+          orderBy: [{ slaDueAt: 'asc' }, { createdAt: 'desc' }],
+          take: limit,
+        });
+
+        return {
+          success: true,
+          tasks: tasks.map((task) => ({
+            id: task.id,
+            title: task.title,
+            state: task.state,
+            priority: task.priority,
+            dueAt: task.slaDueAt?.toISOString(),
+            site: task.Site?.name || task.Site?.siteNumber || null,
+            reservationId: task.reservationId,
+            assignedTo: task.User_OpTask_assignedToUserIdToUser
+              ? `${task.User_OpTask_assignedToUserIdToUser.firstName} ${task.User_OpTask_assignedToUserIdToUser.lastName}`
+              : null,
+          })),
+          count: tasks.length,
+          message: `${tasks.length} open task${tasks.length !== 1 ? 's' : ''}`,
+        };
+      },
+    });
+
     // Check-in guest (requires confirmation)
     this.tools.set('check_in_guest', {
       name: 'check_in_guest',
@@ -1179,6 +1459,97 @@ export class ChatToolsService {
           request: {
             reservationId: reservation.id,
             requestedTime: requestedTime || 'As late as possible',
+            status: 'pending',
+          },
+        };
+      },
+    });
+
+    // Request reservation change
+    this.tools.set('request_reservation_change', {
+      name: 'request_reservation_change',
+      description: 'Request changes to a reservation (dates, site, or party size). Staff will review the request.',
+      parameters: {
+        type: 'object',
+        properties: {
+          reservationId: { type: 'string', description: 'Reservation ID or confirmation code (optional if already in context)' },
+          changeType: { type: 'string', description: 'Type of change (dates, site, party size, other)' },
+          newArrivalDate: { type: 'string', description: 'New arrival date (YYYY-MM-DD)' },
+          newDepartureDate: { type: 'string', description: 'New departure date (YYYY-MM-DD)' },
+          newSiteId: { type: 'string', description: 'Requested site ID (optional)' },
+          newSiteType: { type: 'string', description: 'Requested site type (optional)' },
+          partySize: { type: 'number', description: 'New total guest count (optional)' },
+          notes: { type: 'string', description: 'Additional notes for staff (optional)' },
+        },
+        required: [],
+      },
+      guestAllowed: true,
+      execute: async (args, context, prisma) => {
+        if (context.participantType !== ChatParticipantType.guest) {
+          return { success: false, message: 'This tool is for guests only' };
+        }
+
+        const reservationId = getString(args.reservationId) ?? context.currentReservationId;
+        const changeType = getString(args.changeType);
+        const newArrivalDate = getString(args.newArrivalDate);
+        const newDepartureDate = getString(args.newDepartureDate);
+        const newSiteId = getString(args.newSiteId);
+        const newSiteType = parseSiteType(args.newSiteType);
+        const partySize = getNumber(args.partySize);
+        const notes = getString(args.notes);
+
+        if (!reservationId) {
+          throw new BadRequestException('Reservation ID is required');
+        }
+
+        const reservation = await prisma.reservation.findFirst({
+          where: {
+            campgroundId: context.campgroundId,
+            OR: [{ id: reservationId }],
+            guestId: context.participantId,
+          },
+          include: { Guest: true, Site: true },
+        });
+
+        if (!reservation) {
+          return { success: false, message: 'Reservation not found' };
+        }
+
+        const changeLines = [
+          changeType ? `Change type: ${changeType}` : null,
+          newArrivalDate ? `New arrival: ${newArrivalDate}` : null,
+          newDepartureDate ? `New departure: ${newDepartureDate}` : null,
+          newSiteId ? `Requested site: ${newSiteId}` : null,
+          newSiteType ? `Requested site type: ${newSiteType}` : null,
+          partySize ? `New party size: ${partySize}` : null,
+          notes ? `Notes: ${notes}` : null,
+        ].filter(Boolean);
+
+        const changeSummary = changeLines.length > 0 ? changeLines.join('\n') : 'No details provided.';
+
+        await prisma.message.create({
+          data: {
+            id: randomUUID(),
+            campgroundId: context.campgroundId,
+            reservationId: reservation.id,
+            guestId: reservation.guestId,
+            senderType: 'guest',
+            content: `Reservation change request for ${reservation.Site?.name || 'site'} (${reservation.arrivalDate.toISOString().split('T')[0]} - ${reservation.departureDate.toISOString().split('T')[0]}).\n\n${changeSummary}`,
+          },
+        });
+
+        return {
+          success: true,
+          message: 'Your reservation change request has been sent to the campground staff. They will follow up shortly.',
+          request: {
+            reservationId: reservation.id,
+            changeType,
+            newArrivalDate,
+            newDepartureDate,
+            newSiteId,
+            newSiteType,
+            partySize,
+            notes: notes ? '[redacted]' : undefined,
             status: 'pending',
           },
         };
@@ -1570,6 +1941,167 @@ export class ChatToolsService {
           },
           message: `Total revenue: $${totalRevenueDollars.toFixed(2)} from ${payments.length} transactions`,
           jsonRender,
+        };
+      },
+    });
+
+    // Create hold
+    this.tools.set('create_hold', {
+      name: 'create_hold',
+      description: 'Place a temporary hold on a site to prevent booking.',
+      parameters: {
+        type: 'object',
+        properties: {
+          siteId: { type: 'string', description: 'Site ID or name' },
+          arrivalDate: { type: 'string', description: 'Arrival date (YYYY-MM-DD)' },
+          departureDate: { type: 'string', description: 'Departure date (YYYY-MM-DD)' },
+          holdMinutes: { type: 'number', description: 'Hold duration in minutes (optional)' },
+          note: { type: 'string', description: 'Optional note for the hold' },
+        },
+        required: ['siteId', 'arrivalDate', 'departureDate'],
+      },
+      guestAllowed: false,
+      staffRoles: ['owner', 'manager', 'front_desk'],
+      requiresConfirmation: true,
+      confirmationTitle: 'Confirm Hold',
+      preValidate: async (args, context, prisma) => {
+        const siteId = getString(args.siteId);
+        if (!siteId) {
+          return { valid: false, message: 'Site ID is required.' };
+        }
+
+        let site = await prisma.site.findFirst({
+          where: { id: siteId, campgroundId: context.campgroundId },
+        });
+
+        if (!site) {
+          site = await prisma.site.findFirst({
+            where: {
+              campgroundId: context.campgroundId,
+              OR: [
+                { name: siteId },
+                { name: `Site ${siteId}` },
+                { name: { contains: siteId, mode: 'insensitive' } },
+              ],
+            },
+          });
+        }
+
+        if (!site) {
+          const availableSites = await prisma.site.findMany({
+            where: { campgroundId: context.campgroundId, status: 'active' },
+            select: { id: true, name: true },
+            orderBy: { name: 'asc' },
+            take: 20,
+          });
+
+          const siteNames = availableSites.map(s => s.name).join(', ');
+          return {
+            valid: false,
+            message: `Site "${siteId}" was not found. Available sites: ${siteNames}. Please specify a valid site name.`,
+          };
+        }
+
+        args.siteId = site.id;
+        args._siteName = site.name;
+        return { valid: true, siteName: site.name };
+      },
+      execute: async (args, context) => {
+        const siteId = getString(args.siteId);
+        const arrivalDate = getString(args.arrivalDate);
+        const departureDate = getString(args.departureDate);
+        const holdMinutes = getNumber(args.holdMinutes);
+        const note = getString(args.note);
+        const siteName = getString(args._siteName) ?? siteId;
+
+        if (!siteId || !arrivalDate || !departureDate) {
+          throw new BadRequestException('Site ID, arrival date, and departure date are required');
+        }
+
+        const hold = await this.holds.create({
+          campgroundId: context.campgroundId,
+          siteId,
+          arrivalDate,
+          departureDate,
+          holdMinutes,
+          note,
+        });
+
+        return {
+          success: true,
+          message: `Hold placed on ${siteName} from ${arrivalDate} to ${departureDate}.`,
+          hold: {
+            id: hold.id,
+            siteId: hold.siteId,
+            arrivalDate: hold.arrivalDate.toISOString().split('T')[0],
+            departureDate: hold.departureDate.toISOString().split('T')[0],
+            expiresAt: hold.expiresAt?.toISOString() ?? null,
+            status: hold.status,
+            note: hold.note,
+          },
+        };
+      },
+    });
+
+    // List active holds
+    this.tools.set('list_holds', {
+      name: 'list_holds',
+      description: 'List active site holds for a campground.',
+      parameters: {
+        type: 'object',
+        properties: {},
+      },
+      guestAllowed: false,
+      staffRoles: ['owner', 'manager', 'front_desk'],
+      execute: async (args, context) => {
+        const holds = await this.holds.listByCampground(context.campgroundId);
+        return {
+          success: true,
+          holds: holds.map((hold) => ({
+            id: hold.id,
+            siteId: hold.siteId,
+            siteName: hold.Site?.name ?? hold.Site?.siteNumber ?? null,
+            arrivalDate: hold.arrivalDate.toISOString().split('T')[0],
+            departureDate: hold.departureDate.toISOString().split('T')[0],
+            expiresAt: hold.expiresAt?.toISOString() ?? null,
+            status: hold.status,
+            note: hold.note,
+          })),
+          count: holds.length,
+          message: `${holds.length} active hold${holds.length !== 1 ? 's' : ''}`,
+        };
+      },
+    });
+
+    // Release hold
+    this.tools.set('release_hold', {
+      name: 'release_hold',
+      description: 'Release an active hold by ID.',
+      parameters: {
+        type: 'object',
+        properties: {
+          holdId: { type: 'string', description: 'Hold ID' },
+        },
+        required: ['holdId'],
+      },
+      guestAllowed: false,
+      staffRoles: ['owner', 'manager', 'front_desk'],
+      execute: async (args, context) => {
+        const holdId = getString(args.holdId);
+        if (!holdId) {
+          throw new BadRequestException('Hold ID is required');
+        }
+
+        const hold = await this.holds.release(context.campgroundId, holdId);
+        return {
+          success: true,
+          message: `Released hold ${hold.id}.`,
+          hold: {
+            id: hold.id,
+            siteId: hold.siteId,
+            status: hold.status,
+            expiresAt: hold.expiresAt?.toISOString() ?? null,
+          },
         };
       },
     });
@@ -2322,7 +2854,45 @@ export class ChatToolsService {
 
     this.logger.log(`Executing tool: ${name} with args: ${JSON.stringify(args)}`);
 
-    return tool.execute(args, context, this.prisma);
+    const result = await tool.execute(args, context, this.prisma);
+    await this.recordToolAudit(name, args, context, result);
+    return result;
+  }
+
+  private async recordToolAudit(
+    name: string,
+    args: Record<string, unknown>,
+    context: ChatContext,
+    result: unknown,
+  ) {
+    const config = AUDITED_TOOL_ACTIONS[name];
+    if (!config) return;
+
+    if (isRecord(result) && result.success === false) return;
+
+    const entityId = config.resolveEntityId(args, result);
+    if (!entityId) return;
+
+    const actorId = context.participantType === ChatParticipantType.guest
+      ? null
+      : context.participantId;
+    const afterPayload = sanitizeAuditValue({ tool: name, args, result });
+
+    try {
+      await this.audit.record({
+        campgroundId: context.campgroundId,
+        actorId,
+        action: config.action,
+        entity: config.entity,
+        entityId,
+        before: null,
+        after: isRecord(afterPayload) ? afterPayload : { tool: name },
+      });
+    } catch (error) {
+      this.logger.warn(
+        `Failed to record audit for tool ${name}: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
+    }
   }
 
   /**
@@ -2355,6 +2925,89 @@ export class ChatToolsService {
   /**
    * Format confirmation description for display
    */
+  formatConfirmationSummary(toolName: string, args: Record<string, unknown>): string | undefined {
+    const reservationId = getString(args.reservationId);
+    const reason = getString(args.reason);
+
+    switch (toolName) {
+      case 'check_in_guest':
+        return reservationId ? `Check in reservation ${reservationId}.` : 'Check in the guest.';
+      case 'check_out_guest':
+        return reservationId ? `Check out reservation ${reservationId}.` : 'Check out the guest.';
+      case 'process_refund': {
+        const amount = formatCurrency(getNumber(args.amountCents));
+        return reservationId && amount
+          ? `Refund ${amount} for reservation ${reservationId}.`
+          : amount
+            ? `Refund ${amount}.`
+            : 'Process a refund.';
+      }
+      case 'cancel_reservation':
+        return reservationId ? `Cancel reservation ${reservationId}.` : 'Cancel the reservation.';
+      case 'block_site': {
+        const siteName = getString(args._siteName) ?? getString(args.siteName) ?? getString(args.siteId);
+        const startDate = getString(args.startDate);
+        const endDate = getString(args.endDate);
+        const window = startDate && endDate ? ` from ${startDate} to ${endDate}` : startDate ? ` starting ${startDate}` : '';
+        return siteName
+          ? `Block ${siteName}${window}${reason ? ` for "${reason}"` : ''}.`
+          : `Block a site${window}${reason ? ` for "${reason}"` : ''}.`;
+      }
+      case 'create_hold': {
+        const siteName = getString(args._siteName) ?? getString(args.siteName) ?? getString(args.siteId);
+        const arrivalDate = getString(args.arrivalDate);
+        const departureDate = getString(args.departureDate);
+        if (siteName && arrivalDate && departureDate) {
+          return `Hold ${siteName} from ${arrivalDate} to ${departureDate}.`;
+        }
+        return 'Place a temporary hold on the site.';
+      }
+      case 'apply_discount': {
+        const discountCents = getNumber(args.discountCents);
+        const discountPercent = getNumber(args.discountPercent);
+        const amount = discountCents !== undefined
+          ? formatCurrency(discountCents)
+          : discountPercent !== undefined
+            ? `${discountPercent}%`
+            : undefined;
+        const amountLabel = amount ?? 'a discount';
+        return reservationId
+          ? `Apply ${amountLabel} to reservation ${reservationId}${reason ? ` for "${reason}"` : ''}.`
+          : `Apply ${amountLabel}${reason ? ` for "${reason}"` : ''}.`;
+      }
+      case 'add_charge': {
+        const amount = formatCurrency(getNumber(args.amountCents));
+        const description = getString(args.description);
+        const amountLabel = amount ?? 'an additional charge';
+        return reservationId
+          ? `Add ${amountLabel} to reservation ${reservationId}${description ? ` for "${description}"` : ''}.`
+          : `Add ${amountLabel}${description ? ` for "${description}"` : ''}.`;
+      }
+      case 'move_reservation': {
+        const newSiteId = getString(args.newSiteId);
+        return reservationId && newSiteId
+          ? `Move reservation ${reservationId} to site ${newSiteId}${reason ? ` for "${reason}"` : ''}.`
+          : reservationId
+            ? `Move reservation ${reservationId}${reason ? ` for "${reason}"` : ''}.`
+            : 'Move the reservation to a different site.';
+      }
+      case 'extend_stay': {
+        const additionalNights = getNumber(args.additionalNights);
+        const newDepartureDate = getString(args.newDepartureDate);
+        const extension = newDepartureDate
+          ? `to ${newDepartureDate}`
+          : additionalNights
+            ? `by ${additionalNights} night${additionalNights !== 1 ? 's' : ''}`
+            : 'by additional nights';
+        return reservationId
+          ? `Extend reservation ${reservationId} ${extension}.`
+          : `Extend the stay ${extension}.`;
+      }
+      default:
+        return undefined;
+    }
+  }
+
   formatConfirmationDescription(toolName: string, args: Record<string, unknown>): string {
     switch (toolName) {
       case 'check_in_guest':

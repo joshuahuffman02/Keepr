@@ -24,7 +24,7 @@ flowchart LR
 
 ## Notes
 - **Web**: App Router routes under `platform/apps/web/app` are rendered server-side (and occasionally client-side) with shared UI components.
-- **API**: Built with NestJS and Prisma 7; production builds generate a serverless bundle (`platform/apps/api/dist/serverless.js`) that Vercel routes.
+- **API**: Built with NestJS and Prisma 7; Railway runs the standard Node build (`platform/apps/api/dist/main.js`) while the serverless bundle (`platform/apps/api/dist/serverless.js`) remains available for optional Vercel deployments.
 - **Shared packages**: Provide shared types, Zod schemas, and SDK helpers that both apps import during build time.
 - **Rust services**: Self-contained binaries (availability, payment, auth) that keep complex domain problems isolated while exposing HTTP endpoints or integration hooks back to the API.
 - **Persistence**: Postgres (via Prisma schemas) is the canonical data store; Redis handles sessions, locks, and short-lived caches.

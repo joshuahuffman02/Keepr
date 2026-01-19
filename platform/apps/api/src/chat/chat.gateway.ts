@@ -13,6 +13,7 @@ import { Server, Socket } from "socket.io";
 import { JwtService } from "@nestjs/jwt";
 import { PrismaService } from "../prisma/prisma.service";
 import { ChatParticipantType } from "@prisma/client";
+import type { ChatMessageVisibility, ChatMessagePart } from "./dto/send-message.dto";
 
 interface AuthenticatedChatSocket extends Socket {
   data: {
@@ -39,6 +40,7 @@ type ChatActionRequired = {
   actionId: string;
   title: string;
   description: string;
+  summary?: string;
   options?: Array<{ id: string; label: string; variant?: string }>;
 };
 
@@ -292,6 +294,8 @@ export class ChatGateway
       toolCalls?: ChatToolCall[];
       toolResults?: ChatToolResult[];
       actionRequired?: ChatActionRequired;
+      parts?: ChatMessagePart[];
+      visibility?: ChatMessageVisibility;
     }
   ) {
     this.server.to(`conversation:${conversationId}`).emit("chat:complete", {

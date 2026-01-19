@@ -3,6 +3,7 @@ import { ComplianceService } from './compliance.service';
 import { PrismaService } from '../prisma/prisma.service';
 
 describe('ComplianceService', () => {
+    let moduleRef: TestingModule;
     let service: ComplianceService;
     let prisma: PrismaService;
 
@@ -13,15 +14,19 @@ describe('ComplianceService', () => {
     };
 
     beforeEach(async () => {
-        const module: TestingModule = await Test.createTestingModule({
+        moduleRef = await Test.createTestingModule({
             providers: [
                 ComplianceService,
                 { provide: PrismaService, useValue: mockPrismaService },
             ],
         }).compile();
 
-        service = module.get<ComplianceService>(ComplianceService);
-        prisma = module.get<PrismaService>(PrismaService);
+        service = moduleRef.get<ComplianceService>(ComplianceService);
+        prisma = moduleRef.get<PrismaService>(PrismaService);
+    });
+
+    afterEach(async () => {
+        await moduleRef?.close();
     });
 
     it('should be defined', () => {

@@ -235,10 +235,11 @@ export class WebhookService {
     const ts2 =
       v2Timestamp || Math.floor(Date.now() / 1000);
 
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), DELIVERY_TIMEOUT_MS);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), DELIVERY_TIMEOUT_MS);
+    timeoutId.unref?.();
 
+    try {
       const res = await fetch(url, {
         method: "POST",
         headers: {
@@ -255,7 +256,6 @@ export class WebhookService {
         body,
         signal: controller.signal,
       });
-      clearTimeout(timeoutId);
 
       const text = await res.text();
 
@@ -278,6 +278,8 @@ export class WebhookService {
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Webhook send failed";
       await this.scheduleRetry(deliveryId, null, message);
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
 
@@ -490,16 +492,17 @@ export class WebhookService {
       },
     });
 
+    const { signature: v2Sig, timestamp: v2Ts } =
+      this.securityService.generateSignature(
+        delivery.WebhookEndpoint.secret,
+        body
+      );
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), DELIVERY_TIMEOUT_MS);
+    timeoutId.unref?.();
+
     try {
-      const { signature: v2Sig, timestamp: v2Ts } =
-        this.securityService.generateSignature(
-          delivery.WebhookEndpoint.secret,
-          body
-        );
-
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), DELIVERY_TIMEOUT_MS);
-
       const res = await fetch(delivery.WebhookEndpoint.url, {
         method: "POST",
         headers: {
@@ -513,7 +516,6 @@ export class WebhookService {
         body,
         signal: controller.signal,
       });
-      clearTimeout(timeoutId);
 
       const text = await res.text();
 
@@ -539,6 +541,8 @@ export class WebhookService {
         data: { status: "failed", errorMessage: message },
       });
       throw err;
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
 

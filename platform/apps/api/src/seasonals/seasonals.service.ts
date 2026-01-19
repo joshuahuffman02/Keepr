@@ -11,7 +11,7 @@ import {
   SignatureRequestStatus,
   SignatureDocumentType,
   Prisma,
-} from ".prisma/client";
+} from "@prisma/client";
 import { randomUUID } from "crypto";
 import {
   CreateSeasonalGuestDto,

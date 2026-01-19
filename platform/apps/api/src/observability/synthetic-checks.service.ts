@@ -189,10 +189,11 @@ export class SyntheticChecksService implements OnModuleInit {
 
     const start = Date.now();
     try {
-      await Promise.race([
+      await this.withTimeout(
         this.prismaService.$queryRaw`SELECT 1`,
-        this.createTimeout(config.timeoutMs, "Database check timeout"),
-      ]);
+        config.timeoutMs,
+        "Database check timeout"
+      );
 
       const latencyMs = Date.now() - start;
       const ok = latencyMs <= this.budgetMs;
@@ -234,10 +235,11 @@ export class SyntheticChecksService implements OnModuleInit {
 
     const start = Date.now();
     try {
-      await Promise.race([
+      await this.withTimeout(
         this.redisService.ping(),
-        this.createTimeout(config.timeoutMs, "Redis check timeout"),
-      ]);
+        config.timeoutMs,
+        "Redis check timeout"
+      );
 
       const latencyMs = Date.now() - start;
       const ok = latencyMs <= this.budgetMs;
@@ -280,15 +282,16 @@ export class SyntheticChecksService implements OnModuleInit {
     const start = Date.now();
     try {
       // Simple Stripe API health check - list products with limit 1
-      await Promise.race([
+      await this.withTimeout(
         fetch("https://api.stripe.com/v1/balance", {
           method: "GET",
           headers: {
             Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
           },
         }),
-        this.createTimeout(config.timeoutMs, "Stripe check timeout"),
-      ]);
+        config.timeoutMs,
+        "Stripe check timeout"
+      );
 
       const latencyMs = Date.now() - start;
       const ok = latencyMs <= this.budgetMs;
@@ -333,17 +336,18 @@ export class SyntheticChecksService implements OnModuleInit {
     try {
       // Check the configured provider's API
       if (hasResend) {
-        await Promise.race([
+        await this.withTimeout(
           fetch("https://api.resend.com/domains", {
             method: "GET",
             headers: {
               Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
             },
           }),
-          this.createTimeout(config.timeoutMs, "Email check timeout"),
-        ]);
+          config.timeoutMs,
+          "Email check timeout"
+        );
       } else if (hasPostmark) {
-        await Promise.race([
+        await this.withTimeout(
           fetch("https://api.postmarkapp.com/server", {
             method: "GET",
             headers: {
@@ -351,8 +355,9 @@ export class SyntheticChecksService implements OnModuleInit {
               "X-Postmark-Server-Token": process.env.POSTMARK_SERVER_TOKEN!,
             },
           }),
-          this.createTimeout(config.timeoutMs, "Email check timeout"),
-        ]);
+          config.timeoutMs,
+          "Email check timeout"
+        );
       } else {
         // For SMTP, we just verify configuration exists
         // Full connection test would be too expensive for a synthetic
@@ -570,9 +575,19 @@ export class SyntheticChecksService implements OnModuleInit {
     };
   }
 
-  private createTimeout(ms: number, message: string): Promise<never> {
-    return new Promise((_, reject) => {
-      setTimeout(() => reject(new Error(message)), ms);
+  private async withTimeout<T>(promise: Promise<T>, ms: number, message: string): Promise<T> {
+    let timeoutId: NodeJS.Timeout | null = null;
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      timeoutId = setTimeout(() => reject(new Error(message)), ms);
+      timeoutId.unref();
     });
+
+    try {
+      return await Promise.race([promise, timeoutPromise]);
+    } finally {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    }
   }
 }

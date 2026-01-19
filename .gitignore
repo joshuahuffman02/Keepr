@@ -24,6 +24,8 @@ coverage/
 *.tsbuildinfo
 tmp/
 temp/
+.ralph/
+target/
 
 # Env
 .env

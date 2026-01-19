@@ -153,6 +153,7 @@ export class AiController {
         rigInfo: body.rigInfo,
         preferences: body.preferences,
         history: body.history,
+        sessionOnly: true,
       });
     } catch (error) {
       this.logger.error('Chat endpoint error:', error instanceof Error ? error.stack : error);

@@ -38,6 +38,7 @@ export class HoldsService implements OnModuleInit, OnModuleDestroy {
           this.logger.warn(`Hold expiry worker failed: ${err}`);
         }
       }, intervalMs);
+      this.expireTimer.unref?.();
     }
   }
 

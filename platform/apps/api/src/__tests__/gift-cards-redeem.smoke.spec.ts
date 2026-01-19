@@ -1,4 +1,4 @@
-import { Test } from "@nestjs/testing";
+import { Test, type TestingModule } from "@nestjs/testing";
 import { UserRole } from "@prisma/client";
 import { GiftCardsService } from "../gift-cards/gift-cards.service";
 import { PrismaService } from "../prisma/prisma.service";
@@ -12,6 +12,7 @@ jest.mock("../ledger/ledger-posting.util", () => ({
 
 describe("Gift cards & store credit redeem smoke", () => {
   let giftCards: GiftCardsService;
+  let moduleRef: TestingModule;
   const storedValue = {
     balanceByAccount: jest.fn(),
     redeem: jest.fn()
@@ -38,7 +39,7 @@ describe("Gift cards & store credit redeem smoke", () => {
   };
 
   beforeAll(async () => {
-    const moduleRef = await Test.createTestingModule({
+    moduleRef = await Test.createTestingModule({
       providers: [
         GiftCardsService,
         {
@@ -54,6 +55,10 @@ describe("Gift cards & store credit redeem smoke", () => {
       .compile();
 
     giftCards = moduleRef.get(GiftCardsService);
+  });
+
+  afterAll(async () => {
+    await moduleRef.close();
   });
 
   beforeEach(() => {

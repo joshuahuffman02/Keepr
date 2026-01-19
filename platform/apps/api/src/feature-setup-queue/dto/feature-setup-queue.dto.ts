@@ -1,5 +1,5 @@
 import { IsString, IsOptional, IsEnum, IsInt, Min, IsArray } from "class-validator";
-import { FeatureSetupStatus } from ".prisma/client";
+import { FeatureSetupStatus } from "@prisma/client";
 
 export { FeatureSetupStatus };
 

@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { io, Socket } from "socket.io-client";
 import { API_BASE } from "@/lib/api-config";
-import type { ChatAttachment, UnifiedChatMessage } from "../types";
+import type { ChatAttachment, ChatMessageVisibility, UnifiedChatMessage } from "../types";
 
 // Derive WebSocket base URL from API base (remove /api suffix)
 const WS_BASE = API_BASE.replace(/\/api$/, "");
@@ -31,6 +31,7 @@ interface ActionRequired {
   actionId: string;
   title: string;
   description: string;
+  summary?: string;
   data?: Record<string, unknown>;
   options?: ActionOption[];
 }
@@ -46,6 +47,7 @@ interface ChatMessage {
   createdAt: string;
   isStreaming?: boolean;
   attachments?: ChatAttachment[];
+  visibility?: ChatMessageVisibility;
 }
 
 interface StreamToken {
@@ -74,6 +76,7 @@ interface CompleteEvent {
   toolResults?: ToolResult[];
   actionRequired?: ActionRequired;
   timestamp: string;
+  visibility?: ChatMessageVisibility;
 }
 
 type SendMessageResponse = {
@@ -84,6 +87,7 @@ type SendMessageResponse = {
 type SendMessagePayload = {
   message: string;
   attachments?: ChatAttachment[];
+  visibility?: ChatMessageVisibility;
 };
 
 type RegenerateResponse = {
@@ -280,6 +284,7 @@ export function useChatStream({ campgroundId, isGuest, guestId, authToken, sessi
                 toolCalls: data.toolCalls,
                 toolResults: data.toolResults,
                 actionRequired: data.actionRequired,
+                visibility: data.visibility,
                 isStreaming: false,
               }
             : msg
@@ -381,6 +386,7 @@ export function useChatStream({ campgroundId, isGuest, guestId, authToken, sessi
           conversationId: conversationIdRef.current,
           message: payload.message,
           attachments: payload.attachments,
+          visibility: payload.visibility,
           context: {},
         }),
       });
@@ -403,6 +409,7 @@ export function useChatStream({ campgroundId, isGuest, guestId, authToken, sessi
         role: "user",
         content: payload.message,
         attachments: payload.attachments,
+        visibility: payload.visibility,
         createdAt: new Date().toISOString(),
       };
 
@@ -606,13 +613,14 @@ export function useChatStream({ campgroundId, isGuest, guestId, authToken, sessi
   });
 
   const sendMessage = useCallback(
-    (message: string, options?: { attachments?: ChatAttachment[] }) => {
+    (message: string, options?: { attachments?: ChatAttachment[]; visibility?: ChatMessageVisibility }) => {
       const trimmed = message.trim();
       const attachments = options?.attachments;
       if (!trimmed && (!attachments || attachments.length === 0)) return;
       sendMessageMutation.mutate({
         message: trimmed,
         attachments,
+        visibility: options?.visibility,
       });
     },
     [sendMessageMutation]
@@ -658,6 +666,7 @@ export function useChatStream({ campgroundId, isGuest, guestId, authToken, sessi
         toolResults: message.toolResults,
         actionRequired: message.actionRequired,
         createdAt: message.createdAt ?? new Date().toISOString(),
+        visibility: message.visibility,
       }));
       setMessages(mapped);
       setIsTyping(false);

@@ -76,6 +76,9 @@ export async function POST(request: Request) {
   const context = getString(body.context);
   const history = toHistory(body.history);
   const attachments = toAttachments(body.attachments);
+  const visibility = getString(body.visibility);
+  const resolvedVisibility =
+    visibility === "internal" || visibility === "public" ? visibility : undefined;
   const trimmedMessage = message.trim();
 
   if ((mode === "public" || mode === "support") && !trimmedMessage) {
@@ -117,6 +120,7 @@ export async function POST(request: Request) {
       conversationId,
       message: trimmedMessage,
       attachments,
+      visibility: resolvedVisibility,
       context: {},
     };
   } else {
@@ -125,6 +129,7 @@ export async function POST(request: Request) {
       conversationId,
       message: trimmedMessage,
       attachments,
+      visibility: resolvedVisibility,
       context: {},
     };
   }
@@ -169,9 +174,13 @@ export async function POST(request: Request) {
       content = getString(data.content) ?? "";
       if (typeof data.conversationId === "string") meta.conversationId = data.conversationId;
       if (typeof data.messageId === "string") meta.messageId = data.messageId;
+      if (Array.isArray(data.parts)) meta.parts = data.parts;
       if (Array.isArray(data.toolCalls)) meta.toolCalls = data.toolCalls;
       if (Array.isArray(data.toolResults)) meta.toolResults = data.toolResults;
       if (isRecord(data.actionRequired)) meta.actionRequired = data.actionRequired;
+      if (data.visibility === "internal" || data.visibility === "public") {
+        meta.visibility = data.visibility;
+      }
     }
   }
 

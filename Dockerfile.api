@@ -2,7 +2,7 @@ FROM node:25.3.0-alpine AS base
 # COMPLETE CACHE BUST v23 - Fix corepack not found in Node 25 alpine
 ARG CACHE_BUST=v23
 # Node 25 alpine doesn't include corepack by default, install it first
-RUN npm install -g --force corepack && corepack enable && corepack prepare pnpm@7.33.6 --activate
+RUN npm install -g --force corepack && corepack enable && corepack prepare pnpm@9.15.9 --activate
 WORKDIR /app
 RUN echo "Build: ${CACHE_BUST} - $(date)" > /tmp/build-info
 

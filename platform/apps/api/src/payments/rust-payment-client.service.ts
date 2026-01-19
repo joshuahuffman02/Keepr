@@ -1,6 +1,7 @@
-import { Injectable, Logger, OnModuleInit } from "@nestjs/common";
+import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { z } from "zod";
+import { getRequestHeaders } from "../common/request-context";
 
 /**
  * Rust Payment Client Service
@@ -105,12 +106,13 @@ interface CreateRefundDto {
 }
 
 @Injectable()
-export class RustPaymentClientService implements OnModuleInit {
+export class RustPaymentClientService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(RustPaymentClientService.name);
   private readonly baseUrl: string;
   private readonly timeout: number;
   private isHealthy = false;
   private fallbackToLocal = false;
+  private healthCheckTimeout: NodeJS.Timeout | null = null;
 
   constructor(private readonly config: ConfigService) {
     this.baseUrl = this.config.get<string>("RUST_PAYMENT_SERVICE_URL", "http://localhost:8080");
@@ -119,6 +121,14 @@ export class RustPaymentClientService implements OnModuleInit {
 
   async onModuleInit(): Promise<void> {
     await this.checkHealth();
+  }
+
+  onModuleDestroy(): void {
+    if (this.healthCheckTimeout) {
+      clearTimeout(this.healthCheckTimeout);
+      this.healthCheckTimeout = null;
+    }
+    this.healthCheckScheduled = false;
   }
 
   /**
@@ -130,6 +140,7 @@ export class RustPaymentClientService implements OnModuleInit {
       const timeoutId = setTimeout(() => controller.abort(), 2000);
 
       const response = await fetch(`${this.baseUrl}/health`, {
+        headers: getRequestHeaders(),
         signal: controller.signal,
       });
       clearTimeout(timeoutId);
@@ -164,7 +175,7 @@ export class RustPaymentClientService implements OnModuleInit {
 
       const response = await fetch(`${this.baseUrl}/api/payments/create-intent`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getRequestHeaders() },
         body: JSON.stringify(dto),
         signal: controller.signal,
       });
@@ -201,7 +212,7 @@ export class RustPaymentClientService implements OnModuleInit {
 
       const response = await fetch(`${this.baseUrl}/api/payments/intents/${paymentIntentId}/capture`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getRequestHeaders() },
         body: JSON.stringify(dto),
         signal: controller.signal,
       });
@@ -235,7 +246,7 @@ export class RustPaymentClientService implements OnModuleInit {
 
       const response = await fetch(`${this.baseUrl}/api/payments/refund`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getRequestHeaders() },
         body: JSON.stringify(dto),
         signal: controller.signal,
       });
@@ -269,7 +280,7 @@ export class RustPaymentClientService implements OnModuleInit {
 
       const response = await fetch(`${this.baseUrl}/api/payments/calculate-fees`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getRequestHeaders() },
         body: JSON.stringify({ amount_cents: amountCents }),
         signal: controller.signal,
       });
@@ -304,7 +315,7 @@ export class RustPaymentClientService implements OnModuleInit {
 
       const response = await fetch(`${this.baseUrl}/api/reconciliation/process-payout`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getRequestHeaders() },
         body: JSON.stringify({
           payout_id: payoutId,
           campground_id: campgroundId,
@@ -349,7 +360,7 @@ export class RustPaymentClientService implements OnModuleInit {
     this.healthCheckScheduled = true;
 
     // Retry health check after 30 seconds
-    setTimeout(async () => {
+    this.healthCheckTimeout = setTimeout(async () => {
       this.healthCheckScheduled = false;
       const healthy = await this.checkHealth();
       if (healthy) {
@@ -357,5 +368,6 @@ export class RustPaymentClientService implements OnModuleInit {
         this.logger.log("Rust payment service recovered, resuming Rust operations");
       }
     }, 30000);
+    this.healthCheckTimeout.unref();
   }
 }

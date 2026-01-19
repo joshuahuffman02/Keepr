@@ -28,6 +28,8 @@ sha2 = "0.10"
 hmac = "0.12"
 # Random generation
 rand = "0.8"
+# UUID
+uuid = { version = "1", features = ["v4"] }
 # Base64 encoding
 base64 = "0.22"
 # Database (runtime queries)
@@ -42,6 +44,10 @@ dotenvy = "0.15"
 # Logging
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tracing-opentelemetry = "0.25"
+opentelemetry = { version = "0.24", features = ["trace"] }
+opentelemetry_sdk = { version = "0.24", features = ["rt-tokio"] }
+opentelemetry-otlp = { version = "0.17", features = ["http-proto", "reqwest-client"] }
 
 [dev-dependencies]
 tokio-test = "0.4"

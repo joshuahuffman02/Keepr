@@ -52,6 +52,7 @@ export class CampgroundReviewConnectors {
   private async fetchWithTimeout(url: string, timeoutMs = 8000): Promise<Response> {
     const controller = new AbortController();
     const id = setTimeout(() => controller.abort(), timeoutMs);
+    id.unref?.();
     try {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore

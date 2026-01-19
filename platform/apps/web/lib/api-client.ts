@@ -708,8 +708,35 @@ const UnknownSchema = z.unknown();
 const UnknownArraySchema = z.array(z.unknown());
 const UnknownRecordSchema = z.record(z.unknown());
 
+function createRequestId() {
+  if (typeof globalThis !== "undefined") {
+    const cryptoObj = globalThis.crypto;
+    if (cryptoObj && "randomUUID" in cryptoObj && typeof cryptoObj.randomUUID === "function") {
+      return `req_${cryptoObj.randomUUID()}`;
+    }
+  }
+  return `req_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`;
+}
+
 function scopedHeaders(extra?: Record<string, string>) {
   const headers: Record<string, string> = extra ? { ...extra } : {};
+  const requestId = headers["x-request-id"] || headers["X-Request-Id"];
+  if (!requestId) {
+    headers["x-request-id"] = createRequestId();
+  } else if (requestId) {
+    headers["x-request-id"] = requestId;
+    delete headers["X-Request-Id"];
+  }
+  const traceparent = headers["traceparent"] || headers["Traceparent"];
+  if (traceparent) {
+    headers["traceparent"] = traceparent;
+    delete headers["Traceparent"];
+  }
+  const tracestate = headers["tracestate"] || headers["Tracestate"];
+  if (tracestate) {
+    headers["tracestate"] = tracestate;
+    delete headers["Tracestate"];
+  }
   if (typeof window !== "undefined") {
     const cg = localStorage.getItem("campreserv:selectedCampground");
     const org = localStorage.getItem("campreserv:selectedOrg");

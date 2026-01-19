@@ -18,6 +18,7 @@ export type {
   ChatConversationSummary,
   ChatRecommendation,
   HelpArticleLink,
+  ChatMessageVisibility,
   UnifiedChatMessage,
 } from "./types";
 export { PROMPTS } from "./prompts";

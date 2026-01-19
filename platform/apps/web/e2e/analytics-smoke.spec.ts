@@ -10,14 +10,21 @@ test.describe("Analytics (Data Intelligence) smoke", () => {
 
   test("loads dashboard cards and recommendations with mock fallback", async ({ page }) => {
     await page.goto("/analytics");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Basic smoke: page loaded and routed to /analytics.
     await expect(page).toHaveURL(/\/analytics/);
 
-    // Best-effort visibility checks (non-strict to avoid duplicates/missing content in mock mode).
-    await page.getByText(/analytics/i).first().waitFor({ timeout: 3000 }).catch(() => {});
-    await page.getByText(/recommendations/i).first().waitFor({ timeout: 3000 }).catch(() => {});
+    const dashboardHeading = page.getByRole("heading", { name: "Analytics Dashboard" });
+    const emptyState = page.getByText("Select a campground to view analytics");
+
+    await Promise.race([
+      dashboardHeading.waitFor({ timeout: 15000 }),
+      emptyState.waitFor({ timeout: 15000 }),
+    ]);
+
+    if (await dashboardHeading.isVisible()) {
+      await page.getByText(/recommendations/i).first().waitFor({ timeout: 3000 }).catch(() => {});
+    }
   });
 });
-

@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { API_BASE } from "@/lib/api-config";
-import type { ChatAttachment, UnifiedChatMessage } from "../types";
+import type { ChatAttachment, ChatMessageVisibility, UnifiedChatMessage } from "../types";
 
 interface ActionOption {
   id: string;
@@ -41,6 +41,7 @@ interface ChatMessage {
   toolResults?: ToolResult[];
   actionRequired?: ActionRequired;
   createdAt: string;
+  visibility?: ChatMessageVisibility;
 }
 
 interface SendMessageResponse {
@@ -52,11 +53,13 @@ interface SendMessageResponse {
   toolResults?: ToolResult[];
   actionRequired?: ActionRequired;
   createdAt: string;
+  visibility?: ChatMessageVisibility;
 }
 
 type SendMessagePayload = {
   message: string;
   attachments?: ChatAttachment[];
+  visibility?: ChatMessageVisibility;
 };
 
 interface ExecuteActionResponse {
@@ -76,6 +79,9 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 
 const getString = (value: unknown): string | undefined =>
   typeof value === "string" ? value : undefined;
+
+const getVisibility = (value: unknown): ChatMessageVisibility | undefined =>
+  value === "internal" || value === "public" ? value : undefined;
 
 const isToolCall = (value: unknown): value is ToolCall =>
   isRecord(value) &&
@@ -112,6 +118,7 @@ const toSendMessageResponse = (value: unknown): SendMessageResponse => {
     toolResults: Array.isArray(value.toolResults) ? value.toolResults.filter(isToolResult) : undefined,
     actionRequired: isActionRequired(value.actionRequired) ? value.actionRequired : undefined,
     createdAt: getString(value.createdAt) ?? new Date().toISOString(),
+    visibility: getVisibility(value.visibility),
   };
 };
 
@@ -176,6 +183,7 @@ export function useChat({ campgroundId, isGuest, guestId, authToken, sessionId }
           conversationId,
           message: payload.message,
           attachments: payload.attachments,
+          visibility: payload.visibility,
           context: {},
         }),
       });
@@ -196,6 +204,7 @@ export function useChat({ campgroundId, isGuest, guestId, authToken, sessionId }
         role: "user",
         content: payload.message,
         attachments: payload.attachments,
+        visibility: payload.visibility,
         createdAt: new Date().toISOString(),
       };
       setMessages((prev) => [...prev, userMessage]);
@@ -213,6 +222,7 @@ export function useChat({ campgroundId, isGuest, guestId, authToken, sessionId }
         toolResults: data.toolResults,
         actionRequired: data.actionRequired,
         createdAt: data.createdAt,
+        visibility: data.visibility,
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
@@ -388,13 +398,14 @@ export function useChat({ campgroundId, isGuest, guestId, authToken, sessionId }
   });
 
   const sendMessage = useCallback(
-    (message: string, options?: { attachments?: ChatAttachment[] }) => {
+    (message: string, options?: { attachments?: ChatAttachment[]; visibility?: ChatMessageVisibility }) => {
       const trimmed = message.trim();
       const attachments = options?.attachments;
       if (!trimmed && (!attachments || attachments.length === 0)) return;
       sendMessageMutation.mutate({
         message: trimmed,
         attachments,
+        visibility: options?.visibility,
       });
     },
     [sendMessageMutation]
@@ -438,6 +449,7 @@ export function useChat({ campgroundId, isGuest, guestId, authToken, sessionId }
         toolResults: message.toolResults,
         actionRequired: message.actionRequired,
         createdAt: message.createdAt ?? new Date().toISOString(),
+        visibility: message.visibility,
       }));
       setMessages(mapped);
       setIsTyping(false);

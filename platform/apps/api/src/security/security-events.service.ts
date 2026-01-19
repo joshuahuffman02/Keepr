@@ -1,4 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable, Logger, OnModuleDestroy } from "@nestjs/common";
 import { Prisma } from "@prisma/client";
 import { randomUUID } from "crypto";
 
@@ -90,7 +90,7 @@ export interface SecurityEvent {
 }
 
 @Injectable()
-export class SecurityEventsService {
+export class SecurityEventsService implements OnModuleDestroy {
     private readonly logger = new Logger(SecurityEventsService.name);
     private readonly alertWebhookUrl: string | null;
     private readonly alertingEnabled: boolean;
@@ -105,6 +105,7 @@ export class SecurityEventsService {
 
         // Cleanup old event counts every 5 minutes
         this.cleanupInterval = setInterval(() => this.cleanupEventCounts(), 5 * 60 * 1000);
+        this.cleanupInterval.unref?.();
 
         this.logger.log(`Security events service initialized (alerting: ${this.alertingEnabled})`);
     }
@@ -357,8 +358,6 @@ export class SecurityEventsService {
     }
 
     onModuleDestroy(): void {
-        if (this.cleanupInterval) {
-            clearInterval(this.cleanupInterval);
-        }
+        clearInterval(this.cleanupInterval);
     }
 }

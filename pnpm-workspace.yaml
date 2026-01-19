@@ -1,6 +1,7 @@
 packages:
   - platform/apps/*
   - platform/packages/*
+  - tools/ralph
 
 ignoredBuiltDependencies:
   - '@nestjs/core'

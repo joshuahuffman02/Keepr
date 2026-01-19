@@ -103,6 +103,7 @@ interface BookingContext {
     rigInfo?: { type: string; length: number };
     preferences?: string[];
     history?: { role: 'user' | 'assistant'; content: string }[];
+    sessionOnly?: boolean;
 }
 
 interface SiteRecommendation {
@@ -149,22 +150,26 @@ export class AiBookingAssistService {
         // Check feature enabled
         await this.gate.assertFeatureEnabled(context.campgroundId, AiFeatureType.booking_assist);
 
-        // Check/record consent
-        const hasConsent = await this.gate.hasConsent(
-            context.campgroundId,
-            AiConsentType.booking_assist,
-            undefined,
-            context.sessionId,
-        );
+        const sessionOnly = context.sessionOnly === true;
 
-        if (!hasConsent) {
-            // Auto-grant session-based consent for booking assist
-            await this.gate.recordConsent({
-                campgroundId: context.campgroundId,
-                consentType: AiConsentType.booking_assist,
-                sessionId: context.sessionId,
-                source: 'booking_widget',
-            });
+        if (!sessionOnly) {
+            // Check/record consent
+            const hasConsent = await this.gate.hasConsent(
+                context.campgroundId,
+                AiConsentType.booking_assist,
+                undefined,
+                context.sessionId,
+            );
+
+            if (!hasConsent) {
+                // Auto-grant session-based consent for booking assist
+                await this.gate.recordConsent({
+                    campgroundId: context.campgroundId,
+                    consentType: AiConsentType.booking_assist,
+                    sessionId: context.sessionId,
+                    source: 'booking_widget',
+                });
+            }
         }
 
         // Get campground and site data
@@ -224,7 +229,7 @@ export class AiBookingAssistService {
         // Fetch conversation history from DB if not provided in context
         // (DB history is only useful for metadata since content is hashed, but good as fallback)
         let historyMeta: AiInteractionLog[] = [];
-        if (!context.history || context.history.length === 0) {
+        if (!sessionOnly && (!context.history || context.history.length === 0)) {
             historyMeta = await this.prisma.aiInteractionLog.findMany({
                 where: {
                     campgroundId: context.campgroundId,
@@ -296,6 +301,7 @@ export class AiBookingAssistService {
             maxTokens: 600,
             temperature: 0.6,
             tools: this.buildTools(),
+            persistLogs: !sessionOnly,
         });
 
         const toolCall = this.pickToolCall(response.toolCalls);
@@ -429,8 +435,9 @@ export class AiBookingAssistService {
             return `- ${sc.name} (${sc.siteType}, up to ${sc.maxOccupancy} guests, ${rigLength}, ${hookupsLabel}, ${petLabel}, ${accessibility}, ${rate}/night)`;
         }).join('\n');
 
-        return `You are the Active Campground AI Partner in GUEST MODE for ${campground.name}.
+        return `You are the Active Campground AI Partner in PUBLIC GUEST MODE for ${campground.name}.
 You guide guests to the best-fit site class and prefill an anonymous booking context. You do not create or confirm reservations.
+This chat is session-only; do not request personal contact details.
 
 Allowed:
 - Ask non-PII preference questions (dates, flexibility, RV length, power needs, pets, accessibility, location features).

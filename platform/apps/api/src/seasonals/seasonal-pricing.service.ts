@@ -7,7 +7,7 @@ import {
   SeasonalBillingFrequency,
   SeasonalPaymentMethod,
   Prisma,
-} from ".prisma/client";
+} from "@prisma/client";
 import { randomUUID } from "crypto";
 
 export interface GuestPricingContext {

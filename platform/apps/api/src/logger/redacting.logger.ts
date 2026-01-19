@@ -1,4 +1,5 @@
 import { Injectable } from "@nestjs/common";
+import { getRequestContext, getTraceFields } from "../common/request-context";
 
 const redactEmail = (value: string) => value.replace(/\b[\w.-]+@[\w.-]+\.\w+\b/g, "[redacted_email]");
 const redactPhone = (value: string) => value.replace(/\+?\d[\d\s().-]{7,}\b/g, "[redacted_phone]");
@@ -20,21 +21,46 @@ const redact = (value: unknown, keyHint?: string): unknown => {
   return value;
 };
 
+const getLogContext = (): Record<string, string> | null => {
+  const store = getRequestContext();
+  if (!store) return null;
+
+  const context: Record<string, string> = {};
+  if (store.requestId) context.requestId = store.requestId;
+  if (store.traceparent) {
+    const { traceId, spanId } = getTraceFields(store.traceparent);
+    if (traceId) context.traceId = traceId;
+    if (spanId) context.spanId = spanId;
+  }
+
+  return Object.keys(context).length ? context : null;
+};
+
 @Injectable()
 export class RedactingLogger {
   log(message?: unknown, ...optionalParams: unknown[]): void {
-    console.log(redact(message), ...optionalParams.map((value) => redact(value)));
+    const context = getLogContext();
+    const payload = context ? [...optionalParams, context] : optionalParams;
+    console.log(redact(message), ...payload.map((value) => redact(value)));
   }
   error(message?: unknown, ...optionalParams: unknown[]): void {
-    console.error(redact(message), ...optionalParams.map((value) => redact(value)));
+    const context = getLogContext();
+    const payload = context ? [...optionalParams, context] : optionalParams;
+    console.error(redact(message), ...payload.map((value) => redact(value)));
   }
   warn(message?: unknown, ...optionalParams: unknown[]): void {
-    console.warn(redact(message), ...optionalParams.map((value) => redact(value)));
+    const context = getLogContext();
+    const payload = context ? [...optionalParams, context] : optionalParams;
+    console.warn(redact(message), ...payload.map((value) => redact(value)));
   }
   debug?(message: unknown, ...optionalParams: unknown[]): void {
-    console.debug(redact(message), ...optionalParams.map((value) => redact(value)));
+    const context = getLogContext();
+    const payload = context ? [...optionalParams, context] : optionalParams;
+    console.debug(redact(message), ...payload.map((value) => redact(value)));
   }
   verbose?(message: unknown, ...optionalParams: unknown[]): void {
-    console.debug(redact(message), ...optionalParams.map((value) => redact(value)));
+    const context = getLogContext();
+    const payload = context ? [...optionalParams, context] : optionalParams;
+    console.debug(redact(message), ...payload.map((value) => redact(value)));
   }
 }

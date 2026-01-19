@@ -11,8 +11,8 @@ This document captures hard-won lessons from debugging Railway deployments. Refe
 
 ### Dockerfile.web (CRITICAL)
 ```dockerfile
-FROM node:22-alpine AS base
-RUN corepack enable && corepack prepare pnpm@7.33.6 --activate
+FROM node:25.3.0-alpine AS base
+RUN npm install -g --force corepack && corepack enable && corepack prepare pnpm@9.15.9 --activate
 WORKDIR /app
 # ... build stages ...
 

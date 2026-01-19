@@ -5,7 +5,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "test": "vitest"
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
     "cross-fetch": "^4.0.0"
@@ -16,4 +17,3 @@
     "@types/node": "^22.7.4"
   }
 }
-

@@ -13,11 +13,14 @@ import {
   ToolResult,
   ActionRequired,
   ChatAttachment,
+  ChatMessagePart,
+  ChatMessageVisibility,
 } from './dto/send-message.dto';
 import {
   ExecuteActionDto,
   ExecuteActionResponse,
 } from './dto/execute-action.dto';
+import { ExecuteToolDto, ExecuteToolResponse } from './dto/execute-tool.dto';
 import {
   GetHistoryDto,
   ConversationHistoryResponse,
@@ -28,6 +31,7 @@ import {
   ConversationListResponse,
   ConversationSummary,
 } from './dto/get-conversations.dto';
+import { GetTranscriptDto, TranscriptFormat, TranscriptResponse } from './dto/get-transcript.dto';
 import { SubmitFeedbackDto, SubmitFeedbackResponse } from './dto/submit-feedback.dto';
 import { RegenerateMessageDto } from './dto/regenerate-message.dto';
 import { ChatToolsService } from './chat-tools.service';
@@ -143,6 +147,154 @@ const normalizeAttachments = (value: unknown): ChatAttachment[] | undefined => {
   return attachments.length > 0 ? attachments : undefined;
 };
 
+const getMessageVisibility = (value: unknown): ChatMessageVisibility | undefined =>
+  value === 'internal' || value === 'public' ? value : undefined;
+
+const getString = (value: unknown): string | undefined =>
+  typeof value === 'string' ? value : undefined;
+
+const buildMessageMetadata = (
+  attachments?: ChatAttachment[],
+  visibility?: ChatMessageVisibility,
+): Prisma.InputJsonValue | undefined => {
+  const metadata: Record<string, unknown> = {};
+  if (attachments && attachments.length > 0) {
+    metadata.attachments = attachments;
+  }
+  if (visibility === 'internal') {
+    metadata.visibility = visibility;
+  }
+  return Object.keys(metadata).length > 0 ? toJsonValue(metadata) : undefined;
+};
+
+const extractCardPart = (value: unknown): ChatMessagePart | null => {
+  if (!isRecord(value)) return null;
+  const candidate = [
+    value.jsonRender,
+    value.jsonRenderTree,
+    value.uiRender,
+    value.uiTree,
+    value.report,
+    value.layout,
+    value.tree,
+  ].find(isRecord);
+  if (!candidate) return null;
+  const title = getString(candidate.title) ?? getString(value.title);
+  const summary = getString(candidate.summary) ?? getString(value.summary);
+  return {
+    type: 'card',
+    title: title || undefined,
+    summary,
+    payload: candidate,
+  };
+};
+
+const buildMessageParts = (params: {
+  content?: string;
+  attachments?: ChatAttachment[];
+  toolCalls?: ToolCall[];
+  toolResults?: ToolResult[];
+}): ChatMessagePart[] | undefined => {
+  const parts: ChatMessagePart[] = [];
+  const content = params.content?.trim() ?? '';
+  if (content) {
+    parts.push({ type: 'text', text: content });
+  }
+  if (params.attachments && params.attachments.length > 0) {
+    for (const attachment of params.attachments) {
+      parts.push({ type: 'file', file: attachment });
+    }
+  }
+
+  const toolResults = params.toolResults ?? [];
+  const resultsById = new Map(toolResults.map((result) => [result.toolCallId, result]));
+
+  if (params.toolCalls && params.toolCalls.length > 0) {
+    for (const call of params.toolCalls) {
+      const result = resultsById.get(call.id);
+      parts.push({
+        type: 'tool',
+        name: call.name,
+        callId: call.id,
+        args: call.args,
+        result: result?.result,
+        error: result?.error,
+      });
+    }
+  } else if (toolResults.length > 0) {
+    for (const result of toolResults) {
+      parts.push({
+        type: 'tool',
+        name: 'tool',
+        callId: result.toolCallId,
+        result: result.result,
+        error: result.error,
+      });
+    }
+  }
+
+  for (const result of toolResults) {
+    const cardPart = extractCardPart(result.result);
+    if (cardPart) {
+      parts.push(cardPart);
+    }
+  }
+
+  return parts.length > 0 ? parts : undefined;
+};
+
+const formatTranscriptRole = (role: MessageHistoryItem['role']): string => {
+  switch (role) {
+    case 'user':
+      return 'User';
+    case 'assistant':
+      return 'Assistant';
+    case 'tool':
+      return 'Tool';
+    case 'system':
+      return 'System';
+    default:
+      return 'Assistant';
+  }
+};
+
+const formatTranscriptMessage = (
+  message: MessageHistoryItem,
+  format: TranscriptFormat,
+): string => {
+  const roleLabel = formatTranscriptRole(message.role);
+  const header =
+    format === 'markdown'
+      ? `**${roleLabel}** (${message.createdAt})`
+      : `[${message.createdAt}] ${roleLabel}:`;
+  const lines: string[] = [header];
+
+  const content = message.content?.trim();
+  if (content) lines.push(content);
+
+  if (message.attachments && message.attachments.length > 0) {
+    const attachmentLine = message.attachments
+      .map((attachment) => `${attachment.name} (${attachment.contentType})`)
+      .join(', ');
+    lines.push(`Attachments: ${attachmentLine}`);
+  }
+
+  if (message.toolCalls && message.toolCalls.length > 0) {
+    lines.push(`Tool calls: ${message.toolCalls.map((call) => call.name).join(', ')}`);
+  }
+
+  if (message.toolResults && message.toolResults.length > 0) {
+    lines.push(`Tool results: ${message.toolResults.length}`);
+  }
+
+  return lines.join('\n');
+};
+
+const buildTranscriptContent = (
+  messages: MessageHistoryItem[],
+  format: TranscriptFormat,
+): string => messages.map((message) => formatTranscriptMessage(message, format)).join('\n\n');
+
 const isPendingActionType = (value: unknown): value is PendingAction["type"] =>
   value === "confirmation" || value === "form" || value === "selection";
 
@@ -193,6 +345,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
       this.cleanupInterval = setInterval(() => {
         this.cleanupExpiredActions();
       }, CLEANUP_INTERVAL_MS);
+      this.cleanupInterval.unref?.();
       this.logger.warn('Chat service using in-memory pending actions (Redis unavailable)');
     } else {
       this.logger.log('Chat service initialized with Redis-backed pending actions');
@@ -283,8 +436,12 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     const message = dto.message?.trim() ?? '';
     const { conversationId: existingConversationId } = dto;
     const attachments = normalizeAttachments(dto.attachments);
+    const visibility = dto.visibility === 'internal' ? 'internal' : undefined;
     if (!message && !attachments) {
       throw new BadRequestException('Message or attachment required');
+    }
+    if (visibility === 'internal' && context.participantType !== ChatParticipantType.staff) {
+      throw new ForbiddenException('Internal notes are staff-only');
     }
 
     // Get or create conversation
@@ -299,10 +456,38 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
         conversationId: conversation.id,
         role: ChatMessageRole.user,
         content: message,
-        metadata: attachments ? toJsonValue({ attachments }) : undefined,
+        metadata: buildMessageMetadata(attachments, visibility),
       },
     });
     await this.ensureConversationTitle(conversation.id, conversation.title, message, attachments);
+
+    if (visibility === 'internal') {
+      const internalReply = await this.prisma.chatMessage.create({
+        data: {
+          id: randomUUID(),
+          conversationId: conversation.id,
+          role: ChatMessageRole.assistant,
+          content: 'Internal note saved.',
+          metadata: toJsonValue({ visibility: 'internal' }),
+        },
+      });
+      const parts = buildMessageParts({ content: internalReply.content });
+
+      await this.prisma.chatConversation.update({
+        where: { id: conversation.id },
+        data: { updatedAt: new Date() },
+      });
+
+      return {
+        conversationId: conversation.id,
+        messageId: internalReply.id,
+        role: 'assistant',
+        content: internalReply.content,
+        parts,
+        createdAt: internalReply.createdAt.toISOString(),
+        visibility: 'internal',
+      };
+    }
 
     // Build conversation history for context
     const history = await this.buildConversationHistory(conversation.id);
@@ -385,6 +570,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
         messageId: assistantMessage.id,
         role: 'assistant',
         content: finalContent,
+        parts: buildMessageParts({ content: finalContent, toolCalls, toolResults }),
         toolCalls: toolCalls.length > 0 ? toolCalls : undefined,
         toolResults: toolResults.length > 0 ? toolResults : undefined,
         actionRequired,
@@ -419,8 +605,12 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     const message = dto.message?.trim() ?? '';
     const { conversationId: existingConversationId } = dto;
     const attachments = normalizeAttachments(dto.attachments);
+    const visibility = dto.visibility === 'internal' ? 'internal' : undefined;
     if (!message && !attachments) {
       throw new BadRequestException('Message or attachment required');
+    }
+    if (visibility === 'internal' && context.participantType !== ChatParticipantType.staff) {
+      throw new ForbiddenException('Internal notes are staff-only');
     }
 
     // Get or create conversation
@@ -435,10 +625,35 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
         conversationId: conversation.id,
         role: ChatMessageRole.user,
         content: message,
-        metadata: attachments ? toJsonValue({ attachments }) : undefined,
+        metadata: buildMessageMetadata(attachments, visibility),
       },
     });
     await this.ensureConversationTitle(conversation.id, conversation.title, message, attachments);
+
+    if (visibility === 'internal') {
+      const internalReply = await this.prisma.chatMessage.create({
+        data: {
+          id: randomUUID(),
+          conversationId: conversation.id,
+          role: ChatMessageRole.assistant,
+          content: 'Internal note saved.',
+          metadata: toJsonValue({ visibility: 'internal' }),
+        },
+      });
+
+      await this.prisma.chatConversation.update({
+        where: { id: conversation.id },
+        data: { updatedAt: new Date() },
+      });
+
+      this.chatGateway.emitComplete(conversation.id, {
+        messageId: internalReply.id,
+        content: internalReply.content,
+        parts: buildMessageParts({ content: internalReply.content }),
+        visibility: 'internal',
+      });
+      return;
+    }
 
     // Emit typing indicator
     this.chatGateway.emitTyping(conversation.id, true);
@@ -547,6 +762,11 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
             toolCalls,
             toolResults,
             actionRequired,
+            parts: buildMessageParts({
+              content: finalContent || 'I need your confirmation to proceed.',
+              toolCalls,
+              toolResults,
+            }),
           });
           return;
         }
@@ -595,6 +815,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
         content: finalContent,
         toolCalls: toolCalls.length > 0 ? toolCalls : undefined,
         toolResults: toolResults.length > 0 ? toolResults : undefined,
+        parts: buildMessageParts({ content: finalContent, toolCalls, toolResults }),
       });
     } catch (error) {
       this.logger.error('Chat stream error:', error);
@@ -722,6 +943,65 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
   }
 
   /**
+   * Execute a tool directly for staff or guest flows
+   */
+  async executeTool(
+    dto: ExecuteToolDto,
+    context: ChatContext,
+  ): Promise<ExecuteToolResponse> {
+    const { tool, args, conversationId } = dto;
+    const originalArgs = args ?? {};
+
+    if (conversationId) {
+      await this.getConversation(conversationId, context);
+    }
+
+    try {
+      const preValidateResult = await this.toolsService.runPreValidate(tool, originalArgs, context);
+      if (preValidateResult && !preValidateResult.valid) {
+        return {
+          success: false,
+          message: preValidateResult.message || 'Validation failed',
+          error: preValidateResult.message || 'Validation failed',
+        };
+      }
+
+      const mergedArgs = preValidateResult ? { ...originalArgs, ...preValidateResult } : originalArgs;
+      const result = await this.toolsService.executeTool(tool, mergedArgs, context);
+      const resultRecord = isRecord(result) ? result : {};
+      const resultMessage =
+        typeof resultRecord.message === 'string' ? resultRecord.message : 'Tool executed successfully';
+
+      if (conversationId) {
+        const toolCallId = `tool_${randomUUID()}`;
+        await this.prisma.chatMessage.create({
+          data: {
+            id: randomUUID(),
+            conversationId,
+            role: ChatMessageRole.tool,
+            content: `Executed: ${tool}`,
+            toolCalls: toJsonValue([{ id: toolCallId, name: tool, args: originalArgs }]),
+            toolResults: toJsonValue([{ toolCallId, result }]),
+          },
+        });
+      }
+
+      return {
+        success: true,
+        message: resultMessage,
+        result: 'data' in resultRecord ? resultRecord.data : resultRecord,
+      };
+    } catch (error) {
+      this.logger.error('Tool execution error:', error);
+      return {
+        success: false,
+        message: 'Failed to execute tool',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
+  }
+
+  /**
    * Get conversation history
    */
   async getHistory(
@@ -782,15 +1062,24 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
         const metadata = isRecord(m.metadata) ? m.metadata : undefined;
         const attachments = normalizeAttachments(metadata?.attachments);
         const hydratedAttachments = await this.hydrateAttachments(attachments);
+        const toolCalls = parseToolCalls(m.toolCalls);
+        const toolResults = parseToolResults(m.toolResults);
 
         return {
           id: m.id,
           role: normalizeMessageRole(m.role),
           content: m.content,
-          toolCalls: parseToolCalls(m.toolCalls),
-          toolResults: parseToolResults(m.toolResults),
+          parts: buildMessageParts({
+            content: m.content,
+            attachments: hydratedAttachments,
+            toolCalls,
+            toolResults,
+          }),
+          toolCalls,
+          toolResults,
           attachments: hydratedAttachments,
           createdAt: m.createdAt.toISOString(),
+          visibility: getMessageVisibility(metadata?.visibility),
         };
       })
     );
@@ -915,6 +1204,93 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
   }
 
   /**
+   * Export conversation transcript
+   */
+  async getTranscript(
+    conversationId: string,
+    dto: GetTranscriptDto,
+    context: ChatContext,
+  ): Promise<TranscriptResponse> {
+    const conversation = await this.getConversation(conversationId, context);
+    const format: TranscriptFormat = dto.format ?? 'markdown';
+
+    const messages = await this.prisma.chatMessage.findMany({
+      where: { conversationId: conversation.id },
+      orderBy: { createdAt: 'asc' },
+      take: 500,
+    });
+
+    const formattedMessages: MessageHistoryItem[] = await Promise.all(
+      messages.map(async (m) => {
+        const metadata = isRecord(m.metadata) ? m.metadata : undefined;
+        const attachments = normalizeAttachments(metadata?.attachments);
+        const hydratedAttachments = await this.hydrateAttachments(attachments);
+        const toolCalls = parseToolCalls(m.toolCalls);
+        const toolResults = parseToolResults(m.toolResults);
+
+        return {
+          id: m.id,
+          role: normalizeMessageRole(m.role),
+          content: m.content,
+          parts: buildMessageParts({
+            content: m.content,
+            attachments: hydratedAttachments,
+            toolCalls,
+            toolResults,
+          }),
+          toolCalls,
+          toolResults,
+          attachments: hydratedAttachments,
+          createdAt: m.createdAt.toISOString(),
+          visibility: getMessageVisibility(metadata?.visibility),
+        };
+      })
+    );
+
+    if (format === 'json') {
+      return {
+        conversationId: conversation.id,
+        format,
+        messages: formattedMessages,
+      };
+    }
+
+    return {
+      conversationId: conversation.id,
+      format,
+      content: buildTranscriptContent(formattedMessages, format),
+    };
+  }
+
+  /**
+   * Delete a single conversation
+   */
+  async deleteConversation(
+    conversationId: string,
+    context: ChatContext,
+  ): Promise<{ success: true }> {
+    const conversation = await this.getConversation(conversationId, context);
+    await this.prisma.chatConversation.delete({ where: { id: conversation.id } });
+    return { success: true };
+  }
+
+  /**
+   * Delete all conversations for the participant in a campground
+   */
+  async deleteAllConversations(
+    context: ChatContext,
+  ): Promise<{ success: true; deletedCount: number }> {
+    const result = await this.prisma.chatConversation.deleteMany({
+      where: {
+        campgroundId: context.campgroundId,
+        participantType: context.participantType,
+        participantId: context.participantId,
+      },
+    });
+    return { success: true, deletedCount: result.count };
+  }
+
+  /**
    * Persist feedback for a chat message
    */
   async submitFeedback(
@@ -983,6 +1359,10 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
 
     if (targetMessage.role !== ChatMessageRole.assistant) {
       throw new BadRequestException('Only assistant messages can be regenerated');
+    }
+    const targetMetadata = isRecord(targetMessage.metadata) ? targetMessage.metadata : undefined;
+    if (getMessageVisibility(targetMetadata?.visibility) === 'internal') {
+      throw new BadRequestException('Internal notes cannot be regenerated');
     }
 
     const conversation = await this.getConversation(targetMessage.conversationId, context);
@@ -1092,6 +1472,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
         messageId: assistantMessage.id,
         role: 'assistant',
         content: finalContent,
+        parts: buildMessageParts({ content: finalContent, toolCalls, toolResults }),
         toolCalls: toolCalls.length > 0 ? toolCalls : undefined,
         toolResults: toolResults.length > 0 ? toolResults : undefined,
         actionRequired,
@@ -1321,6 +1702,10 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     }
 
     const formattedHistory = history
+      .filter((message) => {
+        const metadata = isRecord(message.metadata) ? message.metadata : undefined;
+        return getMessageVisibility(metadata?.visibility) !== 'internal';
+      })
       .slice(-10) // Last 10 messages
       .map(m => {
         const role =
@@ -1366,8 +1751,14 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
    */
   private buildSystemPrompt(context: ChatContext): string {
     const isGuest = context.participantType === ChatParticipantType.guest;
+    const today = new Date().toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
 
-    const basePrompt = `You are Keepr AI, a helpful assistant for ${isGuest ? 'campground guests' : 'campground staff'}.
+    const basePrompt = `You are Keepr AI, a helpful assistant for campground operations and guest support.
 
 IMPORTANT GUIDELINES:
 - Be friendly, concise, and helpful
@@ -1378,32 +1769,52 @@ IMPORTANT GUIDELINES:
 - Format prices in dollars (e.g., $99.00)
 - Format dates in a friendly way (e.g., "Saturday, January 11th")
 
-Today's date: ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}`;
+SAFETY & PRIVACY:
+- Never request or store passwords, full payment card numbers, or SSNs
+- Never expose full payment details; only share masked or summary information
+- If a request is sensitive or destructive, confirm intent and summarize impact
+- Do not invent data; use tools or state what is unknown
+
+Today's date: ${today}`;
 
     if (isGuest) {
       return `${basePrompt}
 
-You are helping a guest with their campground booking. You can:
+Mode: Guest portal (authenticated guest).
+
+You are helping a guest with their campground booking and stay. You can:
 - Search for available sites and check rates
-- Make new reservations
-- View and modify existing reservations (with their permission)
-- Answer questions about the campground
-- Help with payments
+- View reservations and balances
+- Request reservation changes (dates, site, party size) and early/late check-in or checkout
+- Answer questions about campground policies, hours, and amenities
+- Offer post-stay follow-ups and review prompts when appropriate
+
+Guest guardrails:
+- Never ask for sensitive payment details; direct guests to in-app payment flows
+- Confirm reservation IDs or dates before making changes
+- If asked for staff-only actions, explain limits and suggest contacting the front desk
 
 If asked to do something outside your capabilities, politely explain what you can help with or suggest contacting the campground directly.`;
     }
 
     return `${basePrompt}
 
-You are helping campground staff manage operations. Based on their role (${context.role || 'staff'}), you can help with:
+Mode: Staff operations (${context.role || 'staff'}).
+
+You are helping campground staff manage operations. You can help with:
 - Search and manage reservations
 - Check-in and check-out guests
 - Process payments and refunds
 - View reports and occupancy
 - Manage site availability
+- Place or release temporary site holds
 - Create maintenance tickets
+- Review open operational tasks
 
-For destructive actions (refunds, cancellations), always confirm with the user first.`;
+Staff guardrails:
+- Never ask for full card numbers or passwords; use tools for payments and refunds
+- For destructive actions (refunds, cancellations, site blocks), always confirm first
+- If a request exceeds the user's role, say what permissions are needed and suggest escalation`;
   }
 
   /**
@@ -1483,6 +1894,7 @@ For destructive actions (refunds, cancellations), always confirm with the user f
           actionId,
           title: pendingAction.title,
           description: this.toolsService.formatConfirmationDescription(rawCall.name, mergedArgs),
+          summary: this.toolsService.formatConfirmationSummary(rawCall.name, mergedArgs),
           data: mergedArgs,
           options: [
             { id: 'confirm', label: 'Confirm', variant: 'default' },

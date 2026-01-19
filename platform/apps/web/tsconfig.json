@@ -25,6 +25,12 @@
       "@/*": [
         "./*"
       ],
+      "@keepr/sdk": [
+        "../../packages/sdk/src"
+      ],
+      "@keepr/sdk/*": [
+        "../../packages/sdk/src/*"
+      ],
       "@keepr/shared": [
         "../../packages/shared/dist"
       ],

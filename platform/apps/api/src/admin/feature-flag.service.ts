@@ -9,6 +9,18 @@ type FeatureFlagCreateInput = Omit<Prisma.FeatureFlagCreateInput, "id" | "update
 export class FeatureFlagService {
     constructor(private readonly prisma: PrismaService) { }
 
+    private isFlagEnabled(
+        flag: Pick<Prisma.FeatureFlagGetPayload<{ select: { enabled: true; scope: true; campgrounds: true } }>, "enabled" | "scope" | "campgrounds">,
+        campgroundId?: string
+    ) {
+        if (!flag.enabled) return false;
+        if (flag.scope === FeatureFlagScope.global) return true;
+        if (flag.scope === FeatureFlagScope.campground && campgroundId) {
+            return flag.campgrounds.includes(campgroundId);
+        }
+        return false;
+    }
+
     async findAll() {
         return this.prisma.featureFlag.findMany({
             orderBy: { name: "asc" },
@@ -23,6 +35,22 @@ export class FeatureFlagService {
 
     async findByKey(key: string) {
         return this.prisma.featureFlag.findUnique({ where: { key } });
+    }
+
+    async listEvaluated(campgroundId?: string) {
+        const flags = await this.prisma.featureFlag.findMany({
+            select: {
+                key: true,
+                enabled: true,
+                scope: true,
+                campgrounds: true,
+            },
+            orderBy: { name: "asc" },
+        });
+        return flags.map((flag) => ({
+            key: flag.key,
+            enabled: this.isFlagEnabled(flag, campgroundId),
+        }));
     }
 
     async create(data: FeatureFlagCreateInput) {
@@ -57,11 +85,6 @@ export class FeatureFlagService {
     async isEnabled(key: string, campgroundId?: string): Promise<boolean> {
         const flag = await this.findByKey(key);
         if (!flag) return false;
-        if (!flag.enabled) return false;
-        if (flag.scope === "global") return true;
-        if (flag.scope === "campground" && campgroundId) {
-            return flag.campgrounds.includes(campgroundId);
-        }
-        return false;
+        return this.isFlagEnabled(flag, campgroundId);
     }
 }
