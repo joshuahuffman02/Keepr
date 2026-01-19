@@ -1,6 +1,0 @@
-/Users/josh/Documents/GitHub/Campreserv (broken) copy/platform/services/auth-service-rs/target/debug/deps/slab-6514545c7fbb89ae.d: /Users/josh/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slab-0.4.11/src/lib.rs /Users/josh/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slab-0.4.11/src/builder.rs
-
-/Users/josh/Documents/GitHub/Campreserv (broken) copy/platform/services/auth-service-rs/target/debug/deps/libslab-6514545c7fbb89ae.rmeta: /Users/josh/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slab-0.4.11/src/lib.rs /Users/josh/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slab-0.4.11/src/builder.rs
-
-/Users/josh/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slab-0.4.11/src/lib.rs:
-/Users/josh/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/slab-0.4.11/src/builder.rs:
