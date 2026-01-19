@@ -1,4 +1,4 @@
-import type { paths } from "@keepr/sdk";
+import type { paths } from "../../../packages/sdk/src/openapi-types";
 
 type Assert<T extends true> = T;
 type HasPath<P extends string> = P extends keyof paths ? true : false;
