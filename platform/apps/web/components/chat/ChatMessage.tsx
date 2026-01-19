@@ -37,6 +37,7 @@ const SUPPORT_EMAIL = "support@keeprstay.com";
 const SUPPORT_SLA = "Typical response within 24 hours.";
 const LONG_MESSAGE_CHAR_LIMIT = 800;
 const LONG_MESSAGE_LINE_LIMIT = 12;
+const HIDDEN_TOOL_NAMES = new Set(["get_tasks"]);
 
 const getString = (value: unknown, fallback = ""): string =>
   typeof value === "string" ? value : fallback;
@@ -790,6 +791,17 @@ export const ChatMessage = memo(function ChatMessage({
   const orphanedToolResults = (toolResults ?? []).filter(
     (result) => !toolCallIds.has(result.toolCallId)
   );
+  const hiddenToolCallIds = new Set(
+    (toolCalls ?? [])
+      .filter((call) => HIDDEN_TOOL_NAMES.has(call.name))
+      .map((call) => call.id)
+  );
+  const visibleToolCalls = (toolCalls ?? []).filter(
+    (call) => !HIDDEN_TOOL_NAMES.has(call.name)
+  );
+  const visibleOrphanedToolResults = orphanedToolResults.filter(
+    (result) => !hiddenToolCallIds.has(result.toolCallId)
+  );
   const reportSummary = useMemo(
     () => extractReportSummary(toolResults),
     [toolResults]
@@ -1211,9 +1223,9 @@ export const ChatMessage = memo(function ChatMessage({
         )}
 
         {/* Tool calls */}
-        {toolCalls && toolCalls.length > 0 && (
+        {visibleToolCalls.length > 0 && (
           <div className="mt-3 space-y-2">
-            {toolCalls.map((call) => {
+            {visibleToolCalls.map((call) => {
               const result = toolResults?.find((item) => item.toolCallId === call.id);
               return <ToolCallCard key={call.id} call={call} result={result} />;
             })}
@@ -1221,9 +1233,9 @@ export const ChatMessage = memo(function ChatMessage({
         )}
 
         {/* Tool results (unmatched) */}
-        {orphanedToolResults.length > 0 && (
+        {visibleOrphanedToolResults.length > 0 && (
           <div className="mt-3 space-y-2">
-            {orphanedToolResults.map((result) => (
+            {visibleOrphanedToolResults.map((result) => (
               <ToolResultDisplay key={result.toolCallId} result={result} />
             ))}
           </div>

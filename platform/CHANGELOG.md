@@ -43,6 +43,7 @@
 - Fix API OpenTelemetry bootstrap to use resource helpers compatible with the current SDK and tighten chat task query typing.
 - Redact PII from chat tool execution logs.
 - Accept the `open` state alias for chat task queries so ops can fetch pending/assigned/in-progress/blocked tasks.
+- Hide the `get_tasks` tool cards in the staff chat UI to reduce noise when tasks are empty.
 
 ### Added
 - Onboarding import checklist with system-specific export prompts, coverage tracking, and warning override.
