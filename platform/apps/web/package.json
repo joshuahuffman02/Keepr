@@ -19,6 +19,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@hookform/resolvers": "^3.9.1",
     "@json-render/react": "^0.2.0",
+    "@keepr/sdk": "workspace:^",
     "@keepr/shared": "workspace:*",
     "@opentelemetry/exporter-trace-otlp-http": "^0.210.0",
     "@opentelemetry/resources": "^2.4.0",
@@ -77,7 +78,6 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@keepr/sdk": "workspace:^",
     "@playwright/test": "^1.57.0",
     "@rushstack/eslint-patch": "^1.15.0",
     "@testing-library/dom": "^10.4.1",
