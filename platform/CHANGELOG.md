@@ -42,6 +42,7 @@
 - Chat tool cards now render availability/balance/task summaries even when tool outputs include a message string.
 - Fix API OpenTelemetry bootstrap to use resource helpers compatible with the current SDK and tighten chat task query typing.
 - Redact PII from chat tool execution logs.
+- Accept the `open` state alias for chat task queries so ops can fetch pending/assigned/in-progress/blocked tasks.
 
 ### Added
 - Onboarding import checklist with system-specific export prompts, coverage tracking, and warning override.

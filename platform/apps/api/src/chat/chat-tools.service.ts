@@ -12,6 +12,16 @@ import { AiPrivacyService } from '../ai/ai-privacy.service';
 // Date string validation (YYYY-MM-DD format)
 const dateStringSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format. Use YYYY-MM-DD');
 const opTaskStateSchema = z.enum(['pending', 'assigned', 'in_progress', 'blocked', 'completed', 'verified', 'cancelled']);
+const opTaskStateFilterSchema = z.enum([
+  'pending',
+  'assigned',
+  'in_progress',
+  'blocked',
+  'completed',
+  'verified',
+  'cancelled',
+  'open',
+]);
 const opTaskPrioritySchema = z.enum(['low', 'medium', 'high', 'urgent']);
 
 // Helper to get today's start/end in a specific timezone
@@ -68,18 +78,33 @@ const isOpTaskState = (value: unknown): value is OpTaskState =>
 const parseOpTaskState = (value: unknown): OpTaskState | undefined =>
   isOpTaskState(value) ? value : undefined;
 
+const parseOpTaskStateFilter = (value: unknown): OpTaskState | "open" | undefined => {
+  if (value === "open") return "open";
+  return parseOpTaskState(value);
+};
+
 const isOpTaskPriority = (value: unknown): value is OpTaskPriority =>
   typeof value === "string" && value in OpTaskPriority;
 
 const parseOpTaskPriority = (value: unknown): OpTaskPriority | undefined =>
   isOpTaskPriority(value) ? value : undefined;
 
-const parseOpTaskStates = (value: unknown): OpTaskState[] | undefined => {
+const parseOpTaskStateFilters = (
+  value: unknown
+): { states: OpTaskState[]; includeOpen: boolean } | undefined => {
   if (!Array.isArray(value)) return undefined;
-  const parsed = value
-    .map(parseOpTaskState)
-    .filter((state): state is OpTaskState => Boolean(state));
-  return parsed.length > 0 ? parsed : undefined;
+  const parsedStates: OpTaskState[] = [];
+  let includeOpen = false;
+  for (const entry of value) {
+    if (entry === "open") {
+      includeOpen = true;
+      continue;
+    }
+    const parsed = parseOpTaskState(entry);
+    if (parsed) parsedStates.push(parsed);
+  }
+  if (parsedStates.length === 0 && !includeOpen) return undefined;
+  return { states: parsedStates, includeOpen };
 };
 
 const parseOpTaskPriorities = (value: unknown): OpTaskPriority[] | undefined => {
@@ -199,8 +224,8 @@ const toolArgSchemas: Record<string, z.ZodSchema> = {
     notes: z.string().optional(),
   }),
   get_tasks: z.object({
-    state: opTaskStateSchema.optional(),
-    states: z.array(opTaskStateSchema).optional(),
+    state: opTaskStateFilterSchema.optional(),
+    states: z.array(opTaskStateFilterSchema).optional(),
     priority: opTaskPrioritySchema.optional(),
     priorities: z.array(opTaskPrioritySchema).optional(),
     siteId: z.string().optional(),
@@ -1003,8 +1028,8 @@ export class ChatToolsService {
       parameters: {
         type: 'object',
         properties: {
-          state: { type: 'string', description: 'Task state filter (optional)' },
-          states: { type: 'array', items: { type: 'string' }, description: 'Task states filter (optional)' },
+          state: { type: 'string', description: "Task state filter (optional). Use 'open' for pending/assigned/in_progress/blocked." },
+          states: { type: 'array', items: { type: 'string' }, description: "Task states filter (optional). Supports 'open' alias." },
           priority: { type: 'string', description: 'Priority filter (optional)' },
           priorities: { type: 'array', items: { type: 'string' }, description: 'Priority filters (optional)' },
           siteId: { type: 'string', description: 'Site ID filter (optional)' },
@@ -1017,8 +1042,8 @@ export class ChatToolsService {
       staffRoles: ['owner', 'manager', 'front_desk', 'maintenance'],
       execute: async (args, context, prisma) => {
         const limit = Math.min(getNumber(args.limit) ?? 10, 50);
-        const state = parseOpTaskState(args.state);
-        const states = parseOpTaskStates(args.states);
+        const state = parseOpTaskStateFilter(args.state);
+        const states = parseOpTaskStateFilters(args.states);
         const priority = parseOpTaskPriority(args.priority);
         const priorities = parseOpTaskPriorities(args.priorities);
         const siteId = getString(args.siteId);
@@ -1031,11 +1056,21 @@ export class ChatToolsService {
           OpTaskState.blocked,
         ];
 
-        const stateFilter: Prisma.OpTaskWhereInput["state"] = states
-          ? { in: states }
-          : state
-            ? state
-            : { in: openStates };
+        let stateFilter: Prisma.OpTaskWhereInput["state"];
+        if (states) {
+          const combined = new Set<OpTaskState>(states.states);
+          if (states.includeOpen) {
+            openStates.forEach((entry) => combined.add(entry));
+          }
+          const combinedStates = Array.from(combined);
+          stateFilter = combinedStates.length > 0 ? { in: combinedStates } : { in: openStates };
+        } else if (state === "open") {
+          stateFilter = { in: openStates };
+        } else if (state) {
+          stateFilter = state;
+        } else {
+          stateFilter = { in: openStates };
+        }
         const priorityFilter: Prisma.OpTaskWhereInput["priority"] = priorities
           ? { in: priorities }
           : priority
