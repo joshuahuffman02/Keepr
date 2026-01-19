@@ -38,6 +38,7 @@ Goal: Bring Keepr's guest, portal, staff, and support chat experiences up to the
 - [x] Auto-title conversations for the history list.
 - [x] Add staff quick actions: arrivals, departures, occupancy, maintenance.
 - [x] Add tool execution UI (confirmations, forms, selections).
+- [x] Add json-render-powered inline report/graph cards in staff chat (source: `/Users/josh/Documents/GitHub/github extra stuff/json-render-main`).
 - [ ] Add structured results for tools (availability, balances, tasks).
 - [ ] Add audit trail for actions executed by AI.
 
@@ -75,6 +76,7 @@ Goal: Bring Keepr's guest, portal, staff, and support chat experiences up to the
 - [x] Add attachment picker and preview panel.
 - [x] Add staff history search + filters and auto-titles.
 - [x] Add artifact sidecar panel.
+- [x] Wire json-render into the chat artifact panel for staff graphs/reports.
 
 ### API + Backend (NestJS)
 - [x] Add AI SDK-compatible SSE endpoint or proxy for streaming.
@@ -146,6 +148,7 @@ Phase 4 - Optimization + rollout (ongoing)
 - Attachments now support upload, preview, and inline rendering for staff + portal guests using the existing uploads service.
 - Staff history now supports search + time filters with auto-titled conversation summaries.
 - Artifact sidecar panel surfaces availability, quote, and report outputs from tool results.
+- Json-render report/graph cards now render inside the staff artifact sidecar when tool results include a json-render tree.
 - Feedback/regenerate actions now emit analytics events when a session ID is available.
 - Support chat now includes an in-chat ticket composer with severity, transcripts, attachments, and SLA/email fallback messaging.
 

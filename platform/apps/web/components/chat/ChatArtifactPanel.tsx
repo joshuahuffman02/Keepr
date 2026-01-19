@@ -2,10 +2,18 @@
 
 import { useMemo } from "react";
 import { X } from "lucide-react";
+import { JSONUIProvider, Renderer } from "@json-render/react";
 import { cn } from "@/lib/utils";
+import type { AiUiBuilderTree } from "@/lib/api-client";
+import { jsonRenderRegistry } from "@/components/ai/json-render-registry";
 import type { ChatAccent, UnifiedChatMessage, ChatToolResult } from "./types";
 
-type ArtifactType = "availability" | "quote" | "revenue" | "occupancy";
+type ArtifactType = "availability" | "quote" | "revenue" | "occupancy" | "json-render";
+
+type JsonRenderArtifact = {
+  tree: AiUiBuilderTree;
+  data: Record<string, unknown>;
+};
 
 type ChatArtifact = {
   id: string;
@@ -14,6 +22,7 @@ type ChatArtifact = {
   summary?: string;
   details?: string[];
   createdAt?: string;
+  jsonRender?: JsonRenderArtifact;
 };
 
 type ChatArtifactPanelProps = {
@@ -32,11 +41,75 @@ const getString = (value: unknown, fallback = ""): string =>
 const getNumber = (value: unknown, fallback = 0): number =>
   typeof value === "number" && Number.isFinite(value) ? value : fallback;
 
+const firstRecord = (values: unknown[]) => {
+  for (const value of values) {
+    if (isRecord(value)) return value;
+  }
+  return undefined;
+};
+
+const isJsonRenderTree = (value: unknown): value is AiUiBuilderTree =>
+  isRecord(value) && typeof value.root === "string" && isRecord(value.elements);
+
 const toArtifactDate = (value?: string) => {
   if (!value) return "";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "";
   return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+};
+
+const extractJsonRender = (data: Record<string, unknown>) => {
+  const candidates = [
+    data.jsonRender,
+    data.jsonRenderTree,
+    data.uiRender,
+    data.uiTree,
+    data.report,
+    data.layout,
+  ];
+
+  for (const candidate of candidates) {
+    if (!isRecord(candidate)) continue;
+    const candidateTree = isJsonRenderTree(candidate.tree)
+      ? candidate.tree
+      : isJsonRenderTree(candidate)
+        ? candidate
+        : undefined;
+    if (!candidateTree) continue;
+
+    const payloadData =
+      firstRecord([candidate.data, candidate.dataset, candidate.context, candidate.payload]) ??
+      firstRecord([data.data, data.metrics, data.payload]);
+
+    return {
+      tree: candidateTree,
+      data: payloadData ?? {},
+      title: getString(candidate.title) || getString(data.title) || "Report",
+      summary: getString(candidate.summary) || getString(data.summary) || undefined,
+    };
+  }
+
+  if (isJsonRenderTree(data.tree)) {
+    const payloadData =
+      firstRecord([data.data, data.dataset, data.context, data.payload]) ?? undefined;
+    return {
+      tree: data.tree,
+      data: payloadData ?? {},
+      title: getString(data.title) || "Report",
+      summary: getString(data.summary) || undefined,
+    };
+  }
+
+  if (isJsonRenderTree(data)) {
+    return {
+      tree: data,
+      data: {},
+      title: "Report",
+      summary: undefined,
+    };
+  }
+
+  return null;
 };
 
 const toArtifacts = (messages: UnifiedChatMessage[]): ChatArtifact[] => {
@@ -141,6 +214,21 @@ const toArtifacts = (messages: UnifiedChatMessage[]): ChatArtifact[] => {
           createdAt: message.createdAt,
         });
       }
+
+      const jsonRender = extractJsonRender(data);
+      if (jsonRender) {
+        artifacts.push({
+          id: `${message.id}-json-render-${index}`,
+          type: "json-render",
+          title: jsonRender.title,
+          summary: jsonRender.summary,
+          createdAt: message.createdAt,
+          jsonRender: {
+            tree: jsonRender.tree,
+            data: jsonRender.data,
+          },
+        });
+      }
     });
   });
 
@@ -154,6 +242,24 @@ export function ChatArtifactPanel({
   accent = "staff",
 }: ChatArtifactPanelProps) {
   const artifacts = useMemo(() => toArtifacts(messages), [messages]);
+  const actionHandlers = useMemo(
+    () => ({
+      open_report: () => {
+        if (typeof window !== "undefined") {
+          window.open("/reports", "_blank");
+        }
+      },
+      export_report: () => {
+        if (typeof window !== "undefined") {
+          window.open("/reports?export=csv", "_blank");
+        }
+      },
+      refresh_data: () => undefined,
+      run_report: () => undefined,
+      save_report: () => undefined,
+    }),
+    []
+  );
   if (!isOpen) return null;
   const accentBorder =
     accent === "guest"
@@ -197,6 +303,17 @@ export function ChatArtifactPanel({
                 {artifact.details.map((line, index) => (
                   <div key={`${artifact.id}-detail-${index}`}>{line}</div>
                 ))}
+              </div>
+            )}
+            {artifact.type === "json-render" && artifact.jsonRender && (
+              <div className="mt-3 rounded-lg border border-border bg-muted/30 p-2">
+                <JSONUIProvider
+                  registry={jsonRenderRegistry}
+                  initialData={artifact.jsonRender.data}
+                  actionHandlers={actionHandlers}
+                >
+                  <Renderer tree={artifact.jsonRender.tree} registry={jsonRenderRegistry} />
+                </JSONUIProvider>
               </div>
             )}
           </div>
