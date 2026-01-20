@@ -31,9 +31,9 @@ This checklist tracks alignment with Vercel-grade monorepo standards for speed, 
 | Health checks | Health + readiness endpoints | Health + readiness + SLO docs | Platform | Phase 2 | Done | API + Rust readiness endpoints documented in observability conventions |
 | Deployment docs | Mixed references | Single source of truth | Platform | Phase 2 | Done | Vercel config + repo summary + architecture docs aligned |
 | Vercel web output | Root config only | App-level config for subdir builds | Platform | Phase 2 | Done | Added `platform/apps/web/vercel.json` with `.next` output; root config keeps `platform/apps/web/.next` |
-| Vercel project settings | Unverified | Root/output dir aligned to app | Platform | Phase 2 | Planned | Confirm project Root Directory=`platform/apps/web`, Output Directory=`.next` (or unset) |
+| Vercel project settings | Unverified | Root/output dir aligned to app | Platform | Phase 2 | In progress | Documented in `docs/vercel-project-settings.md`; confirm in Vercel UI |
 | Vercel build context | SDK excluded by ignore | SDK sources included in build | Platform | Phase 2 | Done | `.vercelignore` no longer excludes `platform/packages/sdk` |
-| Vercel env parity | Env documented only | Vercel env matches web `.env` needs | Platform | Phase 2 | Planned | Ensure `NEXT_PUBLIC_API_BASE`, `NEXTAUTH_URL`, `NEXTAUTH_SECRET`, `OTEL_*` set |
+| Vercel env parity | Env documented only | Vercel env matches web `.env` needs | Platform | Phase 2 | Done | Expanded `platform/apps/web/.env.example` with required/optional keys |
 | Vercel analytics | Not enabled | Speed Insights + Analytics | Web | Phase 3 | Done | Added `@vercel/analytics` + `@vercel/speed-insights` in web root layout |
 | Sentry Next.js config | Legacy client config | instrumentation-client convention | Web | Phase 3 | Done | Added `platform/apps/web/instrumentation-client.ts` and enabled instrumentation hook |
 | Turbo remote cache | Disabled | Remote cache enabled | Platform | Phase 3 | Planned | Enable Vercel Remote Cache for faster builds |
@@ -42,4 +42,4 @@ This checklist tracks alignment with Vercel-grade monorepo standards for speed, 
 - Trigger CI to validate typecheck + Rust jobs.
 - Decide on a unified lint/format stack.
 - Confirm Vercel project Root/Output Directory settings for the web app.
-- Set required Vercel environment variables for the web build.
+- Apply web env variables in Vercel using `platform/apps/web/.env.example`.
