@@ -17,6 +17,7 @@
 - Route lint/test/typecheck through Turbo and add per-package typecheck scripts.
 - Remove the duplicate web ESLint config so `.eslintrc.cjs` is the single source.
 - Align Vercel build config with the workspace web app output path and build commands.
+- Add an app-level `vercel.json` for the web app so subdirectory deployments resolve `.next` correctly.
 - Build the shared SDK before the web build in Vercel so OpenAPI contract types resolve.
 - Propagate `x-request-id` between web and API, exposing it in CORS responses.
 - Forward `x-request-id`/trace headers from API to Rust service calls.

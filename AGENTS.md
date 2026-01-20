@@ -50,3 +50,19 @@
 - Lint: `pnpm lint:web` (Next.js ESLint plus `scripts/check-no-any-no-assert.js`).
 - Format: `pnpm format` (runs `pnpm lint:fix` to sync eslint fixes and no-any checks).
 - E2E: `pnpm --dir platform/apps/web test:e2e` (Playwright).
+
+## Codex-only guardrails
+- Codex 5.2 is the only agent you should use this month; take extra care to keep it focused on the guardrails below.
+- Before making changes, have Codex re-read this `AGENTS.md` and call out any missing guardrails, then append the summary it produces to this file so future runs inherit the same concern.
+- Tell Codex to keep every edit “lowest blast radius”—reuse existing patterns, minimize LOC, ban normalization shortcuts or blanket `try/catch`, and let failures bubble instead of silently patching unknown shapes.
+- Instruct Codex to explain each failure (“why did this break?” plus “how can we avoid it?”) and then fold those answers into updated instructions/prompts in this repo before completing the ticket.
+- Require Codex to audit the repo’s CI/lint/test commands and ensure the following pass without skipping steps: `pnpm lint:web`, `pnpm --dir platform/apps/api test:smoke`, `pnpm --dir platform/apps/web test` (add any extra targeted `pnpm --dir platform/apps/api test -- <path>` if you touch critical services).
+- If any workflow fails, force Codex to debug and resolve the root cause before claiming success.
+- After a successful run, record the exact prompt/AGENTS snippet you used in this file so teammates can reproduce the optimized Codex-only flow.
+
+## Relevant Codex skills
+- `agent-awareness` (`codex/skills/agent-awareness/SKILL.md`): consult this when deciding whether a specialized reviewer (code, security, UI, API, etc.) is warranted once the work is done.
+- `nextjs` (`codex/skills/nextjs/SKILL.md`): follow this when touching App Router routes, layouts, or data fetching—server/client boundaries, caching strategy, and route-group conventions are enforced there.
+- `nestjs-api` (`codex/skills/nestjs-api/SKILL.md`): use this for any NestJS controller/service/DTO work; keep business logic in services, guard endpoints, validate DTOs, and throw Nest exceptions.
+- `prisma-database` (`codex/skills/prisma-database/SKILL.md`): rely on this when writing queries/migrations—select only needed fields, avoid raw SQL, null-check results, paginate large lists, and wrap writes in transactions.
+- `ui-development` (`codex/skills/ui-development/SKILL.md`): when editing React/Tailwind components, this skill keeps props typed, tokens consistent, interactions accessible, and responsive states defined.
