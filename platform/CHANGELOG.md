@@ -49,6 +49,7 @@
 - Require confirmation for far-future or cross-year date ranges in chat tools and log staging availability summaries for debugging.
 - Expand the chat shell when artifacts are open and make the artifact panel full width on small screens.
 - Widen the artifact panel on desktop and pad the chat message list so report cards feel less cramped.
+- Return direct confirmation prompts when tool pre-validation fails so chat replies don't get truncated.
 
 ### Added
 - Onboarding import checklist with system-specific export prompts, coverage tracking, and warning override.

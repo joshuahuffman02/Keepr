@@ -558,8 +558,13 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
         toolResults = toolProcessResult.toolResults;
         actionRequired = toolProcessResult.actionRequired;
 
+        const prevalidateMessage = this.getPrevalidateFailureMessage(toolResults);
+        if (prevalidateMessage) {
+          finalContent = prevalidateMessage;
+        }
+
         // If tools were executed, get a follow-up response
-        if (toolResults.length > 0 && !actionRequired) {
+        if (!prevalidateMessage && toolResults.length > 0 && !actionRequired) {
           const followUp = await this.aiProvider.getCompletion({
             campgroundId: context.campgroundId,
             featureType: AiFeatureType.booking_assist,
@@ -859,8 +864,13 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
           return;
         }
 
+        const prevalidateMessage = this.getPrevalidateFailureMessage(toolResults);
+        if (prevalidateMessage) {
+          finalContent = prevalidateMessage;
+        }
+
         // If tools were executed, get a follow-up response
-        if (toolResults.length > 0) {
+        if (!prevalidateMessage && toolResults.length > 0) {
           const followUp = await this.aiProvider.getCompletion({
             campgroundId: context.campgroundId,
             featureType: AiFeatureType.booking_assist,
@@ -1122,6 +1132,7 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
           success: false,
           message: preValidateResult.message || 'Validation failed',
           error: preValidateResult.message || 'Validation failed',
+          prevalidateFailed: true,
         };
       }
 
@@ -2000,6 +2011,17 @@ export class ChatService implements OnModuleInit, OnModuleDestroy {
     return facts;
   }
 
+  private getPrevalidateFailureMessage(toolResults: ToolResult[]): string | null {
+    for (const result of toolResults) {
+      const payload = isRecord(result.result) ? result.result : null;
+      if (!payload || payload.prevalidateFailed !== true) continue;
+      if (typeof payload.message === 'string' && payload.message.trim().length > 0) {
+        return payload.message.trim();
+      }
+    }
+    return null;
+  }
+
   private formatHistoryWithToolResults(
     history: ChatMessage[],
     message: string,
@@ -2154,6 +2176,7 @@ Staff guardrails:
           result: {
             success: false,
             message: preValidateResult.message || 'Validation failed',
+            prevalidateFailed: true,
           },
         });
         continue; // Skip to next tool call
