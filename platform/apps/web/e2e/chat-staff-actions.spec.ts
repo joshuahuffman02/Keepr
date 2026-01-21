@@ -81,9 +81,11 @@ test.describe("Staff chat actions", () => {
 
     await expect(page.getByText("Hold confirmed.")).toBeVisible();
 
-    expect(actionPayload).not.toBeNull();
-    if (!actionPayload) return;
-    expect(actionPayload.actionId).toBe("action-1");
-    expect(actionPayload.selectedOption).toBe("confirm");
+    expect(actionPayload).toEqual(
+      expect.objectContaining({
+        actionId: "action-1",
+        selectedOption: "confirm",
+      }),
+    );
   });
 });

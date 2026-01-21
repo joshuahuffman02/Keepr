@@ -40,6 +40,7 @@ This checklist tracks alignment with Vercel-grade monorepo standards for speed, 
 
 ## Next Actions
 - Trigger CI to validate typecheck + Rust jobs.
+- Local verification complete: `pnpm typecheck`, `cargo test --manifest-path platform/services/availability-rs/Cargo.toml`, `cargo test --manifest-path platform/services/payment-processor-rs/Cargo.toml`, `cargo test --manifest-path platform/services/auth-service-rs/Cargo.toml`.
 - Decide on a unified lint/format stack.
 - Confirm Vercel project Root/Output Directory settings for the web app.
 - Apply web env variables in Vercel using `platform/apps/web/.env.example`.

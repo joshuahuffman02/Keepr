@@ -33,4 +33,5 @@ export interface ExecuteToolResponse {
   message: string;
   result?: unknown;
   error?: string;
+  prevalidateFailed?: boolean;
 }
