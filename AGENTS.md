@@ -66,3 +66,7 @@
 - `nestjs-api` (`codex/skills/nestjs-api/SKILL.md`): use this for any NestJS controller/service/DTO work; keep business logic in services, guard endpoints, validate DTOs, and throw Nest exceptions.
 - `prisma-database` (`codex/skills/prisma-database/SKILL.md`): rely on this when writing queries/migrations—select only needed fields, avoid raw SQL, null-check results, paginate large lists, and wrap writes in transactions.
 - `ui-development` (`codex/skills/ui-development/SKILL.md`): when editing React/Tailwind components, this skill keeps props typed, tokens consistent, interactions accessible, and responsive states defined.
+
+## Codex guardrails summary (2025-01-16)
+- Missing guardrails: no repo-level guidance on where MCP tool configs should live (global vs repo), which Chrome Developer MCP package/version to pin, or how to verify MCP tools are installed correctly.
+- Missing guardrails: no guidance on handling network-restricted installs (approved mirrors, offline cache strategy), which affects MCP setup in sandboxed runs.

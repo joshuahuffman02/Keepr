@@ -45,6 +45,50 @@ const getNumber = (value: unknown): number | undefined =>
 const getBoolean = (value: unknown): boolean | undefined =>
   typeof value === "boolean" ? value : undefined;
 
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+const MAX_DATE_LOOKAHEAD_DAYS = 120;
+
+const getTodayStart = () => {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+};
+
+const parseDateInput = (value?: string): Date | undefined => {
+  if (!value) return undefined;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return undefined;
+  return date;
+};
+
+const needsDateConfirmation = (start?: Date, end?: Date): boolean => {
+  if (!start) return false;
+  const todayStart = getTodayStart();
+  const startIsFuture = start.getTime() >= todayStart.getTime();
+  if (!startIsFuture) return false;
+  const daysAhead = Math.floor((start.getTime() - todayStart.getTime()) / MS_PER_DAY);
+  const currentYear = todayStart.getFullYear();
+  const startYear = start.getFullYear();
+  const endYear = end ? end.getFullYear() : startYear;
+  const crossesYear = startYear !== endYear;
+  const outsideCurrentYear = startYear !== currentYear || endYear !== currentYear;
+  return daysAhead > MAX_DATE_LOOKAHEAD_DAYS || crossesYear || outsideCurrentYear;
+};
+
+const getDateConfirmationError = (
+  startDate?: string,
+  endDate?: string,
+  confirmed?: boolean,
+): string | null => {
+  const parsedStart = parseDateInput(startDate);
+  if (!parsedStart) return null;
+  const parsedEnd = parseDateInput(endDate);
+  if (!needsDateConfirmation(parsedStart, parsedEnd) || confirmed) return null;
+  const rangeLabel = startDate && endDate
+    ? `${startDate} to ${endDate}`
+    : startDate ?? endDate ?? "the requested dates";
+  return `Those dates look far in the future or cross into a different year (${rangeLabel}). Please confirm the exact dates to continue.`;
+};
+
 const formatCurrency = (amountCents?: number) => {
   if (amountCents === undefined || !Number.isFinite(amountCents)) return undefined;
   return `$${(amountCents / 100).toFixed(2)}`;
@@ -134,12 +178,20 @@ const toolArgSchemas: Record<string, z.ZodSchema> = {
     departureDate: dateStringSchema,
     guests: z.number().int().positive().optional(),
     siteType: z.enum(['rv', 'tent', 'cabin']).optional(),
+    confirmed: z.boolean().optional(),
   }),
   get_quote: z.object({
     siteId: z.string().min(1, 'Site ID is required'),
     arrivalDate: dateStringSchema,
     departureDate: dateStringSchema,
     guests: z.number().int().positive().optional(),
+    confirmed: z.boolean().optional(),
+  }),
+  get_activities: z.object({
+    startDate: dateStringSchema.optional(),
+    endDate: dateStringSchema.optional(),
+    reservationId: z.string().optional(),
+    confirmed: z.boolean().optional(),
   }),
   search_reservations: z.object({
     query: z.string().optional(),
@@ -164,10 +216,12 @@ const toolArgSchemas: Record<string, z.ZodSchema> = {
   get_occupancy: z.object({
     startDate: dateStringSchema,
     endDate: dateStringSchema,
+    confirmed: z.boolean().optional(),
   }),
   get_revenue_report: z.object({
     startDate: dateStringSchema,
     endDate: dateStringSchema,
+    confirmed: z.boolean().optional(),
   }),
   create_hold: z.object({
     siteId: z.string().min(1, 'Site ID is required'),
@@ -439,10 +493,21 @@ export class ChatToolsService {
           departureDate: { type: 'string', description: 'Departure date (YYYY-MM-DD)' },
           guests: { type: 'number', description: 'Number of guests (optional)' },
           siteType: { type: 'string', description: 'Site type filter: rv, tent, cabin (optional)' },
+          confirmed: { type: 'boolean', description: 'Set true after confirming far-future or cross-year dates' },
         },
         required: ['arrivalDate', 'departureDate'],
       },
       guestAllowed: true,
+      preValidate: async (args) => {
+        const arrivalDate = getString(args.arrivalDate);
+        const departureDate = getString(args.departureDate);
+        const confirmed = getBoolean(args.confirmed);
+        const confirmationError = getDateConfirmationError(arrivalDate, departureDate, confirmed);
+        if (confirmationError) {
+          return { valid: false, message: confirmationError };
+        }
+        return { valid: true };
+      },
       execute: async (args, context, prisma) => {
         const arrivalDate = getString(args.arrivalDate);
         const departureDate = getString(args.departureDate);
@@ -485,6 +550,12 @@ export class ChatToolsService {
         // Filter to available sites
         const availableSites = sites.filter(s => !bookedSiteIds.has(s.id));
 
+        if (process.env.NODE_ENV === "staging") {
+          this.logger.log(
+            `check_availability summary: arrival=${arrivalDate} departure=${departureDate} guests=${guests ?? "n/a"} siteType=${siteType ?? "any"} totalSites=${sites.length} bookedSites=${bookedSiteIds.size} available=${availableSites.length}`
+          );
+        }
+
         // Calculate nights
         const arrival = new Date(arrivalDate);
         const departure = new Date(departureDate);
@@ -526,12 +597,21 @@ export class ChatToolsService {
           arrivalDate: { type: 'string', description: 'Arrival date (YYYY-MM-DD)' },
           departureDate: { type: 'string', description: 'Departure date (YYYY-MM-DD)' },
           guests: { type: 'number', description: 'Number of guests' },
+          confirmed: { type: 'boolean', description: 'Set true after confirming far-future or cross-year dates' },
         },
         required: ['siteId', 'arrivalDate', 'departureDate'],
       },
       guestAllowed: true,
       // Pre-validate site exists and resolve name to ID
       preValidate: async (args, context, prisma) => {
+        const arrivalDate = getString(args.arrivalDate);
+        const departureDate = getString(args.departureDate);
+        const confirmed = getBoolean(args.confirmed);
+        const confirmationError = getDateConfirmationError(arrivalDate, departureDate, confirmed);
+        if (confirmationError) {
+          return { valid: false, message: confirmationError };
+        }
+
         const siteId = getString(args.siteId);
         if (!siteId) {
           return { valid: false, message: 'Site ID is required.' };
@@ -1315,10 +1395,25 @@ export class ChatToolsService {
           startDate: { type: 'string', description: 'Start date (YYYY-MM-DD)' },
           endDate: { type: 'string', description: 'End date (YYYY-MM-DD)' },
           reservationId: { type: 'string', description: 'Reservation ID to get events during stay (alternative to dates)' },
+          confirmed: { type: 'boolean', description: 'Set true after confirming far-future or cross-year dates' },
         },
         required: [],
       },
       guestAllowed: true,
+      preValidate: async (args) => {
+        const reservationId = getString(args.reservationId);
+        if (reservationId) {
+          return { valid: true };
+        }
+        const startDate = getString(args.startDate);
+        const endDate = getString(args.endDate);
+        const confirmed = getBoolean(args.confirmed);
+        const confirmationError = getDateConfirmationError(startDate, endDate, confirmed);
+        if (confirmationError) {
+          return { valid: false, message: confirmationError };
+        }
+        return { valid: true };
+      },
       execute: async (args, context, prisma) => {
         let startDate: Date;
         let endDate: Date;
@@ -1665,11 +1760,22 @@ export class ChatToolsService {
         properties: {
           startDate: { type: 'string', description: 'Start date (YYYY-MM-DD)' },
           endDate: { type: 'string', description: 'End date (YYYY-MM-DD)' },
+          confirmed: { type: 'boolean', description: 'Set true after confirming far-future or cross-year dates' },
         },
         required: ['startDate', 'endDate'],
       },
       guestAllowed: false,
       staffRoles: ['owner', 'manager'],
+      preValidate: async (args) => {
+        const startDate = getString(args.startDate);
+        const endDate = getString(args.endDate);
+        const confirmed = getBoolean(args.confirmed);
+        const confirmationError = getDateConfirmationError(startDate, endDate, confirmed);
+        if (confirmationError) {
+          return { valid: false, message: confirmationError };
+        }
+        return { valid: true };
+      },
       execute: async (args, context, prisma) => {
         const startDateInput = getString(args.startDate);
         const endDateInput = getString(args.endDate);
@@ -1834,11 +1940,22 @@ export class ChatToolsService {
         properties: {
           startDate: { type: 'string', description: 'Start date (YYYY-MM-DD)' },
           endDate: { type: 'string', description: 'End date (YYYY-MM-DD)' },
+          confirmed: { type: 'boolean', description: 'Set true after confirming far-future or cross-year dates' },
         },
         required: ['startDate', 'endDate'],
       },
       guestAllowed: false,
       staffRoles: ['owner', 'manager', 'finance'],
+      preValidate: async (args) => {
+        const startDate = getString(args.startDate);
+        const endDate = getString(args.endDate);
+        const confirmed = getBoolean(args.confirmed);
+        const confirmationError = getDateConfirmationError(startDate, endDate, confirmed);
+        if (confirmationError) {
+          return { valid: false, message: confirmationError };
+        }
+        return { valid: true };
+      },
       execute: async (args, context, prisma) => {
         const startDateInput = getString(args.startDate);
         const endDateInput = getString(args.endDate);
