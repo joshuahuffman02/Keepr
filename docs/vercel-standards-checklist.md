@@ -36,10 +36,11 @@ This checklist tracks alignment with Vercel-grade monorepo standards for speed, 
 | Vercel env parity | Env documented only | Vercel env matches web `.env` needs | Platform | Phase 2 | Done | Expanded `platform/apps/web/.env.example` with required/optional keys |
 | Vercel analytics | Not enabled | Speed Insights + Analytics | Web | Phase 3 | Done | Added `@vercel/analytics` + `@vercel/speed-insights` in web root layout |
 | Sentry Next.js config | Legacy client config | instrumentation-client convention | Web | Phase 3 | Done | Added `platform/apps/web/instrumentation-client.ts` and enabled instrumentation hook |
-| Turbo remote cache | Disabled | Remote cache enabled | Platform | Phase 3 | Planned | Enable Vercel Remote Cache for faster builds |
+| Turbo remote cache | Disabled | Remote cache enabled | Platform | Phase 3 | In progress | Documented in `docs/vercel-project-settings.md`; enable in Vercel and set `TURBO_*` for local/CI |
 
 ## Next Actions
 - Trigger CI to validate typecheck + Rust jobs.
 - Decide on a unified lint/format stack.
 - Confirm Vercel project Root/Output Directory settings for the web app.
 - Apply web env variables in Vercel using `platform/apps/web/.env.example`.
+- Enable Turbo Remote Cache in Vercel and set `TURBO_TEAM`/`TURBO_TOKEN` for local caching.

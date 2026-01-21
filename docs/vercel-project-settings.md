@@ -15,3 +15,7 @@ Use these settings for the web app project in Vercel.
 ## Notes
 - The repo root `vercel.json` targets `platform/apps/web/.next` for root-based builds; the app-level `platform/apps/web/vercel.json` uses `.next`.
 - If Vercel UI settings override `vercel.json`, align them with the values above.
+
+## Turbo Remote Cache
+- Enable Turborepo Remote Cache in the Vercel project settings (Build & Development).
+- For local/CI cache usage, set `TURBO_TEAM` and `TURBO_TOKEN` (generate via `npx turbo login`).
