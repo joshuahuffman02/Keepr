@@ -606,6 +606,10 @@ export function ChatWidget({
   const shellHeightClassName = showArtifacts
     ? "h-[calc(100vh-4rem)] sm:h-[680px] 2xl:h-[760px]"
     : undefined;
+  const artifactPanelWidthClassName = "sm:w-[22rem] md:w-[24rem] lg:w-[26rem] xl:w-[28rem] 2xl:w-[30rem]";
+  const artifactPanelPaddingClassName = showArtifacts
+    ? "sm:pr-[22rem] md:pr-[24rem] lg:pr-[26rem] xl:pr-[28rem] 2xl:pr-[30rem]"
+    : undefined;
 
   const emptyState = (
     <div className="text-center py-8">
@@ -806,6 +810,7 @@ export function ChatWidget({
           containerRef={scrollContainerRef}
           onScroll={handleMessageScroll}
           onShowArtifacts={handleShowArtifacts}
+          className={artifactPanelPaddingClassName}
         />
         {showJumpToLatest && (
           <div className="pointer-events-none absolute inset-x-0 bottom-4 flex justify-center">
@@ -854,6 +859,7 @@ export function ChatWidget({
           onClose={() => setShowArtifacts(false)}
           messages={messages}
           accent={accent}
+          className={artifactPanelWidthClassName}
         />
       </div>
       <div className="p-4 border-t border-border">

@@ -30,6 +30,7 @@ type ChatArtifactPanelProps = {
   onClose: () => void;
   messages: UnifiedChatMessage[];
   accent?: ChatAccent;
+  className?: string;
 };
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -240,6 +241,7 @@ export function ChatArtifactPanel({
   onClose,
   messages,
   accent = "staff",
+  className,
 }: ChatArtifactPanelProps) {
   const artifacts = useMemo(() => toArtifacts(messages), [messages]);
   const actionHandlers = useMemo(
@@ -270,8 +272,15 @@ export function ChatArtifactPanel({
           ? "border-status-success/30"
           : "border-blue-200";
 
+  const panelWidthClassName = className ?? "sm:w-80";
+
   return (
-    <div className="absolute inset-0 sm:inset-y-0 sm:right-0 sm:left-auto w-full sm:w-80 bg-card border-t border-border sm:border-t-0 sm:border-l shadow-xl z-10 flex flex-col">
+    <div
+      className={cn(
+        "absolute inset-0 sm:inset-y-0 sm:right-0 sm:left-auto w-full bg-card border-t border-border sm:border-t-0 sm:border-l shadow-xl z-10 flex flex-col",
+        panelWidthClassName
+      )}
+    >
       <div className="flex items-center justify-between px-3 py-2 border-b border-border">
         <div className="text-sm font-semibold">Artifacts</div>
         <button

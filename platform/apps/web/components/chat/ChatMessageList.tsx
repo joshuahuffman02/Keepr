@@ -4,6 +4,7 @@ import type { ReactNode, RefObject } from "react";
 import { Fragment, useCallback, useEffect, useRef } from "react";
 import { ChatMessage } from "./ChatMessage";
 import type { ChatAccent, UnifiedChatMessage } from "./types";
+import { cn } from "@/lib/utils";
 
 const isScrollable = (element: HTMLElement) => {
   const style = window.getComputedStyle(element);
@@ -46,6 +47,7 @@ type ChatMessageListProps = {
   bottomRef?: RefObject<HTMLDivElement>;
   containerRef?: RefObject<HTMLDivElement>;
   onScroll?: () => void;
+  className?: string;
 };
 
 export function ChatMessageList({
@@ -66,6 +68,7 @@ export function ChatMessageList({
   bottomRef,
   containerRef,
   onScroll,
+  className,
 }: ChatMessageListProps) {
   const localContainerRef = useRef<HTMLDivElement>(null);
   const lastTouchYRef = useRef<number | null>(null);
@@ -186,7 +189,10 @@ export function ChatMessageList({
       onTouchEnd={handleTouchEnd}
       onTouchCancel={handleTouchEnd}
       style={{ WebkitOverflowScrolling: "touch" }}
-      className="flex-1 min-h-0 overflow-y-auto overscroll-contain touch-pan-y p-4 space-y-4"
+      className={cn(
+        "flex-1 min-h-0 overflow-y-auto overscroll-contain touch-pan-y p-4 space-y-4",
+        className
+      )}
       data-testid="chat-message-list"
     >
       {messages.length === 0 && emptyState}
