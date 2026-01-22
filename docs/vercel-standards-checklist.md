@@ -39,7 +39,7 @@ This checklist tracks alignment with Vercel-grade monorepo standards for speed, 
 | Turbo remote cache | Disabled | Remote cache enabled | Platform | Phase 3 | Done | Enabled in Vercel with `TURBO_TEAM`/`TURBO_TOKEN` set |
 
 ## Next Actions
-- Trigger CI to validate typecheck + Rust jobs.
+- CI triggered (`gh workflow run ci.yml --ref staging`), run id `21260453044` in progress.
 - Local verification complete: `pnpm typecheck`, `pnpm lint:web`, `pnpm --dir platform/apps/api test:smoke`, `pnpm --dir platform/apps/web test`, `cargo test --manifest-path platform/services/availability-rs/Cargo.toml`, `cargo test --manifest-path platform/services/payment-processor-rs/Cargo.toml`, `cargo test --manifest-path platform/services/auth-service-rs/Cargo.toml`.
 - Decide on a unified lint/format stack.
 - Confirm Vercel project Root/Output Directory settings for the web app.
