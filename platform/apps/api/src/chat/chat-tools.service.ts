@@ -86,7 +86,7 @@ const getDateConfirmationError = (
   const rangeLabel = startDate && endDate
     ? `${startDate} to ${endDate}`
     : startDate ?? endDate ?? "the requested dates";
-  return `Those dates look far in the future or cross into a different year (${rangeLabel}). Please confirm the exact dates to continue.`;
+  return `That date range looks far out (${rangeLabel}). Did you mean this upcoming weekend? If not, please confirm the exact dates (YYYY-MM-DD to YYYY-MM-DD).`;
 };
 
 const formatCurrency = (amountCents?: number) => {
