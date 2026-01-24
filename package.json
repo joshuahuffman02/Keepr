@@ -8,7 +8,7 @@
     "pnpm": "9.15.9"
   },
   "scripts": {
-    "format": "pnpm lint:fix",
+    "format": "pnpm exec prettier --write . && pnpm lint:fix",
     "api": "pnpm --dir platform/apps/api dev",
     "web": "pnpm --dir platform/apps/web dev",
     "dev": "concurrently -n api,web -c cyan,magenta \"pnpm --dir platform/apps/api dev\" \"pnpm --dir platform/apps/web dev\"",
@@ -41,6 +41,7 @@
     "@jest/test-sequencer": "^29.7.0",
     "@keepr/ralph": "workspace:*",
     "concurrently": "^8.2.2",
+    "prettier": "^3.8.1",
     "simple-git-hooks": "^2.9.0",
     "turbo": "2.5.5"
   },

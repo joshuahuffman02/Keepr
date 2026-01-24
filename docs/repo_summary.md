@@ -16,6 +16,7 @@ Keepr is a pnpm 9.15.9 workspace that pairs a NestJS API (`platform/apps/api`) w
 - SDK packages run via `pnpm --filter @keepr/sdk test` and `pnpm --filter @keepr/integrations-sdk test`.
 - OpenAPI types for the SDK are generated from `platform/apps/api/openapi.json` with `pnpm --dir platform/packages/sdk openapi:types` (ensure the API spec is current via `pnpm --dir platform/apps/api openapi:generate`).
 - `pnpm lint` runs Turbo lint plus `scripts/check-no-any-no-assert.js`; `pnpm lint:web` keeps the web-only lint flow.
+- `pnpm format` runs Prettier across the repo, then applies ESLint fixes for the web app.
 - `pnpm typecheck` runs Turbo typecheck across packages; `pnpm test` runs Turbo test for all packages with test scripts.
 - `pnpm changeset` captures release notes for `platform/packages/*`; `pnpm changeset:version` applies version bumps.
 - `pnpm smoke` runs `scripts/smoke.js` to verify Ralph scaffolding.
